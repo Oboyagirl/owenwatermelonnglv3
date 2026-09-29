@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <script>
+      (function() {
+        // Suppress Vite HMR websocket noise in preview sandbox
+        var origConsoleError = console.error;
+        console.error = function() {
+          var msg = Array.prototype.slice.call(arguments).join(' ');
+          if (msg.indexOf('[vite] failed to connect to websocket') !== -1 ||
+              msg.indexOf('WebSocket closed without opened') !== -1) {
+            return;
+          }
+          return origConsoleError.apply(console, arguments);
+        };
+        window.addEventListener('unhandledrejection', function(event) {
+          var str = '' + (event && event.reason && (event.reason.message || event.reason.stack || event.reason));
+          if (str.indexOf('WebSocket') !== -1 || str.indexOf('websocket') !== -1) {
+            event.preventDefault();
+            if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+          }
+        }, true);
+        window.addEventListener('error', function(event) {
+          var str = '' + (event && (event.message || ''));
+          if (str.indexOf('WebSocket') !== -1 || str.indexOf('websocket') !== -1) {
+            event.preventDefault();
+            if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+          }
+        }, true);
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Owen Watermelon V3</title>
+    <meta name="description" content="Unblocked games website template with built-in iframe games catalog, tab cloaker, web proxy tools, and customizable games JSON." />
+    <meta property="og:title" content="Owen Watermelon V3" />
+    <meta property="og:description" content="Unblocked games website template with built-in iframe games catalog, tab cloaker, web proxy tools, and customizable games JSON." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-[#07130c] text-slate-100 min-h-screen antialiased selection:bg-[#ff2d55]/30 selection:text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
