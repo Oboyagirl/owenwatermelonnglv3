@@ -170,7 +170,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": true,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Moto-X3M/",
+    "iframeSrc": "/g/Moto-X3M",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Moto-X3M/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Moto-X3M/",
@@ -393,7 +393,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Clash/",
+    "iframeSrc": "/g/Clash",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Clash/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Clash/",
@@ -431,7 +431,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Flappy-Bird/",
+    "iframeSrc": "/g/Flappy-Bird",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Flappy-Bird/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Flappy-Bird/",
@@ -469,7 +469,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Super-Mario-Run/",
+    "iframeSrc": "/g/Super-Mario-Run",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Super-Mario-Run/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Super-Mario-Run/",
@@ -507,7 +507,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Stumble-Guys/",
+    "iframeSrc": "/g/Stumble-Guys",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Stumble-Guys/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Stumble-Guys/",
@@ -545,7 +545,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Tower-Builder/",
+    "iframeSrc": "/g/Tower-Builder",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Tower-Builder/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Tower-Builder/",
@@ -583,7 +583,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Idle-Miners-Tycoon/",
+    "iframeSrc": "/g/Idle-Miners-Tycoon",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Idle-Miners-Tycoon/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Idle-Miners-Tycoon/",
@@ -621,7 +621,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/The-Impossible-Quiz/",
+    "iframeSrc": "/g/The-Impossible-Quiz",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/The-Impossible-Quiz/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/The-Impossible-Quiz/",
@@ -659,7 +659,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Dune-/",
+    "iframeSrc": "/g/Dune-",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Dune-/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Dune-/",
@@ -697,7 +697,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Do-Not-Open-horror-game-/",
+    "iframeSrc": "/g/Do-Not-Open-horror-game-",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Do-Not-Open-horror-game-/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Do-Not-Open-horror-game-/",
@@ -735,7 +735,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Poppy-Playtime/",
+    "iframeSrc": "/g/Poppy-Playtime",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Poppy-Playtime/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Poppy-Playtime/",
@@ -773,7 +773,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Backrooms/",
+    "iframeSrc": "/g/Backrooms",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Backrooms/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Backrooms/",
@@ -811,7 +811,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Five-Nights-at-Winstons/",
+    "iframeSrc": "/g/Five-Nights-at-Winstons",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Five-Nights-at-Winstons/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Five-Nights-at-Winstons/",
@@ -849,7 +849,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/FNAF-Browser/",
+    "iframeSrc": "/g/FNAF-Browser",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/FNAF-Browser/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/FNAF-Browser/",
@@ -887,7 +887,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Behind-The-Scenes-Backrooms-/",
+    "iframeSrc": "/g/Behind-The-Scenes-Backrooms-",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Behind-The-Scenes-Backrooms-/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Behind-The-Scenes-Backrooms-/",
@@ -925,7 +925,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Huggy-Wuggy-Horror/",
+    "iframeSrc": "/g/Huggy-Wuggy-Horror",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Huggy-Wuggy-Horror/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Huggy-Wuggy-Horror/",
@@ -963,7 +963,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/IO-games/",
+    "iframeSrc": "/g/IO-games",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/IO-games/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/IO-games/",
@@ -1001,7 +1001,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Agar-io/",
+    "iframeSrc": "/g/Agar-io",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Agar-io/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Agar-io/",
@@ -1039,7 +1039,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Tanks-io/",
+    "iframeSrc": "/g/Tanks-io",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Tanks-io/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Tanks-io/",
@@ -1077,7 +1077,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/slither-io/",
+    "iframeSrc": "/g/slither-io",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/slither-io/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/slither-io/",
@@ -1152,7 +1152,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Shell-Shockers-io/",
+    "iframeSrc": "/g/Shell-Shockers-io",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Shell-Shockers-io/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Shell-Shockers-io/",
@@ -1190,7 +1190,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Gartic-io/",
+    "iframeSrc": "/g/Gartic-io",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Gartic-io/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Gartic-io/",
@@ -1228,7 +1228,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Hole-io/",
+    "iframeSrc": "/g/Hole-io",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Hole-io/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Hole-io/",
@@ -1266,7 +1266,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Paper-io-3D/",
+    "iframeSrc": "/g/Paper-io-3D",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Paper-io-3D/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Paper-io-3D/",
@@ -1304,7 +1304,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/FlipHero-io/",
+    "iframeSrc": "/g/FlipHero-io",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/FlipHero-io/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/FlipHero-io/",
@@ -1342,7 +1342,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Eat-io/",
+    "iframeSrc": "/g/Eat-io",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Eat-io/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Eat-io/",
@@ -1380,7 +1380,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Aquapark-io/",
+    "iframeSrc": "/g/Aquapark-io",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Aquapark-io/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Aquapark-io/",
@@ -1418,7 +1418,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Biters-io/",
+    "iframeSrc": "/g/Biters-io",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Biters-io/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Biters-io/",
@@ -1456,7 +1456,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Just-fall-lol/",
+    "iframeSrc": "/g/Just-fall-lol",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Just-fall-lol/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Just-fall-lol/",
@@ -1531,7 +1531,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Fall-Boys/",
+    "iframeSrc": "/g/Fall-Boys",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Fall-Boys/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Fall-Boys/",
@@ -1569,7 +1569,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Rooftop-Sniper-2/",
+    "iframeSrc": "/g/Rooftop-Sniper-2",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Rooftop-Sniper-2/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Rooftop-Sniper-2/",
@@ -1607,7 +1607,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Rag-Doll-Games-Boxing-/",
+    "iframeSrc": "/g/Rag-Doll-Games-Boxing-",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Rag-Doll-Games-Boxing-/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Rag-Doll-Games-Boxing-/",
@@ -1645,7 +1645,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Squid-Game-2/",
+    "iframeSrc": "/g/Squid-Game-2",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Squid-Game-2/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Squid-Game-2/",
@@ -1683,7 +1683,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Stick-Slashers/",
+    "iframeSrc": "/g/Stick-Slashers",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Stick-Slashers/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Stick-Slashers/",
@@ -1721,7 +1721,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Zombs-Royale/",
+    "iframeSrc": "/g/Zombs-Royale",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Zombs-Royale/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Zombs-Royale/",
@@ -1759,7 +1759,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Basket-Bros-/",
+    "iframeSrc": "/g/Basket-Bros-",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Basket-Bros-/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Basket-Bros-/",
@@ -1797,7 +1797,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Tiny-Castle/",
+    "iframeSrc": "/g/Tiny-Castle",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Tiny-Castle/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Tiny-Castle/",
@@ -1983,7 +1983,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Bob-against-the-WORLD-/",
+    "iframeSrc": "/g/Bob-against-the-WORLD-",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Bob-against-the-WORLD-/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Bob-against-the-WORLD-/",
@@ -2021,7 +2021,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Tanks-VS-Zombies/",
+    "iframeSrc": "/g/Tanks-VS-Zombies",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Tanks-VS-Zombies/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Tanks-VS-Zombies/",
@@ -2059,7 +2059,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/3-Little-Heroes/",
+    "iframeSrc": "/g/3-Little-Heroes",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/3-Little-Heroes/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/3-Little-Heroes/",
@@ -2134,7 +2134,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Getting-over-it/",
+    "iframeSrc": "/g/Getting-over-it",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Getting-over-it/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Getting-over-it/",
@@ -2209,7 +2209,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Space-bar-clicker/",
+    "iframeSrc": "/g/Space-bar-clicker",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Space-bar-clicker/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Space-bar-clicker/",
@@ -2321,7 +2321,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Stickman-Climb-2/",
+    "iframeSrc": "/g/Stickman-Climb-2",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Stickman-Climb-2/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Stickman-Climb-2/",
@@ -2507,7 +2507,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Burning-Rubber-5-XS/",
+    "iframeSrc": "/g/Burning-Rubber-5-XS",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Burning-Rubber-5-XS/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Burning-Rubber-5-XS/",
@@ -2545,7 +2545,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/CraftMine/",
+    "iframeSrc": "/g/CraftMine",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/CraftMine/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/CraftMine/",
@@ -2583,7 +2583,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Death-Run/",
+    "iframeSrc": "/g/Death-Run",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Death-Run/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Death-Run/",
@@ -2621,7 +2621,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Baldi-39-s-Basics/",
+    "iframeSrc": "/g/Baldi-39-s-Basics",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Baldi-39-s-Basics/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Baldi-39-s-Basics/",
@@ -2659,7 +2659,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Pixel-Craft/",
+    "iframeSrc": "/g/Pixel-Craft",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Pixel-Craft/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Pixel-Craft/",
@@ -2697,7 +2697,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Fifa-2002-/",
+    "iframeSrc": "/g/Fifa-2002-",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Fifa-2002-/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Fifa-2002-/",
@@ -2735,7 +2735,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/GTA-for-Browser/",
+    "iframeSrc": "/g/GTA-for-Browser",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/GTA-for-Browser/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/GTA-for-Browser/",
@@ -2773,7 +2773,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Brawl-Stars/",
+    "iframeSrc": "/g/Brawl-Stars",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Brawl-Stars/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Brawl-Stars/",
@@ -2848,7 +2848,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Dino-Run-3/",
+    "iframeSrc": "/g/Dino-Run-3",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Dino-Run-3/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Dino-Run-3/",
@@ -2886,7 +2886,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Browser-Doom/",
+    "iframeSrc": "/g/Browser-Doom",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Browser-Doom/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Browser-Doom/",
@@ -2924,7 +2924,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Marble-Run/",
+    "iframeSrc": "/g/Marble-Run",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Marble-Run/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Marble-Run/",
@@ -2962,7 +2962,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Cube-Craft-Survival/",
+    "iframeSrc": "/g/Cube-Craft-Survival",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Cube-Craft-Survival/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Cube-Craft-Survival/",
@@ -3000,7 +3000,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Elastic-Morty/",
+    "iframeSrc": "/g/Elastic-Morty",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Elastic-Morty/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Elastic-Morty/",
@@ -3075,7 +3075,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Shards/",
+    "iframeSrc": "/g/Shards",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Shards/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Shards/",
@@ -3150,7 +3150,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Color-Road/",
+    "iframeSrc": "/g/Color-Road",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Color-Road/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Color-Road/",
@@ -3188,7 +3188,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Hover-Racer-Drive/",
+    "iframeSrc": "/g/Hover-Racer-Drive",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Hover-Racer-Drive/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Hover-Racer-Drive/",
@@ -3226,7 +3226,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Draw-Climber/",
+    "iframeSrc": "/g/Draw-Climber",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Draw-Climber/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Draw-Climber/",
@@ -3264,7 +3264,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Spiral-Roll/",
+    "iframeSrc": "/g/Spiral-Roll",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Spiral-Roll/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Spiral-Roll/",
@@ -3302,7 +3302,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Gangsters/",
+    "iframeSrc": "/g/Gangsters",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Gangsters/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Gangsters/",
@@ -3340,7 +3340,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Mine-Shooter/",
+    "iframeSrc": "/g/Mine-Shooter",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Mine-Shooter/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Mine-Shooter/",
@@ -3378,7 +3378,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/HTML5-2D-games/",
+    "iframeSrc": "/g/HTML5-2D-games",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/HTML5-2D-games/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/HTML5-2D-games/",
@@ -3416,7 +3416,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Dumb-Ways-To-Die/",
+    "iframeSrc": "/g/Dumb-Ways-To-Die",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Dumb-Ways-To-Die/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Dumb-Ways-To-Die/",
@@ -3454,7 +3454,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Bakeria/",
+    "iframeSrc": "/g/Papa-39-s-Bakeria",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Bakeria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Bakeria/",
@@ -3492,7 +3492,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Burgeria/",
+    "iframeSrc": "/g/Papa-39-s-Burgeria",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Burgeria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Burgeria/",
@@ -3530,7 +3530,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Cheeseria/",
+    "iframeSrc": "/g/Papa-39-s-Cheeseria",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Cheeseria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Cheeseria/",
@@ -3568,7 +3568,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Cupcakeria/",
+    "iframeSrc": "/g/Papa-39-s-Cupcakeria",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Cupcakeria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Cupcakeria/",
@@ -3606,7 +3606,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Donuteria/",
+    "iframeSrc": "/g/Papa-39-s-Donuteria",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Donuteria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Donuteria/",
@@ -3644,7 +3644,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Freezeria/",
+    "iframeSrc": "/g/Papa-39-s-Freezeria",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Freezeria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Freezeria/",
@@ -3682,7 +3682,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Hot-Doggeria/",
+    "iframeSrc": "/g/Papa-39-s-Hot-Doggeria",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Hot-Doggeria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Hot-Doggeria/",
@@ -3720,7 +3720,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pancakeria/",
+    "iframeSrc": "/g/Papa-39-s-Pancakeria",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pancakeria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pancakeria/",
@@ -3758,7 +3758,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pastaria/",
+    "iframeSrc": "/g/Papa-39-s-Pastaria",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pastaria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pastaria/",
@@ -3796,7 +3796,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pizzeria/",
+    "iframeSrc": "/g/Papa-39-s-Pizzeria",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pizzeria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pizzeria/",
@@ -3834,7 +3834,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Scooperia/",
+    "iframeSrc": "/g/Papa-39-s-Scooperia",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Scooperia/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Scooperia/",
@@ -3872,7 +3872,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Sushiria/",
+    "iframeSrc": "/g/Papa-39-s-Sushiria",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Sushiria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Sushiria/",
@@ -3910,7 +3910,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Taco-Mia/",
+    "iframeSrc": "/g/Papa-39-s-Taco-Mia",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Taco-Mia/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Taco-Mia/",
@@ -3948,7 +3948,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Papa-s-Bakeria/",
+    "iframeSrc": "/g/Papa-s-Bakeria",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-s-Bakeria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-s-Bakeria/",
@@ -4171,7 +4171,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Soccer-Skils/",
+    "iframeSrc": "/g/Soccer-Skils",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Soccer-Skils/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Soccer-Skils/",
@@ -4246,7 +4246,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Apple-shooter/",
+    "iframeSrc": "/g/Apple-shooter",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Apple-shooter/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Apple-shooter/",
@@ -4284,7 +4284,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Cycle-Extreme/",
+    "iframeSrc": "/g/Cycle-Extreme",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Cycle-Extreme/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Cycle-Extreme/",
@@ -4322,7 +4322,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/knife-hit/",
+    "iframeSrc": "/g/knife-hit",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/knife-hit/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/knife-hit/",
@@ -4360,7 +4360,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Mr-Fight/",
+    "iframeSrc": "/g/Mr-Fight",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Mr-Fight/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Mr-Fight/",
@@ -4398,7 +4398,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Zombie-Killer/",
+    "iframeSrc": "/g/Zombie-Killer",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Zombie-Killer/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Zombie-Killer/",
@@ -4436,7 +4436,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Room-Clicker/",
+    "iframeSrc": "/g/Room-Clicker",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Room-Clicker/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Room-Clicker/",
@@ -4511,7 +4511,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Mario/",
+    "iframeSrc": "/g/Mario",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Mario/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Mario/",
@@ -4549,7 +4549,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Pool-Ball/",
+    "iframeSrc": "/g/Pool-Ball",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Pool-Ball/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Pool-Ball/",
@@ -4587,7 +4587,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Ultimate-Bro-Workout/",
+    "iframeSrc": "/g/Ultimate-Bro-Workout",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Ultimate-Bro-Workout/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Ultimate-Bro-Workout/",
@@ -4771,7 +4771,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/sausage-run/",
+    "iframeSrc": "/g/sausage-run",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/sausage-run/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/sausage-run/",
@@ -4809,7 +4809,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Donkey-Kong/",
+    "iframeSrc": "/g/Donkey-Kong",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Donkey-Kong/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Donkey-Kong/",
@@ -4847,7 +4847,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Google-Baseball/",
+    "iframeSrc": "/g/Google-Baseball",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Google-Baseball/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Google-Baseball/",
@@ -4885,7 +4885,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/EXTREME-air-hockey/",
+    "iframeSrc": "/g/EXTREME-air-hockey",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/EXTREME-air-hockey/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/EXTREME-air-hockey/",
@@ -4923,7 +4923,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Acid-Bunny/",
+    "iframeSrc": "/g/Acid-Bunny",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Acid-Bunny/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Acid-Bunny/",
@@ -4961,7 +4961,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Acid-Bunny-2/",
+    "iframeSrc": "/g/Acid-Bunny-2",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Acid-Bunny-2/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Acid-Bunny-2/",
@@ -4999,7 +4999,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Paper-Plane/",
+    "iframeSrc": "/g/Paper-Plane",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Paper-Plane/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Paper-Plane/",
@@ -5074,7 +5074,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/How-to-get-FORTNITE-/",
+    "iframeSrc": "/g/How-to-get-FORTNITE-",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/How-to-get-FORTNITE-/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/How-to-get-FORTNITE-/",
@@ -5112,7 +5112,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Roblox/",
+    "iframeSrc": "/g/Roblox",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Roblox/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Roblox/",
@@ -5150,7 +5150,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Random-Stuff/",
+    "iframeSrc": "/g/Random-Stuff",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Random-Stuff/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Random-Stuff/",
@@ -5188,7 +5188,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/SUS/",
+    "iframeSrc": "/g/SUS",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/SUS/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/SUS/",

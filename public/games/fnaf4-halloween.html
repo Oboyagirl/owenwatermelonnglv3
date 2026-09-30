@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+  <title>Five Nights at Freddy's 4 Halloween Edition</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #game-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #MMFCanvas {
+      max-width: 100vw;
+      max-height: 100vh;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+    #loader-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, #1a0808 0%, #050101 80%, #000000 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 100;
+      transition: opacity 0.5s ease;
+    }
+    .halloween-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #ff7700;
+      text-shadow: 0 0 15px rgba(255, 119, 0, 0.6);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    .halloween-subtitle {
+      font-size: 13px;
+      color: #ffaa55;
+      margin-bottom: 24px;
+      opacity: 0.8;
+      text-align: center;
+    }
+    .progress-box {
+      width: 100%;
+      max-width: 440px;
+      background: rgba(20, 10, 10, 0.85);
+      border: 1px solid rgba(255, 119, 0, 0.35);
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+    }
+    .step-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .bar-bg {
+      width: 100%;
+      height: 10px;
+      background: #1e1313;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+    #download-bar {
+      background: linear-gradient(90deg, #ea580c, #f97316);
+      box-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
+    }
+    #extract-bar {
+      background: linear-gradient(90deg, #10b981, #34d399);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    }
+    .status-text {
+      font-size: 11px;
+      color: #94a3b8;
+      text-align: center;
+      margin-top: 4px;
+    }
+    .error-box {
+      margin-top: 14px;
+      padding: 10px;
+      background: rgba(220, 38, 38, 0.2);
+      border: 1px solid #ef4444;
+      border-radius: 8px;
+      font-size: 11px;
+      color: #fca5a5;
+      display: none;
+      text-align: center;
+    }
+    .btn-retry {
+      margin-top: 8px;
+      padding: 6px 14px;
+      background: #ea580c;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="MMFCanvas" width="1280" height="720">Your browser does not support Canvas.</canvas>
+
+    <div id="loader-overlay">
+      <div class="halloween-title">🎃 FNAF 4: Halloween Edition 🎃</div>
+      <div class="halloween-subtitle">Unblocked iPad Fast Loader</div>
+
+      <div class="progress-box">
+        <div class="step-label">
+          <span>Downloading Game Parts</span>
+          <span id="dl-percent">0%</span>
+        </div>
+        <div class="bar-bg">
+          <div id="download-bar" class="bar-fill"></div>
+        </div>
+
+        <div class="step-label">
+          <span>Extracting Sounds & Textures</span>
+          <span id="ex-percent">0%</span>
+        </div>
+        <div class="bar-bg">
+          <div id="extract-bar" class="bar-fill"></div>
+        </div>
+
+        <div id="status-text" class="status-text">Connecting to unblocked archive mirror...</div>
+        <div id="error-box" class="error-box"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const BASE_URL = 'https://freeonlinewebtools.github.io/gamelist6.github.io/Five-Nights-at-Freddys-4-Halloween/';
+      const TOTAL_PARTS = 19;
+      const assetMap = new Map();
+      const statusEl = document.getElementById('status-text');
+      const dlBar = document.getElementById('download-bar');
+      const dlPercent = document.getElementById('dl-percent');
+      const exBar = document.getElementById('extract-bar');
+      const exPercent = document.getElementById('ex-percent');
+      const errorBox = document.getElementById('error-box');
+      const overlay = document.getElementById('loader-overlay');
+
+      function updateDl(pct, msg) {
+        dlBar.style.width = pct + '%';
+        dlPercent.innerText = pct + '%';
+        if (msg) statusEl.innerText = msg;
+      }
+
+      function updateEx(pct, msg) {
+        exBar.style.width = pct + '%';
+        exPercent.innerText = pct + '%';
+        if (msg) statusEl.innerText = msg;
+      }
+
+      function showError(msg) {
+        errorBox.style.display = 'block';
+        errorBox.innerHTML = `<div>${msg}</div><button class="btn-retry" onclick="location.reload()">Retry Loading</button>`;
+      }
+
+      // Intercept resource requests to point to object URLs
+      function installInterceptors() {
+        const ogFetch = window.fetch;
+        window.fetch = async function(input, init) {
+          if (typeof input === 'string' && input.includes('resources/')) {
+            const fileName = input.split('/').pop().split('?')[0];
+            if (assetMap.has(fileName)) {
+              return ogFetch(assetMap.get(fileName), init);
+            }
+          }
+          return ogFetch(input, init);
+        };
+
+        const ogOpen = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function(method, url) {
+          if (typeof url === 'string' && url.includes('resources/')) {
+            const fileName = url.split('/').pop().split('?')[0];
+            if (assetMap.has(fileName)) {
+              url = assetMap.get(fileName);
+            }
+          }
+          return ogOpen.apply(this, arguments);
+        };
+
+        const mediaTags = [HTMLImageElement, HTMLAudioElement, HTMLVideoElement];
+        for (const Tag of mediaTags) {
+          const desc = Object.getOwnPropertyDescriptor(Tag.prototype, 'src');
+          if (desc && desc.set) {
+            Object.defineProperty(Tag.prototype, 'src', {
+              configurable: true,
+              enumerable: true,
+              get: desc.get,
+              set: function(val) {
+                if (typeof val === 'string' && val.includes('resources/')) {
+                  const fileName = val.split('/').pop().split('?')[0];
+                  if (assetMap.has(fileName)) {
+                    val = assetMap.get(fileName);
+                  }
+                }
+                desc.set.call(this, val);
+              }
+            });
+          }
+        }
+      }
+
+      async function fetchPartWithRetry(partNum, retries = 3) {
+        const url = `${BASE_URL}resources.zip.part${partNum}`;
+        for (let attempt = 0; attempt < retries; attempt++) {
+          try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return await res.arrayBuffer();
+          } catch (e) {
+            if (attempt === retries - 1) throw e;
+            await new Promise(r => setTimeout(r, 1000));
+          }
+        }
+      }
+
+      async function startLoading() {
+        try {
+          updateDl(5, 'Downloading package chunks (1 / 19)...');
+          const buffers = [];
+
+          // Download parts in parallel batches of 3 to balance iPad RAM and network speed
+          const batchSize = 3;
+          let completed = 0;
+
+          for (let i = 1; i <= TOTAL_PARTS; i += batchSize) {
+            const batch = [];
+            for (let j = i; j < i + batchSize && j <= TOTAL_PARTS; j++) {
+              batch.push((async (partIndex) => {
+                const buf = await fetchPartWithRetry(partIndex);
+                completed++;
+                const pct = Math.floor((completed / TOTAL_PARTS) * 100);
+                updateDl(pct, `Downloaded ${completed} of ${TOTAL_PARTS} pieces...`);
+                return { index: partIndex, buf };
+              })(j));
+            }
+            const results = await Promise.all(batch);
+            for (const item of results) {
+              buffers[item.index - 1] = item.buf;
+            }
+          }
+
+          updateDl(100, 'All parts downloaded! Merging archive...');
+          await new Promise(r => setTimeout(r, 100));
+
+          // Combine buffers into unified blob
+          const combinedBlob = new Blob(buffers, { type: 'application/zip' });
+          buffers.length = 0; // release RAM for iPadOS
+
+          updateEx(10, 'Opening Halloween assets ZIP...');
+          const zip = await JSZip.loadAsync(combinedBlob);
+          const fileKeys = Object.keys(zip.files).filter(k => !zip.files[k].dir);
+          const totalFiles = fileKeys.length;
+
+          updateEx(20, `Unpacking ${totalFiles} game files...`);
+          let extractedCount = 0;
+
+          for (let i = 0; i < totalFiles; i++) {
+            const fileName = fileKeys[i];
+            const fileObj = zip.files[fileName];
+            const blob = await fileObj.async('blob');
+            const objectUrl = URL.createObjectURL(blob);
+            // Index both with and without path
+            assetMap.set(fileName, objectUrl);
+            const baseName = fileName.split('/').pop();
+            if (baseName !== fileName) {
+              assetMap.set(baseName, objectUrl);
+            }
+            extractedCount++;
+            if (extractedCount % 10 === 0 || extractedCount === totalFiles) {
+              const pct = 20 + Math.floor((extractedCount / totalFiles) * 75);
+              updateEx(pct, `Extracted ${extractedCount} of ${totalFiles} assets...`);
+            }
+          }
+
+          updateEx(98, 'Initializing game engine...');
+          installInterceptors();
+
+          // Load Runtime.js
+          const script = document.createElement('script');
+          script.src = `${BASE_URL}Runtime.js`;
+          script.onload = () => {
+            updateEx(100, 'Starting Five Nights at Freddy\'s 4 Halloween...');
+            setTimeout(() => {
+              try {
+                new Runtime("MMFCanvas", "resources/Fnaf-4-halloween.cch");
+                overlay.style.opacity = '0';
+                setTimeout(() => { overlay.style.display = 'none'; }, 500);
+              } catch (err) {
+                console.error("Runtime initialization error:", err);
+                overlay.style.display = 'none';
+              }
+            }, 300);
+          };
+          script.onerror = () => {
+            showError('Could not load game engine Runtime.js');
+          };
+          document.head.appendChild(script);
+
+        } catch (err) {
+          console.error('Loading failed:', err);
+          showError(`Loading error: ${err.message}. Please check your connection and tap Retry.`);
+        }
+      }
+
+      startLoading();
+    })();
+  </script>
+</body>
+</html>

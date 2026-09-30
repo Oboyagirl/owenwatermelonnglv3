@@ -8,6 +8,71 @@ async function startServer() {
   const app = express();
   const PORT = Number(process.env.PORT) || 3000;
 
+  // Direct Game Play-Shell Runner - Unblocks games for school iPads by piping play-shells and resolving assets via jsDelivr CDN
+  app.get('/g/:slug', (req, res) => {
+    const slug = req.params.slug;
+    const lowerSlug = slug.toLowerCase();
+
+    // Direct redirect for games with special local runners
+    if (lowerSlug.includes('halloween') && lowerSlug.includes('fnaf')) {
+      return res.redirect('/games/fnaf4-halloween.html');
+    }
+
+    // Try ubghyper play shell first
+    const playShellUrl = `https://ubghyper.github.io/g/${encodeURIComponent(slug)}/`;
+    https.get(playShellUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+      }
+    }, (proxyRes) => {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+      res.removeHeader('X-Frame-Options');
+      res.removeHeader('Content-Security-Policy');
+
+      if (proxyRes.statusCode === 200) {
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        let body = '';
+        proxyRes.setEncoding('utf-8');
+        proxyRes.on('data', chunk => { body += chunk; });
+        proxyRes.on('end', () => {
+          let modified = body.replace(/<meta[^>]*http-equiv=["']?Content-Security-Policy["']?[^>]*>/gi, '');
+          res.send(modified);
+        });
+      } else {
+        // Fallback to direct shard with jsDelivr CDN base tag
+        const cdnBase = `https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@9aa2f58b44aae1f82fb25a1ed8a43293eac3d5cc/${slug}/`;
+        const directUrl = `https://ubghyper.github.io/GameList.github.io/${slug}/`;
+        
+        https.get(directUrl, (directRes) => {
+          if (directRes.statusCode && directRes.statusCode >= 200 && directRes.statusCode < 400) {
+            res.setHeader('Content-Type', 'text/html; charset=utf-8');
+            let body = '';
+            directRes.setEncoding('utf-8');
+            directRes.on('data', chunk => { body += chunk; });
+            directRes.on('end', () => {
+              const baseTag = `<base href="${cdnBase}">`;
+              let modified = body.replace(/<meta[^>]*http-equiv=["']?Content-Security-Policy["']?[^>]*>/gi, '');
+              if (/<head[^>]*>/i.test(modified)) {
+                modified = modified.replace(/(<head[^>]*>)/i, `$1\n${baseTag}`);
+              } else {
+                modified = baseTag + modified;
+              }
+              res.send(modified);
+            });
+          } else {
+            // Forward to general proxy
+            res.redirect(`/api/proxy?url=${encodeURIComponent(directUrl)}`);
+          }
+        }).on('error', () => {
+          res.redirect(`/api/proxy?url=${encodeURIComponent(directUrl)}`);
+        });
+      }
+    }).on('error', (err) => {
+      res.status(502).send('Error loading play-shell: ' + err.message);
+    });
+  });
+
   // Unblock Proxy Endpoint - Routes external games through server so school filters (Securly, GoGuardian) cannot block them
   app.get('/api/proxy', (req, res) => {
     let targetUrl = req.query.url as string;
@@ -56,8 +121,16 @@ async function startServer() {
             body += chunk;
           });
           proxyRes.on('end', () => {
-            // Inject base tag right after head to resolve relative assets and strip any meta CSP
-            const baseTag = `<base href="${targetUrl}">`;
+            // If target belongs to ubghyper, resolve relative assets via jsDelivr CDN to bypass school filters
+            let baseHref = targetUrl;
+            if (targetUrl.includes('ubghyper.github.io/GameList.github.io/')) {
+              const gameMatch = targetUrl.match(/GameList\.github\.io\/([^/]+)/);
+              if (gameMatch && gameMatch[1]) {
+                baseHref = `https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@9aa2f58b44aae1f82fb25a1ed8a43293eac3d5cc/${gameMatch[1]}/`;
+              }
+            }
+
+            const baseTag = `<base href="${baseHref}">`;
             let modified = body.replace(/<meta[^>]*http-equiv=["']?Content-Security-Policy["']?[^>]*>/gi, '');
             if (/<head[^>]*>/i.test(modified)) {
               modified = modified.replace(/(<head[^>]*>)/i, `$1\n${baseTag}`);
