@@ -56,9 +56,9 @@ async function startServer() {
             body += chunk;
           });
           proxyRes.on('end', () => {
-            // Inject base tag right after head to resolve relative assets
+            // Inject base tag right after head to resolve relative assets and strip any meta CSP
             const baseTag = `<base href="${targetUrl}">`;
-            let modified = body;
+            let modified = body.replace(/<meta[^>]*http-equiv=["']?Content-Security-Policy["']?[^>]*>/gi, '');
             if (/<head[^>]*>/i.test(modified)) {
               modified = modified.replace(/(<head[^>]*>)/i, `$1\n${baseTag}`);
             } else {

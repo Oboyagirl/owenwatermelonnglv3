@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Game } from '../types/game';
 import { DEFAULT_GAMES } from '../data/defaultGames';
 
-const STORAGE_KEY = 'owen_watermelon_v3_games_v26';
+const STORAGE_KEY = 'owen_watermelon_v3_games_v27';
 const FAVORITES_KEY = 'owen_watermelon_v3_favorites';
 
 export function resolveAssetUrl(url: string): string {

@@ -12,7 +12,7 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Basket-Random/basketrandom.jpg",
     banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Basket-Random/splash.jpeg",
     mirrors: [
-      "https://ubghyper.github.io/GameList.github.io/Basket-Random/",
+      "https://basket-random.pages.dev/",
       "https://html5.gamedistribution.com/bf1268dccb5d43e7970bb3edaa54afc8/"
     ],
     tags: ["Basketball", "2 Player", "Ragdoll", "Sports", "Multiplayer", "Unblocked"],
@@ -20,8 +20,8 @@ const CURATED_GAMES: Game[] = [
     plays: 95400,
     author: "RHM Interactive",
     featured: true,
-    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Basket-Random/",
-    iframeCode: `<iframe src="https://ubghyper.github.io/GameList.github.io/Basket-Random/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeSrc: "https://basket-random.pages.dev/",
+    iframeCode: `<iframe src="https://basket-random.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
     controls: [
       { key: "W", action: "Player 1 Jump & Shoot" },
       { key: "Up Arrow", action: "Player 2 Jump & Shoot" }
@@ -36,15 +36,16 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Retro-Bowl/retrobowl.jpg",
     banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Retro-Bowl/html5game/splash.png",
     mirrors: [
-      "https://ubghyper.github.io/GameList.github.io/Retro-Bowl/"
+      "https://retro--bowl.pages.dev/",
+      "games/retro-bowl/html5game/index.html"
     ],
     tags: ["Football", "Sports", "Pixel", "NFL", "Retro Bowl", "Unblocked"],
     rating: 4.9,
     plays: 128920,
     author: "New Star Games",
     featured: true,
-    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Retro-Bowl/",
-    iframeCode: `<iframe src="https://ubghyper.github.io/GameList.github.io/Retro-Bowl/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeSrc: "https://retro--bowl.pages.dev/",
+    iframeCode: `<iframe src="https://retro--bowl.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
     controls: [
       { key: "Mouse Drag & Release", action: "Pass & Aim Football" },
       { key: "W / S or Up / Down", action: "Dodge Tackles & Stiff Arm" },
@@ -60,15 +61,15 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Drive-Mad/logo.jpg",
     banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Drive-Mad/webapp/cover.jpg",
     mirrors: [
-      "https://ubghyper.github.io/GameList.github.io/Drive-Mad/"
+      "https://drive-mad.pages.dev/"
     ],
     tags: ["Racing", "Physics", "Truck", "Driving", "Popular", "Unblocked"],
     rating: 4.9,
     plays: 114400,
     author: "Martin Magni",
     featured: true,
-    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Drive-Mad/",
-    iframeCode: `<iframe src="https://ubghyper.github.io/GameList.github.io/Drive-Mad/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeSrc: "https://drive-mad.pages.dev/",
+    iframeCode: `<iframe src="https://drive-mad.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
     controls: [
       { key: "W / D or Up / Right", action: "Drive Forward / Steer" },
       { key: "S / A or Down / Left", action: "Brake / Reverse" }
@@ -83,15 +84,15 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Slope/slope.jpg",
     banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Slope/slope.jpg",
     mirrors: [
-      "https://ubghyper.github.io/GameList.github.io/Slope/"
+      "https://slope.pages.dev/"
     ],
     tags: ["3D", "Runner", "Reflex", "Neon", "Arcade", "Unblocked"],
     rating: 4.9,
     plays: 165200,
     author: "Rob Kay",
     featured: true,
-    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Slope/",
-    iframeCode: `<iframe src="https://ubghyper.github.io/GameList.github.io/Slope/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeSrc: "https://slope.pages.dev/",
+    iframeCode: `<iframe src="https://slope.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
     controls: [
       { key: "A / D or ← / →", action: "Steer Ball Left & Right" }
     ]
@@ -105,15 +106,16 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/FNAF-1/FNAF-1.png",
     banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/FNAF-1/FNAF-1.png",
     mirrors: [
-      "https://sussygamedeveloper.github.io/FNAF1/"
+      "https://freeonlinewebtools.github.io/gamelist8.github.io/FNAF-1/",
+      "https://fnaf.pages.dev/"
     ],
     tags: ["Horror", "Survival", "FNAF", "Strategy", "Classic", "Unblocked"],
     rating: 4.9,
     plays: 142500,
     author: "Scott Cawthon",
     featured: true,
-    iframeSrc: "https://sussygamedeveloper.github.io/FNAF1/",
-    iframeCode: `<iframe src="https://sussygamedeveloper.github.io/FNAF1/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeSrc: "https://freeonlinewebtools.github.io/gamelist8.github.io/FNAF-1/",
+    iframeCode: `<iframe src="https://freeonlinewebtools.github.io/gamelist8.github.io/FNAF-1/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
     controls: [
       { key: "Mouse Move", action: "Pan Office Left & Right" },
       { key: "Mouse Hover Bottom", action: "Open Surveillance Monitor" },
@@ -128,20 +130,152 @@ const CURATED_GAMES: Game[] = [
     category: "Action",
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/FNAF-1/FNAF-1.png",
     mirrors: [
-      "https://sussygamedeveloper.github.io/FNAF2/",
-      "https://sussygamedeveloper.github.io/FNAF1/"
+      "https://freeonlinewebtools.github.io/gamelist8.github.io/FNAF-2/"
     ],
     tags: ["Horror", "FNAF", "Survival", "Strategy"],
     rating: 4.9,
     plays: 98100,
     author: "Scott Cawthon",
     featured: false,
-    iframeSrc: "https://sussygamedeveloper.github.io/FNAF2/",
-    iframeCode: `<iframe src="https://sussygamedeveloper.github.io/FNAF2/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeSrc: "https://freeonlinewebtools.github.io/gamelist8.github.io/FNAF-2/",
+    iframeCode: `<iframe src="https://freeonlinewebtools.github.io/gamelist8.github.io/FNAF-2/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
     controls: [
       { key: "Mouse Hover", action: "Pan Office" },
       { key: "Space / Ctrl", action: "Flashlight" },
       { key: "Bottom Hover", action: "Wear Mask / Monitor" }
+    ]
+  },
+  {
+    id: "fnaf-3",
+    source: "unblocked",
+    title: "Five Nights at Freddy's 3",
+    description: "Thirty years after Freddy Fazbear's Pizza closed its doors, the events that took place there have become nothing more than a rumor.",
+    category: "Action",
+    thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/FNAF-1/FNAF-1.png",
+    mirrors: [
+      "https://freeonlinewebtools.github.io/gamelist8.github.io/FNAF-3/"
+    ],
+    tags: ["Horror", "FNAF", "Survival", "Strategy"],
+    rating: 4.8,
+    plays: 87400,
+    author: "Scott Cawthon",
+    featured: false,
+    iframeSrc: "https://freeonlinewebtools.github.io/gamelist8.github.io/FNAF-3/",
+    iframeCode: `<iframe src="https://freeonlinewebtools.github.io/gamelist8.github.io/FNAF-3/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    controls: [
+      { key: "Mouse Hover", action: "Pan Office" },
+      { key: "Monitor / Reboot", action: "Fix Ventilation & Audio" }
+    ]
+  },
+  {
+    id: "fnaf-4",
+    source: "unblocked",
+    title: "Five Nights at Freddy's 4",
+    description: "The fear has followed you home! Defend yourself against Freddy Fazbear, Chica, Bonnie, Foxy, and even worse things lurking in the shadows.",
+    category: "Action",
+    thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/FNAF-1/FNAF-1.png",
+    mirrors: [
+      "https://freeonlinewebtools.github.io/gamelist6.github.io/FNAF-4/"
+    ],
+    tags: ["Horror", "FNAF", "Survival", "Strategy"],
+    rating: 4.8,
+    plays: 91200,
+    author: "Scott Cawthon",
+    featured: false,
+    iframeSrc: "https://freeonlinewebtools.github.io/gamelist6.github.io/FNAF-4/",
+    iframeCode: `<iframe src="https://freeonlinewebtools.github.io/gamelist6.github.io/FNAF-4/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    controls: [
+      { key: "Mouse Hover", action: "Move to Doors / Bed / Closet" },
+      { key: "Ctrl / Space", action: "Flashlight" },
+      { key: "Shift", action: "Hold Door Shut" }
+    ]
+  },
+  {
+    id: "kindergarten",
+    source: "unblocked",
+    title: "Kindergarten",
+    description: "An abstract puzzle adventure game! You play as a student in a school that is a little bit... off. Figure out how to survive the day!",
+    category: "Adventure",
+    thumbnail: "https://freeonlinewebtools.github.io/gamelist6.github.io/Kindergarten/Kindergarten.png",
+    mirrors: [
+      "https://freeonlinewebtools.github.io/gamelist6.github.io/Kindergarten/"
+    ],
+    tags: ["Horror", "Puzzle", "Adventure", "Kindergarten", "Unblocked"],
+    rating: 4.9,
+    plays: 86400,
+    author: "Con Man Games & SmashGames",
+    featured: true,
+    iframeSrc: "https://freeonlinewebtools.github.io/gamelist6.github.io/Kindergarten/",
+    iframeCode: `<iframe src="https://freeonlinewebtools.github.io/gamelist6.github.io/Kindergarten/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    controls: [
+      { key: "WASD / Arrow Keys", action: "Move Student" },
+      { key: "E / Space", action: "Interact / Talk" }
+    ]
+  },
+  {
+    id: "kindergarten-2",
+    source: "unblocked",
+    title: "Kindergarten 2",
+    description: "Welcome to a whole new Tuesday at a new school! Solve intricate mysteries, help classmates, and avoid trouble with the teachers.",
+    category: "Adventure",
+    thumbnail: "https://freeonlinewebtools.github.io/gamelist8.github.io/Kindergarten-2/Kindergarten-2.png",
+    mirrors: [
+      "https://freeonlinewebtools.github.io/gamelist8.github.io/Kindergarten-2/"
+    ],
+    tags: ["Horror", "Puzzle", "Adventure", "Kindergarten", "Unblocked"],
+    rating: 4.9,
+    plays: 89300,
+    author: "Con Man Games & SmashGames",
+    featured: true,
+    iframeSrc: "https://freeonlinewebtools.github.io/gamelist8.github.io/Kindergarten-2/",
+    iframeCode: `<iframe src="https://freeonlinewebtools.github.io/gamelist8.github.io/Kindergarten-2/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    controls: [
+      { key: "WASD / Arrow Keys", action: "Move Student" },
+      { key: "E / Space", action: "Interact / Talk" }
+    ]
+  },
+  {
+    id: "kindergarten3port",
+    source: "unblocked",
+    title: "Kindergarten 3 (Port)",
+    description: "The third chapter of the beloved Kindergarten mystery adventure! Navigate class schedules, talk to classmates, and collect items.",
+    category: "Adventure",
+    thumbnail: "https://freeonlinewebtools.github.io/gamelist7.github.io/Kindergarten3Port/Kindergarten3Port.png",
+    mirrors: [
+      "https://freeonlinewebtools.github.io/gamelist7.github.io/Kindergarten3Port/"
+    ],
+    tags: ["Horror", "Puzzle", "Adventure", "Kindergarten", "Unblocked"],
+    rating: 4.9,
+    plays: 94200,
+    author: "Con Man Games & SmashGames",
+    featured: true,
+    iframeSrc: "https://freeonlinewebtools.github.io/gamelist7.github.io/Kindergarten3Port/",
+    iframeCode: `<iframe src="https://freeonlinewebtools.github.io/gamelist7.github.io/Kindergarten3Port/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    controls: [
+      { key: "WASD / Arrow Keys", action: "Move Student" },
+      { key: "E / Space", action: "Interact / Talk" }
+    ]
+  },
+  {
+    id: "friday-night-funkin-lullaby",
+    source: "unblocked",
+    title: "Friday Night Funkin: Lullaby",
+    description: "High-energy rhythm game featuring intense spooky tracks! Hit the rhythm arrows in time with the music to out-sing your opponent.",
+    category: "Music",
+    thumbnail: "https://freeonlinewebtools.github.io/gamelist7.github.io/Friday-Night-Funkin-Lullaby/Friday-Night-Funkin-Lullaby.png",
+    mirrors: [
+      "https://freeonlinewebtools.github.io/gamelist7.github.io/Friday-Night-Funkin-Lullaby/"
+    ],
+    tags: ["FNF", "Rhythm", "Music", "Spooky", "Unblocked"],
+    rating: 4.9,
+    plays: 104500,
+    author: "Banbuds & Team",
+    featured: true,
+    iframeSrc: "https://freeonlinewebtools.github.io/gamelist7.github.io/Friday-Night-Funkin-Lullaby/",
+    iframeCode: `<iframe src="https://freeonlinewebtools.github.io/gamelist7.github.io/Friday-Night-Funkin-Lullaby/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    controls: [
+      { key: "DFJK / Arrow Keys", action: "Hit Rhythm Notes" },
+      { key: "Space", action: "Special Note Action" }
     ]
   },
   {
@@ -153,17 +287,39 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Cookie-Clicker/cookie.png",
     banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Cookie-Clicker/cookie.png",
     mirrors: [
-      "https://ubghyper.github.io/GameList.github.io/Cookie-Clicker/"
+      "https://cookie-clicker.pages.dev/"
     ],
     tags: ["Clicker", "Idle", "Casual", "Addictive", "Unblocked"],
     rating: 4.9,
     plays: 135000,
     author: "Orteil",
     featured: true,
-    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Cookie-Clicker/",
-    iframeCode: `<iframe src="https://ubghyper.github.io/GameList.github.io/Cookie-Clicker/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+    iframeSrc: "https://cookie-clicker.pages.dev/",
+    iframeCode: `<iframe src="https://cookie-clicker.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
     controls: [
       { key: "Mouse Click", action: "Click the Big Cookie & Buy Upgrades" }
+    ]
+  },
+  {
+    id: "subway-surfers",
+    source: "unblocked",
+    title: "Subway Surfers",
+    description: "Dash as fast as you can through subway tracks, dodge trains, jump over barriers, and surf on hoverboards in the world-famous endless runner!",
+    category: "Racing",
+    thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Subway-Surfers/thumb.png",
+    mirrors: [
+      "https://subway-surfers.pages.dev/"
+    ],
+    tags: ["Runner", "Endless", "Surfer", "Popular", "Unblocked"],
+    rating: 4.9,
+    plays: 198000,
+    author: "SYBO & Kiloo",
+    featured: true,
+    iframeSrc: "https://subway-surfers.pages.dev/",
+    iframeCode: `<iframe src="https://subway-surfers.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    controls: [
+      { key: "WASD / Arrow Keys", action: "Dodge, Jump & Slide" },
+      { key: "Space", action: "Activate Hoverboard" }
     ]
   },
   {
@@ -174,13 +330,16 @@ const CURATED_GAMES: Game[] = [
     category: "Casual",
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Monkey-Mart/logo.png",
     banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Monkey-Mart/logo.png",
-    tags: ["Management", "Sim", "Monkey", "Cute", "Shop"],
+    mirrors: [
+      "https://monkey-mart.pages.dev/"
+    ],
+    tags: ["Management", "Sim", "Monkey", "Cute", "Shop", "Unblocked"],
     rating: 4.9,
     plays: 126000,
     author: "TinyDobbins",
     featured: true,
-    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Monkey-Mart/",
-    iframeCode: `<iframe src="https://ubghyper.github.io/GameList.github.io/Monkey-Mart/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+    iframeSrc: "https://monkey-mart.pages.dev/",
+    iframeCode: `<iframe src="https://monkey-mart.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
     controls: [
       { key: "WASD / Arrow Keys", action: "Move Monkey Manager" }
     ]
@@ -193,15 +352,15 @@ const CURATED_GAMES: Game[] = [
     category: "Racing",
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Snow-Rider-3D/snow-rider-3d.jpg",
     mirrors: [
-      "https://ubghyper.github.io/GameList.github.io/Snow-Rider-3D/"
+      "https://snow-rider-3d.pages.dev/"
     ],
     tags: ["Sled", "Winter", "3D", "Runner", "Racing", "Unblocked"],
     rating: 4.8,
     plays: 148525,
     author: "Ashima Prabhakar",
     featured: true,
-    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Snow-Rider-3D/",
-    iframeCode: `<iframe src="https://ubghyper.github.io/GameList.github.io/Snow-Rider-3D/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeSrc: "https://snow-rider-3d.pages.dev/",
+    iframeCode: `<iframe src="https://snow-rider-3d.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
     controls: [
       { key: "A / D or ← / →", action: "Steer Sled Left & Right" },
       { key: "Space or W", action: "Jump Over Chasms" }
@@ -216,15 +375,16 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Drift-Boss/drift-boss.png",
     banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Drift-Boss/drift-boss.png",
     mirrors: [
-      "https://ubghyper.github.io/GameList.github.io/Drift-Boss/"
+      "https://www.mathplayground.com/drift-boss-v3/index.html",
+      "https://html5.gamedistribution.com/0a8b51e5eaee42e7b4db83ca00afc92e/"
     ],
     tags: ["Drifting", "One Button", "Cars", "Casual", "Unblocked"],
     rating: 4.8,
     plays: 92300,
     author: "MarketJS",
     featured: false,
-    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Drift-Boss/",
-    iframeCode: `<iframe src="https://ubghyper.github.io/GameList.github.io/Drift-Boss/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+    iframeSrc: "https://www.mathplayground.com/drift-boss-v3/index.html",
+    iframeCode: `<iframe src="https://www.mathplayground.com/drift-boss-v3/index.html" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
     controls: [
       { key: "Space / Click / Hold", action: "Drift Right (Release to go Straight)" }
     ]
@@ -237,15 +397,15 @@ const CURATED_GAMES: Game[] = [
     category: "Sports",
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Basketball-Stars/assets/images/basketball-stars.png",
     mirrors: [
-      "https://ubghyper.github.io/GameList.github.io/Basketball-Stars/"
+      "https://html5.gamedistribution.com/69d78d071f704fa183d75b4114ae40ec/"
     ],
     tags: ["Basketball", "Sports", "2 Player", "Multiplayer", "Unblocked"],
     rating: 4.8,
     plays: 104000,
     author: "Madpuffers",
     featured: false,
-    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Basketball-Stars/",
-    iframeCode: `<iframe src="https://ubghyper.github.io/GameList.github.io/Basketball-Stars/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeSrc: "https://html5.gamedistribution.com/69d78d071f704fa183d75b4114ae40ec/",
+    iframeCode: `<iframe src="https://html5.gamedistribution.com/69d78d071f704fa183d75b4114ae40ec/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
     controls: [
       { key: "WASD", action: "Player 1 Move / Jump / Steal" },
       { key: "Arrow Keys", action: "Player 2 Move / Jump / Steal" }
@@ -259,15 +419,15 @@ const CURATED_GAMES: Game[] = [
     category: "Racing",
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Moto3XM/moto3xm.png",
     mirrors: [
-      "https://ubghyper.github.io/GameList.github.io/Moto3XM/"
+      "https://moto-x3m.pages.dev/"
     ],
     tags: ["Motorcycle", "Stunt", "Racing", "Physics", "Unblocked"],
     rating: 4.9,
     plays: 132000,
     author: "Madpuffers",
     featured: true,
-    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Moto3XM/",
-    iframeCode: `<iframe src="https://ubghyper.github.io/GameList.github.io/Moto3XM/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeSrc: "https://moto-x3m.pages.dev/",
+    iframeCode: `<iframe src="https://moto-x3m.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
     controls: [
       { key: "↑ / W", action: "Accelerate Gas" },
       { key: "↓ / S", action: "Brake / Reverse" },
@@ -282,17 +442,40 @@ const CURATED_GAMES: Game[] = [
     category: "Arcade",
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Crossy-Road/crossyroad.png",
     mirrors: [
-      "https://ubghyper.github.io/GameList.github.io/Crossy-Road/"
+      "https://crossy-road.pages.dev/"
     ],
     tags: ["Voxel", "Runner", "Casual", "Crossy", "Unblocked"],
     rating: 4.9,
     plays: 118000,
     author: "Hipster Whale",
     featured: true,
-    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Crossy-Road/",
-    iframeCode: `<iframe src="https://ubghyper.github.io/GameList.github.io/Crossy-Road/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+    iframeSrc: "https://crossy-road.pages.dev/",
+    iframeCode: `<iframe src="https://crossy-road.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
     controls: [
       { key: "Arrow Keys / WASD", action: "Hop Forward, Left, Right & Back" }
+    ]
+  },
+  {
+    id: "1v1-lol",
+    source: "unblocked",
+    title: "1v1.LOL",
+    description: "Fast-paced third-person building and shooting combat simulator. Practice your ramps, 90s, and shotgun duels in online arena matches.",
+    category: "Action",
+    thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/1v1-LOL/1v1lol.png",
+    mirrors: [
+      "https://1v1-lol.pages.dev/"
+    ],
+    tags: ["Action", "Shooter", "Building", "Multiplayer", "Unblocked"],
+    rating: 4.8,
+    plays: 167000,
+    author: "JustPlay.LOL",
+    featured: true,
+    iframeSrc: "https://1v1-lol.pages.dev/",
+    iframeCode: `<iframe src="https://1v1-lol.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    controls: [
+      { key: "WASD", action: "Move & Strafe" },
+      { key: "Left Click", action: "Shoot / Build" },
+      { key: "Z / X / C / V", action: "Wall / Floor / Stairs / Roof" }
     ]
   },
   {
@@ -303,15 +486,15 @@ const CURATED_GAMES: Game[] = [
     category: "Casual",
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Tiny-Fishing/tinyfishing.png",
     mirrors: [
-      "https://ubghyper.github.io/GameList.github.io/Tiny-Fishing/"
+      "https://tiny-fishing.pages.dev/"
     ],
     tags: ["Fishing", "Idle", "Casual", "Upgrade", "Unblocked"],
     rating: 4.8,
     plays: 87500,
     author: "Madpuffers",
     featured: false,
-    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Tiny-Fishing/",
-    iframeCode: `<iframe src="https://ubghyper.github.io/GameList.github.io/Tiny-Fishing/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+    iframeSrc: "https://tiny-fishing.pages.dev/",
+    iframeCode: `<iframe src="https://tiny-fishing.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
     controls: [
       { key: "Mouse Drag / Swipe", action: "Cast & Hook Fish" }
     ]
@@ -324,15 +507,15 @@ const CURATED_GAMES: Game[] = [
     category: "Arcade",
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Doodle-Jump/doodle.png",
     mirrors: [
-      "https://ubghyper.github.io/GameList.github.io/Doodle-Jump/"
+      "https://doodle-jump.pages.dev/"
     ],
     tags: ["Jump", "Endless", "Arcade", "Retro", "Unblocked"],
     rating: 4.7,
     plays: 74200,
     author: "Lima Sky",
     featured: false,
-    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Doodle-Jump/",
-    iframeCode: `<iframe src="https://ubghyper.github.io/GameList.github.io/Doodle-Jump/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+    iframeSrc: "https://doodle-jump.pages.dev/",
+    iframeCode: `<iframe src="https://doodle-jump.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
     controls: [
       { key: "← / → or A / D", action: "Move Left & Right" }
     ]

@@ -308,6 +308,23 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
           </div>
 
           <div className="flex items-center gap-1 sm:gap-2">
+            <button
+              onClick={() => {
+                setUseProxy(!useProxy);
+                setKeyCounter(prev => prev + 1);
+              }}
+              className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer border ${
+                useProxy
+                  ? 'bg-[#10b981] text-[#064e3b] border-[#10b981] shadow-sm'
+                  : 'text-emerald-400 bg-[#16402a] hover:bg-[#255238] border border-[#10b981]/30'
+              }`}
+              title="Toggle Google Cloud Run Proxy to bypass school iPad web filters (Securly, GoGuardian, Lightspeed)"
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">{useProxy ? 'iPad Unblock: ON' : '⚡ iPad Unblock'}</span>
+              <span className="sm:hidden">{useProxy ? 'ON' : 'Unblock'}</span>
+            </button>
+
             {mirrorsList.length > 1 && (
               <button
                 onClick={handleNextMirror}
