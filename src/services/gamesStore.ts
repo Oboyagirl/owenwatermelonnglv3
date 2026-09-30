@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Game } from '../types/game';
-import { DEFAULT_GAMES } from '../data/defaultGames';
+import { DEFAULT_GAMES, formatUBGIframe, STANDARD_UBG_SANDBOX } from '../data/defaultGames';
 
-const STORAGE_KEY = 'owen_watermelon_v3_games_v28';
+const STORAGE_KEY = 'owen_watermelon_v3_games_v29';
 const FAVORITES_KEY = 'owen_watermelon_v3_favorites';
 
 export function resolveAssetUrl(url: string): string {
@@ -15,7 +15,8 @@ export function resolveAssetUrl(url: string): string {
   // On GitHub Pages (static hosting without Express backend), fallback /g/:slug to ubghyper direct shell
   if (typeof window !== 'undefined' && window.location.hostname.endsWith('github.io')) {
     if (clean.startsWith('g/')) {
-      return `https://ubghyper.github.io/${clean}/`;
+      const slug = clean.replace(/^g\//, '').replace(/\/$/, '');
+      return `https://ubghyper.github.io/GameList.github.io/${slug}/`;
     }
   }
 
@@ -49,6 +50,8 @@ function sanitizeGame(game: Game): Game {
       thumbnail: authoritative.thumbnail,
       banner: authoritative.banner,
       iframeSrc: authoritative.iframeSrc,
+      sandbox: STANDARD_UBG_SANDBOX,
+      iframeCode: formatUBGIframe(authoritative.title, authoritative.iframeSrc),
       source: authoritative.source || game.source || 'unblocked',
       secondaryCategory: authoritative.secondaryCategory || game.secondaryCategory || 'Potato Classics',
       mirrors: authoritative.mirrors || game.mirrors,
@@ -61,8 +64,11 @@ function sanitizeGame(game: Game): Game {
     thumb = 'https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Slope/slope.jpg';
   }
 
-  let iframeSrc = game.iframeSrc;
-  if (iframeSrc && iframeSrc.startsWith('/games/')) {
+  let iframeSrc = game.iframeSrc || '';
+  if (iframeSrc.startsWith('/g/')) {
+    const slug = iframeSrc.replace(/^\/g\//, '').replace(/\/$/, '');
+    iframeSrc = `https://ubghyper.github.io/GameList.github.io/${slug}/`;
+  } else if (iframeSrc && iframeSrc.startsWith('/games/')) {
     iframeSrc = iframeSrc.slice(1);
   }
 
@@ -70,6 +76,8 @@ function sanitizeGame(game: Game): Game {
     ...game, 
     thumbnail: thumb, 
     iframeSrc, 
+    sandbox: STANDARD_UBG_SANDBOX,
+    iframeCode: formatUBGIframe(game.title, iframeSrc),
     source: game.source || 'unblocked',
     secondaryCategory: game.secondaryCategory || 'Potato Classics'
   };
@@ -77,9 +85,18 @@ function sanitizeGame(game: Game): Game {
 
 export function useGamesStore() {
   const [games, setGames] = useState<Game[]>(() => {
-    // Clean up older storage keys that might have stored duplicate game IDs
+    // Clean up older storage keys that might have stored duplicate game IDs or old paths
     try {
-      ['owen_watermelon_v3_games_v1', 'owen_watermelon_v3_games_v2', 'owen_watermelon_v3_games_v10', 'owen_watermelon_v3_games_v11', 'owen_watermelon_v3_games_v12', 'owen_watermelon_v3_games_v13'].forEach(k => {
+      [
+        'owen_watermelon_v3_games_v1', 
+        'owen_watermelon_v3_games_v2', 
+        'owen_watermelon_v3_games_v10', 
+        'owen_watermelon_v3_games_v11', 
+        'owen_watermelon_v3_games_v12', 
+        'owen_watermelon_v3_games_v13',
+        'owen_watermelon_v3_games_v27',
+        'owen_watermelon_v3_games_v28'
+      ].forEach(k => {
         localStorage.removeItem(k);
       });
     } catch {}

@@ -21,7 +21,7 @@ const CURATED_GAMES: Game[] = [
     author: "RHM Interactive",
     featured: true,
     iframeSrc: "https://basket-random.pages.dev/",
-    iframeCode: `<iframe src="https://basket-random.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Basket Random — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://basket-random.pages.dev/"></iframe>`,
     controls: [
       { key: "W", action: "Player 1 Jump & Shoot" },
       { key: "Up Arrow", action: "Player 2 Jump & Shoot" }
@@ -45,7 +45,7 @@ const CURATED_GAMES: Game[] = [
     author: "New Star Games",
     featured: true,
     iframeSrc: "https://retro--bowl.pages.dev/",
-    iframeCode: `<iframe src="https://retro--bowl.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Retro Bowl — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://retro--bowl.pages.dev/"></iframe>`,
     controls: [
       { key: "Mouse Drag & Release", action: "Pass & Aim Football" },
       { key: "W / S or Up / Down", action: "Dodge Tackles & Stiff Arm" },
@@ -69,7 +69,7 @@ const CURATED_GAMES: Game[] = [
     author: "Martin Magni",
     featured: true,
     iframeSrc: "https://drive-mad.pages.dev/",
-    iframeCode: `<iframe src="https://drive-mad.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Drive Mad — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://drive-mad.pages.dev/"></iframe>`,
     controls: [
       { key: "W / D or Up / Right", action: "Drive Forward / Steer" },
       { key: "S / A or Down / Left", action: "Brake / Reverse" }
@@ -92,7 +92,7 @@ const CURATED_GAMES: Game[] = [
     author: "Rob Kay",
     featured: true,
     iframeSrc: "https://slope.pages.dev/",
-    iframeCode: `<iframe src="https://slope.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Slope — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://slope.pages.dev/"></iframe>`,
     controls: [
       { key: "A / D or ← / →", action: "Steer Ball Left & Right" }
     ]
@@ -115,7 +115,7 @@ const CURATED_GAMES: Game[] = [
     author: "Scott Cawthon",
     featured: true,
     iframeSrc: "https://freeonlinewebtools.github.io/gamelist8.github.io/FNAF-1/",
-    iframeCode: `<iframe src="https://freeonlinewebtools.github.io/gamelist8.github.io/FNAF-1/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Five Nights at Freddy's (FNAF 1) — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://freeonlinewebtools.github.io/gamelist8.github.io/FNAF-1/"></iframe>`,
     controls: [
       { key: "Mouse Move", action: "Pan Office Left & Right" },
       { key: "Mouse Hover Bottom", action: "Open Surveillance Monitor" },
@@ -138,7 +138,7 @@ const CURATED_GAMES: Game[] = [
     author: "Scott Cawthon",
     featured: false,
     iframeSrc: "https://freeonlinewebtools.github.io/gamelist8.github.io/FNAF-2/",
-    iframeCode: `<iframe src="https://freeonlinewebtools.github.io/gamelist8.github.io/FNAF-2/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Five Nights at Freddy's 2 — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://freeonlinewebtools.github.io/gamelist8.github.io/FNAF-2/"></iframe>`,
     controls: [
       { key: "Mouse Hover", action: "Pan Office" },
       { key: "Space / Ctrl", action: "Flashlight" },
@@ -161,7 +161,7 @@ const CURATED_GAMES: Game[] = [
     author: "Scott Cawthon",
     featured: false,
     iframeSrc: "https://freeonlinewebtools.github.io/gamelist8.github.io/FNAF-3/",
-    iframeCode: `<iframe src="https://freeonlinewebtools.github.io/gamelist8.github.io/FNAF-3/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Five Nights at Freddy's 3 — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://freeonlinewebtools.github.io/gamelist8.github.io/FNAF-3/"></iframe>`,
     controls: [
       { key: "Mouse Hover", action: "Pan Office" },
       { key: "Monitor / Reboot", action: "Fix Ventilation & Audio" }
@@ -183,7 +183,7 @@ const CURATED_GAMES: Game[] = [
     author: "Scott Cawthon",
     featured: false,
     iframeSrc: "https://freeonlinewebtools.github.io/gamelist6.github.io/FNAF-4/",
-    iframeCode: `<iframe src="https://freeonlinewebtools.github.io/gamelist6.github.io/FNAF-4/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Five Nights at Freddy's 4 — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://freeonlinewebtools.github.io/gamelist6.github.io/FNAF-4/"></iframe>`,
     controls: [
       { key: "Mouse Hover", action: "Move to Doors / Bed / Closet" },
       { key: "Ctrl / Space", action: "Flashlight" },
@@ -206,7 +206,7 @@ const CURATED_GAMES: Game[] = [
     author: "Con Man Games & SmashGames",
     featured: true,
     iframeSrc: "https://freeonlinewebtools.github.io/gamelist6.github.io/Kindergarten/",
-    iframeCode: `<iframe src="https://freeonlinewebtools.github.io/gamelist6.github.io/Kindergarten/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Kindergarten — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://freeonlinewebtools.github.io/gamelist6.github.io/Kindergarten/"></iframe>`,
     controls: [
       { key: "WASD / Arrow Keys", action: "Move Student" },
       { key: "E / Space", action: "Interact / Talk" }
@@ -228,7 +228,7 @@ const CURATED_GAMES: Game[] = [
     author: "Con Man Games & SmashGames",
     featured: true,
     iframeSrc: "https://freeonlinewebtools.github.io/gamelist8.github.io/Kindergarten-2/",
-    iframeCode: `<iframe src="https://freeonlinewebtools.github.io/gamelist8.github.io/Kindergarten-2/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Kindergarten 2 — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://freeonlinewebtools.github.io/gamelist8.github.io/Kindergarten-2/"></iframe>`,
     controls: [
       { key: "WASD / Arrow Keys", action: "Move Student" },
       { key: "E / Space", action: "Interact / Talk" }
@@ -250,7 +250,7 @@ const CURATED_GAMES: Game[] = [
     author: "Con Man Games & SmashGames",
     featured: true,
     iframeSrc: "https://freeonlinewebtools.github.io/gamelist7.github.io/Kindergarten3Port/",
-    iframeCode: `<iframe src="https://freeonlinewebtools.github.io/gamelist7.github.io/Kindergarten3Port/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Kindergarten 3 (Port) — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://freeonlinewebtools.github.io/gamelist7.github.io/Kindergarten3Port/"></iframe>`,
     controls: [
       { key: "WASD / Arrow Keys", action: "Move Student" },
       { key: "E / Space", action: "Interact / Talk" }
@@ -272,7 +272,7 @@ const CURATED_GAMES: Game[] = [
     author: "Banbuds & Team",
     featured: true,
     iframeSrc: "https://freeonlinewebtools.github.io/gamelist7.github.io/Friday-Night-Funkin-Lullaby/",
-    iframeCode: `<iframe src="https://freeonlinewebtools.github.io/gamelist7.github.io/Friday-Night-Funkin-Lullaby/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Friday Night Funkin: Lullaby — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://freeonlinewebtools.github.io/gamelist7.github.io/Friday-Night-Funkin-Lullaby/"></iframe>`,
     controls: [
       { key: "DFJK / Arrow Keys", action: "Hit Rhythm Notes" },
       { key: "Space", action: "Special Note Action" }
@@ -295,7 +295,7 @@ const CURATED_GAMES: Game[] = [
     author: "Orteil",
     featured: true,
     iframeSrc: "https://cookie-clicker.pages.dev/",
-    iframeCode: `<iframe src="https://cookie-clicker.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Cookie Clicker — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://cookie-clicker.pages.dev/"></iframe>`,
     controls: [
       { key: "Mouse Click", action: "Click the Big Cookie & Buy Upgrades" }
     ]
@@ -316,7 +316,7 @@ const CURATED_GAMES: Game[] = [
     author: "SYBO & Kiloo",
     featured: true,
     iframeSrc: "https://subway-surfers.pages.dev/",
-    iframeCode: `<iframe src="https://subway-surfers.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Subway Surfers — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://subway-surfers.pages.dev/"></iframe>`,
     controls: [
       { key: "WASD / Arrow Keys", action: "Dodge, Jump & Slide" },
       { key: "Space", action: "Activate Hoverboard" }
@@ -339,7 +339,7 @@ const CURATED_GAMES: Game[] = [
     author: "TinyDobbins",
     featured: true,
     iframeSrc: "https://monkey-mart.pages.dev/",
-    iframeCode: `<iframe src="https://monkey-mart.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Monkey Mart — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://monkey-mart.pages.dev/"></iframe>`,
     controls: [
       { key: "WASD / Arrow Keys", action: "Move Monkey Manager" }
     ]
@@ -360,7 +360,7 @@ const CURATED_GAMES: Game[] = [
     author: "Ashima Prabhakar",
     featured: true,
     iframeSrc: "https://snow-rider-3d.pages.dev/",
-    iframeCode: `<iframe src="https://snow-rider-3d.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Snow Rider 3D — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://snow-rider-3d.pages.dev/"></iframe>`,
     controls: [
       { key: "A / D or ← / →", action: "Steer Sled Left & Right" },
       { key: "Space or W", action: "Jump Over Chasms" }
@@ -384,7 +384,7 @@ const CURATED_GAMES: Game[] = [
     author: "MarketJS",
     featured: false,
     iframeSrc: "https://www.mathplayground.com/drift-boss-v3/index.html",
-    iframeCode: `<iframe src="https://www.mathplayground.com/drift-boss-v3/index.html" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Drift Boss — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://www.mathplayground.com/drift-boss-v3/index.html"></iframe>`,
     controls: [
       { key: "Space / Click / Hold", action: "Drift Right (Release to go Straight)" }
     ]
@@ -405,7 +405,7 @@ const CURATED_GAMES: Game[] = [
     author: "Madpuffers",
     featured: false,
     iframeSrc: "https://html5.gamedistribution.com/69d78d071f704fa183d75b4114ae40ec/",
-    iframeCode: `<iframe src="https://html5.gamedistribution.com/69d78d071f704fa183d75b4114ae40ec/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Basketball Stars — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://html5.gamedistribution.com/69d78d071f704fa183d75b4114ae40ec/"></iframe>`,
     controls: [
       { key: "WASD", action: "Player 1 Move / Jump / Steal" },
       { key: "Arrow Keys", action: "Player 2 Move / Jump / Steal" }
@@ -427,7 +427,7 @@ const CURATED_GAMES: Game[] = [
     author: "Madpuffers",
     featured: true,
     iframeSrc: "https://moto-x3m.pages.dev/",
-    iframeCode: `<iframe src="https://moto-x3m.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Moto X3M Bike Race — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://moto-x3m.pages.dev/"></iframe>`,
     controls: [
       { key: "↑ / W", action: "Accelerate Gas" },
       { key: "↓ / S", action: "Brake / Reverse" },
@@ -450,7 +450,7 @@ const CURATED_GAMES: Game[] = [
     author: "Hipster Whale",
     featured: true,
     iframeSrc: "https://crossy-road.pages.dev/",
-    iframeCode: `<iframe src="https://crossy-road.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Crossy Road — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://crossy-road.pages.dev/"></iframe>`,
     controls: [
       { key: "Arrow Keys / WASD", action: "Hop Forward, Left, Right & Back" }
     ]
@@ -471,7 +471,7 @@ const CURATED_GAMES: Game[] = [
     author: "JustPlay.LOL",
     featured: true,
     iframeSrc: "https://1v1-lol.pages.dev/",
-    iframeCode: `<iframe src="https://1v1-lol.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="1v1.LOL — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://1v1-lol.pages.dev/"></iframe>`,
     controls: [
       { key: "WASD", action: "Move & Strafe" },
       { key: "Left Click", action: "Shoot / Build" },
@@ -494,7 +494,7 @@ const CURATED_GAMES: Game[] = [
     author: "Madpuffers",
     featured: false,
     iframeSrc: "https://tiny-fishing.pages.dev/",
-    iframeCode: `<iframe src="https://tiny-fishing.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Tiny Fishing — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://tiny-fishing.pages.dev/"></iframe>`,
     controls: [
       { key: "Mouse Drag / Swipe", action: "Cast & Hook Fish" }
     ]
@@ -515,7 +515,7 @@ const CURATED_GAMES: Game[] = [
     author: "Lima Sky",
     featured: false,
     iframeSrc: "https://doodle-jump.pages.dev/",
-    iframeCode: `<iframe src="https://doodle-jump.pages.dev/" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Doodle Jump — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://doodle-jump.pages.dev/"></iframe>`,
     controls: [
       { key: "← / → or A / D", action: "Move Left & Right" }
     ]
@@ -534,7 +534,7 @@ const CURATED_GAMES: Game[] = [
     author: "Owen Watermelon Studios",
     featured: true,
     iframeSrc: "games/watermelon-merge.html",
-    iframeCode: `<iframe src="/games/watermelon-merge.html" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Watermelon Merge (Suika) — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="games/watermelon-merge.html"></iframe>`,
     controls: [
       { key: "Mouse / Touch", action: "Aim & Drop Fruit" }
     ]
@@ -552,7 +552,7 @@ const CURATED_GAMES: Game[] = [
     author: "Retro Arcade Labs",
     featured: false,
     iframeSrc: "games/snake.html",
-    iframeCode: `<iframe src="/games/snake.html" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Cyber Snake 3000 — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="games/snake.html"></iframe>`,
     controls: [
       { key: "Arrow Keys / WASD", action: "Change Direction" },
       { key: "Space", action: "Restart" }
@@ -571,7 +571,7 @@ const CURATED_GAMES: Game[] = [
     author: "Pixel Block Syndicate",
     featured: false,
     iframeSrc: "games/tetris.html",
-    iframeCode: `<iframe src="/games/tetris.html" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Tetrix Block Fall — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="games/tetris.html"></iframe>`,
     controls: [
       { key: "← / →", action: "Move Piece" },
       { key: "↑ / W", action: "Rotate" },
@@ -592,7 +592,7 @@ const CURATED_GAMES: Game[] = [
     author: "Gabriele Cirulli & Owen",
     featured: false,
     iframeSrc: "games/2048.html",
-    iframeCode: `<iframe src="/games/2048.html" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="2048 Neon Watermelon — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="games/2048.html"></iframe>`,
     controls: [
       { key: "Arrow Keys / WASD", action: "Slide Tiles" },
       { key: "Swipe", action: "Touch Screen Slide" }
@@ -611,7 +611,7 @@ const CURATED_GAMES: Game[] = [
     author: "Atari Inspired",
     featured: false,
     iframeSrc: "games/breakout.html",
-    iframeCode: `<iframe src="/games/breakout.html" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Watermelon Breakout — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="games/breakout.html"></iframe>`,
     controls: [
       { key: "Mouse / Touch", action: "Move Paddle" }
     ]
@@ -629,7 +629,7 @@ const CURATED_GAMES: Game[] = [
     author: "Dong Nguyen Homage",
     featured: false,
     iframeSrc: "games/flappy.html",
-    iframeCode: `<iframe src="/games/flappy.html" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Flappy Melon Flight — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="games/flappy.html"></iframe>`,
     controls: [
       { key: "Space / Tap", action: "Flap Wings" }
     ]
@@ -647,7 +647,7 @@ const CURATED_GAMES: Game[] = [
     author: "Galactic Studios",
     featured: false,
     iframeSrc: "games/space.html",
-    iframeCode: `<iframe src="/games/space.html" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Space Defender 8-Bit — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="games/space.html"></iframe>`,
     controls: [
       { key: "← / → / WASD", action: "Move Starship" },
       { key: "Space", action: "Fire Laser Blaster" }
@@ -666,7 +666,7 @@ const CURATED_GAMES: Game[] = [
     author: "Owen Watermelon",
     featured: false,
     iframeSrc: "games/pong.html",
-    iframeCode: `<iframe src="/games/pong.html" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,
+    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Cyber Pong (1P & 2P) — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="games/pong.html"></iframe>`,
     controls: [
       { key: "W / S or Mouse", action: "Player 1 Paddle" },
       { key: "↑ / ↓", action: "Player 2 Paddle" }
@@ -674,18 +674,36 @@ const CURATED_GAMES: Game[] = [
   }
 ];
 
+export const STANDARD_UBG_SANDBOX = "allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups";
+
+export function formatUBGIframe(title: string, src: string): string {
+  return `<iframe id="plyIframe" class="ply-iframe" title="${title} — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="${STANDARD_UBG_SANDBOX}" src="${src}"></iframe>`;
+}
+
 function buildDefaultGames(): Game[] {
   const seen = new Set<string>();
   const games: Game[] = [];
+
+  const normalizeGame = (g: Game, defaultCategory: string): Game => {
+    let src = g.iframeSrc || '';
+    if (src.startsWith('/g/')) {
+      const slug = src.replace(/^\/g\//, '').replace(/\/$/, '');
+      src = `https://ubghyper.github.io/GameList.github.io/${slug}/`;
+    }
+    return {
+      ...g,
+      iframeSrc: src,
+      sandbox: STANDARD_UBG_SANDBOX,
+      iframeCode: formatUBGIframe(g.title, src),
+      secondaryCategory: g.secondaryCategory || defaultCategory
+    };
+  };
 
   // Add curated games first (priority)
   for (const g of CURATED_GAMES) {
     if (g && g.id && !seen.has(g.id)) {
       seen.add(g.id);
-      games.push({
-        ...g,
-        secondaryCategory: g.secondaryCategory || 'Potato Classics'
-      });
+      games.push(normalizeGame(g, 'Potato Classics'));
     }
   }
 
@@ -693,7 +711,7 @@ function buildDefaultGames(): Game[] {
   for (const g of TRIPPLE_POTATOES_GAMES) {
     if (g && g.id && !seen.has(g.id)) {
       seen.add(g.id);
-      games.push(g);
+      games.push(normalizeGame(g, 'Potato Classics'));
     }
   }
 
@@ -701,10 +719,7 @@ function buildDefaultGames(): Game[] {
   for (const g of (ubgGamesList as unknown as Game[])) {
     if (g && g.id && !seen.has(g.id)) {
       seen.add(g.id);
-      games.push({
-        ...g,
-        secondaryCategory: g.secondaryCategory || 'Unblocked Archive'
-      });
+      games.push(normalizeGame(g, 'Unblocked Archive'));
     }
   }
 
