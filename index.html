@@ -2,6 +2,14 @@
 <html lang="en" class="dark">
   <head>
     <script>
+      // Ensure trailing slash on GitHub Pages subdirectory URLs so relative paths resolve correctly
+      (function() {
+        var path = window.location.pathname;
+        if (path && !path.endsWith('/') && !path.split('/').pop().includes('.')) {
+          window.location.replace(window.location.origin + path + '/' + window.location.search + window.location.hash);
+        }
+      })();
+
       (function() {
         // Suppress Vite HMR websocket noise in preview sandbox
         var origConsoleError = console.error;
@@ -29,6 +37,15 @@
         }, true);
       })();
     </script>
+    <style>
+      html, body {
+        background-color: #07130c !important;
+        color: #f1f5f9;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+      }
+    </style>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Owen Watermelon V3</title>

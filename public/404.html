@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Owen Watermelon V3</title>
+  <script>
+    // GitHub Pages SPA redirect
+    var path = window.location.pathname;
+    var segments = path.split('/').filter(Boolean);
+    // If hosted at https://username.github.io/repo-name/
+    if (segments.length > 0) {
+      window.location.replace('/' + segments[0] + '/');
+    } else {
+      window.location.replace('/');
+    }
+  </script>
+</head>
+<body style="background: #07130c; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
+  <p>Loading arcade...</p>
+</body>
+</html>

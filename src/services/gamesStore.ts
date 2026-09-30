@@ -11,7 +11,15 @@ export function resolveAssetUrl(url: string): string {
     return url;
   }
   const clean = url.startsWith('/') ? url.slice(1) : url;
-  const base = import.meta.env.BASE_URL || '/';
+
+  // On GitHub Pages (static hosting without Express backend), fallback /g/:slug to ubghyper direct shell
+  if (typeof window !== 'undefined' && window.location.hostname.endsWith('github.io')) {
+    if (clean.startsWith('g/')) {
+      return `https://ubghyper.github.io/${clean}/`;
+    }
+  }
+
+  const base = import.meta.env.BASE_URL || './';
   if (base.endsWith('/')) {
     return `${base}${clean}`;
   }
