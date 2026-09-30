@@ -47,16 +47,20 @@ export const PasscodeGate: React.FC<PasscodeGateProps> = ({ onUnlock }) => {
       setIsSuccess(true);
       if (isCreator) {
         setIsCreatorUnlocked(true);
-        localStorage.setItem('owen_creator_mode_active', 'true');
+        try {
+          localStorage.setItem('owen_creator_mode_active', 'true');
+        } catch {}
       }
       setError(false);
       setErrorMessage('');
 
-      if (rememberMe) {
-        localStorage.setItem(PASSCODE_STORAGE_KEY, 'unlocked');
-      } else {
-        sessionStorage.setItem(PASSCODE_STORAGE_KEY, 'unlocked');
-      }
+      try {
+        if (rememberMe) {
+          localStorage.setItem(PASSCODE_STORAGE_KEY, 'unlocked');
+        } else {
+          sessionStorage.setItem(PASSCODE_STORAGE_KEY, 'unlocked');
+        }
+      } catch {}
 
       setTimeout(() => {
         onUnlock(isCreator);

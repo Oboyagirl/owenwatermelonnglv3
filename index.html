@@ -1,17 +1,29 @@
 <!doctype html>
 <html lang="en" class="dark">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Owen Watermelon V3</title>
+    <meta name="description" content="Unblocked games website template with built-in iframe games catalog, tab cloaker, web proxy tools, and customizable games JSON." />
+    <meta property="og:title" content="Owen Watermelon V3" />
+    <meta property="og:description" content="Unblocked games website template with built-in iframe games catalog, tab cloaker, web proxy tools, and customizable games JSON." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/x-icon" href="./favicon.ico" />
+
     <script>
       // Ensure trailing slash on GitHub Pages subdirectory URLs so relative paths resolve correctly
       (function() {
-        var path = window.location.pathname;
-        if (path && !path.endsWith('/') && !path.split('/').pop().includes('.')) {
-          window.location.replace(window.location.origin + path + '/' + window.location.search + window.location.hash);
-        }
+        try {
+          var path = window.location.pathname;
+          if (path && !path.endsWith('/') && !path.split('/').pop().includes('.')) {
+            window.location.replace(window.location.origin + path + '/' + window.location.search + window.location.hash);
+          }
+        } catch (e) {}
       })();
 
+      // Suppress Vite HMR websocket noise in preview sandbox without hiding real errors
       (function() {
-        // Suppress Vite HMR websocket noise in preview sandbox
         var origConsoleError = console.error;
         console.error = function() {
           var msg = Array.prototype.slice.call(arguments).join(' ');
@@ -21,22 +33,9 @@
           }
           return origConsoleError.apply(console, arguments);
         };
-        window.addEventListener('unhandledrejection', function(event) {
-          var str = '' + (event && event.reason && (event.reason.message || event.reason.stack || event.reason));
-          if (str.indexOf('WebSocket') !== -1 || str.indexOf('websocket') !== -1) {
-            event.preventDefault();
-            if (event.stopImmediatePropagation) event.stopImmediatePropagation();
-          }
-        }, true);
-        window.addEventListener('error', function(event) {
-          var str = '' + (event && (event.message || ''));
-          if (str.indexOf('WebSocket') !== -1 || str.indexOf('websocket') !== -1) {
-            event.preventDefault();
-            if (event.stopImmediatePropagation) event.stopImmediatePropagation();
-          }
-        }, true);
       })();
     </script>
+
     <style>
       html, body {
         background-color: #07130c !important;
@@ -45,22 +44,110 @@
         padding: 0;
         min-height: 100vh;
       }
+      @keyframes melonPulse {
+        0%, 100% { transform: scale(1); opacity: 0.9; }
+        50% { transform: scale(1.06); opacity: 1; filter: drop-shadow(0 0 16px rgba(16, 185, 129, 0.4)); }
+      }
+      @keyframes loaderSlide {
+        0% { left: -40%; width: 40%; }
+        50% { left: 30%; width: 50%; }
+        100% { left: 100%; width: 40%; }
+      }
     </style>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Owen Watermelon V3</title>
-    <meta name="description" content="Unblocked games website template with built-in iframe games catalog, tab cloaker, web proxy tools, and customizable games JSON." />
-    <meta property="og:title" content="Owen Watermelon V3" />
-    <meta property="og:description" content="Unblocked games website template with built-in iframe games catalog, tab cloaker, web proxy tools, and customizable games JSON." />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   </head>
   <body class="bg-[#07130c] text-slate-100 min-h-screen antialiased selection:bg-[#ff2d55]/30 selection:text-white">
-    <div id="root"></div>
+    <div id="root">
+      <!-- High-fidelity boot loader screen: visible until React mounts or if offline/slow -->
+      <div id="boot-container" style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #07130c; color: #f1f5f9; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; text-align: center; padding: 24px; box-sizing: border-box;">
+        <div style="width: 76px; height: 76px; border-radius: 22px; background: rgba(16, 185, 129, 0.12); border: 2px solid #10b981; display: flex; align-items: center; justify-content: center; font-size: 38px; margin-bottom: 20px; box-shadow: 0 0 35px rgba(16, 185, 129, 0.25); animation: melonPulse 2.4s ease-in-out infinite; user-select: none;">
+          🍉
+        </div>
+        <h1 style="font-size: 26px; font-weight: 800; margin: 0 0 8px 0; color: #ffffff; letter-spacing: -0.5px;">
+          Owen Watermelon <span style="color: #ff2d55;">V3</span>
+        </h1>
+        <p id="boot-status" style="font-size: 13px; color: #94a3b8; margin: 0 0 24px 0; max-width: 320px; line-height: 1.5;">
+          Launching 800+ unblocked games, stealth cloaker & proxy...
+        </p>
+
+        <!-- Progress track -->
+        <div style="width: 200px; height: 4px; background: rgba(255, 255, 255, 0.08); border-radius: 9999px; overflow: hidden; position: relative;">
+          <div style="position: absolute; top: 0; bottom: 0; background: linear-gradient(90deg, #10b981, #ff2d55); border-radius: 9999px; animation: loaderSlide 1.8s ease-in-out infinite;"></div>
+        </div>
+
+        <!-- Diagnostic box: only shown if an unexpected fatal error occurs -->
+        <div id="boot-diagnostic" style="display: none; margin-top: 28px; max-width: 440px; width: 100%; background: #0c2016; border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 14px; padding: 14px; text-align: left; box-sizing: border-box;">
+          <div style="color: #f87171; font-weight: 700; font-size: 12px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+            ⚠️ Notice
+          </div>
+          <div id="boot-error-text" style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #fca5a5; max-height: 90px; overflow-y: auto; word-break: break-all; margin-bottom: 12px; line-height: 1.4;"></div>
+          <button onclick="try{localStorage.clear();sessionStorage.clear();}catch(e){}location.reload();" style="width: 100%; padding: 8px 12px; background: #10b981; border: none; border-radius: 8px; color: #042f2e; font-weight: 700; font-size: 11px; cursor: pointer;">
+            Reset Cache & Reload
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Global error capture to prevent silent blank screens -->
+    <script>
+      window.addEventListener('error', function(e) {
+        var msg = (e && (e.message || (e.error && e.error.message))) || '';
+        if (msg.indexOf('WebSocket') !== -1 || msg.indexOf('websocket') !== -1) return;
+        var diag = document.getElementById('boot-diagnostic');
+        var text = document.getElementById('boot-error-text');
+        if (diag && text) {
+          diag.style.display = 'block';
+          text.textContent = msg || 'An unexpected script error occurred while loading.';
+        }
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        var str = '' + (e && e.reason && (e.reason.message || e.reason));
+        if (str.indexOf('WebSocket') !== -1 || str.indexOf('websocket') !== -1) return;
+        var diag = document.getElementById('boot-diagnostic');
+        var text = document.getElementById('boot-error-text');
+        if (diag && text) {
+          diag.style.display = 'block';
+          text.textContent = str || 'Unhandled promise rejection during initialization.';
+        }
+      });
+    </script>
+
+    <!-- Primary entry point: Vite transforms this to compiled bundle in dist/ -->
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- Fallback loader for GitHub Pages serving directly from root branch -->
+    <script>
+      setTimeout(function() {
+        var bootContainer = document.getElementById('boot-container');
+        if (bootContainer) {
+          // If the dev script /src/main.tsx failed to mount React (e.g. static GitHub Pages root), inject the compiled production bundle
+          if (!document.getElementById('compiled-bundle-script')) {
+            console.log('Activating static bundle fallback...');
+            var css = document.createElement('link');
+            css.rel = 'stylesheet';
+            css.href = './assets/index.css';
+            document.head.appendChild(css);
+
+            var s = document.createElement('script');
+            s.id = 'compiled-bundle-script';
+            s.type = 'module';
+            s.crossOrigin = 'anonymous';
+            s.src = './assets/index.js';
+            s.onerror = function() {
+              // Try fallback to /dist/assets if deployed from repo root
+              var s2 = document.createElement('script');
+              s2.type = 'module';
+              s2.crossOrigin = 'anonymous';
+              s2.src = './dist/assets/index.js';
+              document.body.appendChild(s2);
+            };
+            document.body.appendChild(s);
+          }
+        }
+      }, 350);
+    </script>
   </body>
 </html>

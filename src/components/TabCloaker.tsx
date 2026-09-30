@@ -5,12 +5,20 @@ import { CloakPreset } from '../types/game';
 
 export const TabCloaker: React.FC = () => {
   const [activeId, setActiveId] = useState<string>(() => {
-    return localStorage.getItem('owen_active_cloak') || 'default';
+    try {
+      return localStorage.getItem('owen_active_cloak') || 'default';
+    } catch {
+      return 'default';
+    }
   });
   const [customTitle, setCustomTitle] = useState('');
   const [customFavicon, setCustomFavicon] = useState('');
   const [panicUrl, setPanicUrl] = useState(() => {
-    return localStorage.getItem('owen_panic_url') || 'https://classroom.google.com';
+    try {
+      return localStorage.getItem('owen_panic_url') || 'https://classroom.google.com';
+    } catch {
+      return 'https://classroom.google.com';
+    }
   });
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 

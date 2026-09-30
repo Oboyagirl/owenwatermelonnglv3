@@ -55,13 +55,19 @@ export default function App() {
 
   // Authentication gate state with persistence
   const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
-    return localStorage.getItem(PASSCODE_STORAGE_KEY) === 'unlocked' ||
-           sessionStorage.getItem(PASSCODE_STORAGE_KEY) === 'unlocked';
+    try {
+      return localStorage.getItem(PASSCODE_STORAGE_KEY) === 'unlocked' ||
+             sessionStorage.getItem(PASSCODE_STORAGE_KEY) === 'unlocked';
+    } catch {
+      return false;
+    }
   });
 
   const handleLockSite = () => {
-    localStorage.removeItem(PASSCODE_STORAGE_KEY);
-    sessionStorage.removeItem(PASSCODE_STORAGE_KEY);
+    try {
+      localStorage.removeItem(PASSCODE_STORAGE_KEY);
+      sessionStorage.removeItem(PASSCODE_STORAGE_KEY);
+    } catch {}
     setIsUnlocked(false);
   };
 
@@ -130,38 +136,45 @@ export default function App() {
   ];
 
   const filteredGames = games.filter(g => {
+    if (!g) return false;
+    const title = (g.title || '').toLowerCase();
+    const desc = (g.description || '').toLowerCase();
+    const cleanSearch = (searchTerm || '').toLowerCase();
+
     const matchesSearch = 
-      g.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      g.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (g.tags && g.tags.some(t => t.toLowerCase().includes(searchTerm.toLowerCase())));
+      title.includes(cleanSearch) ||
+      desc.includes(cleanSearch) ||
+      (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && t.toLowerCase().includes(cleanSearch)));
 
     if (!matchesSearch) return false;
 
     if (selectedCategory === 'All') return true;
     if (selectedCategory === 'Favorites') return favorites.includes(g.id);
 
-    const catLower = selectedCategory.toLowerCase();
+    const catLower = (selectedCategory || '').toLowerCase();
+    const secCatLower = (g.secondaryCategory || '').toLowerCase();
+    const mainCatLower = (g.category || '').toLowerCase();
     
     // Special handling for Potato Classics category
     if (catLower === 'potato classics') {
       return (
-        g.secondaryCategory?.toLowerCase() === 'potato classics' ||
-        (g.tags && g.tags.some(t => t.toLowerCase().includes('potato') || t.toLowerCase().includes('tripplethepotatoes'))) ||
-        g.id.startsWith('potatoes-')
+        secCatLower === 'potato classics' ||
+        (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && (t.toLowerCase().includes('potato') || t.toLowerCase().includes('tripplethepotatoes')))) ||
+        (typeof g.id === 'string' && g.id.startsWith('potatoes-'))
       );
     }
 
     if (catLower === 'cooking sim') {
       return (
-        g.secondaryCategory?.toLowerCase() === 'cooking sim' ||
-        (g.tags && g.tags.some(t => t.toLowerCase().includes('cooking') || t.toLowerCase().includes('papa louie')))
+        secCatLower === 'cooking sim' ||
+        (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && (t.toLowerCase().includes('cooking') || t.toLowerCase().includes('papa louie'))))
       );
     }
 
     return (
-      g.category.toLowerCase() === catLower ||
-      g.secondaryCategory?.toLowerCase() === catLower ||
-      (g.tags && g.tags.some(t => t.toLowerCase() === catLower))
+      mainCatLower === catLower ||
+      secCatLower === catLower ||
+      (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && t.toLowerCase() === catLower))
     );
   });
 

@@ -62,11 +62,16 @@ export function applyCloak(preset: CloakPreset) {
     document.getElementsByTagName('head')[0].appendChild(link);
   }
   link.href = preset.faviconUrl;
-  localStorage.setItem('owen_active_cloak', preset.id);
+  try {
+    localStorage.setItem('owen_active_cloak', preset.id);
+  } catch {}
 }
 
 export function triggerPanic() {
-  const panicUrl = localStorage.getItem('owen_panic_url') || 'https://classroom.google.com';
+  let panicUrl = 'https://classroom.google.com';
+  try {
+    panicUrl = localStorage.getItem('owen_panic_url') || panicUrl;
+  } catch {}
   // Fast emergency redirect
   window.location.replace(panicUrl);
 }
