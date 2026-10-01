@@ -1,8 +1,12 @@
 import sevenZebMap from './sevenZebGamesMap.json';
 import freeWebToolsMap from './freeWebToolsMap.json';
+import gameInClassroomMap from './gameInClassroomMap.json';
+import brokenGamesFixMap from './brokenGamesFixMap.json';
 
 const sMap = sevenZebMap as Record<string, string>;
 const fMap = freeWebToolsMap as Record<string, string>;
+const gicMap = gameInClassroomMap as Record<string, string>;
+const fixMap = brokenGamesFixMap as Record<string, string>;
 
 const ACADEMICS_MAP: Record<string, string> = {
   "drivemad": "https://academics-study.github.io/drive-mad/",
@@ -37,7 +41,7 @@ const ACADEMICS_MAP: Record<string, string> = {
   "worldshardestgame": "https://7zeb.github.io/homework/steal-a-brainrot/go/worlds-hardest-game-2.html",
   "worldshardestgame2": "https://7zeb.github.io/homework/steal-a-brainrot/go/worlds-hardest-game-2.html",
   "worldshardestgame3": "https://7zeb.github.io/homework/steal-a-brainrot/go/worlds-hardest-game-3.html",
-  "fruitninja": "https://freeonlinewebtools.github.io/gamelist4.github.io/Fruit-Ninja/",
+  "fruitninja": "https://gameinclassroom.github.io/fruit-ninja/",
   "mario": "https://7zeb.github.io/homework/mario-game/index.html",
   "supermario": "https://7zeb.github.io/homework/mario-game/index.html",
   "supermario63": "https://7zeb.github.io/homework/mario-game/index.html",
@@ -49,12 +53,11 @@ const ACADEMICS_MAP: Record<string, string> = {
   "stickmerge2": "https://7zeb.github.io/homework/steal-a-brainrot/go/stick-merge.html",
   "bindingofisaac": "https://flyingsully.github.io/GameList.github.io/Binding-Of-Isaac/",
   "ducklife4": "https://flyingsully.github.io/GameList.github.io/Duck-Life-4/",
-  "cluster-rush": "https://freeonlinewebtools.github.io/gamelist2.github.io/Cluster-Rush/",
-  "clusterrush": "https://freeonlinewebtools.github.io/gamelist2.github.io/Cluster-Rush/",
+  "clusterrush": "https://gameinclassroom.github.io/cluster-rush/",
   "cuphead": "https://freeonlinewebtools.github.io/gamelist2.github.io/Cuphead/",
-  "badicecream": "https://freeonlinewebtools.github.io/gamelist2.github.io/Bad-Ice-Cream/",
-  "badicecream2": "https://freeonlinewebtools.github.io/gamelist3.github.io/Bad-Ice-Cream-2/",
-  "badicecream3": "https://freeonlinewebtools.github.io/gamelist3.github.io/Bad-Ice-Cream-3/",
+  "badicecream": "https://freeonlinewebtools.github.io/gamelist8.github.io/Bad-Ice-Cream/",
+  "badicecream2": "https://gameinclassroom.github.io/bad-ice-cream-2/",
+  "badicecream3": "https://gameinclassroom.github.io/bad-ice-cream-3/",
   "candycrush": "https://freeonlinewebtools.github.io/gamelist3.github.io/Candy-Crush/",
   "deathrun3d": "https://freeonlinewebtools.github.io/gamelist3.github.io/Death-Run-3D/",
   "dadish": "https://freeonlinewebtools.github.io/gamelist3.github.io/Dadish/",
@@ -62,7 +65,10 @@ const ACADEMICS_MAP: Record<string, string> = {
   "dadish3": "https://freeonlinewebtools.github.io/gamelist2.github.io/Dadish-3/",
   "bladeball": "https://freeonlinewebtools.github.io/gamelist3.github.io/Blade-Ball/",
   "blockpost": "https://freeonlinewebtools.github.io/gamelist3.github.io/Blockpost/",
-  "boxingrandom": "https://freeonlinewebtools.github.io/gamelist3.github.io/Boxing-Random/"
+  "boxingrandom": "https://7zeb.github.io/homework/boxingrandom.html",
+  "clash": "https://freeonlinewebtools.github.io/gamelist3.github.io/Clash-Of-Vikings/",
+  "clashofvikings": "https://freeonlinewebtools.github.io/gamelist3.github.io/Clash-Of-Vikings/",
+  "clashoftanks": "https://freeonlinewebtools.github.io/gamelist3.github.io/Clash-Of-Vikings/"
 };
 
 const FLYINGSULLY_GAMES = new Set([
@@ -83,6 +89,15 @@ const PRESERVED_LOCAL_GAMES = new Set([
   "games/pong.html"
 ]);
 
+function cleanText(str: string): string {
+  return str
+    .replace(/&#39;/g, "")
+    .replace(/&amp;/g, "and")
+    .replace(/&quot;/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+}
+
 export function resolveGameSource(
   id: string,
   title: string,
@@ -92,6 +107,21 @@ export function resolveGameSource(
   // If preserved local game, keep as-is
   if (PRESERVED_LOCAL_GAMES.has(currentSrc)) {
     return { src: currentSrc, mirrors: [currentSrc, ...mirrors.filter(m => m !== currentSrc)] };
+  }
+
+  // 1. Direct explicit fix map check (handles clash and all 86 reported issues)
+  if (fixMap[id]) {
+    const fixedUrl = fixMap[id];
+    return { src: fixedUrl, mirrors: [fixedUrl, ...mirrors.filter(m => m !== fixedUrl)] };
+  }
+
+  const cleanTitle = cleanText(title);
+  const cleanId = cleanText(id.replace(/^potatoes-/, ""));
+  const cleanSlug = cleanText(currentSrc.replace(/https?:\/\/[^\/]+\/[^\/]+\/([^\/]+)\/?.*/, "$1"));
+
+  if (fixMap[cleanTitle] || fixMap[cleanId] || fixMap[cleanSlug]) {
+    const fixedUrl = fixMap[cleanTitle] || fixMap[cleanId] || fixMap[cleanSlug];
+    return { src: fixedUrl, mirrors: [fixedUrl, ...mirrors.filter(m => m !== fixedUrl)] };
   }
 
   // Check if primary is blocked by Securly (contains ubg keyword, pages.dev, gamedistribution, or broken games/)
@@ -106,37 +136,37 @@ export function resolveGameSource(
   let resolvedSrc = currentSrc;
 
   if (isBlocked) {
-    const cleanTitle = title.toLowerCase().replace(/[^a-z0-9]/g, '');
-    const cleanId = id.replace(/^potatoes-/, '').toLowerCase().replace(/[^a-z0-9]/g, '');
-    const cleanSlug = currentSrc.replace(/https?:\/\/[^\/]+\/[^\/]+\/([^\/]+)\/?.*/, '$1').toLowerCase().replace(/[^a-z0-9]/g, '');
-
-    // 1. Try Academics-Study verified endpoints
+    // 2. Try Academics-Study verified endpoints
     if (ACADEMICS_MAP[cleanTitle] || ACADEMICS_MAP[cleanId] || ACADEMICS_MAP[cleanSlug]) {
       resolvedSrc = ACADEMICS_MAP[cleanTitle] || ACADEMICS_MAP[cleanId] || ACADEMICS_MAP[cleanSlug];
     }
-    // 2. Try 7zeb verified endpoints (proven to work on school iPads)
+    // 3. Try 7zeb verified endpoints (proven to work on school iPads)
     else if (sMap[cleanTitle] || sMap[cleanId] || sMap[cleanSlug]) {
       resolvedSrc = sMap[cleanTitle] || sMap[cleanId] || sMap[cleanSlug];
     }
-    // 3. Try freeonlinewebtools verified gamelist (proven to work for Kindergarten)
+    // 4. Try gameinclassroom verified endpoints (580 repos)
+    else if (gicMap[cleanTitle] || gicMap[cleanId] || gicMap[cleanSlug]) {
+      resolvedSrc = gicMap[cleanTitle] || gicMap[cleanId] || gicMap[cleanSlug];
+    }
+    // 5. Try freeonlinewebtools verified gamelist
     else if (fMap[cleanTitle] || fMap[cleanId] || fMap[cleanSlug]) {
       resolvedSrc = fMap[cleanTitle] || fMap[cleanId] || fMap[cleanSlug];
     }
-    // 4. Try FlyingSully mirrors
+    // 6. Try FlyingSully mirrors
     else if (FLYINGSULLY_GAMES.has(cleanTitle) || FLYINGSULLY_GAMES.has(cleanId) || FLYINGSULLY_GAMES.has(cleanSlug)) {
       resolvedSrc = `https://flyingsully.github.io/GameList.github.io/${title.replace(/ /g, '-')}/`;
     }
-    // 5. Look for clean mirrors already in mirrors array
+    // 7. Look for clean mirrors already in mirrors array
     else {
       const cleanMirror = mirrors.find(m => 
-        m.includes('7zeb.github.io') || 
-        m.includes('freeonlinewebtools.github.io') || 
-        m.includes('academics-study.github.io') || 
-        m.includes('javaspence.github.io') || 
-        m.includes('henshmi.github.io') || 
-        m.includes('joe-the-chicken.github.io') || 
-        m.includes('gameinclassroom.github.io') ||
-        m.includes('flyingsully.github.io')
+        (m.includes('7zeb.github.io') || 
+         m.includes('gameinclassroom.github.io') ||
+         m.includes('academics-study.github.io') || 
+         m.includes('javaspence.github.io') || 
+         m.includes('henshmi.github.io') || 
+         m.includes('joe-the-chicken.github.io') || 
+         m.includes('flyingsully.github.io')) &&
+        !m.includes('ubghyper')
       );
       if (cleanMirror) {
         resolvedSrc = cleanMirror;
