@@ -68,7 +68,7 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
       return resolveAssetUrl(activeIframeSrc);
     }
     if (useProxy) {
-      return `/api/proxy?url=${encodeURIComponent(activeIframeSrc)}`;
+      return `https://translate.google.com/translate?sl=auto&tl=en&u=${encodeURIComponent(activeIframeSrc)}`;
     }
     return activeIframeSrc;
   })();

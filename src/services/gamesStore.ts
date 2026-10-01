@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Game } from '../types/game';
 import { DEFAULT_GAMES, formatGameIframe, URL_OVERRIDES } from '../data/defaultGames';
 
-const STORAGE_KEY = 'owen_watermelon_v3_games_v34';
+const STORAGE_KEY = 'owen_watermelon_v3_games_v35';
 const FAVORITES_KEY = 'owen_watermelon_v3_favorites';
 
 export function resolveAssetUrl(url: string): string {
@@ -107,7 +107,8 @@ export function useGamesStore() {
         'owen_watermelon_v3_games_v30',
         'owen_watermelon_v3_games_v31',
         'owen_watermelon_v3_games_v32',
-        'owen_watermelon_v3_games_v33'
+        'owen_watermelon_v3_games_v33',
+        'owen_watermelon_v3_games_v34'
       ].forEach(k => {
         localStorage.removeItem(k);
       });

@@ -1,6 +1,7 @@
 import { Game } from '../types/game';
 import ubgGamesList from './ubgFilteredGames.json';
 import { TRIPPLE_POTATOES_GAMES } from './tripplePotatoesGames';
+import { resolveGameSource } from './unblockedResolver';
 
 const CURATED_GAMES: Game[] = [
   {
@@ -799,31 +800,15 @@ function buildDefaultGames(): Game[] {
   const games: Game[] = [];
 
   const normalizeGame = (g: Game, defaultCategory: string): Game => {
-    let src = g.iframeSrc || '';
+    let initialSrc = g.iframeSrc || '';
     if (URL_OVERRIDES[g.id]) {
-      src = URL_OVERRIDES[g.id];
-    } else if (src.startsWith('/g/')) {
-      const slug = src.replace(/^\/g\//, '').replace(/\/$/, '');
-      src = `https://ubghyper.github.io/GameList.github.io/${slug}/`;
+      initialSrc = URL_OVERRIDES[g.id];
+    } else if (initialSrc.startsWith('/g/')) {
+      const slug = initialSrc.replace(/^\/g\//, '').replace(/\/$/, '');
+      initialSrc = `https://ubghyper.github.io/GameList.github.io/${slug}/`;
     }
 
-    // Automatically prefer non-Securly clean mirrors if primary is blocked
-    if (src.includes('ubghyper') || src.includes('pages.dev') || src.includes('gamedistribution.com') || (src.startsWith('games/') && !src.startsWith('games/watermelon') && !src.startsWith('games/snake') && !src.startsWith('games/tetris') && !src.startsWith('games/2048') && !src.startsWith('games/breakout') && !src.startsWith('games/flappy') && !src.startsWith('games/space') && !src.startsWith('games/pong'))) {
-      const cleanMirror = (g.mirrors || []).find(m => 
-        m.includes('freeonlinewebtools.github.io') || 
-        m.includes('7zeb.github.io') || 
-        m.includes('academics-study.github.io') ||
-        m.includes('javaspence.github.io') ||
-        m.includes('henshmi.github.io') ||
-        m.includes('joe-the-chicken.github.io') ||
-        m.includes('gameinclassroom.github.io')
-      );
-      if (cleanMirror) {
-        src = cleanMirror;
-      }
-    }
-
-    const mirrors = [src, ...(g.mirrors || []).filter(m => m !== src)];
+    const { src, mirrors } = resolveGameSource(g.id, g.title, initialSrc, g.mirrors);
 
     return {
       ...g,
