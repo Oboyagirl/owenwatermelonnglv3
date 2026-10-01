@@ -5,6 +5,54 @@ import { resolveGameSource } from './unblockedResolver';
 
 const CURATED_GAMES: Game[] = [
   {
+    id: "soccer-2026",
+    source: "unblocked",
+    title: "Soccer 2026",
+    description: "Lead your national team onto the pitch, pass, tackle, and strike spectacular goals in this full 3D tournament soccer game.",
+    category: "Sports",
+    thumbnail: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&auto=format&fit=crop&q=80",
+    mirrors: [
+      "games/soccer-2026.html"
+    ],
+    tags: ["Soccer", "Football", "3D", "Sports", "World Cup", "Tournament", "Unblocked"],
+    rating: 4.9,
+    plays: 104200,
+    author: "Playgama",
+    featured: true,
+    iframeSrc: "games/soccer-2026.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Soccer 2026" src="games/soccer-2026.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Arrow Keys / WASD", action: "Move Player" },
+      { key: "Space / X", action: "Shoot / Slide Tackle" },
+      { key: "C", action: "Pass / Switch Player" }
+    ]
+  },
+  {
+    id: "soccer-real",
+    source: "unblocked",
+    title: "Soccer REAL",
+    description: "Realistic 3D soccer simulation featuring agile dribbling, precision penalty kicks, and dynamic stadium action powered by Three.js.",
+    category: "Sports",
+    thumbnail: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=1200&auto=format&fit=crop&q=80",
+    mirrors: [
+      "games/soccer-real.html"
+    ],
+    tags: ["Soccer", "Football", "Realistic", "3D", "Three.js", "Sports", "Unblocked"],
+    rating: 4.9,
+    plays: 98700,
+    author: "Zambi",
+    featured: true,
+    iframeSrc: "games/soccer-real.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Soccer REAL" src="games/soccer-real.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "WASD / Arrows", action: "Move Player" },
+      { key: "K / Space", action: "Shoot Ball" },
+      { key: "J", action: "Pass Ball" }
+    ]
+  },
+  {
     id: "pool-ball",
     source: "unblocked",
     title: "Classic 8-Ball Pool",

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#123b73">
+  <title>Soccer REAL</title>
+  <script src="https://cdn.jsdelivr.net/gh/unbilgicox/zambi@main/sdkgon.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/unbilgicox/zambi@main/images/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/unbilgicox/zambi@main/images/GLTFLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/unbilgicox/zambi@main/images/SkeletonUtils.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/unbilgicox/zambi@main/game.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #1f5191;
+      overscroll-behavior: none;
+      touch-action: none;
+    }
+
+    body {
+      position: fixed;
+      inset: 0;
+    }
+
+    canvas {
+      display: block;
+      outline: 0;
+      touch-action: none;
+    }
+
+    #chf2 {
+      position: absolute;
+      inset: 0;
+    }
+
+    #launch-screen {
+      position: fixed;
+      z-index: 1000;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+      background:
+        radial-gradient(circle at 50% 28%, rgba(72, 174, 255, .42), transparent 35%),
+        linear-gradient(160deg, #123b73 0%, #071b39 100%);
+    }
+
+    #launch-screen[hidden] {
+      display: none;
+    }
+
+    .launch-card {
+      width: min(440px, 100%);
+      padding: 34px 28px 30px;
+      border: 1px solid rgba(255, 255, 255, .2);
+      border-radius: 28px;
+      background: rgba(4, 21, 48, .78);
+      box-shadow: 0 26px 80px rgba(0, 0, 0, .38);
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .ball {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 18px;
+      border: 5px solid #fff;
+      border-top-color: #31c46c;
+      border-radius: 50%;
+      box-shadow: inset 0 0 0 7px rgba(49, 196, 108, .18), 0 10px 24px rgba(0, 0, 0, .28);
+      animation: spin 1s linear infinite;
+    }
+
+    .ready .ball {
+      animation: none;
+      border-color: #31c46c;
+    }
+
+    h1 {
+      display: block;
+      margin: 0;
+      color: #fff;
+      font-size: clamp(34px, 9vw, 54px);
+      font-style: italic;
+      letter-spacing: -.05em;
+      line-height: .95;
+      text-shadow: 0 4px 0 rgba(0, 0, 0, .22);
+    }
+
+    .accent {
+      color: #55df86;
+    }
+
+    #loading-status {
+      display: block;
+      min-height: 22px;
+      margin: 22px 0 0;
+      color: #d7e7ff;
+      font-size: 16px;
+      line-height: 1.35;
+    }
+
+    #start-button {
+      display: block;
+      width: 100%;
+      margin-top: 24px;
+      padding: 17px 24px;
+      border: 0;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #62ec94, #2cbd64);
+      color: #062a16;
+      box-shadow: 0 8px 0 #168b43, 0 16px 34px rgba(44, 189, 100, .28);
+      font: 900 24px/1 Arial, Helvetica, sans-serif;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    #start-button:active {
+      transform: translateY(4px);
+      box-shadow: 0 4px 0 #168b43, 0 10px 24px rgba(44, 189, 100, .22);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ball { animation-duration: 2.5s; }
+    }
+  </style>
+  <script>
+    var CDN = "https://cdn.jsdelivr.net/gh/unbilgicox/zambi@main";
+    var LANG = "en";
+
+    (function(){
+      var base = String(CDN||"").replace(/\/+$/,"");
+      var SKIP = /^(https?:|data:|blob:|about:|javascript:|mailto:|#|\/\/)/i;
+
+      function map(u){
+        if(u==null) return u;
+        var s = String(u);
+        if(!s || SKIP.test(s)) return s;
+        if(s === "/sdk.js" || s === "sdk.js") return "data:text/javascript,";
+        if(!base) return s;
+        if(s.charAt(0) === "/") s = s.slice(1);
+        if(s.slice(0,2) === "./") s = s.slice(2);
+        return base + "/" + s;
+      }
+      window.__cdn = map;
+
+      function isCross(u){
+        try{
+          if(!/^https?:\/\//i.test(u)) return false;
+          return u.indexOf(location.origin + "/") !== 0;
+        }catch(e){ return false; }
+      }
+
+      function patchSrc(ctor, cors){
+        if(!ctor || !ctor.prototype) return;
+        var d = Object.getOwnPropertyDescriptor(ctor.prototype, "src");
+        if(!d || !d.set) return;
+        Object.defineProperty(ctor.prototype, "src", {
+          configurable:true, enumerable:d.enumerable,
+          get:function(){ return d.get ? d.get.call(this) : ""; },
+          set:function(v){
+            var u = map(v);
+            if(cors && isCross(u)){ try{ if(!this.crossOrigin) this.crossOrigin = "anonymous"; }catch(e){} }
+            d.set.call(this, u);
+          }
+        });
+      }
+      patchSrc(window.HTMLImageElement, true);
+      patchSrc(window.HTMLMediaElement, true);
+      patchSrc(window.HTMLSourceElement, true);
+      patchSrc(window.HTMLScriptElement, false);
+      patchSrc(window.HTMLLinkElement, false);
+
+      var NativeImage = window.Image;
+      window.Image = function(w,h){
+        var img = new NativeImage(w,h);
+        try{ img.crossOrigin = "anonymous"; }catch(e){}
+        return img;
+      };
+      window.Image.prototype = NativeImage.prototype;
+
+      var setAttr = Element.prototype.setAttribute;
+      Element.prototype.setAttribute = function(n, v){
+        if(n === "src" || n === "href"){
+          v = map(v);
+          if(n === "src" && isCross(v) && (this.tagName === "IMG" || this.tagName === "AUDIO" || this.tagName === "VIDEO")){
+            try{ if(!this.getAttribute("crossorigin")) setAttr.call(this, "crossorigin", "anonymous"); }catch(e){}
+          }
+        }
+        return setAttr.call(this, n, v);
+      };
+
+      (function(){
+        if(!window.THREE_CROSSORIGIN_PATCH){
+          window.THREE_CROSSORIGIN_PATCH = true;
+          var t = 0;
+          var iv = setInterval(function(){
+            if(window.THREE && window.THREE.Loader && window.THREE.Loader.prototype){
+              try{ window.THREE.Loader.prototype.crossOrigin = "anonymous"; }catch(e){}
+              clearInterval(iv);
+            }
+            if(++t > 200) clearInterval(iv);
+          }, 50);
+        }
+      })();
+
+      var xhrOpen = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function(m, u){
+        var a = [].slice.call(arguments);
+        a[1] = map(u);
+        return xhrOpen.apply(this, a);
+      };
+
+      if(window.fetch){
+        var f = window.fetch;
+        window.fetch = function(input, init){
+          if(typeof input === "string") input = map(input);
+          else if(input && input.url && typeof Request === "function"){
+            var m2 = map(input.url);
+            if(m2 !== input.url) input = new Request(m2, input);
+          }
+          return f.call(window, input, init);
+        };
+      }
+
+      var LS="ya_player_data", LSS="ya_player_stats";
+      function rd(k,f){ try{ return JSON.parse(localStorage.getItem(k)||f); }catch(e){ return JSON.parse(f); } }
+      function wr(k,o){ try{ localStorage.setItem(k,JSON.stringify(o)); }catch(e){} }
+      var pdata=rd(LS,"{}"), pstats=rd(LSS,"{}");
+      var isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      function cb(o,n,a){ try{ if(o&&o.callbacks&&typeof o.callbacks[n]==="function") o.callbacks[n](a); }catch(e){} }
+
+      var yplayer={
+        getUniqueID:function(){ return "local-player"; },
+        getName:function(){ return pdata.__name || "Player"; },
+        getPhoto:function(){ return ""; },
+        getMode:function(){ return "lite"; },
+        getIDsPerGame:function(){ return Promise.resolve([]); },
+        getData:function(){ return Promise.resolve(JSON.parse(JSON.stringify(pdata))); },
+        setData:function(d){ pdata=Object.assign(pdata,d||{}); wr(LS,pdata); return Promise.resolve(); },
+        getStats:function(){ return Promise.resolve(JSON.parse(JSON.stringify(pstats))); },
+        setStats:function(d){ pstats=Object.assign(pstats,d||{}); wr(LSS,pstats); return Promise.resolve(); },
+        incrementStats:function(d){
+          Object.keys(d||{}).forEach(function(k){ pstats[k]=(+pstats[k]||0)+(+d[k]||0); });
+          wr(LSS,pstats); return Promise.resolve(JSON.parse(JSON.stringify(pstats)));
+        },
+        signIn:function(){ return Promise.reject(new Error("no auth")); }
+      };
+
+      var yleaderboards={
+        getLeaderboardDescription:function(n){ return Promise.resolve({ name:n, "default":true, entry_style:{}, description:{ invert_sort_order:false, score_format:{ type:"numeric" }, type:"numeric" } }); },
+        setLeaderboardScore:function(){ return Promise.resolve(); },
+        getLeaderboardPlayerEntry:function(){ return Promise.reject(new Error("no entry")); },
+        getLeaderboardEntries:function(){ return Promise.resolve({ leaderboard:{}, ranges:[], userRank:0, entries:[] }); }
+      };
+
+      var ysdk={
+        environment:{
+          app:{ id:"0" },
+          browser:{ lang:LANG },
+          i18n:{ lang:LANG, tld:"com" },
+          payload:null,
+          isTelegram:false
+        },
+        deviceInfo:{
+          type:isMobile?"mobile":"desktop",
+          isMobile:function(){ return isMobile; },
+          isDesktop:function(){ return !isMobile; },
+          isTablet:function(){ return false; },
+          isTV:function(){ return false; }
+        },
+        adv:{
+          showFullscreenAdv:function(o){ cb(o,"onOpen"); setTimeout(function(){ cb(o,"onClose",false); },300); },
+          showRewardedVideo:function(o){
+            cb(o,"onOpen");
+            setTimeout(function(){ cb(o,"onRewarded"); setTimeout(function(){ cb(o,"onClose"); },120); },400);
+          },
+          showBannerAdv:function(){ return Promise.resolve({ stickyAdvIsShowing:false, reason:"UNKNOWN" }); },
+          hideBannerAdv:function(){ return Promise.resolve({ stickyAdvIsShowing:false }); },
+          getBannerAdvStatus:function(){ return Promise.resolve({ stickyAdvIsShowing:false }); }
+        },
+        features:{
+          LoadingAPI:{ ready:function(){} },
+          GameplayAPI:{ start:function(){}, stop:function(){} }
+        },
+        screen:{
+          fullscreen:{
+            get status(){ return document.fullscreenElement ? "on" : "off"; },
+            request:function(){ try{ (document.documentElement.requestFullscreen||function(){}).call(document.documentElement); }catch(e){} return Promise.resolve(); },
+            exit:function(){ try{ if(document.exitFullscreen) document.exitFullscreen(); }catch(e){} return Promise.resolve(); }
+          }
+        },
+        feedback:{
+          canReview:function(){ return Promise.resolve({ value:false, reason:"NO_AUTH" }); },
+          requestReview:function(){ return Promise.resolve({ feedbackSent:false }); }
+        },
+        clipboard:{ writeText:function(t){ try{ return navigator.clipboard.writeText(t); }catch(e){ return Promise.resolve(); } } },
+        shortcut:{
+          canShowPrompt:function(){ return Promise.resolve({ canShow:false }); },
+          showPrompt:function(){ return Promise.resolve({ outcome:"rejected" }); }
+        },
+        getPlayer:function(){ return Promise.resolve(yplayer); },
+        getLeaderboards:function(){ return Promise.resolve(yleaderboards); },
+        getPayments:function(){ return Promise.reject(new Error("payments unavailable")); },
+        getFlags:function(){ return Promise.resolve({}); },
+        getStorage:function(){ return Promise.resolve(window.localStorage); },
+        isAvailableMethod:function(){ return Promise.resolve(false); },
+        dispatchEvent:function(){ return Promise.resolve(); },
+        onEvent:function(){ return function(){}; },
+        on:function(){ return function(){}; },
+        off:function(){},
+        EVENT:{ EXIT:"EXIT", HISTORY_BACK:"HISTORY_BACK" },
+        exit:function(){ return Promise.resolve(); }
+      };
+
+      function deep(){
+        var fn=function(){ return Promise.resolve(true); };
+        return new Proxy(fn,{
+          get:function(t,p){
+            if(p==="then"||p==="catch"||p==="finally") return undefined;
+            if(p===Symbol.toPrimitive) return function(){ return 0; };
+            if(p==="toString") return function(){ return ""; };
+            return deep();
+          },
+          apply:function(){ return Promise.resolve(true); }
+        });
+      }
+      var proxied=new Proxy(ysdk,{
+        get:function(t,p){
+          if(p==="then"||p==="catch"||p==="finally") return undefined;
+          if(p in t) return t[p];
+          if(typeof p==="symbol") return undefined;
+          return deep();
+        }
+      });
+
+      window.YaGames={ init:function(){ return Promise.resolve(proxied); } };
+      window.ysdkLang = LANG;
+    })();
+  </script>
+</head>
+<body>
+  <canvas id="myCanvas" aria-label="Soccer REAL game field"></canvas>
+  <div id="chf2"><canvas id="gcvs"></canvas></div>
+  <div id="launch-screen" role="dialog" aria-modal="true" aria-labelledby="game-title">
+    <div class="launch-card ready">
+      <div class="ball" aria-hidden="true"></div>
+      <h1 id="game-title">SOCCER <span class="accent">REAL</span></h1>
+      <p id="loading-status" role="status" aria-live="polite">Ready to Kick Off!</p>
+      <button id="start-button" type="button">START</button>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      function resize() {
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        var c1 = document.getElementById('myCanvas');
+        var c2 = document.getElementById('gcvs');
+        if (c1) { c1.width = w; c1.height = h; c1.style.width = w + 'px'; c1.style.height = h + 'px'; }
+        if (c2) { c2.width = w; c2.height = h; c2.style.width = w + 'px'; c2.style.height = h + 'px'; }
+      }
+      window.addEventListener('resize', resize);
+      window.addEventListener('orientationchange', resize);
+      setTimeout(resize, 100);
+
+      var startBtn = document.getElementById('start-button');
+      var launchScreen = document.getElementById('launch-screen');
+      if (startBtn && launchScreen) {
+        startBtn.addEventListener('click', function() {
+          launchScreen.hidden = true;
+          launchScreen.style.display = 'none';
+        });
+      }
+    })();
+  </script>
+
+  <script type="module" src="https://cdn.jsdelivr.net/gh/unbilgicox/zambi@main/bootstrap.js"></script>
+</body>
+</html>
