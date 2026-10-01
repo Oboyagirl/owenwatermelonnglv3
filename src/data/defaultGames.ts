@@ -4,6 +4,28 @@ import { TRIPPLE_POTATOES_GAMES } from './tripplePotatoesGames';
 
 const CURATED_GAMES: Game[] = [
   {
+    id: "pool-ball",
+    source: "unblocked",
+    title: "Classic 8-Ball Pool",
+    description: "Line up your cue stick, control English spin, and sink solids or stripes in this authentic billiards simulator.",
+    category: "Sports",
+    thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Pool-Ball/logo.png",
+    mirrors: [
+      "https://henshmi.github.io/Classic-8-Ball-Pool/dist/"
+    ],
+    tags: ["Pool", "8-Ball", "Billiards", "Sports", "Unblocked"],
+    rating: 4.8,
+    plays: 89400,
+    author: "Henshmi",
+    featured: true,
+    iframeSrc: "https://henshmi.github.io/Classic-8-Ball-Pool/dist/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Classic 8-Ball Pool" src="https://henshmi.github.io/Classic-8-Ball-Pool/dist/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Mouse Drag / Touch", action: "Aim Cue & Set Power" },
+      { key: "Release", action: "Shoot Ball" }
+    ]
+  },
+  {
     id: "basket-random",
     source: "unblocked",
     title: "Basket Random",
@@ -36,16 +58,15 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Retro-Bowl/retrobowl.jpg",
     banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Retro-Bowl/html5game/splash.png",
     mirrors: [
-      "https://blobby-boi.github.io/retro-bowl/",
-      "https://retro--bowl.pages.dev/"
-    ],
+        "https://javaspence.github.io/retrobowl/"
+      ],
     tags: ["Football", "Sports", "Pixel", "NFL", "Retro Bowl", "Unblocked"],
     rating: 4.9,
     plays: 128920,
     author: "New Star Games",
     featured: true,
-    iframeSrc: "https://blobby-boi.github.io/retro-bowl/",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Retro Bowl" src="https://blobby-boi.github.io/retro-bowl/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://javaspence.github.io/retrobowl/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" src="https://javaspence.github.io/retrobowl/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Mouse Drag & Release", action: "Pass & Aim Football" },
       { key: "W / S or Up / Down", action: "Dodge Tackles & Stiff Arm" },
@@ -61,15 +82,15 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Drive-Mad/logo.jpg",
     banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Drive-Mad/webapp/cover.jpg",
     mirrors: [
-      "https://blobby-boi.github.io/drive-mad/"
-    ],
+        "https://academics-study.github.io/drive-mad/"
+      ],
     tags: ["Racing", "Physics", "Truck", "Driving", "Popular", "Unblocked"],
     rating: 4.9,
     plays: 114400,
     author: "Martin Magni",
     featured: true,
-    iframeSrc: "https://blobby-boi.github.io/drive-mad/",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Drive Mad" src="https://blobby-boi.github.io/drive-mad/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://academics-study.github.io/drive-mad/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" src="https://academics-study.github.io/drive-mad/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "W / D or Up / Right", action: "Drive Forward / Steer" },
       { key: "S / A or Down / Left", action: "Brake / Reverse" }
@@ -84,15 +105,15 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Slope/slope.jpg",
     banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Slope/slope.jpg",
     mirrors: [
-      "https://blobby-boi.github.io/Slope/"
-    ],
+        "https://7zeb.github.io/homework/slope.html"
+      ],
     tags: ["3D", "Runner", "Reflex", "Neon", "Arcade", "Unblocked"],
     rating: 4.9,
     plays: 165200,
     author: "Rob Kay",
     featured: true,
-    iframeSrc: "https://blobby-boi.github.io/Slope/",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Slope" src="https://blobby-boi.github.io/Slope/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://7zeb.github.io/homework/slope.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" src="https://7zeb.github.io/homework/slope.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "A / D or ← / →", action: "Steer Ball Left & Right" }
     ]
@@ -106,16 +127,16 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/FNAF-1/FNAF-1.png",
     banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/FNAF-1/FNAF-1.png",
     mirrors: [
-      "https://blobby-boi.github.io/FNAF/",
-      "https://irv77.github.io/hd_fnaf/1/"
-    ],
+        "https://7zeb.github.io/homework/fnaf.html",
+        "https://academics-study.github.io/hd_fnaf/1/"
+      ],
     tags: ["Horror", "Survival", "FNAF", "Strategy", "Classic", "Unblocked"],
     rating: 4.9,
     plays: 142500,
     author: "Scott Cawthon",
     featured: true,
-    iframeSrc: "https://blobby-boi.github.io/FNAF/",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Five Nights at Freddy's (FNAF 1)" src="https://blobby-boi.github.io/FNAF/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://7zeb.github.io/homework/fnaf.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" src="https://7zeb.github.io/homework/fnaf.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Mouse Move", action: "Pan Office Left & Right" },
       { key: "Mouse Hover Bottom", action: "Open Surveillance Monitor" },
@@ -130,16 +151,15 @@ const CURATED_GAMES: Game[] = [
     category: "Action",
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/FNAF-1/FNAF-1.png",
     mirrors: [
-      "https://blobby-boi.github.io/FNAF2/",
-      "https://irv77.github.io/hd_fnaf/2/"
-    ],
+        "https://academics-study.github.io/hd_fnaf/2/"
+      ],
     tags: ["Horror", "FNAF", "Survival", "Strategy"],
     rating: 4.9,
     plays: 98100,
     author: "Scott Cawthon",
     featured: false,
-    iframeSrc: "https://blobby-boi.github.io/FNAF2/",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Five Nights at Freddy's 2" src="https://blobby-boi.github.io/FNAF2/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://academics-study.github.io/hd_fnaf/2/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" src="https://academics-study.github.io/hd_fnaf/2/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Mouse Hover", action: "Pan Office" },
       { key: "Space / Ctrl", action: "Flashlight" },
@@ -154,16 +174,15 @@ const CURATED_GAMES: Game[] = [
     category: "Action",
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/FNAF-1/FNAF-1.png",
     mirrors: [
-      "https://blobby-boi.github.io/FNAF3/",
-      "https://irv77.github.io/hd_fnaf/3/"
-    ],
+        "https://academics-study.github.io/hd_fnaf/3/"
+      ],
     tags: ["Horror", "FNAF", "Survival", "Strategy"],
     rating: 4.8,
     plays: 87400,
     author: "Scott Cawthon",
     featured: false,
-    iframeSrc: "https://blobby-boi.github.io/FNAF3/",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Five Nights at Freddy's 3" src="https://blobby-boi.github.io/FNAF3/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://academics-study.github.io/hd_fnaf/3/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" src="https://academics-study.github.io/hd_fnaf/3/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Mouse Hover", action: "Pan Office" },
       { key: "Monitor / Reboot", action: "Fix Ventilation & Audio" }
@@ -177,16 +196,16 @@ const CURATED_GAMES: Game[] = [
     category: "Action",
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/FNAF-1/FNAF-1.png",
     mirrors: [
-      "https://blobby-boi.github.io/FNAF4/",
-      "https://freeonlinewebtools.github.io/gamelist6.github.io/FNAF-4/"
-    ],
+        "https://academics-study.github.io/hd_fnaf/4/",
+        "https://freeonlinewebtools.github.io/gamelist6.github.io/FNAF-4/"
+      ],
     tags: ["Horror", "FNAF", "Survival", "Strategy"],
     rating: 4.8,
     plays: 91200,
     author: "Scott Cawthon",
     featured: false,
-    iframeSrc: "https://blobby-boi.github.io/FNAF4/",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Five Nights at Freddy's 4" src="https://blobby-boi.github.io/FNAF4/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://academics-study.github.io/hd_fnaf/4/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" src="https://academics-study.github.io/hd_fnaf/4/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Mouse Hover", action: "Move to Doors / Bed / Closet" },
       { key: "Ctrl / Space", action: "Flashlight" },
@@ -290,15 +309,15 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Cookie-Clicker/cookie.png",
     banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Cookie-Clicker/cookie.png",
     mirrors: [
-      "https://blobby-boi.github.io/Cookie-Clicker/"
-    ],
+        "https://7zeb.github.io/homework/cookieclicker.html"
+      ],
     tags: ["Clicker", "Idle", "Casual", "Addictive", "Unblocked"],
     rating: 4.9,
     plays: 135000,
     author: "Orteil",
     featured: true,
-    iframeSrc: "https://blobby-boi.github.io/Cookie-Clicker/",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Cookie Clicker" src="https://blobby-boi.github.io/Cookie-Clicker/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://7zeb.github.io/homework/cookieclicker.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" src="https://7zeb.github.io/homework/cookieclicker.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Mouse Click", action: "Click the Big Cookie & Buy Upgrades" }
     ]
@@ -311,15 +330,15 @@ const CURATED_GAMES: Game[] = [
     category: "Racing",
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Subway-Surfers/thumb.png",
     mirrors: [
-      "https://blobby-boi.github.io/Subway-Surfers/"
-    ],
+        "https://7zeb.github.io/homework/subway-surfers/index.html"
+      ],
     tags: ["Runner", "Endless", "Surfer", "Popular", "Unblocked"],
     rating: 4.9,
     plays: 198000,
     author: "SYBO & Kiloo",
     featured: true,
-    iframeSrc: "https://blobby-boi.github.io/Subway-Surfers/",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Subway Surfers" src="https://blobby-boi.github.io/Subway-Surfers/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://7zeb.github.io/homework/subway-surfers/index.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" src="https://7zeb.github.io/homework/subway-surfers/index.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "WASD / Arrow Keys", action: "Dodge, Jump & Slide" },
       { key: "Space", action: "Activate Hoverboard" }
@@ -334,15 +353,15 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Monkey-Mart/logo.png",
     banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Monkey-Mart/logo.png",
     mirrors: [
-      "https://blobby-boi.github.io/monkey-mart/"
-    ],
+        "https://7zeb.github.io/homework/monkey-mart/index.html"
+      ],
     tags: ["Management", "Sim", "Monkey", "Cute", "Shop", "Unblocked"],
     rating: 4.9,
     plays: 126000,
     author: "TinyDobbins",
     featured: true,
-    iframeSrc: "https://blobby-boi.github.io/monkey-mart/",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Monkey Mart" src="https://blobby-boi.github.io/monkey-mart/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://7zeb.github.io/homework/monkey-mart/index.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" src="https://7zeb.github.io/homework/monkey-mart/index.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "WASD / Arrow Keys", action: "Move Monkey Manager" }
     ]
@@ -355,15 +374,15 @@ const CURATED_GAMES: Game[] = [
     category: "Racing",
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Snow-Rider-3D/snow-rider-3d.jpg",
     mirrors: [
-      "https://frtax.github.io/Snow-Rider-3D/"
-    ],
+        "https://7zeb.github.io/homework/snowrider.html"
+      ],
     tags: ["Sled", "Winter", "3D", "Runner", "Racing", "Unblocked"],
     rating: 4.8,
     plays: 148525,
     author: "Ashima Prabhakar",
     featured: true,
-    iframeSrc: "https://frtax.github.io/Snow-Rider-3D/",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Snow Rider 3D" src="https://frtax.github.io/Snow-Rider-3D/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://7zeb.github.io/homework/snowrider.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" src="https://7zeb.github.io/homework/snowrider.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "A / D or ← / →", action: "Steer Sled Left & Right" },
       { key: "Space or W", action: "Jump Over Chasms" }
@@ -400,15 +419,16 @@ const CURATED_GAMES: Game[] = [
     category: "Sports",
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Basketball-Stars/assets/images/basketball-stars.png",
     mirrors: [
-      "https://html5.gamedistribution.com/69d78d071f704fa183d75b4114ae40ec/"
+      "https://joe-the-chicken.github.io/basketball-stars/",
+      "https://7zeb.github.io/homework/basketballstars.html"
     ],
     tags: ["Basketball", "Sports", "2 Player", "Multiplayer", "Unblocked"],
     rating: 4.8,
     plays: 104000,
     author: "Madpuffers",
     featured: false,
-    iframeSrc: "https://html5.gamedistribution.com/69d78d071f704fa183d75b4114ae40ec/",
-    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Basketball Stars — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://html5.gamedistribution.com/69d78d071f704fa183d75b4114ae40ec/"></iframe>`,
+    iframeSrc: "https://joe-the-chicken.github.io/basketball-stars/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Basketball Stars" src="https://joe-the-chicken.github.io/basketball-stars/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "WASD", action: "Player 1 Move / Jump / Steal" },
       { key: "Arrow Keys", action: "Player 2 Move / Jump / Steal" }
@@ -466,15 +486,15 @@ const CURATED_GAMES: Game[] = [
     category: "Action",
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/1v1-LOL/1v1lol.png",
     mirrors: [
-      "https://blobby-boi.github.io/1v1lol/"
-    ],
+        "https://7zeb.github.io/homework/1v1-lol/index.html"
+      ],
     tags: ["Action", "Shooter", "Building", "Multiplayer", "Unblocked"],
     rating: 4.8,
     plays: 167000,
     author: "JustPlay.LOL",
     featured: true,
-    iframeSrc: "https://blobby-boi.github.io/1v1lol/",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="1v1.LOL" src="https://blobby-boi.github.io/1v1lol/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://7zeb.github.io/homework/1v1-lol/index.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" src="https://7zeb.github.io/homework/1v1-lol/index.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "WASD", action: "Move & Strafe" },
       { key: "Left Click", action: "Shoot / Build" },
@@ -688,20 +708,45 @@ export function formatUBGIframe(title: string, src: string): string {
 }
 
 export const URL_OVERRIDES: Record<string, string> = {
-  // Basket Random: clean non-ubg GitHub Pages host (Securly safe)
+  // Basket Random: clean 7zeb host
   "basket-random": "https://7zeb.github.io/basket-random/",
   "potatoes-basket-random": "https://7zeb.github.io/basket-random/",
 
-  // Snow Rider 3D & Monkey Mart: clean hosts without UBG or pages.dev
-  "snow-rider-3d": "https://frtax.github.io/Snow-Rider-3D/",
-  "monkey-mart": "https://blobby-boi.github.io/monkey-mart/",
+  // Basketball Stars (Clean unblocked hosts)
+  "basketball-stars": "https://joe-the-chicken.github.io/basketball-stars/",
+  "potatoes-basketball-stars": "https://joe-the-chicken.github.io/basketball-stars/",
+  "potatoes-basket-bros": "https://7zeb.github.io/homework/basketbros.html",
 
-  // FNAF Series (Zero-DRM, zero-Securly GitHub ports)
-  "fnaf-1": "https://blobby-boi.github.io/FNAF/",
-  "fnaf-2": "https://blobby-boi.github.io/FNAF2/",
-  "fnaf-3": "https://blobby-boi.github.io/FNAF3/",
-  "fnaf-4": "https://blobby-boi.github.io/FNAF4/",
-  "potatoes-fnaf-browser": "https://blobby-boi.github.io/FNAF/",
+  // Pool Ball / 8-Ball Pool (Clean HTML5 Canvas)
+  "pool-ball": "https://henshmi.github.io/Classic-8-Ball-Pool/dist/",
+  "potatoes-pool-ball": "https://henshmi.github.io/Classic-8-Ball-Pool/dist/",
+  "8-ball-pool": "https://henshmi.github.io/Classic-8-Ball-Pool/dist/",
+
+  // Soccer Random (Clean GitHub hosts)
+  "soccer-random": "https://gameinclassroom.github.io/soccer-random/",
+  "potatoes-soccer-random": "https://gameinclassroom.github.io/soccer-random/",
+  "potatoes-soccer-skils": "https://gameinclassroom.github.io/soccer-random/",
+
+  // Volley Random (Clean GitHub hosts)
+  "volley-random": "https://gameinclassroom.github.io/volley-random/",
+  "potatoes-volley-random": "https://gameinclassroom.github.io/volley-random/",
+
+  // Geometry Dash (7zeb Remastered Godot Build)
+  "geometry-dash": "https://7zeb.github.io/homework/geometry-dash-remastered/index.html",
+  "potatoes-geometry-dash": "https://7zeb.github.io/homework/geometry-dash-remastered/index.html",
+  "potatoes-geometry-dash-sub-zero": "https://7zeb.github.io/homework/geometry-dash-remastered/index.html",
+  "potatoes-geometry-dash-meltdown": "https://7zeb.github.io/homework/geometryvibes.html",
+
+  // Snow Rider 3D & Monkey Mart: 7zeb host
+  "snow-rider-3d": "https://7zeb.github.io/homework/snowrider.html",
+  "monkey-mart": "https://7zeb.github.io/homework/monkey-mart/index.html",
+
+  // FNAF Series (7zeb & academics-study clean ports)
+  "fnaf-1": "https://7zeb.github.io/homework/fnaf.html",
+  "fnaf-2": "https://academics-study.github.io/hd_fnaf/2/",
+  "fnaf-3": "https://academics-study.github.io/hd_fnaf/3/",
+  "fnaf-4": "https://academics-study.github.io/hd_fnaf/4/",
+  "potatoes-fnaf-browser": "https://7zeb.github.io/homework/fnaf.html",
   "fnaf-world": "https://irv77.github.io/hd_fnaf/w/",
   "fnaf-sister-location": "https://irv77.github.io/hd_fnaf/sl/",
   "fnaf-5": "https://irv77.github.io/hd_fnaf/sl/",
@@ -709,36 +754,44 @@ export const URL_OVERRIDES: Record<string, string> = {
   "fnaf-pizzasim": "https://irv77.github.io/hd_fnaf/ps/",
   "fnaf-ucn": "https://irv77.github.io/hd_fnaf/ucn/",
 
-  // Top Games on Blobby-Boi (Zero "ubg" keywords, bypasses Securly Pass)
-  "retro-bowl": "https://blobby-boi.github.io/retro-bowl/",
-  "slope": "https://blobby-boi.github.io/Slope/",
-  "subway-surfers": "https://blobby-boi.github.io/Subway-Surfers/",
-  "potatoes-subway-surfers": "https://blobby-boi.github.io/Subway-Surfers/",
-  "potatoes-subway-surfers-havana": "https://blobby-boi.github.io/Subway-Surfers/",
-  "potatoes-subway-surfers-hong-kong": "https://blobby-boi.github.io/Subway-Surfers/",
-  "potatoes-subway-surfers-iceland": "https://blobby-boi.github.io/Subway-Surfers/",
-  "drive-mad": "https://blobby-boi.github.io/drive-mad/",
-  "stickman-hook": "https://blobby-boi.github.io/Stickman-Hook/",
-  "soccer-random": "https://blobby-boi.github.io/soccer-random/",
-  "cookie-clicker": "https://blobby-boi.github.io/Cookie-Clicker/",
-  "1v1-lol": "https://blobby-boi.github.io/1v1lol/",
-  "flappy-bird": "https://blobby-boi.github.io/flappy-bird/",
-
-  // Other classics
-  "moto3xm": "https://ubghyper.github.io/GameList.github.io/Moto3XM/",
-  "crossy-road": "https://ubghyper.github.io/GameList.github.io/Crossy-Road/",
-  "tiny-fishing": "https://ubghyper.github.io/GameList.github.io/Tiny-Fishing/",
-  "doodle-jump": "https://ubghyper.github.io/GameList.github.io/Doodle-Jump/",
-  "happy-wheels": "https://ubghyper.github.io/GameList.github.io/Happy-Wheels/",
-  "2048": "https://ubghyper.github.io/GameList.github.io/2048/",
-  "block-blast": "https://ubghyper.github.io/GameList.github.io/Block-Blast/",
-  "volley-random": "https://ubghyper.github.io/GameList.github.io/Volley-Random/",
-  "smash-karts": "https://ubghyper.github.io/GameList.github.io/Smash-Karts/",
-  "duck-life": "https://ubghyper.github.io/GameList.github.io/Duck-Life/",
-  "geometry-dash": "https://ubghyper.github.io/GameList.github.io/Geometry-Dash/",
-  "bitlife": "https://ubghyper.github.io/GameList.github.io/Bitlife/",
-  "level-devil": "https://ubghyper.github.io/GameList.github.io/Level-Devil/",
-  "sprunki": "https://ubghyper.github.io/GameList.github.io/Sprunki/"
+  // Top Games on 7zeb, Academics-Study, and JavaSpence (Zero Securly blocks)
+  "retro-bowl": "https://javaspence.github.io/retrobowl/",
+  "potatoes-retro-bowl": "https://javaspence.github.io/retrobowl/",
+  "slope": "https://7zeb.github.io/homework/slope.html",
+  "subway-surfers": "https://7zeb.github.io/homework/subway-surfers/index.html",
+  "potatoes-subway-surfers": "https://7zeb.github.io/homework/subway-surfers/index.html",
+  "potatoes-subway-surfers-havana": "https://7zeb.github.io/homework/subway-surfers/index.html",
+  "potatoes-subway-surfers-hong-kong": "https://7zeb.github.io/homework/subway-surfers/index.html",
+  "potatoes-subway-surfers-iceland": "https://7zeb.github.io/homework/subway-surfers/index.html",
+  "drive-mad": "https://academics-study.github.io/drive-mad/",
+  "cookie-clicker": "https://7zeb.github.io/homework/cookieclicker.html",
+  "1v1-lol": "https://7zeb.github.io/homework/1v1-lol/index.html",
+  "flappy-bird": "https://7zeb.github.io/homework/flappy-bird/index.html",
+  "potatoes-flappy-bird": "https://7zeb.github.io/homework/flappy-bird/index.html",
+  "moto3xm": "https://7zeb.github.io/homework/motox3m.html",
+  "potatoes-moto-x3m": "https://7zeb.github.io/homework/motox3m.html",
+  "crossy-road": "https://7zeb.github.io/homework/crossyroad.html",
+  "potatoes-crossy-road": "https://7zeb.github.io/homework/crossyroad.html",
+  "tiny-fishing": "https://7zeb.github.io/homework/tinyfishing.html",
+  "doodle-jump": "https://7zeb.github.io/homework/doodlejump.html",
+  "drift-boss": "https://7zeb.github.io/homework/driftboss.html",
+  "bitlife": "https://7zeb.github.io/homework/bit-life/index.html",
+  "2048": "https://7zeb.github.io/homework/2048.html",
+  "potatoes-paper-io": "https://7zeb.github.io/homework/paperio2.html",
+  "potatoes-hole-io": "https://7zeb.github.io/homework/holeio.html",
+  "potatoes-the-impossible-quiz": "https://7zeb.github.io/homework/theimpossiblequiz.html",
+  "potatoes-rooftop-snipers": "https://7zeb.github.io/homework/rooftopsnipers.html",
+  "potatoes-run-3": "https://7zeb.github.io/homework/run3.html",
+  "potatoes-jetpack-joyride": "https://7zeb.github.io/homework/jetpackjoyride.html",
+  "potatoes-pacman": "https://7zeb.github.io/homework/pacman.html",
+  "potatoes-eggy-car": "https://7zeb.github.io/homework/eggycar.html",
+  "potatoes-granny": "https://7zeb.github.io/homework/granny.html",
+  "potatoes-granny-2": "https://7zeb.github.io/homework/granny2.html",
+  "potatoes-red-ball-4": "https://7zeb.github.io/homework/redball4vol1.html",
+  "potatoes-temple-run-2": "https://7zeb.github.io/homework/templerun2.html",
+  "potatoes-vex-7": "https://7zeb.github.io/homework/vex7.html",
+  "potatoes-vex-8": "https://7zeb.github.io/homework/vex8.html",
+  "potatoes-tunnel-rush": "https://7zeb.github.io/homework/tunnelrush.html"
 };
 
 function buildDefaultGames(): Game[] {
@@ -752,10 +805,21 @@ function buildDefaultGames(): Game[] {
     } else if (src.startsWith('/g/')) {
       const slug = src.replace(/^\/g\//, '').replace(/\/$/, '');
       src = `https://ubghyper.github.io/GameList.github.io/${slug}/`;
-    } else if (src.includes('.pages.dev')) {
-      const match = src.match(/https:\/\/([^.]+)\.pages\.dev/);
-      if (match) {
-        src = `https://ubghyper.github.io/GameList.github.io/${match[1]}/`;
+    }
+
+    // Automatically prefer non-Securly clean mirrors if primary is blocked
+    if (src.includes('ubghyper') || src.includes('pages.dev') || src.includes('gamedistribution.com') || (src.startsWith('games/') && !src.startsWith('games/watermelon') && !src.startsWith('games/snake') && !src.startsWith('games/tetris') && !src.startsWith('games/2048') && !src.startsWith('games/breakout') && !src.startsWith('games/flappy') && !src.startsWith('games/space') && !src.startsWith('games/pong'))) {
+      const cleanMirror = (g.mirrors || []).find(m => 
+        m.includes('freeonlinewebtools.github.io') || 
+        m.includes('7zeb.github.io') || 
+        m.includes('academics-study.github.io') ||
+        m.includes('javaspence.github.io') ||
+        m.includes('henshmi.github.io') ||
+        m.includes('joe-the-chicken.github.io') ||
+        m.includes('gameinclassroom.github.io')
+      );
+      if (cleanMirror) {
+        src = cleanMirror;
       }
     }
 
@@ -765,7 +829,7 @@ function buildDefaultGames(): Game[] {
       ...g,
       iframeSrc: src,
       mirrors,
-      sandbox: undefined, // Unrestricted so GameDistribution & Unity games load without sandbox issues
+      sandbox: undefined, // Unrestricted so Unity and HTML5 games load without sandbox errors
       iframeCode: formatGameIframe(g.title, src),
       secondaryCategory: g.secondaryCategory || defaultCategory
     };
