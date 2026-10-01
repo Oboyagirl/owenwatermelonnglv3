@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Game } from '../types/game';
-import { DEFAULT_GAMES, formatUBGIframe, STANDARD_UBG_SANDBOX } from '../data/defaultGames';
+import { DEFAULT_GAMES, formatGameIframe } from '../data/defaultGames';
 
-const STORAGE_KEY = 'owen_watermelon_v3_games_v29';
+const STORAGE_KEY = 'owen_watermelon_v3_games_v30';
 const FAVORITES_KEY = 'owen_watermelon_v3_favorites';
 
 export function resolveAssetUrl(url: string): string {
@@ -50,8 +50,8 @@ function sanitizeGame(game: Game): Game {
       thumbnail: authoritative.thumbnail,
       banner: authoritative.banner,
       iframeSrc: authoritative.iframeSrc,
-      sandbox: STANDARD_UBG_SANDBOX,
-      iframeCode: formatUBGIframe(authoritative.title, authoritative.iframeSrc),
+      sandbox: undefined,
+      iframeCode: formatGameIframe(authoritative.title, authoritative.iframeSrc),
       source: authoritative.source || game.source || 'unblocked',
       secondaryCategory: authoritative.secondaryCategory || game.secondaryCategory || 'Potato Classics',
       mirrors: authoritative.mirrors || game.mirrors,
@@ -65,7 +65,9 @@ function sanitizeGame(game: Game): Game {
   }
 
   let iframeSrc = game.iframeSrc || '';
-  if (iframeSrc.startsWith('/g/')) {
+  if (game.id === 'basket-random' || game.id === 'potatoes-basket-random') {
+    iframeSrc = "https://html5.gamedistribution.com/bf1268dccb5d43e7970bb3edaa54afc8?gd_sdk_referrer_url=https://basketrandom.io/basket-random";
+  } else if (iframeSrc.startsWith('/g/')) {
     const slug = iframeSrc.replace(/^\/g\//, '').replace(/\/$/, '');
     iframeSrc = `https://ubghyper.github.io/GameList.github.io/${slug}/`;
   } else if (iframeSrc && iframeSrc.startsWith('/games/')) {
@@ -76,8 +78,8 @@ function sanitizeGame(game: Game): Game {
     ...game, 
     thumbnail: thumb, 
     iframeSrc, 
-    sandbox: STANDARD_UBG_SANDBOX,
-    iframeCode: formatUBGIframe(game.title, iframeSrc),
+    sandbox: undefined,
+    iframeCode: formatGameIframe(game.title, iframeSrc),
     source: game.source || 'unblocked',
     secondaryCategory: game.secondaryCategory || 'Potato Classics'
   };
@@ -95,7 +97,8 @@ export function useGamesStore() {
         'owen_watermelon_v3_games_v12', 
         'owen_watermelon_v3_games_v13',
         'owen_watermelon_v3_games_v27',
-        'owen_watermelon_v3_games_v28'
+        'owen_watermelon_v3_games_v28',
+        'owen_watermelon_v3_games_v29'
       ].forEach(k => {
         localStorage.removeItem(k);
       });

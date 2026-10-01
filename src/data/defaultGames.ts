@@ -12,16 +12,16 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Basket-Random/basketrandom.jpg",
     banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Basket-Random/splash.jpeg",
     mirrors: [
-      "https://basket-random.pages.dev/",
-      "https://html5.gamedistribution.com/bf1268dccb5d43e7970bb3edaa54afc8/"
+      "https://html5.gamedistribution.com/bf1268dccb5d43e7970bb3edaa54afc8?gd_sdk_referrer_url=https://basketrandom.io/basket-random",
+      "https://basket-random.pages.dev/"
     ],
     tags: ["Basketball", "2 Player", "Ragdoll", "Sports", "Multiplayer", "Unblocked"],
     rating: 4.9,
     plays: 95400,
     author: "RHM Interactive",
     featured: true,
-    iframeSrc: "https://basket-random.pages.dev/",
-    iframeCode: `<iframe id="plyIframe" class="ply-iframe" title="Basket Random — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="https://basket-random.pages.dev/"></iframe>`,
+    iframeSrc: "https://html5.gamedistribution.com/bf1268dccb5d43e7970bb3edaa54afc8?gd_sdk_referrer_url=https://basketrandom.io/basket-random",
+    iframeCode: `<iframe class="game-iframe" id="game-area" src="https://html5.gamedistribution.com/bf1268dccb5d43e7970bb3edaa54afc8?gd_sdk_referrer_url=https://basketrandom.io/basket-random" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "W", action: "Player 1 Jump & Shoot" },
       { key: "Up Arrow", action: "Player 2 Jump & Shoot" }
@@ -674,10 +674,14 @@ const CURATED_GAMES: Game[] = [
   }
 ];
 
-export const STANDARD_UBG_SANDBOX = "allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups";
+export const STANDARD_ALLOW_PERMISSIONS = "autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope";
+
+export function formatGameIframe(title: string, src: string): string {
+  return `<iframe class="game-iframe" id="game-area" title="${title}" src="${src}" allow="${STANDARD_ALLOW_PERMISSIONS}" allowfullscreen=""></iframe>`;
+}
 
 export function formatUBGIframe(title: string, src: string): string {
-  return `<iframe id="plyIframe" class="ply-iframe" title="${title} — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="${STANDARD_UBG_SANDBOX}" src="${src}"></iframe>`;
+  return formatGameIframe(title, src);
 }
 
 function buildDefaultGames(): Game[] {
@@ -690,11 +694,16 @@ function buildDefaultGames(): Game[] {
       const slug = src.replace(/^\/g\//, '').replace(/\/$/, '');
       src = `https://ubghyper.github.io/GameList.github.io/${slug}/`;
     }
+    // Specific fix for Basket Random
+    if (g.id === 'basket-random' || g.id === 'potatoes-basket-random') {
+      src = "https://html5.gamedistribution.com/bf1268dccb5d43e7970bb3edaa54afc8?gd_sdk_referrer_url=https://basketrandom.io/basket-random";
+    }
+
     return {
       ...g,
       iframeSrc: src,
-      sandbox: STANDARD_UBG_SANDBOX,
-      iframeCode: formatUBGIframe(g.title, src),
+      sandbox: undefined, // Unrestricted so GameDistribution & Unity games load without sandbox issues
+      iframeCode: formatGameIframe(g.title, src),
       secondaryCategory: g.secondaryCategory || defaultCategory
     };
   };

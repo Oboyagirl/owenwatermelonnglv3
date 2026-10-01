@@ -48,7 +48,7 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
   const [keyCounter, setKeyCounter] = useState(0);
 
   // Live Iframe HTML Replacement State
-  const defaultIframeCode = game.iframeCode || `<iframe id="plyIframe" class="ply-iframe" title="${game.title} — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="${game.iframeSrc}"></iframe>`;
+  const defaultIframeCode = game.iframeCode || `<iframe class="game-iframe" id="game-area" title="${game.title}" src="${game.iframeSrc}" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`;
   const [showIframeEditor, setShowIframeEditor] = useState(false);
   const [iframeHtmlInput, setIframeHtmlInput] = useState(defaultIframeCode);
   const [activeIframeSrc, setActiveIframeSrc] = useState(game.iframeSrc);
@@ -75,7 +75,7 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
 
   // Sync state whenever the selected game changes
   useEffect(() => {
-    const code = game.iframeCode || `<iframe id="plyIframe" class="ply-iframe" title="${game.title} — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="${game.iframeSrc}"></iframe>`;
+    const code = game.iframeCode || `<iframe class="game-iframe" id="game-area" title="${game.title}" src="${game.iframeSrc}" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`;
     setIframeHtmlInput(code);
     setActiveIframeSrc(game.iframeSrc);
     setActiveCustomHtml(game.customHtml);
@@ -95,7 +95,7 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
     const nextSrc = mirrorsList[nextIdx];
     setActiveIframeSrc(nextSrc);
     setActiveCustomHtml(undefined);
-    setIframeHtmlInput(`<iframe id="plyIframe" class="ply-iframe" title="${game.title} — UBGHyper" allow="fullscreen; autoplay" allowfullscreen="" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups" src="${nextSrc}"></iframe>`);
+    setIframeHtmlInput(`<iframe class="game-iframe" id="game-area" title="${game.title}" src="${nextSrc}" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`);
     setKeyCounter(prev => prev + 1);
   };
 
@@ -384,19 +384,18 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
           </div>
         </div>
 
-        {/* The Game Iframe - Exact UBGHyper Embed Format */}
+        {/* The Game Iframe - Universal Unrestricted Embed Format */}
         <div className="relative flex-1 w-full h-full bg-[#08160f] overflow-hidden">
           <iframe
             key={`${game.id}-${keyCounter}-${useProxy ? 'proxied' : 'direct'}`}
             ref={iframeRef}
-            id="plyIframe"
-            className="w-full h-full border-0 block ply-iframe"
-            title={`${game.title} — UBGHyper`}
+            id="game-area"
+            className="w-full h-full border-0 block game-iframe"
+            title={game.title}
             src={resolvedIframeSrc}
             srcDoc={activeCustomHtml || undefined}
-            allow="fullscreen; autoplay"
+            allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope"
             allowFullScreen
-            sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-top-navigation-by-user-activation allow-popups"
           />
         </div>
       </div>
