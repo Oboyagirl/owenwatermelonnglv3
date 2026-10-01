@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Game } from '../types/game';
-import { DEFAULT_GAMES, formatGameIframe } from '../data/defaultGames';
+import { DEFAULT_GAMES, formatGameIframe, URL_OVERRIDES } from '../data/defaultGames';
 
-const STORAGE_KEY = 'owen_watermelon_v3_games_v30';
+const STORAGE_KEY = 'owen_watermelon_v3_games_v31';
 const FAVORITES_KEY = 'owen_watermelon_v3_favorites';
 
 export function resolveAssetUrl(url: string): string {
@@ -65,11 +65,16 @@ function sanitizeGame(game: Game): Game {
   }
 
   let iframeSrc = game.iframeSrc || '';
-  if (game.id === 'basket-random' || game.id === 'potatoes-basket-random') {
-    iframeSrc = "https://html5.gamedistribution.com/bf1268dccb5d43e7970bb3edaa54afc8?gd_sdk_referrer_url=https://basketrandom.io/basket-random";
+  if (URL_OVERRIDES[game.id]) {
+    iframeSrc = URL_OVERRIDES[game.id];
   } else if (iframeSrc.startsWith('/g/')) {
     const slug = iframeSrc.replace(/^\/g\//, '').replace(/\/$/, '');
     iframeSrc = `https://ubghyper.github.io/GameList.github.io/${slug}/`;
+  } else if (iframeSrc.includes('.pages.dev')) {
+    const match = iframeSrc.match(/https:\/\/([^.]+)\.pages\.dev/);
+    if (match) {
+      iframeSrc = `https://ubghyper.github.io/GameList.github.io/${match[1]}/`;
+    }
   } else if (iframeSrc && iframeSrc.startsWith('/games/')) {
     iframeSrc = iframeSrc.slice(1);
   }
@@ -98,7 +103,8 @@ export function useGamesStore() {
         'owen_watermelon_v3_games_v13',
         'owen_watermelon_v3_games_v27',
         'owen_watermelon_v3_games_v28',
-        'owen_watermelon_v3_games_v29'
+        'owen_watermelon_v3_games_v29',
+        'owen_watermelon_v3_games_v30'
       ].forEach(k => {
         localStorage.removeItem(k);
       });

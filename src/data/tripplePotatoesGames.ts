@@ -22,7 +22,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": true,
-    "iframeSrc": "https://subway-surfers.pages.dev/",
+    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Subway-Surfers/",
     "iframeCode": "<iframe src=\"https://subway-surfers.pages.dev/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://subway-surfers.pages.dev/",
@@ -59,7 +59,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": true,
-    "iframeSrc": "https://subway-surfers.pages.dev/",
+    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Subway-Surfers/",
     "iframeCode": "<iframe src=\"https://subway-surfers.pages.dev/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://subway-surfers.pages.dev/",
@@ -96,7 +96,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": true,
-    "iframeSrc": "https://subway-surfers.pages.dev/",
+    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Subway-Surfers/",
     "iframeCode": "<iframe src=\"https://subway-surfers.pages.dev/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://subway-surfers.pages.dev/",
@@ -133,7 +133,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": true,
-    "iframeSrc": "https://subway-surfers.pages.dev/",
+    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Subway-Surfers/",
     "iframeCode": "<iframe src=\"https://subway-surfers.pages.dev/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://subway-surfers.pages.dev/",
@@ -849,7 +849,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/FNAF-Browser/",
+    "iframeSrc": "https://irv77.github.io/hd_fnaf/1/",
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/FNAF-Browser/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/FNAF-Browser/",
@@ -5037,7 +5037,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "games/basket-random/index.html",
+    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Basket-Random/",
     "iframeCode": "<iframe src=\"games/basket-random/index.html\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "games/basket-random/index.html",

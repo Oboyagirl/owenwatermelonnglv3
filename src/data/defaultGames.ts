@@ -684,24 +684,82 @@ export function formatUBGIframe(title: string, src: string): string {
   return formatGameIframe(title, src);
 }
 
+export const URL_OVERRIDES: Record<string, string> = {
+  // Basket Random: unblocked GitHub Pages mirror
+  "basket-random": "https://ubghyper.github.io/GameList.github.io/Basket-Random/",
+  "potatoes-basket-random": "https://ubghyper.github.io/GameList.github.io/Basket-Random/",
+
+  // Snow Rider 3D & Monkey Mart
+  "snow-rider-3d": "https://ubghyper.github.io/GameList.github.io/Snow-Rider-3D/",
+  "monkey-mart": "https://ubghyper.github.io/GameList.github.io/Monkey-Mart/",
+
+  // FNAF Series (Zero-DRM standalone HTML5 ports hosted on github.io)
+  "fnaf-1": "https://irv77.github.io/hd_fnaf/1/",
+  "fnaf-2": "https://irv77.github.io/hd_fnaf/2/",
+  "fnaf-3": "https://irv77.github.io/hd_fnaf/3/",
+  "fnaf-4": "https://irv77.github.io/hd_fnaf/4/",
+  "fnaf-world": "https://irv77.github.io/hd_fnaf/w/",
+  "fnaf-sister-location": "https://irv77.github.io/hd_fnaf/sl/",
+  "fnaf-5": "https://irv77.github.io/hd_fnaf/sl/",
+  "five-nights-at-freddys-pizzeria-simulator": "https://irv77.github.io/hd_fnaf/ps/",
+  "fnaf-pizzasim": "https://irv77.github.io/hd_fnaf/ps/",
+  "fnaf-ucn": "https://irv77.github.io/hd_fnaf/ucn/",
+  "potatoes-fnaf-browser": "https://irv77.github.io/hd_fnaf/1/",
+
+  // All pages.dev replacements -> unblocked github.io
+  "drive-mad": "https://ubghyper.github.io/GameList.github.io/Drive-Mad/",
+  "slope": "https://ubghyper.github.io/GameList.github.io/Slope/",
+  "cookie-clicker": "https://ubghyper.github.io/GameList.github.io/Cookie-Clicker/",
+  "subway-surfers": "https://ubghyper.github.io/GameList.github.io/Subway-Surfers/",
+  "potatoes-subway-surfers": "https://ubghyper.github.io/GameList.github.io/Subway-Surfers/",
+  "potatoes-subway-surfers-havana": "https://ubghyper.github.io/GameList.github.io/Subway-Surfers/",
+  "potatoes-subway-surfers-hong-kong": "https://ubghyper.github.io/GameList.github.io/Subway-Surfers/",
+  "potatoes-subway-surfers-iceland": "https://ubghyper.github.io/GameList.github.io/Subway-Surfers/",
+  "moto3xm": "https://ubghyper.github.io/GameList.github.io/Moto3XM/",
+  "crossy-road": "https://ubghyper.github.io/GameList.github.io/Crossy-Road/",
+  "1v1-lol": "https://ubghyper.github.io/GameList.github.io/1v1-LOL/",
+  "tiny-fishing": "https://ubghyper.github.io/GameList.github.io/Tiny-Fishing/",
+  "doodle-jump": "https://ubghyper.github.io/GameList.github.io/Doodle-Jump/",
+  "happy-wheels": "https://ubghyper.github.io/GameList.github.io/Happy-Wheels/",
+  "2048": "https://ubghyper.github.io/GameList.github.io/2048/",
+  "stickman-hook": "https://ubghyper.github.io/GameList.github.io/Stickman-Hook/",
+  "block-blast": "https://ubghyper.github.io/GameList.github.io/Block-Blast/",
+  "flappy-bird": "https://ubghyper.github.io/GameList.github.io/Flappy-Bird/",
+  "soccer-random": "https://ubghyper.github.io/GameList.github.io/Soccer-Random/",
+  "volley-random": "https://ubghyper.github.io/GameList.github.io/Volley-Random/",
+  "smash-karts": "https://ubghyper.github.io/GameList.github.io/Smash-Karts/",
+  "duck-life": "https://ubghyper.github.io/GameList.github.io/Duck-Life/",
+  "geometry-dash": "https://ubghyper.github.io/GameList.github.io/Geometry-Dash/",
+  "bitlife": "https://ubghyper.github.io/GameList.github.io/Bitlife/",
+  "level-devil": "https://ubghyper.github.io/GameList.github.io/Level-Devil/",
+  "sprunki": "https://ubghyper.github.io/GameList.github.io/Sprunki/",
+  "retro-bowl": "https://ubghyper.github.io/GameList.github.io/Retro-Bowl/"
+};
+
 function buildDefaultGames(): Game[] {
   const seen = new Set<string>();
   const games: Game[] = [];
 
   const normalizeGame = (g: Game, defaultCategory: string): Game => {
     let src = g.iframeSrc || '';
-    if (src.startsWith('/g/')) {
+    if (URL_OVERRIDES[g.id]) {
+      src = URL_OVERRIDES[g.id];
+    } else if (src.startsWith('/g/')) {
       const slug = src.replace(/^\/g\//, '').replace(/\/$/, '');
       src = `https://ubghyper.github.io/GameList.github.io/${slug}/`;
+    } else if (src.includes('.pages.dev')) {
+      const match = src.match(/https:\/\/([^.]+)\.pages\.dev/);
+      if (match) {
+        src = `https://ubghyper.github.io/GameList.github.io/${match[1]}/`;
+      }
     }
-    // Specific fix for Basket Random
-    if (g.id === 'basket-random' || g.id === 'potatoes-basket-random') {
-      src = "https://html5.gamedistribution.com/bf1268dccb5d43e7970bb3edaa54afc8?gd_sdk_referrer_url=https://basketrandom.io/basket-random";
-    }
+
+    const mirrors = [src, ...(g.mirrors || []).filter(m => m !== src)];
 
     return {
       ...g,
       iframeSrc: src,
+      mirrors,
       sandbox: undefined, // Unrestricted so GameDistribution & Unity games load without sandbox issues
       iframeCode: formatGameIframe(g.title, src),
       secondaryCategory: g.secondaryCategory || defaultCategory
