@@ -2,19 +2,22 @@ import React, { useState } from 'react';
 import { Play, Heart, Star } from 'lucide-react';
 import { Game } from '../types/game';
 import { resolveAssetUrl } from '../services/gamesStore';
+import { ThemeConfig, THEMES } from '../services/themeStore';
 
 interface GameCardProps {
   game: Game;
   isFavorite: boolean;
   onToggleFavorite: (id: string) => void;
   onPlay: (game: Game) => void;
+  activeTheme?: ThemeConfig;
 }
 
 export const GameCard: React.FC<GameCardProps> = ({
   game,
   isFavorite,
   onToggleFavorite,
-  onPlay
+  onPlay,
+  activeTheme = THEMES.original
 }) => {
   const [imgError, setImgError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -30,10 +33,18 @@ export const GameCard: React.FC<GameCardProps> = ({
       onClick={() => onPlay(game)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group relative flex flex-col bg-[#0a1a11]/90 hover:bg-[#0e2619] border border-[#16402a] hover:border-[#10b981]/50 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-[#10b981]/10 hover:-translate-y-1 cursor-pointer select-none"
+      className="group relative flex flex-col rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 cursor-pointer select-none border"
+      style={{
+        backgroundColor: activeTheme.bgCard,
+        borderColor: isHovered ? activeTheme.borderActive : activeTheme.border,
+        boxShadow: isHovered ? `0 12px 24px ${activeTheme.accentGlow}` : undefined
+      }}
     >
       {/* Thumbnail Container */}
-      <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#07130c]">
+      <div 
+        className="relative aspect-[16/10] w-full overflow-hidden"
+        style={{ backgroundColor: activeTheme.bgPrimary }}
+      >
         <img
           src={resolvedThumb}
           alt={game.title}
@@ -44,12 +55,21 @@ export const GameCard: React.FC<GameCardProps> = ({
         />
 
         {/* Gradient Shadow Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a1a11] via-[#0a1a11]/20 to-transparent opacity-90" />
+        <div 
+          className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-90"
+        />
 
         {/* Top Floating Badges */}
         <div className="absolute top-2.5 inset-x-2.5 flex items-center justify-between pointer-events-none z-10">
           <div className="flex flex-wrap items-center gap-1.5 max-w-[80%]">
-            <span className="px-2 py-0.5 text-[11px] font-bold tracking-wide uppercase bg-[#064e3b]/90 text-[#34d399] border border-[#10b981]/30 rounded-md backdrop-blur-xs shadow-xs">
+            <span 
+              className="px-2 py-0.5 text-[11px] font-bold tracking-wide uppercase border rounded-md backdrop-blur-xs shadow-xs"
+              style={{
+                backgroundColor: activeTheme.accentBadge,
+                borderColor: activeTheme.border,
+                color: activeTheme.kicker
+              }}
+            >
               {game.category}
             </span>
             {game.secondaryCategory && (
@@ -79,7 +99,14 @@ export const GameCard: React.FC<GameCardProps> = ({
 
         {/* Play Overlay Button on Hover */}
         <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0'} pointer-events-none`}>
-          <div className="w-12 h-12 rounded-full bg-[#10b981] text-[#064e3b] flex items-center justify-center shadow-lg shadow-[#10b981]/40 transform scale-90 group-hover:scale-100 transition-transform">
+          <div 
+            className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform"
+            style={{
+              backgroundColor: activeTheme.accent,
+              color: activeTheme.accentText,
+              boxShadow: `0 0 20px ${activeTheme.accentGlow}`
+            }}
+          >
             <Play className="w-6 h-6 fill-current translate-x-0.5" />
           </div>
         </div>
@@ -89,7 +116,12 @@ export const GameCard: React.FC<GameCardProps> = ({
       <div className="p-3.5 flex flex-col flex-1 justify-between gap-2.5">
         <div>
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-bold text-sm text-slate-100 group-hover:text-emerald-300 transition-colors line-clamp-1 leading-snug">
+            <h3 
+              className="font-bold text-sm text-slate-100 transition-colors line-clamp-1 leading-snug"
+              style={{
+                color: isHovered ? activeTheme.kicker : '#f1f5f9'
+              }}
+            >
               {game.title}
             </h3>
             {game.rating && (
@@ -108,7 +140,10 @@ export const GameCard: React.FC<GameCardProps> = ({
         </div>
 
         {/* Card Footer */}
-        <div className="flex items-center justify-between pt-1 border-t border-[#16402a]/60 text-[11px] text-slate-400 font-mono">
+        <div 
+          className="flex items-center justify-between pt-1 border-t text-[11px] text-slate-400 font-mono"
+          style={{ borderColor: activeTheme.border }}
+        >
           <div className="flex items-center gap-2">
             {game.plays ? (
               <span>{game.plays.toLocaleString()} plays</span>
@@ -117,7 +152,10 @@ export const GameCard: React.FC<GameCardProps> = ({
             )}
           </div>
 
-          <span className="text-emerald-400/80 group-hover:text-emerald-300 flex items-center gap-1 font-semibold text-[11px]">
+          <span 
+            className="flex items-center gap-1 font-semibold text-[11px] transition-colors"
+            style={{ color: activeTheme.accent }}
+          >
             <span>Play</span>
             <Play className="w-2.5 h-2.5 fill-current" />
           </span>

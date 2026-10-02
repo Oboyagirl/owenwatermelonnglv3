@@ -1,9 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { EyeOff, ShieldAlert, Sparkles, Check, Copy, Bookmark, ExternalLink } from 'lucide-react';
-import { CLOAK_PRESETS, applyCloak, triggerPanic } from '../data/cloakPresets';
+import React, { useState } from 'react';
+import { EyeOff, ShieldAlert, Check, Copy, Bookmark, ExternalLink } from 'lucide-react';
+import { CLOAK_PRESETS, applyCloak } from '../data/cloakPresets';
 import { CloakPreset } from '../types/game';
+import { ThemeConfig, THEMES } from '../services/themeStore';
 
-export const TabCloaker: React.FC = () => {
+interface TabCloakerProps {
+  activeTheme?: ThemeConfig;
+}
+
+export const TabCloaker: React.FC<TabCloakerProps> = ({
+  activeTheme = THEMES.original
+}) => {
   const [activeId, setActiveId] = useState<string>(() => {
     try {
       return localStorage.getItem('owen_active_cloak') || 'default';
@@ -81,8 +88,8 @@ export const TabCloaker: React.FC = () => {
       {/* Title */}
       <div>
         <h2 className="text-2xl font-bold text-white flex items-center gap-2.5">
-          <EyeOff className="w-6 h-6 text-[#10b981]" />
-          Tab Cloaker & Stealth Camouflage
+          <EyeOff className="w-6 h-6" style={{ color: activeTheme.accent }} />
+          <span>Tab Cloaker & Stealth Camouflage</span>
         </h2>
         <p className="text-xs text-slate-400 mt-1">
           Disguise the Owen Watermelon tab with authentic titles and icons like Google Classroom, Google Drive, or Canvas.
@@ -90,17 +97,35 @@ export const TabCloaker: React.FC = () => {
       </div>
 
       {/* Simulated Tab Bar Preview */}
-      <div className="bg-[#0c2016] border border-[#16402a] rounded-xl p-4 flex flex-col gap-3">
-        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+      <div 
+        className="rounded-2xl p-5 border flex flex-col gap-3 transition-colors"
+        style={{
+          backgroundColor: activeTheme.bgCard,
+          borderColor: activeTheme.border
+        }}
+      >
+        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
           Live Browser Tab Simulation
         </span>
-        <div className="bg-[#08160f] border border-[#16402a] rounded-lg p-2.5 flex items-center gap-3">
+        <div 
+          className="rounded-xl p-3 flex items-center gap-3 border"
+          style={{
+            backgroundColor: activeTheme.bgPrimary,
+            borderColor: activeTheme.border
+          }}
+        >
           <div className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-full bg-red-500/80"></span>
             <span className="w-3 h-3 rounded-full bg-yellow-500/80"></span>
             <span className="w-3 h-3 rounded-full bg-green-500/80"></span>
           </div>
-          <div className="flex items-center gap-2 bg-[#0c2016] px-3 py-1.5 rounded-md border border-[#16402a] max-w-xs shadow-inner">
+          <div 
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg border max-w-xs shadow-inner"
+            style={{
+              backgroundColor: activeTheme.bgCard,
+              borderColor: activeTheme.border
+            }}
+          >
             <span className="text-base">
               {CLOAK_PRESETS.find(p => p.id === activeId)?.icon || '🍉'}
             </span>
@@ -108,7 +133,10 @@ export const TabCloaker: React.FC = () => {
               {document.title}
             </span>
           </div>
-          <span className="text-[11px] text-[#10b981] ml-auto font-medium hidden sm:inline">
+          <span 
+            className="text-[11px] ml-auto font-bold hidden sm:inline"
+            style={{ color: activeTheme.accent }}
+          >
             Active Disguise Applied ✓
           </span>
         </div>
@@ -125,19 +153,22 @@ export const TabCloaker: React.FC = () => {
             return (
               <button
                 key={preset.id}
+                type="button"
                 onClick={() => handleSelectPreset(preset)}
-                className={`flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
-                  isActive
-                    ? 'bg-[#10b981]/15 border-[#10b981] text-white shadow-md shadow-[#10b981]/10'
-                    : 'bg-[#0c2016] border-[#16402a] hover:border-[#10b981]/50 text-slate-300 hover:text-white'
-                }`}
+                className="flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all cursor-pointer"
+                style={{
+                  backgroundColor: isActive ? activeTheme.accentBadge : activeTheme.bgCard,
+                  borderColor: isActive ? activeTheme.borderActive : activeTheme.border,
+                  boxShadow: isActive ? `0 0 12px ${activeTheme.accentGlow}` : undefined,
+                  transform: isActive ? 'scale(1.02)' : undefined
+                }}
               >
                 <span className="text-2xl">{preset.icon}</span>
                 <div className="flex flex-col overflow-hidden flex-1">
-                  <span className="text-xs font-bold truncate">{preset.name}</span>
+                  <span className="text-xs font-bold text-white truncate">{preset.name}</span>
                   <span className="text-[11px] text-slate-400 truncate">Title: "{preset.title}"</span>
                 </div>
-                {isActive && <Check className="w-4 h-4 text-[#10b981] shrink-0" />}
+                {isActive && <Check className="w-4 h-4 shrink-0" style={{ color: activeTheme.accent }} />}
               </button>
             );
           })}
@@ -145,7 +176,13 @@ export const TabCloaker: React.FC = () => {
       </div>
 
       {/* Custom Title & Favicon */}
-      <div className="bg-[#0c2016] border border-[#16402a] rounded-xl p-6 flex flex-col gap-4">
+      <div 
+        className="rounded-2xl p-6 border flex flex-col gap-4 transition-colors"
+        style={{
+          backgroundColor: activeTheme.bgCard,
+          borderColor: activeTheme.border
+        }}
+      >
         <h3 className="text-sm font-bold text-white uppercase tracking-wider">
           Custom Disguise Configuration
         </h3>
@@ -157,7 +194,11 @@ export const TabCloaker: React.FC = () => {
               value={customTitle}
               onChange={e => setCustomTitle(e.target.value)}
               placeholder="e.g. Science Homework - Period 4"
-              className="w-full px-3 py-2 bg-[#08160f] border border-[#16402a] focus:border-[#10b981] rounded-lg text-sm text-white focus:outline-none"
+              className="w-full px-3 py-2 border rounded-xl text-sm text-white focus:outline-none"
+              style={{
+                backgroundColor: activeTheme.bgPrimary,
+                borderColor: activeTheme.border
+              }}
             />
           </div>
           <div>
@@ -167,13 +208,21 @@ export const TabCloaker: React.FC = () => {
               value={customFavicon}
               onChange={e => setCustomFavicon(e.target.value)}
               placeholder="https://example.com/favicon.ico"
-              className="w-full px-3 py-2 bg-[#08160f] border border-[#16402a] focus:border-[#10b981] rounded-lg text-sm text-white focus:outline-none"
+              className="w-full px-3 py-2 border rounded-xl text-sm text-white focus:outline-none"
+              style={{
+                backgroundColor: activeTheme.bgPrimary,
+                borderColor: activeTheme.border
+              }}
             />
           </div>
           <div className="sm:col-span-2 flex justify-end">
             <button
               type="submit"
-              className="px-4 py-2 bg-[#10b981] hover:bg-[#34d399] text-[#064e3b] font-bold text-xs rounded-lg transition-colors cursor-pointer"
+              className="px-5 py-2.5 font-bold text-xs rounded-xl transition-all cursor-pointer shadow-md"
+              style={{
+                backgroundColor: activeTheme.accent,
+                color: activeTheme.accentText
+              }}
             >
               Apply Custom Disguise
             </button>
@@ -182,7 +231,13 @@ export const TabCloaker: React.FC = () => {
       </div>
 
       {/* Emergency Panic Key Configuration */}
-      <div className="bg-[#0c2016] border border-[#16402a] rounded-xl p-6 flex flex-col gap-4">
+      <div 
+        className="rounded-2xl p-6 border flex flex-col gap-4 transition-colors"
+        style={{
+          backgroundColor: activeTheme.bgCard,
+          borderColor: activeTheme.border
+        }}
+      >
         <div className="flex items-center gap-2">
           <ShieldAlert className="w-5 h-5 text-[#ff2d55]" />
           <h3 className="text-sm font-bold text-white uppercase tracking-wider">
@@ -190,7 +245,7 @@ export const TabCloaker: React.FC = () => {
           </h3>
         </div>
         <p className="text-xs text-slate-300 leading-relaxed">
-          Pressing the <kbd className="px-1.5 py-0.5 bg-[#16402a] rounded text-emerald-300 font-mono">Esc</kbd> key or clicking the top Panic Button immediately redirects your active tab to this safety URL with zero trace.
+          Pressing the <kbd className="px-2 py-0.5 rounded font-mono border" style={{ backgroundColor: activeTheme.bgPrimary, borderColor: activeTheme.border, color: activeTheme.accent }}>Esc</kbd> key or clicking the top Panic Button immediately redirects your active tab to this safety URL with zero trace.
         </p>
         <form onSubmit={handleSavePanicUrl} className="flex gap-2">
           <input
@@ -198,45 +253,88 @@ export const TabCloaker: React.FC = () => {
             value={panicUrl}
             onChange={e => setPanicUrl(e.target.value)}
             placeholder="https://classroom.google.com"
-            className="flex-1 px-3 py-2 bg-[#08160f] border border-[#16402a] focus:border-[#ff2d55] rounded-lg text-sm text-white focus:outline-none"
+            className="flex-1 px-3.5 py-2.5 border rounded-xl text-sm text-white focus:outline-none"
+            style={{
+              backgroundColor: activeTheme.bgPrimary,
+              borderColor: activeTheme.border
+            }}
           />
           <button
             type="submit"
-            className="px-4 py-2 bg-[#ff2d55] hover:bg-[#e11d48] text-white font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0"
+            className="px-5 py-2.5 font-bold text-xs rounded-xl transition-colors cursor-pointer shrink-0"
+            style={{
+              backgroundColor: activeTheme.accent,
+              color: activeTheme.accentText
+            }}
           >
-            Update URL
+            Save Panic URL
           </button>
         </form>
       </div>
 
-      {/* Bookmarklets Hub */}
-      <div className="bg-[#0c2016] border border-[#16402a] rounded-xl p-6 flex flex-col gap-4">
+      {/* Stealth Bookmarklets */}
+      <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
-          <Bookmark className="w-5 h-5 text-[#10b981]" />
+          <Bookmark className="w-4 h-4" style={{ color: activeTheme.accent }} />
           <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-            Stealth Bookmarklets (Copy & Paste to Bookmarks)
+            Unblocker Bookmarklets
           </h3>
         </div>
-        <p className="text-xs text-slate-300">
-          Create a new bookmark in your browser, set the name, and paste the code below into the URL field. Click it anytime to activate!
+        <p className="text-xs text-slate-400">
+          Drag these buttons to your browser bookmarks bar or copy the javascript snippet to bypass classroom filters on any site.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-          {bookmarklets.map(b => (
-            <div
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+          {bookmarklets.map((b) => (
+            <div 
               key={b.name}
-              className="p-3.5 bg-[#08160f] border border-[#16402a] rounded-xl flex flex-col justify-between gap-3"
+              className="p-4 rounded-xl border flex flex-col justify-between gap-3"
+              style={{
+                backgroundColor: activeTheme.bgCard,
+                borderColor: activeTheme.border
+              }}
             >
               <div>
                 <span className="text-xs font-bold text-white block">{b.name}</span>
-                <span className="text-[11px] text-slate-400 mt-0.5 block leading-normal">{b.desc}</span>
+                <span className="text-[11px] text-slate-400 mt-0.5 block leading-relaxed">{b.desc}</span>
               </div>
-              <button
-                onClick={() => copyBookmarklet(b.name, b.code)}
-                className="self-end flex items-center gap-1.5 px-3 py-1 bg-[#16402a] hover:bg-[#255238] text-emerald-300 text-xs font-semibold rounded-md transition-colors cursor-pointer"
-              >
-                {copiedKey === b.name ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                <span>{copiedKey === b.name ? 'Copied Code!' : 'Copy Code'}</span>
-              </button>
+              <div className="flex items-center gap-2 pt-2 border-t" style={{ borderColor: activeTheme.border }}>
+                <a
+                  href={b.code}
+                  onClick={(e) => e.preventDefault()}
+                  className="px-3 py-1.5 text-xs font-bold rounded-lg border flex items-center gap-1.5 cursor-grab active:cursor-grabbing select-none"
+                  style={{
+                    backgroundColor: activeTheme.accentBadge,
+                    borderColor: activeTheme.border,
+                    color: activeTheme.kicker
+                  }}
+                  title="Drag this link directly to your browser Bookmarks Bar"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Drag to Bar</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => copyBookmarklet(b.name, b.code)}
+                  className="px-3 py-1.5 text-xs font-semibold rounded-lg hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 ml-auto border"
+                  style={{
+                    backgroundColor: activeTheme.bgPrimary,
+                    borderColor: activeTheme.border,
+                    color: '#94a3b8'
+                  }}
+                >
+                  {copiedKey === b.name ? (
+                    <>
+                      <Check className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
+                      <span style={{ color: activeTheme.accent }}>Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>Copy Code</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           ))}
         </div>

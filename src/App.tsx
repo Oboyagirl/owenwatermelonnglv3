@@ -80,6 +80,24 @@ export default function App() {
   const { siteSettings } = useSiteSettingsStore();
   const { themeId, activeTheme, setTheme } = useThemeStore();
 
+  // Sync document root background and CSS custom properties when theme changes
+  useEffect(() => {
+    try {
+      const root = document.documentElement;
+      root.style.setProperty('--theme-bg-primary', activeTheme.bgPrimary);
+      root.style.setProperty('--theme-bg-secondary', activeTheme.bgSecondary);
+      root.style.setProperty('--theme-bg-card', activeTheme.bgCard);
+      root.style.setProperty('--theme-border', activeTheme.border);
+      root.style.setProperty('--theme-border-active', activeTheme.borderActive);
+      root.style.setProperty('--theme-accent', activeTheme.accent);
+      root.style.setProperty('--theme-accent-hover', activeTheme.accentHover);
+      root.style.setProperty('--theme-accent-text', activeTheme.accentText);
+      root.style.setProperty('--theme-kicker', activeTheme.kicker);
+      document.body.style.backgroundColor = activeTheme.bgPrimary;
+      root.style.backgroundColor = activeTheme.bgPrimary;
+    } catch {}
+  }, [activeTheme]);
+
   const [currentTab, setCurrentTab] = useState<'games' | 'cloaker'>('games');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -249,6 +267,7 @@ export default function App() {
             onSelectGame={handleSelectGame}
             allGames={games}
             onUpdateGame={(id, updates) => updateGame(id, updates)}
+            activeTheme={activeTheme}
           />
         ) : (
           <>
@@ -295,6 +314,7 @@ export default function App() {
                           isFavorite={true}
                           onToggleFavorite={toggleFavorite}
                           onPlay={handleSelectGame}
+                          activeTheme={activeTheme}
                         />
                       ))}
                     </div>
@@ -323,6 +343,7 @@ export default function App() {
                             isFavorite={favorites.includes(game.id)}
                             onToggleFavorite={toggleFavorite}
                             onPlay={handleSelectGame}
+                            activeTheme={activeTheme}
                           />
                         ))}
                       </div>
@@ -403,7 +424,7 @@ export default function App() {
             )}
 
             {/* TAB CLOAKER & CAMOUFLAGE TAB */}
-            {currentTab === 'cloaker' && <TabCloaker />}
+            {currentTab === 'cloaker' && <TabCloaker activeTheme={activeTheme} />}
           </>
         )}
       </main>
