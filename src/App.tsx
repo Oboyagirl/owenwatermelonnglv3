@@ -11,6 +11,7 @@ import { GamePlayer } from './components/GamePlayer';
 import { TabCloaker } from './components/TabCloaker';
 import { StarfieldBackground } from './components/StarfieldBackground';
 import { ThemeModal } from './components/ThemeModal';
+import { PasscodeGate, PASSCODE_STORAGE_KEY } from './components/PasscodeGate';
 import { useGamesStore } from './services/gamesStore';
 import { useSiteSettingsStore } from './services/siteSettingsStore';
 import { useThemeStore } from './services/themeStore';
@@ -103,6 +104,28 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [visibleCount, setVisibleCount] = useState(48);
   const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
+
+  // Authentication gate state with persistence (Passcode: owenpan2244)
+  const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(PASSCODE_STORAGE_KEY) === 'unlocked' ||
+             sessionStorage.getItem(PASSCODE_STORAGE_KEY) === 'unlocked';
+    } catch {
+      return false;
+    }
+  });
+
+  const handleUnlockSite = () => {
+    setIsUnlocked(true);
+  };
+
+  const handleLockSite = () => {
+    try {
+      localStorage.removeItem(PASSCODE_STORAGE_KEY);
+      sessionStorage.removeItem(PASSCODE_STORAGE_KEY);
+    } catch {}
+    setIsUnlocked(false);
+  };
 
   // Reset pagination when filter/search changes
   useEffect(() => {
@@ -230,6 +253,24 @@ export default function App() {
   const featuredGame = games.find(g => g.featured) || games[0];
   const favoriteGamesList = games.filter(g => favorites.includes(g.id));
 
+  // If site is locked with passcode, display PasscodeGate screen (Passcode: owenpan2244)
+  if (!isUnlocked) {
+    return (
+      <div 
+        className="min-h-screen text-slate-100 flex flex-col relative transition-colors duration-300"
+        style={{ backgroundColor: activeTheme.bgPrimary }}
+      >
+        <StarfieldBackground
+          speedMultiplier={siteSettings.starSpeed}
+          densityMultiplier={siteSettings.starDensity}
+          shootingStarsEnabled={siteSettings.shootingStarsEnabled}
+          starColors={activeTheme.starColors}
+        />
+        <PasscodeGate onUnlock={handleUnlockSite} activeTheme={activeTheme} />
+      </div>
+    );
+  }
+
   return (
     <div 
       className="min-h-screen text-slate-100 flex flex-col relative transition-colors duration-300"
@@ -253,6 +294,7 @@ export default function App() {
         siteSettings={siteSettings}
         activeTheme={activeTheme}
         onOpenThemeModal={() => setIsThemeModalOpen(true)}
+        onLockSite={handleLockSite}
       />
 
       {/* Main Content Area */}

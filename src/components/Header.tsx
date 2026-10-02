@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldAlert, ExternalLink, Sparkles, Palette } from 'lucide-react';
+import { ShieldAlert, ExternalLink, Sparkles, Palette, Lock } from 'lucide-react';
 import { triggerPanic } from '../data/cloakPresets';
 import { SiteSettings } from '../types/game';
 import { ThemeConfig } from '../services/themeStore';
@@ -12,6 +12,7 @@ interface HeaderProps {
   siteSettings: SiteSettings;
   activeTheme: ThemeConfig;
   onOpenThemeModal: () => void;
+  onLockSite?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -19,7 +20,8 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectTab,
   siteSettings,
   activeTheme,
-  onOpenThemeModal
+  onOpenThemeModal,
+  onLockSite
 }) => {
   return (
     <>
@@ -133,6 +135,22 @@ export const Header: React.FC<HeaderProps> = ({
               <span>Request Game</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
+
+            {/* Lock Site Button */}
+            {onLockSite && (
+              <button
+                onClick={onLockSite}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white rounded-lg border transition-all whitespace-nowrap cursor-pointer"
+                style={{
+                  backgroundColor: activeTheme.bgCard,
+                  borderColor: activeTheme.border
+                }}
+                title="Lock site with passcode (owenpan2244)"
+              >
+                <Lock className="w-3.5 h-3.5 text-slate-400" />
+                <span className="hidden sm:inline">Lock</span>
+              </button>
+            )}
 
             {/* Emergency Panic Key Button */}
             <button
