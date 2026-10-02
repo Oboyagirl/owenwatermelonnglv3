@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <base href="https://freeonlinewebtools.github.io/gamelist8.github.io/Kindergarten-2/">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Kindergarten 2</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #unity-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    #unity-canvas {
+      width: 100%;
+      height: 100%;
+      max-width: 100vw;
+      max-height: 100vh;
+      object-fit: contain;
+      background: #111;
+      display: none;
+    }
+    #loading-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #111;
+      color: #fff;
+      font-family: system-ui, -apple-system, sans-serif;
+      z-index: 10;
+      gap: 16px;
+    }
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    #loading-text {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    #progress-bar {
+      width: 240px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    #progress-fill {
+      width: 0%;
+      height: 100%;
+      background: #3b82f6;
+      transition: width 0.2s ease;
+    }
+  </style>
+</head>
+<body>
+  <div id="unity-container">
+    <div id="loading-overlay">
+      <div class="spinner"></div>
+      <div id="loading-text">Loading Kindergarten 2...</div>
+      <div id="progress-bar"><div id="progress-fill"></div></div>
+    </div>
+    <canvas id="unity-canvas" width="960" height="540" tabindex="-1"></canvas>
+  </div>
+
+  <script>
+    let max = 0;
+    let done = 0;
+
+    function mergeFiles(fileParts) {
+      return new Promise((resolve, reject) => {
+        let buffers = [];
+        function fetchPart(index) {
+          if (index >= fileParts.length) {
+            let mergedBlob = new Blob(buffers);
+            let mergedFileUrl = URL.createObjectURL(mergedBlob);
+            resolve(mergedFileUrl);
+            return;
+          }
+          fetch(fileParts[index])
+            .then(res => {
+              if (!res.ok) throw new Error("HTTP " + res.status);
+              return res.arrayBuffer();
+            })
+            .then(data => {
+              buffers.push(data);
+              done++;
+              const percent = Math.min(95, Math.round((done / max) * 100));
+              document.querySelector("#loading-text").textContent = `Loading Kindergarten 2 (${percent}%)`;
+              document.querySelector("#progress-fill").style.width = percent + "%";
+              fetchPart(index + 1);
+            })
+            .catch(reject);
+        }
+        fetchPart(0);
+      });
+    }
+
+    function getParts(file, start, end) {
+      let parts = [];
+      for (let i = start; i <= end; i++) {
+        parts.push(file + ".part" + i);
+      }
+      max += end;
+      return parts;
+    }
+
+    Promise.all([
+      mergeFiles(getParts("Build/Build.data", 1, 2)),
+      mergeFiles(getParts("Build/Build.wasm", 1, 3))
+    ]).then(([dataUrl, wasmUrl]) => {
+      const canvas = document.querySelector("#unity-canvas");
+      const overlay = document.querySelector("#loading-overlay");
+      const progressFill = document.querySelector("#progress-fill");
+      const loadingText = document.querySelector("#loading-text");
+
+      loadingText.textContent = "Starting Engine...";
+      progressFill.style.width = "100%";
+
+      function updateCanvasSize() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const targetAspect = 16 / 9;
+        const currentAspect = w / h;
+        
+        if (currentAspect > targetAspect) {
+          canvas.style.height = h + "px";
+          canvas.style.width = (h * targetAspect) + "px";
+        } else {
+          canvas.style.width = w + "px";
+          canvas.style.height = (w / targetAspect) + "px";
+        }
+      }
+
+      window.addEventListener("resize", updateCanvasSize);
+      updateCanvasSize();
+
+      var config = {
+        dataUrl: dataUrl,
+        frameworkUrl: "Build/Build.framework.js",
+        codeUrl: wasmUrl,
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "SmashGames",
+        productName: "Kindergarten2",
+        productVersion: "1.0",
+        matchWebGLToCanvasSize: false
+      };
+
+      var script = document.createElement("script");
+      script.src = "Build/Build.loader.js";
+      script.onload = () => {
+        createUnityInstance(canvas, config, progress => {
+          if (progress >= 1.0) {
+            overlay.remove();
+            canvas.style.display = 'block';
+            updateCanvasSize();
+          }
+        }).catch(err => {
+          console.error("Unity launch error:", err);
+        });
+      };
+      document.body.appendChild(script);
+    }).catch(err => {
+      console.error("Failed to load parts:", err);
+      document.querySelector("#loading-text").textContent = "Failed to load Kindergarten 2. Please reload.";
+    });
+  </script>
+</body>
+</html>

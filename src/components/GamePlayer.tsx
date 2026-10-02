@@ -16,7 +16,8 @@ import {
   Undo2,
   Server,
   RefreshCw,
-  ShieldCheck
+  ShieldCheck,
+  Scan
 } from 'lucide-react';
 import { Game } from '../types/game';
 import { openAboutBlankGame, resolveAssetUrl } from '../services/gamesStore';
@@ -49,6 +50,15 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
   const [isTheater, setIsTheater] = useState(false);
   const [copied, setCopied] = useState(false);
   const [keyCounter, setKeyCounter] = useState(0);
+  const [viewRatio, setViewRatio] = useState<'fit' | '16:9' | 'fill'>('fit');
+
+  const cycleViewRatio = () => {
+    setViewRatio(prev => {
+      if (prev === 'fit') return '16:9';
+      if (prev === '16:9') return 'fill';
+      return 'fit';
+    });
+  };
 
   // Live Iframe HTML Replacement State
   const defaultIframeCode = game.iframeCode || `<iframe class="game-iframe" id="game-area" title="${game.title}" src="${game.iframeSrc}" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`;
@@ -431,6 +441,20 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
             </button>
 
             <button
+              onClick={cycleViewRatio}
+              className="flex items-center gap-1 px-2 py-1 text-xs rounded-lg transition-colors cursor-pointer border"
+              style={{
+                backgroundColor: viewRatio !== 'fit' ? activeTheme.accentBadge : undefined,
+                borderColor: viewRatio !== 'fit' ? activeTheme.borderActive : 'transparent',
+                color: viewRatio !== 'fit' ? activeTheme.accent : '#94a3b8'
+              }}
+              title={`Screen Framing: ${viewRatio.toUpperCase()} (Click to cycle: Auto Fit / 16:9 / Fill Screen)`}
+            >
+              <Scan className="w-3.5 h-3.5" />
+              <span className="text-[10px] font-mono uppercase font-bold hidden sm:inline">{viewRatio}</span>
+            </button>
+
+            <button
               onClick={toggleFullscreen}
               className="p-2 rounded-lg text-slate-400 hover:text-white transition-colors cursor-pointer"
               title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
@@ -442,14 +466,20 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
 
         {/* The Game Iframe - Universal Unrestricted Embed Format */}
         <div 
-          className="relative flex-1 w-full h-full overflow-hidden"
+          className="relative flex-1 w-full h-full overflow-hidden flex items-center justify-center"
           style={{ backgroundColor: activeTheme.bgPrimary }}
         >
           <iframe
             key={`${game.id}-${keyCounter}-${useProxy ? 'proxied' : 'direct'}`}
             ref={iframeRef}
             id="game-area"
-            className="w-full h-full border-0 block game-iframe"
+            className={`border-0 block game-iframe transition-all duration-200 ${
+              viewRatio === '16:9'
+                ? 'w-full aspect-video max-h-full max-w-full m-auto'
+                : viewRatio === 'fit'
+                ? 'w-full h-full object-contain max-h-full max-w-full'
+                : 'w-full h-full'
+            }`}
             title={game.title}
             src={resolvedIframeSrc}
             srcDoc={activeCustomHtml || undefined}

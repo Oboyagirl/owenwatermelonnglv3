@@ -842,7 +842,13 @@ export const URL_OVERRIDES: Record<string, string> = {
   "potatoes-vex-8": "https://7zeb.github.io/homework/vex8.html",
   "potatoes-tunnel-rush": "https://7zeb.github.io/homework/tunnelrush.html",
   "getting-over-it": "games/getting-over-it.html",
-  "potatoes-getting-over-it": "games/getting-over-it.html"
+  "potatoes-getting-over-it": "games/getting-over-it.html",
+  "kindergarten": "games/kindergarten.html",
+  "kindergarten-2": "games/kindergarten-2.html",
+  "the-man-in-the-window": "games/the-man-in-the-window.html",
+  "themanfromthewindow": "games/the-man-in-the-window.html",
+  "case-opener": "games/case-opener.html",
+  "minecraft-case-simulator": "games/case-opener.html"
 };
 
 function buildDefaultGames(): Game[] {
