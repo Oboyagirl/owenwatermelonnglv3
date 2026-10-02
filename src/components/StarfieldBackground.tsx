@@ -27,12 +27,14 @@ interface StarfieldBackgroundProps {
   speedMultiplier?: number;
   densityMultiplier?: number;
   shootingStarsEnabled?: boolean;
+  starColors?: string[];
 }
 
 export const StarfieldBackground: React.FC<StarfieldBackgroundProps> = ({
   speedMultiplier = 1,
   densityMultiplier = 1,
-  shootingStarsEnabled = true
+  shootingStarsEnabled = true,
+  starColors: customStarColors
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -56,8 +58,8 @@ export const StarfieldBackground: React.FC<StarfieldBackgroundProps> = ({
     };
     window.addEventListener('resize', handleResize);
 
-    // Star color palette (deep space with neon watermelon accents)
-    const starColors = [
+    // Star color palette (supports custom theme star colors)
+    const defaultStarColors = [
       '#ffffff', // Crisp pure white
       '#e2e8f0', // Cool starlight
       '#a7f3d0', // Emerald mint glow
@@ -66,6 +68,7 @@ export const StarfieldBackground: React.FC<StarfieldBackgroundProps> = ({
       '#fecdd3', // Soft starlight pink
       '#fef08a'  // Subtle warm gold
     ];
+    const starColors = (customStarColors && customStarColors.length > 0) ? customStarColors : defaultStarColors;
 
     let stars: Star[] = [];
     const baseCount = Math.floor((width * height) / 7500);

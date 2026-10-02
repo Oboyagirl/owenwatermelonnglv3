@@ -840,7 +840,9 @@ export const URL_OVERRIDES: Record<string, string> = {
   "potatoes-temple-run-2": "https://7zeb.github.io/homework/templerun2.html",
   "potatoes-vex-7": "https://7zeb.github.io/homework/vex7.html",
   "potatoes-vex-8": "https://7zeb.github.io/homework/vex8.html",
-  "potatoes-tunnel-rush": "https://7zeb.github.io/homework/tunnelrush.html"
+  "potatoes-tunnel-rush": "https://7zeb.github.io/homework/tunnelrush.html",
+  "getting-over-it": "games/getting-over-it.html",
+  "potatoes-getting-over-it": "games/getting-over-it.html"
 };
 
 function buildDefaultGames(): Game[] {

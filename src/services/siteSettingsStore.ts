@@ -7,8 +7,8 @@ const SITE_SETTINGS_KEY = 'owen_watermelon_site_settings_v1';
 
 export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   siteTitle: 'Owen Watermelon V3',
-  siteSubtitle: 'Unblocked games, retro hits, anti-filter web proxy, and tab cloaker.',
-  announcementText: '✨ 140+ TrippleThePotatoes games added! Use the Web Proxy or Creator Studio anytime.',
+  siteSubtitle: 'Unblocked games, retro hits, and tab cloaker.',
+  announcementText: '🍉 Welcome to Owen Watermelon V3! Try the new Theme Gallery to switch between Nebula, Sky, and 10+ more styles.',
   announcementActive: true,
   announcementType: 'info',
   starSpeed: 1,

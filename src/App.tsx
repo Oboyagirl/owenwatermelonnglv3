@@ -3,21 +3,68 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Header, REQUEST_GAME_URL } from './components/Header';
 import { HeroBanner } from './components/HeroBanner';
 import { GameCard } from './components/GameCard';
 import { GamePlayer } from './components/GamePlayer';
 import { TabCloaker } from './components/TabCloaker';
-import { WebProxy } from './components/WebProxy';
-import { PasscodeGate, PASSCODE_STORAGE_KEY } from './components/PasscodeGate';
 import { StarfieldBackground } from './components/StarfieldBackground';
-import { SiteEditorModal } from './components/SiteEditorModal';
+import { ThemeModal } from './components/ThemeModal';
 import { useGamesStore } from './services/gamesStore';
-import { useSiteSettingsStore, CREATOR_PASSWORD } from './services/siteSettingsStore';
+import { useSiteSettingsStore } from './services/siteSettingsStore';
+import { useThemeStore } from './services/themeStore';
 import { Game } from './types/game';
 import { triggerPanic } from './data/cloakPresets';
-import { Heart, Sparkles, ExternalLink, KeyRound, X, Sliders } from 'lucide-react';
+import { Heart, Sparkles, ExternalLink, Palette } from 'lucide-react';
+
+export function isOwenWatermelonOG(game: Game): boolean {
+  if (!game) return false;
+  const id = (game.id || '').toLowerCase();
+  const title = (game.title || '').toLowerCase();
+  const tags = Array.isArray(game.tags) ? game.tags.map(t => String(t).toLowerCase()) : [];
+  const sec = (game.secondaryCategory || '').toLowerCase();
+
+  if (sec.includes('owen') && sec.includes('og')) return true;
+  if (tags.some(t => t.includes('owen') && t.includes('og')) || tags.includes('og')) return true;
+
+  // Explicitly requested games:
+  // 1. "the games we just added":
+  if (id === 'soccer-2026' || id === 'soccer-real') return true;
+  if (id.includes('stickman-climb') || title.includes('stickman climb')) return true;
+  if (id.includes('people-playground') || id.includes('melon-playground') || title.includes('playground')) return true;
+  if (id.includes('getting-over-it') || title.includes('getting over it')) return true;
+
+  // 2. Foundation watermelon title:
+  if (id === 'watermelon-merge' || title.includes('watermelon')) return true;
+
+  // 3. "Basket Random":
+  if (id.includes('basket-random') || title.includes('basket random')) return true;
+
+  // 4. "Ovo, Ovo 2":
+  if (id.startsWith('ovo') || title.startsWith('ovo')) return true;
+
+  // 5. "all the Duck Life’s":
+  if (id.includes('duck-life') || title.includes('duck life') || title.includes('ducklife')) return true;
+
+  // 6. "cut the rope":
+  if (id.includes('cut-the-rope') || title.includes('cut the rope')) return true;
+
+  // 7. "and yeah" (core hall-of-fame student OGs):
+  const ogList = [
+    'retro-bowl', 'retro-bowl-college', '1v1-lol', 'slope', 'slope-2',
+    'cookie-clicker', 'drift-hunters', 'subway-surfers', 'bitlife',
+    'crossy-road', 'flappy-bird', 'flappy-melon', 'stickman-hook', 'stick-merge',
+    'worlds-hardest-game', 'vex7', 'vex-4', 'smash-karts', 'drive-mad',
+    'happywheels', 'happy-wheels', 'basket-bros', 'getaway-shootout',
+    'rooftop-snipers', 'snow-rider-3d', 'tunnel-rush'
+  ];
+  if (ogList.some(k => id === k || id.startsWith(k + '-') || id.endsWith('-' + k))) {
+    return true;
+  }
+
+  return false;
+}
 
 export default function App() {
   const {
@@ -27,49 +74,17 @@ export default function App() {
     setSelectedGame,
     toggleFavorite,
     updateGame,
-    addGame,
-    deleteGame,
-    resetGames,
     recordPlay
   } = useGamesStore();
 
-  const {
-    siteSettings,
-    isCreatorMode,
-    unlockCreatorMode,
-    lockCreatorMode,
-    updateSiteSettings,
-    resetSiteSettings
-  } = useSiteSettingsStore();
+  const { siteSettings } = useSiteSettingsStore();
+  const { themeId, activeTheme, setTheme } = useThemeStore();
 
-  const [currentTab, setCurrentTab] = useState<'games' | 'cloaker' | 'proxy'>('games');
+  const [currentTab, setCurrentTab] = useState<'games' | 'cloaker'>('games');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [visibleCount, setVisibleCount] = useState(48);
-  const [isEditorModalOpen, setIsEditorModalOpen] = useState(false);
-  
-  // Prompt password state for Creator Edit mode
-  const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
-  const [promptPasswordInput, setPromptPasswordInput] = useState('');
-  const [promptError, setPromptError] = useState(false);
-
-  // Authentication gate state with persistence
-  const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem(PASSCODE_STORAGE_KEY) === 'unlocked' ||
-             sessionStorage.getItem(PASSCODE_STORAGE_KEY) === 'unlocked';
-    } catch {
-      return false;
-    }
-  });
-
-  const handleLockSite = () => {
-    try {
-      localStorage.removeItem(PASSCODE_STORAGE_KEY);
-      sessionStorage.removeItem(PASSCODE_STORAGE_KEY);
-    } catch {}
-    setIsUnlocked(false);
-  };
+  const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
 
   // Reset pagination when filter/search changes
   useEffect(() => {
@@ -79,13 +94,13 @@ export default function App() {
   // Global Panic Key Listener (Esc)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !selectedGame) {
+      if (e.key === 'Escape' && !selectedGame && !isThemeModalOpen) {
         triggerPanic();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedGame]);
+  }, [selectedGame, isThemeModalOpen]);
 
   const handleSelectGame = (game: Game) => {
     setSelectedGame(game);
@@ -97,40 +112,20 @@ export default function App() {
     setSelectedGame(null);
   };
 
-  const handleUnlockSite = (isCreator?: boolean) => {
-    setIsUnlocked(true);
-    if (isCreator) {
-      unlockCreatorMode(CREATOR_PASSWORD);
-      setIsEditorModalOpen(true);
-    }
-  };
-
-  const handlePromptPasswordSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (promptPasswordInput.trim().toLowerCase() === CREATOR_PASSWORD.toLowerCase()) {
-      unlockCreatorMode(CREATOR_PASSWORD);
-      setShowPasswordPrompt(false);
-      setPromptPasswordInput('');
-      setPromptError(false);
-      setIsEditorModalOpen(true);
-    } else {
-      setPromptError(true);
-    }
-  };
-
-  // Categories include primary categories + popular secondaries like "Potato Classics"
+  // Categories include primary categories + popular secondaries
   const categories = [
     'All',
+    'Owen Watermelon OG’s',
     'Favorites',
     'Potato Classics',
+    'Sports',
     'Action',
     'Racing',
-    'Sports',
     'Cooking Sim',
     'Multiplayer',
     'Arcade',
-    'Horror',
     'Puzzle',
+    'Horror',
     'Retro',
     'Casual'
   ];
@@ -155,6 +150,11 @@ export default function App() {
     const secCatLower = (g.secondaryCategory || '').toLowerCase();
     const mainCatLower = (g.category || '').toLowerCase();
     
+    // Special handling for Owen Watermelon OG's category
+    if (catLower.includes('owen') && catLower.includes('og')) {
+      return isOwenWatermelonOG(g);
+    }
+
     // Special handling for Potato Classics category
     if (catLower === 'potato classics') {
       return (
@@ -178,21 +178,51 @@ export default function App() {
     );
   });
 
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {
+      All: games.length,
+      Favorites: favorites.length,
+      'Owen Watermelon OG’s': games.filter(isOwenWatermelonOG).length,
+    };
+    for (const cat of categories) {
+      if (counts[cat] !== undefined) continue;
+      const catLower = cat.toLowerCase();
+      if (catLower === 'potato classics') {
+        counts[cat] = games.filter(g => 
+          (g.secondaryCategory || '').toLowerCase() === 'potato classics' ||
+          (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && (t.toLowerCase().includes('potato') || t.toLowerCase().includes('tripplethepotatoes')))) ||
+          (typeof g.id === 'string' && g.id.startsWith('potatoes-'))
+        ).length;
+      } else if (catLower === 'cooking sim') {
+        counts[cat] = games.filter(g =>
+          (g.secondaryCategory || '').toLowerCase() === 'cooking sim' ||
+          (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && (t.toLowerCase().includes('cooking') || t.toLowerCase().includes('papa louie'))))
+        ).length;
+      } else {
+        counts[cat] = games.filter(g =>
+          (g.category || '').toLowerCase() === catLower ||
+          (g.secondaryCategory || '').toLowerCase() === catLower ||
+          (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && t.toLowerCase() === catLower))
+        ).length;
+      }
+    }
+    return counts;
+  }, [games, favorites, categories]);
+
   const featuredGame = games.find(g => g.featured) || games[0];
   const favoriteGamesList = games.filter(g => favorites.includes(g.id));
 
-  // If site is locked with access code, display the security gate screen
-  if (!isUnlocked) {
-    return <PasscodeGate onUnlock={handleUnlockSite} />;
-  }
-
   return (
-    <div className="min-h-screen bg-[#07130c] text-slate-100 flex flex-col relative selection:bg-[#ff2d55]/30 selection:text-white">
+    <div 
+      className="min-h-screen text-slate-100 flex flex-col relative transition-colors duration-300"
+      style={{ backgroundColor: activeTheme.bgPrimary }}
+    >
       {/* Animated Starfield Background Layer across the entire site */}
       <StarfieldBackground
         speedMultiplier={siteSettings.starSpeed}
         densityMultiplier={siteSettings.starDensity}
         shootingStarsEnabled={siteSettings.shootingStarsEnabled}
+        starColors={activeTheme.starColors}
       />
 
       {/* Top Bar Header */}
@@ -202,11 +232,9 @@ export default function App() {
           setCurrentTab(tab);
           setSelectedGame(null);
         }}
-        onLockSite={handleLockSite}
         siteSettings={siteSettings}
-        isCreatorMode={isCreatorMode}
-        onOpenEditor={() => setIsEditorModalOpen(true)}
-        onPromptPasswordForEditor={() => setShowPasswordPrompt(true)}
+        activeTheme={activeTheme}
+        onOpenThemeModal={() => setIsThemeModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -237,6 +265,11 @@ export default function App() {
                   onSelectCategory={setSelectedCategory}
                   categories={categories}
                   totalGames={games.length}
+                  categoryCounts={categoryCounts}
+                  activeTheme={activeTheme}
+                  activeThemeId={themeId}
+                  onSelectTheme={setTheme}
+                  onOpenThemeGallery={() => setIsThemeModalOpen(true)}
                 />
 
                 {/* Quick Favorites Section if any */}
@@ -262,8 +295,6 @@ export default function App() {
                           isFavorite={true}
                           onToggleFavorite={toggleFavorite}
                           onPlay={handleSelectGame}
-                          isCreatorMode={isCreatorMode}
-                          onEditGame={() => setIsEditorModalOpen(true)}
                         />
                       ))}
                     </div>
@@ -274,7 +305,7 @@ export default function App() {
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center justify-between">
                     <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-[#10b981]" />
+                      <Sparkles className="w-4 h-4" style={{ color: activeTheme.accent }} />
                       <span>{selectedCategory === 'All' ? 'Complete Games Catalog' : `${selectedCategory} Games`}</span>
                     </h2>
                     <span className="text-xs text-slate-400 font-mono tabular-nums">
@@ -292,8 +323,6 @@ export default function App() {
                             isFavorite={favorites.includes(game.id)}
                             onToggleFavorite={toggleFavorite}
                             onPlay={handleSelectGame}
-                            isCreatorMode={isCreatorMode}
-                            onEditGame={() => setIsEditorModalOpen(true)}
                           />
                         ))}
                       </div>
@@ -302,16 +331,26 @@ export default function App() {
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-6 pb-2">
                           <button
                             onClick={() => setVisibleCount(prev => Math.min(prev + 48, filteredGames.length))}
-                            className="px-6 py-3 bg-[#10b981] hover:bg-[#34d399] text-[#064e3b] font-bold text-sm rounded-xl transition-all shadow-lg hover:shadow-emerald-900/40 hover:-translate-y-0.5 cursor-pointer flex items-center gap-2"
+                            className="px-6 py-3 font-bold text-sm rounded-xl transition-all shadow-lg hover:-translate-y-0.5 cursor-pointer flex items-center gap-2"
+                            style={{
+                              backgroundColor: activeTheme.accent,
+                              color: activeTheme.accentText,
+                              boxShadow: `0 10px 25px ${activeTheme.accentGlow}`
+                            }}
                           >
                             <span>Load More Games (+48)</span>
-                            <span className="text-xs bg-[#064e3b]/20 px-2 py-0.5 rounded-full font-mono">
+                            <span className="text-xs px-2 py-0.5 rounded-full font-mono bg-black/20">
                               {filteredGames.length - visibleCount} left
                             </span>
                           </button>
                           <button
                             onClick={() => setVisibleCount(filteredGames.length)}
-                            className="px-5 py-3 bg-[#0c2016] hover:bg-[#122e20] text-emerald-400 border border-[#16402a] font-semibold text-sm rounded-xl transition-colors cursor-pointer"
+                            className="px-5 py-3 border font-semibold text-sm rounded-xl transition-colors cursor-pointer"
+                            style={{
+                              backgroundColor: activeTheme.bgCard,
+                              borderColor: activeTheme.border,
+                              color: activeTheme.kicker
+                            }}
                           >
                             Show All {filteredGames.length} Games
                           </button>
@@ -319,8 +358,14 @@ export default function App() {
                       )}
                     </>
                   ) : (
-                    <div className="p-12 text-center bg-[#0c2016]/90 border border-[#16402a] rounded-2xl flex flex-col items-center justify-center gap-3">
-                      <span className="text-4xl">🍉</span>
+                    <div 
+                      className="p-12 text-center border rounded-2xl flex flex-col items-center justify-center gap-3"
+                      style={{
+                        backgroundColor: activeTheme.bgCard,
+                        borderColor: activeTheme.border
+                      }}
+                    >
+                      <span className="text-4xl">{activeTheme.emoji}</span>
                       <h3 className="text-base font-bold text-white">No matching games found</h3>
                       <p className="text-xs text-slate-400 max-w-sm">
                         Try adjusting your search query or request a game to be added.
@@ -328,7 +373,11 @@ export default function App() {
                       <div className="flex items-center gap-3 mt-2">
                         <button
                           onClick={() => { setSearchTerm(''); setSelectedCategory('All'); }}
-                          className="px-4 py-2 bg-[#10b981] hover:bg-[#34d399] text-[#064e3b] font-bold text-xs rounded-lg transition-colors cursor-pointer"
+                          className="px-4 py-2 font-bold text-xs rounded-lg transition-colors cursor-pointer shadow-md"
+                          style={{
+                            backgroundColor: activeTheme.accent,
+                            color: activeTheme.accentText
+                          }}
                         >
                           Clear Filters
                         </button>
@@ -336,7 +385,12 @@ export default function App() {
                           href={REQUEST_GAME_URL}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-4 py-2 bg-[#16402a] hover:bg-[#255238] text-emerald-300 font-bold text-xs rounded-lg transition-colors flex items-center gap-1.5"
+                          className="px-4 py-2 border font-bold text-xs rounded-lg transition-colors flex items-center gap-1.5"
+                          style={{
+                            backgroundColor: activeTheme.bgSecondary,
+                            borderColor: activeTheme.border,
+                            color: activeTheme.kicker
+                          }}
                         >
                           <span>Request This Game</span>
                           <ExternalLink className="w-3.5 h-3.5" />
@@ -348,9 +402,6 @@ export default function App() {
               </div>
             )}
 
-            {/* WEB PROXY & UNBLOCKER TAB */}
-            {currentTab === 'proxy' && <WebProxy />}
-
             {/* TAB CLOAKER & CAMOUFLAGE TAB */}
             {currentTab === 'cloaker' && <TabCloaker />}
           </>
@@ -358,96 +409,50 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="w-full bg-[#050d09]/90 border-t border-[#16402a] px-4 lg:px-8 py-8 mt-auto relative z-10 backdrop-blur-xs">
+      <footer 
+        className="w-full border-t px-4 lg:px-8 py-8 mt-auto relative z-10 backdrop-blur-xs transition-colors"
+        style={{
+          backgroundColor: activeTheme.bgHeader,
+          borderColor: activeTheme.border
+        }}
+      >
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
           <div className="flex items-center gap-2">
             <span className="font-bold text-white">{siteSettings.siteTitle || 'Owen Watermelon V3'}</span>
             <span>·</span>
-            <span>Unblocked Games & Anti-Filter Proxy</span>
+            <span>Unblocked Games Catalog & Tab Cloaker</span>
           </div>
 
           <div className="flex items-center gap-4">
+            <button
+              onClick={() => setIsThemeModalOpen(true)}
+              className="hover:text-white transition-colors flex items-center gap-1.5 font-medium cursor-pointer"
+              style={{ color: activeTheme.accent }}
+            >
+              <Palette className="w-3.5 h-3.5" />
+              <span>Theme: {activeTheme.name}</span>
+            </button>
+
             <a
               href={REQUEST_GAME_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#10b981] hover:text-[#34d399] transition-colors flex items-center gap-1.5 font-medium"
+              className="hover:text-white transition-colors flex items-center gap-1.5 font-medium"
+              style={{ color: activeTheme.accent }}
             >
-              <span>Request a Game</span>
+              <span>Request Game</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
-            <span>·</span>
-            <span className="text-slate-500 font-mono">Press Esc to Panic</span>
           </div>
         </div>
       </footer>
 
-      {/* Password Prompt Modal for Unlocking Creator Edit Mode */}
-      {showPasswordPrompt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="w-full max-w-sm bg-[#0c2016] border-2 border-[#10b981] rounded-2xl p-6 shadow-2xl flex flex-col gap-4 text-center">
-            <div className="w-12 h-12 rounded-xl bg-[#10b981]/20 border border-[#10b981] flex items-center justify-center text-2xl mx-auto">
-              🔑
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-white">Unlock Creator Edit Mode</h3>
-              <p className="text-xs text-slate-400 mt-1">
-                Enter the secret creator password to edit games, animated stars, banner, and site branding.
-              </p>
-            </div>
-
-            <form onSubmit={handlePromptPasswordSubmit} className="flex flex-col gap-3">
-              <input
-                type="password"
-                value={promptPasswordInput}
-                onChange={e => {
-                  setPromptPasswordInput(e.target.value);
-                  setPromptError(false);
-                }}
-                placeholder="Enter password..."
-                className="w-full px-3.5 py-2.5 bg-[#07130c] border border-[#16402a] focus:border-[#10b981] rounded-xl text-sm text-white focus:outline-none text-center font-mono"
-                autoFocus
-              />
-
-              {promptError && (
-                <p className="text-xs text-rose-400 font-semibold">
-                  Incorrect password. Hint: owenpanedit2244
-                </p>
-              )}
-
-              <div className="flex items-center gap-2 mt-1">
-                <button
-                  type="button"
-                  onClick={() => setShowPasswordPrompt(false)}
-                  className="flex-1 py-2 bg-[#16402a] hover:bg-[#255238] text-slate-300 font-semibold text-xs rounded-xl transition-colors cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-2 bg-[#10b981] hover:bg-[#34d399] text-[#064e3b] font-bold text-xs rounded-xl transition-colors cursor-pointer shadow-md"
-                >
-                  Unlock & Edit
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Creator Studio & Site Editor Full Modal */}
-      <SiteEditorModal
-        isOpen={isEditorModalOpen}
-        onClose={() => setIsEditorModalOpen(false)}
-        siteSettings={siteSettings}
-        onUpdateSiteSettings={updateSiteSettings}
-        onResetSiteSettings={resetSiteSettings}
-        games={games}
-        onUpdateGame={(updated) => updateGame(updated.id, updated)}
-        onAddGame={addGame}
-        onDeleteGame={deleteGame}
-        onResetGames={resetGames}
-        onExitCreatorMode={lockCreatorMode}
+      {/* Theme Gallery Modal */}
+      <ThemeModal
+        isOpen={isThemeModalOpen}
+        onClose={() => setIsThemeModalOpen(false)}
+        activeThemeId={themeId}
+        onSelectTheme={setTheme}
       />
     </div>
   );

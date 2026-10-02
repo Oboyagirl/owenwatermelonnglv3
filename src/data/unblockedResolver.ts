@@ -93,7 +93,8 @@ const PRESERVED_LOCAL_GAMES = new Set([
   "games/space.html",
   "games/pong.html",
   "games/soccer-2026.html",
-  "games/soccer-real.html"
+  "games/soccer-real.html",
+  "games/getting-over-it.html"
 ]);
 
 function cleanText(str: string): string {

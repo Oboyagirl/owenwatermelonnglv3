@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Heart, Star, Sparkles, Edit3 } from 'lucide-react';
+import { Play, Heart, Star } from 'lucide-react';
 import { Game } from '../types/game';
 import { resolveAssetUrl } from '../services/gamesStore';
 
@@ -8,17 +8,13 @@ interface GameCardProps {
   isFavorite: boolean;
   onToggleFavorite: (id: string) => void;
   onPlay: (game: Game) => void;
-  isCreatorMode?: boolean;
-  onEditGame?: (game: Game) => void;
 }
 
 export const GameCard: React.FC<GameCardProps> = ({
   game,
   isFavorite,
   onToggleFavorite,
-  onPlay,
-  isCreatorMode = false,
-  onEditGame
+  onPlay
 }) => {
   const [imgError, setImgError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -63,19 +59,19 @@ export const GameCard: React.FC<GameCardProps> = ({
             )}
           </div>
 
+          {/* Favorite Toggle Button */}
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
               onToggleFavorite(game.id);
             }}
-            className={`p-1.5 rounded-lg backdrop-blur-md transition-transform active:scale-90 pointer-events-auto cursor-pointer shadow-md ${
+            className={`p-1.5 rounded-full transition-all duration-200 pointer-events-auto cursor-pointer shadow-sm ${
               isFavorite
-                ? 'bg-[#ff2d55] text-white hover:bg-[#e0264b]'
-                : 'bg-[#050d09]/80 text-slate-300 hover:text-white hover:bg-[#07130c]'
+                ? 'bg-[#ff2d55] text-white scale-110'
+                : 'bg-black/60 text-slate-300 hover:text-white hover:bg-black/80'
             }`}
-            title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-            aria-label="Favorite game"
+            title={isFavorite ? "Remove from Favorites" : "Add to Favorites"}
           >
             <Heart className={`w-3.5 h-3.5 ${isFavorite ? 'fill-current' : ''}`} />
           </button>
@@ -111,7 +107,7 @@ export const GameCard: React.FC<GameCardProps> = ({
           )}
         </div>
 
-        {/* Card Footer: Metadata and Creator Action */}
+        {/* Card Footer */}
         <div className="flex items-center justify-between pt-1 border-t border-[#16402a]/60 text-[11px] text-slate-400 font-mono">
           <div className="flex items-center gap-2">
             {game.plays ? (
@@ -121,24 +117,10 @@ export const GameCard: React.FC<GameCardProps> = ({
             )}
           </div>
 
-          {isCreatorMode && onEditGame ? (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEditGame(game);
-              }}
-              className="flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30 text-[10px] font-semibold transition-colors cursor-pointer"
-            >
-              <Edit3 className="w-3 h-3" />
-              <span>Edit</span>
-            </button>
-          ) : (
-            <span className="text-emerald-400/80 group-hover:text-emerald-300 flex items-center gap-1 font-semibold text-[11px]">
-              <span>Play</span>
-              <Play className="w-2.5 h-2.5 fill-current" />
-            </span>
-          )}
+          <span className="text-emerald-400/80 group-hover:text-emerald-300 flex items-center gap-1 font-semibold text-[11px]">
+            <span>Play</span>
+            <Play className="w-2.5 h-2.5 fill-current" />
+          </span>
         </div>
       </div>
     </div>
