@@ -1,5 +1,17 @@
 import React from 'react';
-import { ShieldAlert, ExternalLink, Sparkles, Palette, Lock } from 'lucide-react';
+import { 
+  ShieldAlert, 
+  ExternalLink, 
+  Sparkles, 
+  Palette, 
+  Lock, 
+  Search, 
+  X, 
+  Menu, 
+  Dices, 
+  EyeOff,
+  RotateCcw
+} from 'lucide-react';
 import { triggerPanic } from '../data/cloakPresets';
 import { SiteSettings } from '../types/game';
 import { ThemeConfig } from '../services/themeStore';
@@ -13,6 +25,10 @@ interface HeaderProps {
   activeTheme: ThemeConfig;
   onOpenThemeModal: () => void;
   onLockSite?: () => void;
+  searchTerm?: string;
+  onSearchChange?: (val: string) => void;
+  onToggleMobileSidebar?: () => void;
+  onRandomGame?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -21,14 +37,18 @@ export const Header: React.FC<HeaderProps> = ({
   siteSettings,
   activeTheme,
   onOpenThemeModal,
-  onLockSite
+  onLockSite,
+  searchTerm = '',
+  onSearchChange,
+  onToggleMobileSidebar,
+  onRandomGame
 }) => {
   return (
     <>
       {/* Top Announcement Banner if enabled */}
       {siteSettings.announcementActive && siteSettings.announcementText && (
         <div 
-          className="w-full border-b px-4 py-1.5 text-center text-xs font-medium flex items-center justify-center gap-2 transition-colors"
+          className="w-full border-b px-4 py-1.5 text-center text-xs font-medium flex items-center justify-center gap-2 transition-colors z-50 relative"
           style={{ 
             backgroundColor: activeTheme.bgCard,
             borderColor: activeTheme.border,
@@ -40,107 +60,155 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       )}
 
+      {/* PeteZah Browser Chrome Bar (.chrome-bar) */}
       <header 
-        className="sticky top-0 z-40 w-full backdrop-blur-md border-b px-4 lg:px-8 py-3.5 transition-colors"
+        className="sticky top-0 z-40 w-full backdrop-blur-xl border-b px-3 sm:px-6 py-2.5 transition-colors"
         style={{
           backgroundColor: activeTheme.bgHeader,
-          borderColor: activeTheme.border
+          borderColor: activeTheme.border,
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)'
         }}
       >
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className="w-full mx-auto flex items-center justify-between gap-3">
           
-          {/* Brand Wordmark */}
-          <div 
-            onClick={() => onSelectTab('games')}
-            className="flex items-center gap-2.5 cursor-pointer select-none group shrink-0"
-          >
-            <div 
-              className="w-8 h-8 rounded-lg border flex items-center justify-center text-lg shadow-sm transition-colors select-none"
-              style={{
-                backgroundColor: activeTheme.accentBadge,
-                borderColor: activeTheme.border
-              }}
-            >
-              {activeTheme.emoji}
-            </div>
-            <span className="text-lg lg:text-xl font-extrabold tracking-tight text-white group-hover:text-emerald-300 transition-colors whitespace-nowrap">
-              {siteSettings.siteTitle || 'Owen Watermelon'}{' '}
-              <span style={{ color: activeTheme.accent }}>V3</span>
-            </span>
-          </div>
+          {/* Left Controls: Mobile Menu Toggle + Wordmark */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {onToggleMobileSidebar && (
+              <button
+                type="button"
+                onClick={onToggleMobileSidebar}
+                className="md:hidden p-2 rounded-xl text-slate-300 hover:text-white transition-colors border cursor-pointer"
+                style={{
+                  backgroundColor: activeTheme.bgCard,
+                  borderColor: activeTheme.border
+                }}
+                title="Toggle Navigation Menu"
+              >
+                <Menu className="w-4 h-4" />
+              </button>
+            )}
 
-          {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-sm font-medium">
             <button
               onClick={() => onSelectTab('games')}
-              className="transition-colors whitespace-nowrap cursor-pointer font-semibold"
-              style={{
-                color: currentTab === 'games' ? activeTheme.accent : '#cbd5e1'
-              }}
+              className="flex items-center gap-2.5 cursor-pointer select-none group text-left"
+              title="Owen Watermelon V3"
             >
-              Arcade Hub
+              <div 
+                className="w-8 h-8 rounded-xl border flex items-center justify-center text-base shadow-sm transition-transform group-hover:scale-105 shrink-0"
+                style={{
+                  backgroundColor: activeTheme.accentBadge,
+                  borderColor: activeTheme.borderActive
+                }}
+              >
+                {activeTheme.emoji || '🍉'}
+              </div>
+              <div className="hidden sm:flex flex-col">
+                <span className="text-sm font-extrabold tracking-tight text-white leading-tight">
+                  Owen <span style={{ color: activeTheme.accent }}>V3</span>
+                </span>
+                <span className="text-[10px] font-mono text-slate-400">
+                  Arcade Browser
+                </span>
+              </div>
             </button>
-            <button
-              onClick={() => onSelectTab('cloaker')}
-              className="transition-colors whitespace-nowrap cursor-pointer"
-              style={{
-                color: currentTab === 'cloaker' ? activeTheme.accent : '#cbd5e1'
-              }}
-            >
-              Tab Cloaker
-            </button>
-            <a
-              href={REQUEST_GAME_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-slate-300 hover:text-white transition-colors whitespace-nowrap flex items-center gap-1.5"
-            >
-              <span>Request Game</span>
-              <ExternalLink className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
-            </a>
-          </nav>
+          </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          {/* Center: PeteZah Browser Omnibar / Address Search Field */}
+          {onSearchChange && (
+            <div className="flex-1 max-w-xl mx-auto">
+              <div 
+                className="relative flex items-center w-full rounded-xl border transition-all duration-200 group focus-within:ring-1"
+                style={{
+                  backgroundColor: activeTheme.bgPrimary,
+                  borderColor: activeTheme.border,
+                  boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.5)'
+                }}
+              >
+                <div className="pl-3.5 pr-2 pointer-events-none flex items-center gap-1.5 text-slate-500">
+                  <Search className="w-3.5 h-3.5 text-slate-400 group-focus-within:text-sky-400 transition-colors" style={{ color: searchTerm ? activeTheme.accent : undefined }} />
+                  <span className="text-[11px] font-mono text-slate-500 hidden lg:inline">owen://</span>
+                </div>
+
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={e => onSearchChange(e.target.value)}
+                  placeholder="Search 288+ unblocked games, OGs, genres..."
+                  className="w-full py-2 text-xs text-white placeholder-slate-500 bg-transparent focus:outline-none font-medium"
+                />
+
+                {searchTerm ? (
+                  <button
+                    onClick={() => onSearchChange('')}
+                    className="p-1.5 mr-1.5 text-slate-400 hover:text-white rounded-lg transition-colors cursor-pointer"
+                    title="Clear Search"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                ) : (
+                  <div className="pr-3 hidden sm:flex items-center gap-1 text-[10px] font-mono text-slate-500 pointer-events-none">
+                    <kbd className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5">⌘K</kbd>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Right Tools & Action Strip */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Random Game Button */}
+            {onRandomGame && (
+              <button
+                onClick={onRandomGame}
+                className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-xl border transition-all cursor-pointer text-slate-300 hover:text-white"
+                style={{
+                  backgroundColor: activeTheme.bgCard,
+                  borderColor: activeTheme.border
+                }}
+                title="Shuffle Random Unblocked Game"
+              >
+                <Dices className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
+                <span>Random</span>
+              </button>
+            )}
+
+            {/* Tab Cloaker Quick Switch */}
+            <button
+              onClick={() => onSelectTab(currentTab === 'cloaker' ? 'games' : 'cloaker')}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-xl border transition-all cursor-pointer"
+              style={{
+                backgroundColor: currentTab === 'cloaker' ? activeTheme.accentBadge : activeTheme.bgCard,
+                borderColor: currentTab === 'cloaker' ? activeTheme.borderActive : activeTheme.border,
+                color: currentTab === 'cloaker' ? activeTheme.accent : '#94a3b8'
+              }}
+              title="Toggle Tab Cloaker & Stealth Camouflage"
+            >
+              <EyeOff className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">{currentTab === 'cloaker' ? 'Cloaker Active' : 'Cloak'}</span>
+            </button>
+
             {/* Theme Selector Button */}
             <button
               onClick={onOpenThemeModal}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl border transition-all whitespace-nowrap cursor-pointer hover:scale-105"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold rounded-xl border transition-all whitespace-nowrap cursor-pointer hover:scale-105"
               style={{
                 backgroundColor: activeTheme.bgCard,
                 borderColor: activeTheme.borderActive,
                 color: '#ffffff'
               }}
-              title="Change theme (Nebula, Sky, Original, Cyberpunk, etc.)"
+              title="Switch Themes"
             >
               <Palette className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
-              <span className="hidden sm:inline">Theme:</span>
-              <span className="font-extrabold" style={{ color: activeTheme.accent }}>
+              <span className="hidden sm:inline font-extrabold" style={{ color: activeTheme.accent }}>
                 {activeTheme.emoji} {activeTheme.name.split(' ')[0]}
               </span>
             </button>
-
-            {/* Request Game Link */}
-            <a
-              href={REQUEST_GAME_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap cursor-pointer shadow-md font-sans"
-              style={{
-                backgroundColor: activeTheme.accent,
-                color: activeTheme.accentText
-              }}
-              title="Request a new game to be added"
-            >
-              <span>Request Game</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
 
             {/* Lock Site Button */}
             {onLockSite && (
               <button
                 onClick={onLockSite}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white rounded-lg border transition-all whitespace-nowrap cursor-pointer"
+                className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white rounded-xl border transition-all whitespace-nowrap cursor-pointer"
                 style={{
                   backgroundColor: activeTheme.bgCard,
                   borderColor: activeTheme.border
@@ -148,49 +216,20 @@ export const Header: React.FC<HeaderProps> = ({
                 title="Lock site with passcode (owenpan2244)"
               >
                 <Lock className="w-3.5 h-3.5 text-slate-400" />
-                <span className="hidden sm:inline">Lock</span>
+                <span className="hidden lg:inline">Lock</span>
               </button>
             )}
 
             {/* Emergency Panic Key Button */}
             <button
               onClick={triggerPanic}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-[#ff2d55] hover:bg-[#e11d48] rounded-lg shadow-sm shadow-[#ff2d55]/30 transition-all whitespace-nowrap cursor-pointer"
-              title="Emergency Panic: Immediately disguises tab to Google Classroom"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-[#ff2d55] hover:bg-[#e11d48] rounded-xl shadow-sm shadow-[#ff2d55]/30 transition-all whitespace-nowrap cursor-pointer"
+              title="Emergency Panic: Immediately hides tab to Google Classroom"
             >
               <ShieldAlert className="w-3.5 h-3.5 text-white" />
-              <span>Panic (Esc)</span>
+              <span>Panic</span>
             </button>
           </div>
-        </div>
-
-        {/* Mobile sub-nav bar */}
-        <div 
-          className="md:hidden flex items-center justify-around pt-3 border-t mt-2.5 text-xs"
-          style={{ borderColor: activeTheme.border }}
-        >
-          <button
-            onClick={() => onSelectTab('games')}
-            className="cursor-pointer font-bold"
-            style={{ color: currentTab === 'games' ? activeTheme.accent : '#94a3b8' }}
-          >
-            Arcade Hub
-          </button>
-          <button
-            onClick={() => onSelectTab('cloaker')}
-            className="cursor-pointer"
-            style={{ color: currentTab === 'cloaker' ? activeTheme.accent : '#94a3b8' }}
-          >
-            Tab Cloaker
-          </button>
-          <button
-            onClick={onOpenThemeModal}
-            className="cursor-pointer flex items-center gap-1"
-            style={{ color: activeTheme.accent }}
-          >
-            <span>{activeTheme.emoji}</span>
-            <span>Themes</span>
-          </button>
         </div>
       </header>
     </>

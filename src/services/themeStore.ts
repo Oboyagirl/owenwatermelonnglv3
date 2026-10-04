@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 
 export type ThemeId =
+  | 'petezah'
   | 'original'
+  | 'custom'
   | 'nebula'
   | 'sky'
   | 'cyberpunk'
@@ -37,7 +39,27 @@ export interface ThemeConfig {
   kicker: string;
 }
 
-export const THEMES: Record<ThemeId, ThemeConfig> = {
+export const THEMES: Record<Exclude<ThemeId, 'custom'>, ThemeConfig> = {
+  petezah: {
+    id: 'petezah',
+    name: 'PeteZah Obsidian',
+    category: 'Dark',
+    emoji: '🍕',
+    description: 'The ultra-sleek PeteZah chrome portal style with obsidian glass and electric cyan.',
+    bgPrimary: '#020810',
+    bgSecondary: '#07101c',
+    bgCard: '#0c1626',
+    bgHeader: 'rgba(8, 14, 24, 0.88)',
+    border: 'rgba(255, 255, 255, 0.08)',
+    borderActive: '#38bdf8',
+    accent: '#38bdf8',
+    accentHover: '#60a5fa',
+    accentText: '#020810',
+    accentBadge: 'rgba(56, 189, 248, 0.15)',
+    accentGlow: 'rgba(56, 189, 248, 0.25)',
+    starColors: ['#38bdf8', '#60a5fa', '#93c5fd', '#ffffff', '#0284c7'],
+    kicker: '#38bdf8'
+  },
   original: {
     id: 'original',
     name: 'Original Watermelon',
@@ -300,21 +322,85 @@ export const THEMES: Record<ThemeId, ThemeConfig> = {
   }
 };
 
+export interface CustomThemeData {
+  name: string;
+  emoji: string;
+  bgPrimary: string;
+  bgSecondary: string;
+  bgCard: string;
+  border: string;
+  borderActive: string;
+  accent: string;
+  accentHover: string;
+  starColor1: string;
+  starColor2: string;
+}
+
+export const DEFAULT_CUSTOM_THEME: CustomThemeData = {
+  name: 'My Custom Theme',
+  emoji: '✨',
+  bgPrimary: '#080812',
+  bgSecondary: '#0f1020',
+  bgCard: '#15172b',
+  border: '#282b4a',
+  borderActive: '#a855f7',
+  accent: '#a855f7',
+  accentHover: '#c084fc',
+  starColor1: '#a855f7',
+  starColor2: '#38bdf8'
+};
+
+export function buildCustomThemeConfig(custom: CustomThemeData): ThemeConfig {
+  return {
+    id: 'custom',
+    name: custom.name || 'Custom Theme',
+    category: 'Vibrant',
+    emoji: custom.emoji || '✨',
+    description: 'Your own personalized custom theme created with the Theme Studio.',
+    bgPrimary: custom.bgPrimary,
+    bgSecondary: custom.bgSecondary,
+    bgCard: custom.bgCard,
+    bgHeader: 'rgba(8, 10, 20, 0.92)',
+    border: custom.border,
+    borderActive: custom.borderActive || custom.accent,
+    accent: custom.accent,
+    accentHover: custom.accentHover || custom.accent,
+    accentText: '#ffffff',
+    accentBadge: custom.accent + '33',
+    accentGlow: custom.accent + '44',
+    starColors: [custom.starColor1, custom.starColor2, '#ffffff', custom.accent],
+    kicker: custom.accent
+  };
+}
+
 const THEME_STORAGE_KEY = 'owen_watermelon_active_theme_v2';
+const CUSTOM_THEME_STORAGE_KEY = 'owen_custom_theme_v2';
 
 export function useThemeStore() {
+  const [customTheme, setCustomTheme] = useState<CustomThemeData>(() => {
+    try {
+      const saved = localStorage.getItem(CUSTOM_THEME_STORAGE_KEY);
+      if (saved) {
+        return { ...DEFAULT_CUSTOM_THEME, ...JSON.parse(saved) };
+      }
+    } catch {}
+    return DEFAULT_CUSTOM_THEME;
+  });
+
   const [themeId, setThemeId] = useState<ThemeId>(() => {
     try {
       const saved = localStorage.getItem(THEME_STORAGE_KEY) as ThemeId;
-      if (saved && THEMES[saved]) return saved;
+      if (saved && (saved === 'custom' || (saved in THEMES))) return saved;
     } catch {}
-    return 'original';
+    return 'petezah';
   });
 
-  const activeTheme = THEMES[themeId] || THEMES.original;
+  const activeTheme = themeId === 'custom' 
+    ? buildCustomThemeConfig(customTheme) 
+    : (THEMES[themeId as Exclude<ThemeId, 'custom'>] || THEMES.petezah);
 
   const setTheme = (id: ThemeId) => {
-    if (THEMES[id]) {
+    if (id === 'custom' || (id in THEMES)) {
       setThemeId(id);
       try {
         localStorage.setItem(THEME_STORAGE_KEY, id);
@@ -322,10 +408,35 @@ export function useThemeStore() {
     }
   };
 
+  const updateCustomTheme = (updates: Partial<CustomThemeData>) => {
+    setCustomTheme(prev => {
+      const next = { ...prev, ...updates };
+      try {
+        localStorage.setItem(CUSTOM_THEME_STORAGE_KEY, JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  const resetCustomTheme = () => {
+    setCustomTheme(DEFAULT_CUSTOM_THEME);
+    try {
+      localStorage.setItem(CUSTOM_THEME_STORAGE_KEY, JSON.stringify(DEFAULT_CUSTOM_THEME));
+    } catch {}
+  };
+
+  const allThemes: ThemeConfig[] = [
+    buildCustomThemeConfig(customTheme),
+    ...Object.values(THEMES)
+  ];
+
   return {
     themeId,
     activeTheme,
     setTheme,
-    allThemes: Object.values(THEMES)
+    allThemes,
+    customTheme,
+    updateCustomTheme,
+    resetCustomTheme
   };
 }

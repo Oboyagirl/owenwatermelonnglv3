@@ -471,10 +471,10 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         </div>
       </div>
 
-      {/* SEARCH AND QUICK PILL BAR */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+      {/* SEARCH AND FILTER STATUS BAR */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
         {/* Search Bar */}
-        <div className="relative flex-1 max-w-md">
+        <div className="relative flex-1 max-w-lg">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
@@ -497,33 +497,29 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
           )}
         </div>
 
-        {/* Quick Compact Category Pills */}
+        {/* Selected Category Status Indicator */}
         <div 
-          className="flex items-center gap-1.5 p-1 rounded-xl overflow-x-auto scrollbar-none border"
+          className="flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-semibold shrink-0"
           style={{
             backgroundColor: activeTheme.bgCard,
-            borderColor: activeTheme.border
+            borderColor: activeTheme.border,
+            color: activeTheme.kicker
           }}
         >
-          {categories.map(cat => {
-            const isActive = activeCategory === cat;
-            const isOg = isOgCategory(cat);
-            return (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => onSelectCategory(cat)}
-                className="px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5"
-                style={{
-                  backgroundColor: isActive ? activeTheme.accent : undefined,
-                  color: isActive ? activeTheme.accentText : isOg ? activeTheme.kicker : '#cbd5e1'
-                }}
-              >
-                <span>{CATEGORY_CARDS_DATA[cat]?.emoji || '🎮'}</span>
-                <span>{cat}</span>
-              </button>
-            );
-          })}
+          <span className="text-slate-400">Filtering:</span>
+          <span className="text-white flex items-center gap-1.5 font-bold">
+            <span>{CATEGORY_CARDS_DATA[activeCategory]?.emoji || '🎮'}</span>
+            <span>{activeCategory}</span>
+          </span>
+          {activeCategory !== 'All' && (
+            <button
+              onClick={() => onSelectCategory('All')}
+              className="ml-1 text-[11px] px-1.5 py-0.5 rounded hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer"
+              title="Reset to All Games"
+            >
+              Reset ✕
+            </button>
+          )}
         </div>
       </div>
     </div>

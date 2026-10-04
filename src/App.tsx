@@ -11,6 +11,7 @@ import { GamePlayer } from './components/GamePlayer';
 import { TabCloaker } from './components/TabCloaker';
 import { StarfieldBackground } from './components/StarfieldBackground';
 import { ThemeModal } from './components/ThemeModal';
+import { Sidebar } from './components/Sidebar';
 import { PasscodeGate, PASSCODE_STORAGE_KEY } from './components/PasscodeGate';
 import { useGamesStore } from './services/gamesStore';
 import { useSiteSettingsStore } from './services/siteSettingsStore';
@@ -79,7 +80,14 @@ export default function App() {
   } = useGamesStore();
 
   const { siteSettings } = useSiteSettingsStore();
-  const { themeId, activeTheme, setTheme } = useThemeStore();
+  const { 
+    themeId, 
+    activeTheme, 
+    setTheme, 
+    customTheme, 
+    updateCustomTheme, 
+    resetCustomTheme 
+  } = useThemeStore();
 
   // Sync document root background and CSS custom properties when theme changes
   useEffect(() => {
@@ -131,6 +139,49 @@ export default function App() {
   useEffect(() => {
     setVisibleCount(48);
   }, [searchTerm, selectedCategory]);
+
+  // Sidebar collapse & mobile drawer state (PeteZah layout)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('owen_sidebar_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleSidebarCollapse = () => {
+    setIsSidebarCollapsed(prev => {
+      const next = !prev;
+      try {
+        localStorage.setItem('owen_sidebar_collapsed', String(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  const handleRandomGame = () => {
+    if (games.length === 0) return;
+    const randomIndex = Math.floor(Math.random() * games.length);
+    handleSelectGame(games[randomIndex]);
+  };
+
+  // Keyboard shortcut listener: Cmd/Ctrl + K focuses omnibar search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        const searchInput = document.querySelector('input[type="text"][placeholder*="Search"]') as HTMLInputElement;
+        if (searchInput) {
+          searchInput.focus();
+          searchInput.select();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Global Panic Key Listener (Esc)
   useEffect(() => {
@@ -284,238 +335,323 @@ export default function App() {
         starColors={activeTheme.starColors}
       />
 
-      {/* Top Bar Header */}
+      {/* Top Bar Header (PeteZah Chrome Bar) */}
       <Header
         currentTab={currentTab}
         onSelectTab={tab => {
           setCurrentTab(tab);
           setSelectedGame(null);
+          setIsMobileSidebarOpen(false);
         }}
         siteSettings={siteSettings}
         activeTheme={activeTheme}
         onOpenThemeModal={() => setIsThemeModalOpen(true)}
         onLockSite={handleLockSite}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onToggleMobileSidebar={() => setIsMobileSidebarOpen(prev => !prev)}
+        onRandomGame={handleRandomGame}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 w-full pb-16 relative z-10">
-        {/* GAME PLAYER VIEW */}
-        {selectedGame ? (
-          <GamePlayer
-            game={selectedGame}
-            isFavorite={favorites.includes(selectedGame.id)}
-            onToggleFavorite={toggleFavorite}
-            onBack={handleBackToHub}
-            onSelectGame={handleSelectGame}
-            allGames={games}
-            onUpdateGame={(id, updates) => updateGame(id, updates)}
-            activeTheme={activeTheme}
-          />
-        ) : (
-          <>
-            {/* ARCADE GAMES HUB */}
-            {currentTab === 'games' && (
-              <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6 flex flex-col gap-10">
-                {/* Hero Spotlight & Filters */}
-                <HeroBanner
-                  featuredGame={featuredGame}
-                  onPlay={handleSelectGame}
-                  searchTerm={searchTerm}
-                  onSearchChange={setSearchTerm}
-                  activeCategory={selectedCategory}
-                  onSelectCategory={setSelectedCategory}
-                  categories={categories}
-                  totalGames={games.length}
-                  categoryCounts={categoryCounts}
-                  activeTheme={activeTheme}
-                  activeThemeId={themeId}
-                  onSelectTheme={setTheme}
-                  onOpenThemeGallery={() => setIsThemeModalOpen(true)}
-                />
+      {/* Main PeteZah Split Layout: Sidebar + Canvas */}
+      <div className="flex flex-1 w-full relative z-10 min-h-0">
+        {/* Desktop Browser Sidebar */}
+        <Sidebar
+          currentTab={currentTab}
+          onSelectTab={tab => {
+            setCurrentTab(tab);
+            setSelectedGame(null);
+            setIsMobileSidebarOpen(false);
+          }}
+          activeCategory={selectedCategory}
+          onSelectCategory={cat => {
+            setSelectedCategory(cat);
+            setSelectedGame(null);
+            setIsMobileSidebarOpen(false);
+          }}
+          onRandomGame={() => {
+            handleRandomGame();
+            setIsMobileSidebarOpen(false);
+          }}
+          onOpenThemeModal={() => {
+            setIsThemeModalOpen(true);
+            setIsMobileSidebarOpen(false);
+          }}
+          onLockSite={handleLockSite}
+          activeTheme={activeTheme}
+          totalGames={games.length}
+          favoriteCount={favoriteGamesList.length}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={toggleSidebarCollapse}
+        />
 
-                {/* Quick Favorites Section if any */}
-                {selectedCategory === 'All' && !searchTerm && favoriteGamesList.length > 0 && (
-                  <div className="flex flex-col gap-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Heart className="w-4 h-4 text-[#ff2d55] fill-current" />
-                        <h2 className="text-lg font-bold text-white tracking-tight">
-                          Your Starred Favorites
-                        </h2>
+        {/* Mobile Sidebar Drawer Overlay */}
+        {isMobileSidebarOpen && (
+          <div 
+            className="md:hidden fixed inset-0 z-50 flex bg-black/75 backdrop-blur-sm animate-in fade-in duration-200"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          >
+            <div 
+              className="w-72 max-w-[85vw] h-full shadow-2xl flex flex-col animate-in slide-in-from-left duration-200"
+              onClick={e => e.stopPropagation()}
+            >
+              <Sidebar
+                currentTab={currentTab}
+                onSelectTab={tab => {
+                  setCurrentTab(tab);
+                  setSelectedGame(null);
+                  setIsMobileSidebarOpen(false);
+                }}
+                activeCategory={selectedCategory}
+                onSelectCategory={cat => {
+                  setSelectedCategory(cat);
+                  setSelectedGame(null);
+                  setIsMobileSidebarOpen(false);
+                }}
+                onRandomGame={() => {
+                  handleRandomGame();
+                  setIsMobileSidebarOpen(false);
+                }}
+                onOpenThemeModal={() => {
+                  setIsThemeModalOpen(true);
+                  setIsMobileSidebarOpen(false);
+                }}
+                onLockSite={handleLockSite}
+                activeTheme={activeTheme}
+                totalGames={games.length}
+                favoriteCount={favoriteGamesList.length}
+                isCollapsed={false}
+                onToggleCollapse={() => setIsMobileSidebarOpen(false)}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Main Content Viewport */}
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-y-auto">
+          <main className="flex-1 w-full pb-16 relative z-10">
+            {/* GAME PLAYER VIEW */}
+            {selectedGame ? (
+              <GamePlayer
+                game={selectedGame}
+                isFavorite={favorites.includes(selectedGame.id)}
+                onToggleFavorite={toggleFavorite}
+                onBack={handleBackToHub}
+                onSelectGame={handleSelectGame}
+                allGames={games}
+                onUpdateGame={(id, updates) => updateGame(id, updates)}
+                activeTheme={activeTheme}
+              />
+            ) : (
+              <>
+                {/* ARCADE GAMES HUB */}
+                {currentTab === 'games' && (
+                  <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6 flex flex-col gap-10">
+                    {/* Hero Spotlight & Filters */}
+                    <HeroBanner
+                      featuredGame={featuredGame}
+                      onPlay={handleSelectGame}
+                      searchTerm={searchTerm}
+                      onSearchChange={setSearchTerm}
+                      activeCategory={selectedCategory}
+                      onSelectCategory={setSelectedCategory}
+                      categories={categories}
+                      totalGames={games.length}
+                      categoryCounts={categoryCounts}
+                      activeTheme={activeTheme}
+                      activeThemeId={themeId}
+                      onSelectTheme={setTheme}
+                      onOpenThemeGallery={() => setIsThemeModalOpen(true)}
+                    />
+
+                    {/* Quick Favorites Section if any */}
+                    {selectedCategory === 'All' && !searchTerm && favoriteGamesList.length > 0 && (
+                      <div className="flex flex-col gap-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Heart className="w-4 h-4 text-[#ff2d55] fill-current" />
+                            <h2 className="text-lg font-bold text-white tracking-tight">
+                              Your Starred Favorites
+                            </h2>
+                          </div>
+                          <span className="text-xs text-slate-400 font-mono tabular-nums">
+                            {favoriteGamesList.length} {favoriteGamesList.length === 1 ? 'game' : 'games'}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                          {favoriteGamesList.slice(0, 4).map(game => (
+                            <GameCard
+                              key={game.id}
+                              game={game}
+                              isFavorite={true}
+                              onToggleFavorite={toggleFavorite}
+                              onPlay={handleSelectGame}
+                              activeTheme={activeTheme}
+                            />
+                          ))}
+                        </div>
                       </div>
-                      <span className="text-xs text-slate-400 font-mono tabular-nums">
-                        {favoriteGamesList.length} {favoriteGamesList.length === 1 ? 'game' : 'games'}
-                      </span>
-                    </div>
+                    )}
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-                      {favoriteGamesList.slice(0, 4).map(game => (
-                        <GameCard
-                          key={game.id}
-                          game={game}
-                          isFavorite={true}
-                          onToggleFavorite={toggleFavorite}
-                          onPlay={handleSelectGame}
-                          activeTheme={activeTheme}
-                        />
-                      ))}
+                    {/* All Filtered Games Grid */}
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between">
+                        <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+                          <Sparkles className="w-4 h-4" style={{ color: activeTheme.accent }} />
+                          <span>{selectedCategory === 'All' ? 'Complete Games Catalog' : `${selectedCategory} Games`}</span>
+                        </h2>
+                        <span className="text-xs text-slate-400 font-mono tabular-nums">
+                          Showing {Math.min(visibleCount, filteredGames.length)} of {filteredGames.length} {filteredGames.length === games.length ? 'games' : `(from ${games.length} total)`}
+                        </span>
+                      </div>
+
+                      {filteredGames.length > 0 ? (
+                        <>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                            {filteredGames.slice(0, visibleCount).map(game => (
+                              <GameCard
+                                key={game.id}
+                                game={game}
+                                isFavorite={favorites.includes(game.id)}
+                                onToggleFavorite={toggleFavorite}
+                                onPlay={handleSelectGame}
+                                activeTheme={activeTheme}
+                              />
+                            ))}
+                          </div>
+
+                          {visibleCount < filteredGames.length && (
+                            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-6 pb-2">
+                              <button
+                                onClick={() => setVisibleCount(prev => Math.min(prev + 48, filteredGames.length))}
+                                className="px-6 py-3 font-bold text-sm rounded-xl transition-all shadow-lg hover:-translate-y-0.5 cursor-pointer flex items-center gap-2"
+                                style={{
+                                  backgroundColor: activeTheme.accent,
+                                  color: activeTheme.accentText,
+                                  boxShadow: `0 10px 25px ${activeTheme.accentGlow}`
+                                }}
+                              >
+                                <span>Load More Games (+48)</span>
+                                <span className="text-xs px-2 py-0.5 rounded-full font-mono bg-black/20">
+                                  {filteredGames.length - visibleCount} left
+                                </span>
+                              </button>
+                              <button
+                                onClick={() => setVisibleCount(filteredGames.length)}
+                                className="px-5 py-3 border font-semibold text-sm rounded-xl transition-colors cursor-pointer"
+                                style={{
+                                  backgroundColor: activeTheme.bgCard,
+                                  borderColor: activeTheme.border,
+                                  color: activeTheme.kicker
+                                }}
+                              >
+                                Show All {filteredGames.length} Games
+                              </button>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <div 
+                          className="p-12 text-center border rounded-2xl flex flex-col items-center justify-center gap-3"
+                          style={{
+                            backgroundColor: activeTheme.bgCard,
+                            borderColor: activeTheme.border
+                          }}
+                        >
+                          <span className="text-4xl">{activeTheme.emoji}</span>
+                          <h3 className="text-base font-bold text-white">No matching games found</h3>
+                          <p className="text-xs text-slate-400 max-w-sm">
+                            Try adjusting your search query or request a game to be added.
+                          </p>
+                          <div className="flex items-center gap-3 mt-2">
+                            <button
+                              onClick={() => { setSearchTerm(''); setSelectedCategory('All'); }}
+                              className="px-4 py-2 font-bold text-xs rounded-lg transition-colors cursor-pointer shadow-md"
+                              style={{
+                                backgroundColor: activeTheme.accent,
+                                color: activeTheme.accentText
+                              }}
+                            >
+                              Clear Filters
+                            </button>
+                            <a
+                              href={REQUEST_GAME_URL}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-4 py-2 border font-bold text-xs rounded-lg transition-colors flex items-center gap-1.5"
+                              style={{
+                                backgroundColor: activeTheme.bgSecondary,
+                                borderColor: activeTheme.border,
+                                color: activeTheme.kicker
+                              }}
+                            >
+                              <span>Request This Game</span>
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
 
-                {/* All Filtered Games Grid */}
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-                      <Sparkles className="w-4 h-4" style={{ color: activeTheme.accent }} />
-                      <span>{selectedCategory === 'All' ? 'Complete Games Catalog' : `${selectedCategory} Games`}</span>
-                    </h2>
-                    <span className="text-xs text-slate-400 font-mono tabular-nums">
-                      Showing {Math.min(visibleCount, filteredGames.length)} of {filteredGames.length} {filteredGames.length === games.length ? 'games' : `(from ${games.length} total)`}
-                    </span>
-                  </div>
-
-                  {filteredGames.length > 0 ? (
-                    <>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-                        {filteredGames.slice(0, visibleCount).map(game => (
-                          <GameCard
-                            key={game.id}
-                            game={game}
-                            isFavorite={favorites.includes(game.id)}
-                            onToggleFavorite={toggleFavorite}
-                            onPlay={handleSelectGame}
-                            activeTheme={activeTheme}
-                          />
-                        ))}
-                      </div>
-
-                      {visibleCount < filteredGames.length && (
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-6 pb-2">
-                          <button
-                            onClick={() => setVisibleCount(prev => Math.min(prev + 48, filteredGames.length))}
-                            className="px-6 py-3 font-bold text-sm rounded-xl transition-all shadow-lg hover:-translate-y-0.5 cursor-pointer flex items-center gap-2"
-                            style={{
-                              backgroundColor: activeTheme.accent,
-                              color: activeTheme.accentText,
-                              boxShadow: `0 10px 25px ${activeTheme.accentGlow}`
-                            }}
-                          >
-                            <span>Load More Games (+48)</span>
-                            <span className="text-xs px-2 py-0.5 rounded-full font-mono bg-black/20">
-                              {filteredGames.length - visibleCount} left
-                            </span>
-                          </button>
-                          <button
-                            onClick={() => setVisibleCount(filteredGames.length)}
-                            className="px-5 py-3 border font-semibold text-sm rounded-xl transition-colors cursor-pointer"
-                            style={{
-                              backgroundColor: activeTheme.bgCard,
-                              borderColor: activeTheme.border,
-                              color: activeTheme.kicker
-                            }}
-                          >
-                            Show All {filteredGames.length} Games
-                          </button>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div 
-                      className="p-12 text-center border rounded-2xl flex flex-col items-center justify-center gap-3"
-                      style={{
-                        backgroundColor: activeTheme.bgCard,
-                        borderColor: activeTheme.border
-                      }}
-                    >
-                      <span className="text-4xl">{activeTheme.emoji}</span>
-                      <h3 className="text-base font-bold text-white">No matching games found</h3>
-                      <p className="text-xs text-slate-400 max-w-sm">
-                        Try adjusting your search query or request a game to be added.
-                      </p>
-                      <div className="flex items-center gap-3 mt-2">
-                        <button
-                          onClick={() => { setSearchTerm(''); setSelectedCategory('All'); }}
-                          className="px-4 py-2 font-bold text-xs rounded-lg transition-colors cursor-pointer shadow-md"
-                          style={{
-                            backgroundColor: activeTheme.accent,
-                            color: activeTheme.accentText
-                          }}
-                        >
-                          Clear Filters
-                        </button>
-                        <a
-                          href={REQUEST_GAME_URL}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-4 py-2 border font-bold text-xs rounded-lg transition-colors flex items-center gap-1.5"
-                          style={{
-                            backgroundColor: activeTheme.bgSecondary,
-                            borderColor: activeTheme.border,
-                            color: activeTheme.kicker
-                          }}
-                        >
-                          <span>Request This Game</span>
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+                {/* TAB CLOAKER & CAMOUFLAGE TAB */}
+                {currentTab === 'cloaker' && <TabCloaker activeTheme={activeTheme} />}
+              </>
             )}
+          </main>
 
-            {/* TAB CLOAKER & CAMOUFLAGE TAB */}
-            {currentTab === 'cloaker' && <TabCloaker activeTheme={activeTheme} />}
-          </>
-        )}
-      </main>
+          {/* Footer */}
+          <footer 
+            className="w-full border-t px-4 lg:px-8 py-8 mt-auto relative z-10 backdrop-blur-xs transition-colors"
+            style={{
+              backgroundColor: activeTheme.bgHeader,
+              borderColor: activeTheme.border
+            }}
+          >
+            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-white">{siteSettings.siteTitle || 'Owen Watermelon V3'}</span>
+                <span>·</span>
+                <span>PeteZah Unblocked Arcade Browser & Tab Cloaker</span>
+              </div>
 
-      {/* Footer */}
-      <footer 
-        className="w-full border-t px-4 lg:px-8 py-8 mt-auto relative z-10 backdrop-blur-xs transition-colors"
-        style={{
-          backgroundColor: activeTheme.bgHeader,
-          borderColor: activeTheme.border
-        }}
-      >
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-white">{siteSettings.siteTitle || 'Owen Watermelon V3'}</span>
-            <span>·</span>
-            <span>Unblocked Games Catalog & Tab Cloaker</span>
-          </div>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setIsThemeModalOpen(true)}
+                  className="hover:text-white transition-colors flex items-center gap-1.5 font-medium cursor-pointer"
+                  style={{ color: activeTheme.accent }}
+                >
+                  <Palette className="w-3.5 h-3.5" />
+                  <span>Theme: {activeTheme.name}</span>
+                </button>
 
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setIsThemeModalOpen(true)}
-              className="hover:text-white transition-colors flex items-center gap-1.5 font-medium cursor-pointer"
-              style={{ color: activeTheme.accent }}
-            >
-              <Palette className="w-3.5 h-3.5" />
-              <span>Theme: {activeTheme.name}</span>
-            </button>
-
-            <a
-              href={REQUEST_GAME_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-white transition-colors flex items-center gap-1.5 font-medium"
-              style={{ color: activeTheme.accent }}
-            >
-              <span>Request Game</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
-          </div>
+                <a
+                  href={REQUEST_GAME_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors flex items-center gap-1.5 font-medium"
+                  style={{ color: activeTheme.accent }}
+                >
+                  <span>Request Game</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
+          </footer>
         </div>
-      </footer>
+      </div>
 
-      {/* Theme Gallery Modal */}
+      {/* Theme Gallery & Custom Studio Modal */}
       <ThemeModal
         isOpen={isThemeModalOpen}
         onClose={() => setIsThemeModalOpen(false)}
         activeThemeId={themeId}
         onSelectTheme={setTheme}
+        customTheme={customTheme}
+        onUpdateCustomTheme={updateCustomTheme}
+        onResetCustomTheme={resetCustomTheme}
       />
     </div>
   );

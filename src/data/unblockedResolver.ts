@@ -98,10 +98,14 @@ const PRESERVED_LOCAL_GAMES = new Set([
   "games/kindergarten.html",
   "games/kindergarten-2.html",
   "games/the-man-in-the-window.html",
-  "games/case-opener.html"
+  "games/case-opener.html",
+  "games/flash-player.html",
+  "games/fruit-ninja.html",
+  "games/papas-scooperia.html"
 ]);
 
 function cleanText(str: string): string {
+  if (!str) return "";
   return str
     .replace(/&#39;/g, "")
     .replace(/&amp;/g, "and")
@@ -113,7 +117,7 @@ function cleanText(str: string): string {
 export function resolveGameSource(
   id: string,
   title: string,
-  currentSrc: string,
+  currentSrc: string = "",
   mirrors: string[] = []
 ): { src: string; mirrors: string[] } {
   // If preserved local game, keep as-is
@@ -128,8 +132,8 @@ export function resolveGameSource(
   }
 
   const cleanTitle = cleanText(title);
-  const cleanId = cleanText(id.replace(/^potatoes-/, ""));
-  const cleanSlug = cleanText(currentSrc.replace(/https?:\/\/[^\/]+\/[^\/]+\/([^\/]+)\/?.*/, "$1"));
+  const cleanId = cleanText((id || "").replace(/^potatoes-/, ""));
+  const cleanSlug = cleanText((currentSrc || "").replace(/https?:\/\/[^\/]+\/[^\/]+\/([^\/]+)\/?.*/, "$1"));
 
   if (fixMap[cleanTitle] || fixMap[cleanId] || fixMap[cleanSlug]) {
     const fixedUrl = fixMap[cleanTitle] || fixMap[cleanId] || fixMap[cleanSlug];
