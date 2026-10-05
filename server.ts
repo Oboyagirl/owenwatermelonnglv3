@@ -3,10 +3,84 @@ import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import https from 'https';
 import http from 'http';
+import { GoogleGenAI } from '@google/genai';
 
 async function startServer() {
   const app = express();
   const PORT = Number(process.env.PORT) || 3000;
+
+  app.use(express.json());
+
+  // Initialize Gemini AI Client (Server-side only)
+  const ai = new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY,
+    httpOptions: {
+      headers: {
+        'User-Agent': 'aistudio-build',
+      }
+    }
+  });
+
+  // AI Chatbot Endpoint for WatermelonBase
+  app.post('/api/chat', async (req, res) => {
+    try {
+      const { messages, message } = req.body;
+
+      let contents: any[] = [];
+      if (Array.isArray(messages) && messages.length > 0) {
+        contents = messages.map(m => ({
+          role: m.role === 'assistant' || m.role === 'model' ? 'model' : 'user',
+          parts: [{ text: String(m.content || m.text || '') }]
+        }));
+      } else if (message) {
+        contents = [{ role: 'user', parts: [{ text: String(message) }] }];
+      } else {
+        return res.status(400).json({ error: 'No message provided' });
+      }
+
+      let responseText = '';
+      try {
+        const response = await ai.models.generateContent({
+          model: 'gemini-3.8-flash',
+          contents,
+          config: {
+            systemInstruction: `You are "MelonBot" (Watermelon AI), the official, high-energy, super-smart AI assistant for WatermelonBase (Owen Watermelon V3 Arcade).
+You know all about our catalog of 830+ unblocked games, including:
+- Sports & Random games: Soccer Random, Volley Random, Basket Random, Boxing Random, Retro Bowl, Basketball Stars, 8-Ball Pool.
+- Tower Defence: Bloons Tower Defence 1, 2, 3, 4, 5.
+- Restaurant Management: The complete Papa's series (Pizzeria, Burgeria, Freezeria, Cupcakeria, Cheeseria, Donuteria, Hot Doggeria, Pancakeria, Pastaria, Scooperia, Sushiria, Taco Mia, Bakeria, Wingeria, Papa Louie 1-3).
+- Action & Arcade: Fruit Ninja, Slope, 1v1.lol, Drive Mad, Subway Surfers, BitLife, FNAF 1-4, Eaglercraft (Minecraft), Cookie Clicker, Getting Over It, Drift Hunters, Run 3.
+- Owen OGs: Watermelon Merge (Suika), Cyber Snake, Breakout, Flappy Melon, Cyber Pong.
+
+Your job:
+1. Provide awesome, personalized game recommendations based on what the user feels like playing.
+2. Share tips, strategies, secret mechanics, and high-score guides.
+3. Help users understand WatermelonBase features like the Tab Cloaker (camouflaging tabs as Google Classroom or Docs) and Theme Customizer.
+4. Keep answers friendly, snappy, fun, and easy to read using Markdown (bold text, lists, and emojis). Always be enthusiastic about gaming!`
+          }
+        });
+        responseText = response.text || '';
+      } catch (primaryErr) {
+        console.warn('Primary model hit issue, trying gemini-flash-latest fallback:', primaryErr);
+        const fallbackRes = await ai.models.generateContent({
+          model: 'gemini-flash-latest',
+          contents,
+          config: {
+            systemInstruction: 'You are MelonBot, the energetic AI assistant for WatermelonBase unblocked games. Help with recommendations, strategies, and tips in friendly Markdown with emojis!'
+          }
+        });
+        responseText = fallbackRes.text || '';
+      }
+
+      const reply = responseText || "Hello from WatermelonBase! How can I help you game today?";
+      res.json({ reply });
+    } catch (err: any) {
+      console.error('Error generating AI chat response:', err);
+      res.json({ 
+        reply: "🍉 **MelonBot Quick Answer**: WatermelonBase has over 830+ unblocked games ready to play!\n\nTop picks for today:\n- **Watermelon Merge**: Build up to the giant watermelon!\n- **Soccer Random & Basket Random**: Ridiculous ragdoll sports fun.\n- **Bloons TD 5 & Papa's Freezeria**: Timeless strategy & cozy classics.\n\nAsk me anything specific about game strategies, secret controls, or the stealth Tab Cloaker!" 
+      });
+    }
+  });
 
   // Direct Game Play-Shell Runner - Unblocks games for school iPads by piping play-shells and resolving assets via jsDelivr CDN
   app.get('/g/:slug', (req, res) => {

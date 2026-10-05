@@ -126,6 +126,7 @@ interface HeroBannerProps {
   activeThemeId?: ThemeId;
   onSelectTheme?: (id: ThemeId) => void;
   onOpenThemeGallery?: () => void;
+  onOpenCustomThemeStudio?: () => void;
 }
 
 export const HeroBanner: React.FC<HeroBannerProps> = ({
@@ -141,7 +142,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   activeTheme = THEMES.original,
   activeThemeId = 'original',
   onSelectTheme,
-  onOpenThemeGallery
+  onOpenThemeGallery,
+  onOpenCustomThemeStudio
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const heroArt = featuredGame?.banner || featuredGame?.thumbnail || '';
@@ -269,7 +271,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         </div>
       )}
 
-      {/* QUICK THEME CHANGER BAR */}
+      {/* THEME CONTROL BAR (PeteZah Style) */}
       <div 
         className="w-full p-3.5 sm:p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg transition-colors"
         style={{
@@ -277,50 +279,52 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
           borderColor: activeTheme.border
         }}
       >
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2.5 shrink-0">
           <Palette className="w-4 h-4" style={{ color: activeTheme.accent }} />
-          <span className="text-xs font-bold text-white uppercase tracking-wider">
+          <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
             Active Theme:
           </span>
-          <span className="text-xs font-extrabold" style={{ color: activeTheme.accent }}>
-            {activeTheme.emoji} {activeTheme.name}
+          <span className="text-xs font-extrabold flex items-center gap-1.5" style={{ color: activeTheme.accent }}>
+            <span>{activeTheme.emoji}</span>
+            <span>{activeTheme.name}</span>
           </span>
+          {activeThemeId === 'custom' && (
+            <span className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase bg-purple-500/20 text-purple-300 border border-purple-500/30">
+              Personalized
+            </span>
+          )}
         </div>
 
-        {/* Quick Theme Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
-          {Object.values(THEMES).map((th: ThemeConfig) => {
-            const isSelected = activeThemeId === th.id;
-            return (
-              <button
-                key={th.id}
-                type="button"
-                onClick={() => onSelectTheme && onSelectTheme(th.id)}
-                className="px-2.5 py-1 text-xs font-bold rounded-lg border transition-all whitespace-nowrap cursor-pointer flex items-center gap-1 hover:scale-105"
-                style={{
-                  backgroundColor: isSelected ? th.accent : 'rgba(0, 0, 0, 0.4)',
-                  borderColor: isSelected ? th.accent : th.border,
-                  color: isSelected ? th.accentText : '#cbd5e1',
-                  boxShadow: isSelected ? `0 0 12px ${th.accentGlow}` : undefined
-                }}
-                title={th.description}
-              >
-                <span>{th.emoji}</span>
-                <span>{th.name.split(' ')[0]}</span>
-              </button>
-            );
-          })}
+        {/* Action Buttons: Custom Theme Studio + Gallery */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={() => onOpenCustomThemeStudio ? onOpenCustomThemeStudio() : onOpenThemeGallery && onOpenThemeGallery()}
+            className="px-3.5 py-1.5 text-xs font-bold rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 shadow-sm hover:scale-[1.02]"
+            style={{
+              backgroundColor: activeTheme.accentBadge,
+              borderColor: activeTheme.borderActive,
+              color: activeTheme.kicker
+            }}
+            title="Create your own custom theme"
+          >
+            <Sparkles className="w-3.5 h-3.5 animate-pulse" style={{ color: activeTheme.accent }} />
+            <span>✨ Make Custom Theme</span>
+          </button>
 
           {onOpenThemeGallery && (
             <button
+              type="button"
               onClick={onOpenThemeGallery}
-              className="px-3 py-1 text-xs font-bold rounded-lg transition-colors whitespace-nowrap cursor-pointer ml-1"
+              className="px-3.5 py-1.5 text-xs font-semibold rounded-xl border transition-colors cursor-pointer flex items-center gap-1.5 text-slate-300 hover:text-white"
               style={{
-                backgroundColor: activeTheme.accentBadge,
-                color: activeTheme.kicker
+                backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                borderColor: activeTheme.border
               }}
+              title="Browse all built-in themes"
             >
-              Gallery...
+              <Palette className="w-3.5 h-3.5" />
+              <span>Theme Gallery</span>
             </button>
           )}
         </div>

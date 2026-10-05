@@ -11,7 +11,8 @@ import {
   ChevronLeft, 
   ChevronRight,
   Sparkles,
-  ExternalLink
+  ExternalLink,
+  Bot
 } from 'lucide-react';
 import { ThemeConfig } from '../services/themeStore';
 import { triggerPanic } from '../data/cloakPresets';
@@ -24,6 +25,8 @@ interface SidebarProps {
   onSelectCategory: (category: string) => void;
   onRandomGame: () => void;
   onOpenThemeModal: () => void;
+  onOpenCustomThemeStudio?: () => void;
+  onOpenAIChat?: () => void;
   onLockSite?: () => void;
   activeTheme: ThemeConfig;
   totalGames: number;
@@ -39,6 +42,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectCategory,
   onRandomGame,
   onOpenThemeModal,
+  onOpenCustomThemeStudio,
+  onOpenAIChat,
   onLockSite,
   activeTheme,
   totalGames,
@@ -108,15 +113,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Main Navigation Stack */}
       <div className="flex-1 overflow-y-auto px-2.5 py-4 flex flex-col gap-5 custom-scrollbar">
-        {/* Core Sections */}
+        {/* Core Navigation */}
         <div className="flex flex-col gap-1">
           {!isCollapsed && (
             <span className="px-2.5 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              Browse Portal
+              Navigation
             </span>
           )}
 
-          {/* All Games */}
+          {/* Arcade Games Hub */}
           <button
             onClick={() => {
               onSelectTab('games');
@@ -132,68 +137,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
               borderColor: isGames && activeCategory === 'All' ? activeTheme.borderActive : undefined,
               color: isGames && activeCategory === 'All' ? activeTheme.accent : undefined
             }}
-            title="All Games"
+            title="Arcade Hub"
           >
             <Gamepad2 className="w-4 h-4 shrink-0" />
-            {!isCollapsed && <span>All Games</span>}
-          </button>
-
-          {/* Trending & Hot */}
-          <button
-            onClick={() => {
-              onSelectTab('games');
-              onSelectCategory('Sports'); // Or trending view
-            }}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border ${
-              isGames && activeCategory === 'Sports'
-                ? 'shadow-md'
-                : 'border-transparent text-slate-300 hover:text-white hover:bg-white/5'
-            }`}
-            style={{
-              backgroundColor: isGames && activeCategory === 'Sports' ? activeTheme.accentBadge : undefined,
-              borderColor: isGames && activeCategory === 'Sports' ? activeTheme.borderActive : undefined,
-              color: isGames && activeCategory === 'Sports' ? activeTheme.accent : undefined
-            }}
-            title="Trending & Sports"
-          >
-            <Flame className="w-4 h-4 shrink-0 text-amber-400" />
-            {!isCollapsed && <span>Trending & Hot</span>}
-          </button>
-
-          {/* Owen OG Hall of Fame */}
-          <button
-            onClick={() => {
-              onSelectTab('games');
-              onSelectCategory('Owen Watermelon OG’s');
-            }}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border ${
-              isGames && activeCategory === 'Owen Watermelon OG’s'
-                ? 'shadow-md'
-                : 'border-transparent text-slate-300 hover:text-white hover:bg-white/5'
-            }`}
-            style={{
-              backgroundColor: isGames && activeCategory === 'Owen Watermelon OG’s' ? activeTheme.accentBadge : undefined,
-              borderColor: isGames && activeCategory === 'Owen Watermelon OG’s' ? activeTheme.borderActive : undefined,
-              color: isGames && activeCategory === 'Owen Watermelon OG’s' ? activeTheme.accent : undefined
-            }}
-            title="Owen Watermelon OG's"
-          >
-            <span className="text-base shrink-0 leading-none">🍉</span>
-            {!isCollapsed && (
-              <div className="flex items-center justify-between w-full">
-                <span>Owen OG's</span>
-                <span 
-                  className="text-[9px] px-1.5 py-0.2 rounded-full font-bold uppercase border"
-                  style={{
-                    backgroundColor: activeTheme.accentBadge,
-                    borderColor: activeTheme.border,
-                    color: activeTheme.accent
-                  }}
-                >
-                  Hall
-                </span>
-              </div>
-            )}
+            {!isCollapsed && <span>Arcade Hub</span>}
           </button>
 
           {/* Starred Favorites */}
@@ -252,6 +199,80 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
             )}
           </button>
+
+          {/* AI Chatbot Navigation Button */}
+          {onOpenAIChat && (
+            <button
+              onClick={onOpenAIChat}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border border-transparent text-slate-300 hover:text-white hover:bg-white/5 group"
+              style={{
+                color: activeTheme.accent
+              }}
+              title="Talk with WatermelonBase AI (MelonBot)"
+            >
+              <Bot className="w-4 h-4 shrink-0 animate-pulse" />
+              {!isCollapsed && (
+                <div className="flex items-center justify-between w-full">
+                  <span>AI Chatbot</span>
+                  <span 
+                    className="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold uppercase tracking-wider"
+                    style={{
+                      backgroundColor: activeTheme.accentBadge,
+                      color: activeTheme.accent
+                    }}
+                  >
+                    AI
+                  </span>
+                </div>
+              )}
+            </button>
+          )}
+        </div>
+
+        {/* Themes & Custom Creator */}
+        <div className="flex flex-col gap-1 pt-2 border-t" style={{ borderColor: activeTheme.border }}>
+          {!isCollapsed && (
+            <span className="px-2.5 mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              Themes & Styles
+            </span>
+          )}
+
+          {/* Make Custom Theme Button */}
+          <button
+            onClick={() => onOpenCustomThemeStudio ? onOpenCustomThemeStudio() : onOpenThemeModal()}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border shadow-sm group hover:scale-[1.02]"
+            style={{
+              backgroundColor: activeTheme.accentBadge,
+              borderColor: activeTheme.borderActive,
+              color: activeTheme.kicker
+            }}
+            title="Create your own custom theme"
+          >
+            <Sparkles className="w-4 h-4 shrink-0 animate-pulse" style={{ color: activeTheme.accent }} />
+            {!isCollapsed && (
+              <div className="flex items-center justify-between w-full">
+                <span>Custom Theme</span>
+                <span className="text-[9px] px-1.5 py-0.5 rounded font-mono bg-purple-500/20 text-purple-300 font-bold uppercase">
+                  Studio
+                </span>
+              </div>
+            )}
+          </button>
+
+          {/* Theme Gallery */}
+          <button
+            onClick={onOpenThemeModal}
+            className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+            title="Theme Gallery"
+          >
+            <Palette className="w-4 h-4 shrink-0" style={{ color: activeTheme.accent }} />
+            {!isCollapsed && (
+              <div className="flex items-center justify-between w-full">
+                <span>Theme Gallery</span>
+                <span className="text-[10px] text-slate-400">{activeTheme.emoji}</span>
+              </div>
+            )}
+          </button>
         </div>
 
         {/* Quick Utilities / PeteZah Tools */}
@@ -270,21 +291,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             <Dices className="w-4 h-4 shrink-0" style={{ color: activeTheme.accent }} />
             {!isCollapsed && <span>Random Game</span>}
-          </button>
-
-          {/* Theme Gallery */}
-          <button
-            onClick={onOpenThemeModal}
-            className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
-            title="Themes & Customization"
-          >
-            <Palette className="w-4 h-4 shrink-0" style={{ color: activeTheme.accent }} />
-            {!isCollapsed && (
-              <div className="flex items-center justify-between w-full">
-                <span>Themes</span>
-                <span className="text-[10px] text-slate-400">{activeTheme.emoji}</span>
-              </div>
-            )}
           </button>
 
           {/* Request Game */}

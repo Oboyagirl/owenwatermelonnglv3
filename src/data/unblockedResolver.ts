@@ -101,12 +101,16 @@ const PRESERVED_LOCAL_GAMES = new Set([
   "games/case-opener.html",
   "games/flash-player.html",
   "games/fruit-ninja.html",
-  "games/papas-scooperia.html"
+  "games/papas-scooperia.html",
+  "games/soccer-random.html",
+  "games/volley-random.html",
+  "games/basket-random.html",
+  "games/boxing-random.html"
 ]);
 
 function cleanText(str: string): string {
   if (!str) return "";
-  return str
+  return String(str)
     .replace(/&#39;/g, "")
     .replace(/&amp;/g, "and")
     .replace(/&quot;/g, "")
@@ -120,20 +124,25 @@ export function resolveGameSource(
   currentSrc: string = "",
   mirrors: string[] = []
 ): { src: string; mirrors: string[] } {
-  // If preserved local game, keep as-is
-  if (PRESERVED_LOCAL_GAMES.has(currentSrc)) {
-    return { src: currentSrc, mirrors: [currentSrc, ...mirrors.filter(m => m !== currentSrc)] };
+  const safeId = String(id || "");
+  const safeTitle = String(title || "");
+  const safeSrc = String(currentSrc || "");
+  const safeMirrors = Array.isArray(mirrors) ? mirrors : [];
+
+  // If preserved local game (or flash player wrapper with query), keep as-is
+  if (PRESERVED_LOCAL_GAMES.has(safeSrc) || safeSrc.startsWith("games/flash-player.html")) {
+    return { src: safeSrc, mirrors: [safeSrc, ...safeMirrors.filter(m => m !== safeSrc)] };
   }
 
   // 1. Direct explicit fix map check (handles clash and all 86 reported issues)
-  if (fixMap[id]) {
-    const fixedUrl = fixMap[id];
-    return { src: fixedUrl, mirrors: [fixedUrl, ...mirrors.filter(m => m !== fixedUrl)] };
+  if (fixMap[safeId]) {
+    const fixedUrl = fixMap[safeId];
+    return { src: fixedUrl, mirrors: [fixedUrl, ...safeMirrors.filter(m => m !== fixedUrl)] };
   }
 
-  const cleanTitle = cleanText(title);
-  const cleanId = cleanText((id || "").replace(/^potatoes-/, ""));
-  const cleanSlug = cleanText((currentSrc || "").replace(/https?:\/\/[^\/]+\/[^\/]+\/([^\/]+)\/?.*/, "$1"));
+  const cleanTitle = cleanText(safeTitle);
+  const cleanId = cleanText(safeId.replace(/^potatoes-/, ""));
+  const cleanSlug = cleanText(safeSrc.replace(/https?:\/\/[^\/]+\/[^\/]+\/([^\/]+)\/?.*/, "$1"));
 
   if (fixMap[cleanTitle] || fixMap[cleanId] || fixMap[cleanSlug]) {
     const fixedUrl = fixMap[cleanTitle] || fixMap[cleanId] || fixMap[cleanSlug];

@@ -10,7 +10,8 @@ import {
   Menu, 
   Dices, 
   EyeOff,
-  RotateCcw
+  RotateCcw,
+  Bot
 } from 'lucide-react';
 import { triggerPanic } from '../data/cloakPresets';
 import { SiteSettings } from '../types/game';
@@ -24,6 +25,7 @@ interface HeaderProps {
   siteSettings: SiteSettings;
   activeTheme: ThemeConfig;
   onOpenThemeModal: () => void;
+  onOpenAIChat?: () => void;
   onLockSite?: () => void;
   searchTerm?: string;
   onSearchChange?: (val: string) => void;
@@ -37,6 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
   siteSettings,
   activeTheme,
   onOpenThemeModal,
+  onOpenAIChat,
   onLockSite,
   searchTerm = '',
   onSearchChange,
@@ -169,6 +172,24 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <Dices className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
                 <span>Random</span>
+              </button>
+            )}
+
+            {/* AI Chatbot Button */}
+            {onOpenAIChat && (
+              <button
+                onClick={onOpenAIChat}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold rounded-xl border transition-all cursor-pointer hover:scale-105 relative group shadow-sm"
+                style={{
+                  backgroundColor: activeTheme.accentBadge,
+                  borderColor: activeTheme.borderActive,
+                  color: activeTheme.accent
+                }}
+                title="Talk to WatermelonBase AI Chatbot (MelonBot)"
+              >
+                <Bot className="w-3.5 h-3.5 animate-pulse" />
+                <span>AI Chat</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping hidden md:inline" />
               </button>
             )}
 

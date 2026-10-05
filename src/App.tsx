@@ -13,6 +13,8 @@ import { StarfieldBackground } from './components/StarfieldBackground';
 import { ThemeModal } from './components/ThemeModal';
 import { Sidebar } from './components/Sidebar';
 import { PasscodeGate, PASSCODE_STORAGE_KEY } from './components/PasscodeGate';
+import { WelcomeAnimation } from './components/WelcomeAnimation';
+import { AIChatModal } from './components/AIChatModal';
 import { useGamesStore } from './services/gamesStore';
 import { useSiteSettingsStore } from './services/siteSettingsStore';
 import { useThemeStore } from './services/themeStore';
@@ -112,6 +114,19 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [visibleCount, setVisibleCount] = useState(48);
   const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
+  const [themeModalTab, setThemeModalTab] = useState<'gallery' | 'studio'>('gallery');
+  const [isAIChatOpen, setIsAIChatOpen] = useState(false);
+  const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(false);
+
+  const handleOpenThemeGallery = () => {
+    setThemeModalTab('gallery');
+    setIsThemeModalOpen(true);
+  };
+
+  const handleOpenCustomThemeStudio = () => {
+    setThemeModalTab('studio');
+    setIsThemeModalOpen(true);
+  };
 
   // Authentication gate state with persistence (Passcode: owenpan2244)
   const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
@@ -125,6 +140,7 @@ export default function App() {
 
   const handleUnlockSite = () => {
     setIsUnlocked(true);
+    setShowWelcomeAnimation(true);
   };
 
   const handleLockSite = () => {
@@ -133,6 +149,7 @@ export default function App() {
       sessionStorage.removeItem(PASSCODE_STORAGE_KEY);
     } catch {}
     setIsUnlocked(false);
+    setShowWelcomeAnimation(false);
   };
 
   // Reset pagination when filter/search changes
@@ -345,7 +362,8 @@ export default function App() {
         }}
         siteSettings={siteSettings}
         activeTheme={activeTheme}
-        onOpenThemeModal={() => setIsThemeModalOpen(true)}
+        onOpenThemeModal={handleOpenThemeGallery}
+        onOpenAIChat={() => setIsAIChatOpen(true)}
         onLockSite={handleLockSite}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -373,10 +391,9 @@ export default function App() {
             handleRandomGame();
             setIsMobileSidebarOpen(false);
           }}
-          onOpenThemeModal={() => {
-            setIsThemeModalOpen(true);
-            setIsMobileSidebarOpen(false);
-          }}
+          onOpenThemeModal={handleOpenThemeGallery}
+          onOpenCustomThemeStudio={handleOpenCustomThemeStudio}
+          onOpenAIChat={() => setIsAIChatOpen(true)}
           onLockSite={handleLockSite}
           activeTheme={activeTheme}
           totalGames={games.length}
@@ -413,7 +430,15 @@ export default function App() {
                   setIsMobileSidebarOpen(false);
                 }}
                 onOpenThemeModal={() => {
-                  setIsThemeModalOpen(true);
+                  handleOpenThemeGallery();
+                  setIsMobileSidebarOpen(false);
+                }}
+                onOpenCustomThemeStudio={() => {
+                  handleOpenCustomThemeStudio();
+                  setIsMobileSidebarOpen(false);
+                }}
+                onOpenAIChat={() => {
+                  setIsAIChatOpen(true);
                   setIsMobileSidebarOpen(false);
                 }}
                 onLockSite={handleLockSite}
@@ -461,7 +486,8 @@ export default function App() {
                       activeTheme={activeTheme}
                       activeThemeId={themeId}
                       onSelectTheme={setTheme}
-                      onOpenThemeGallery={() => setIsThemeModalOpen(true)}
+                      onOpenThemeGallery={handleOpenThemeGallery}
+                      onOpenCustomThemeStudio={handleOpenCustomThemeStudio}
                     />
 
                     {/* Quick Favorites Section if any */}
@@ -617,7 +643,27 @@ export default function App() {
                 <span>PeteZah Unblocked Arcade Browser & Tab Cloaker</span>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center gap-4">
+                <button
+                  onClick={() => setShowWelcomeAnimation(true)}
+                  className="hover:text-white transition-colors flex items-center gap-1.5 font-medium cursor-pointer"
+                  style={{ color: activeTheme.accent }}
+                  title="Replay Welcome To The WatermelonBase Intro"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Replay Intro</span>
+                </button>
+
+                <button
+                  onClick={() => setIsAIChatOpen(true)}
+                  className="hover:text-white transition-colors flex items-center gap-1.5 font-medium cursor-pointer"
+                  style={{ color: activeTheme.accent }}
+                  title="Open AI Chatbot"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>AI Chatbot</span>
+                </button>
+
                 <button
                   onClick={() => setIsThemeModalOpen(true)}
                   className="hover:text-white transition-colors flex items-center gap-1.5 font-medium cursor-pointer"
@@ -652,7 +698,30 @@ export default function App() {
         customTheme={customTheme}
         onUpdateCustomTheme={updateCustomTheme}
         onResetCustomTheme={resetCustomTheme}
+        initialTab={themeModalTab}
       />
+
+      {/* MelonBot AI Chatbot Modal */}
+      <AIChatModal
+        isOpen={isAIChatOpen}
+        onClose={() => setIsAIChatOpen(false)}
+        activeTheme={activeTheme}
+        onSelectGameTitle={(title) => {
+          setIsAIChatOpen(false);
+          setSearchTerm(title);
+          setSelectedCategory('All');
+          setCurrentTab('games');
+          setSelectedGame(null);
+        }}
+      />
+
+      {/* "Welcome To The WatermelonBase" Animated Intro Overlay (shown after password unlock) */}
+      {showWelcomeAnimation && (
+        <WelcomeAnimation
+          onComplete={() => setShowWelcomeAnimation(false)}
+          activeTheme={activeTheme}
+        />
+      )}
     </div>
   );
 }
