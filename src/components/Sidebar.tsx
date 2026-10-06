@@ -12,7 +12,8 @@ import {
   ChevronRight,
   Sparkles,
   ExternalLink,
-  Bot
+  Bot,
+  Users
 } from 'lucide-react';
 import { ThemeConfig } from '../services/themeStore';
 import { triggerPanic } from '../data/cloakPresets';
@@ -141,6 +142,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             <Gamepad2 className="w-4 h-4 shrink-0" />
             {!isCollapsed && <span>Arcade Hub</span>}
+          </button>
+
+          {/* 2 Player Games */}
+          <button
+            onClick={() => {
+              onSelectTab('games');
+              onSelectCategory('2 Player Games');
+            }}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border ${
+              isGames && (activeCategory === '2 Player Games' || activeCategory === '2 Player')
+                ? 'shadow-md'
+                : 'border-transparent text-slate-300 hover:text-white hover:bg-white/5'
+            }`}
+            style={{
+              backgroundColor: isGames && (activeCategory === '2 Player Games' || activeCategory === '2 Player') ? activeTheme.accentBadge : undefined,
+              borderColor: isGames && (activeCategory === '2 Player Games' || activeCategory === '2 Player') ? activeTheme.borderActive : undefined,
+              color: isGames && (activeCategory === '2 Player Games' || activeCategory === '2 Player') ? '#a78bfa' : undefined
+            }}
+            title="2 Player Games (Local 1v1 & Co-op)"
+          >
+            <Users className="w-4 h-4 shrink-0" style={{ color: '#a78bfa' }} />
+            {!isCollapsed && (
+              <div className="flex items-center justify-between w-full">
+                <span>2 Player Games</span>
+                <span className="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold uppercase bg-violet-500/20 text-violet-300">
+                  1v1
+                </span>
+              </div>
+            )}
           </button>
 
           {/* Sawyer For Sawyer */}
