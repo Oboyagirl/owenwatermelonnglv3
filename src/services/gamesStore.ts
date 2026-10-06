@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Game } from '../types/game';
-import { DEFAULT_GAMES, formatGameIframe, URL_OVERRIDES } from '../data/defaultGames';
+import { DEFAULT_GAMES, formatGameIframe, URL_OVERRIDES, getCanonicalGameKey } from '../data/defaultGames';
 
-const STORAGE_KEY = 'owen_watermelon_v3_games_v44';
+const STORAGE_KEY = 'owen_watermelon_v3_games_v50';
 const FAVORITES_KEY = 'owen_watermelon_v3_favorites';
 
 export function resolveAssetUrl(url: string): string {
@@ -28,14 +28,19 @@ export function resolveAssetUrl(url: string): string {
 }
 
 export function deduplicateGames(list: Game[]): Game[] {
-  const seen = new Set<string>();
+  const seenIds = new Set<string>();
+  const seenKeys = new Set<string>();
   const unique: Game[] = [];
+
   for (const game of list) {
     if (!game || !game.id) continue;
-    if (!seen.has(game.id)) {
-      seen.add(game.id);
-      unique.push(game);
-    }
+    const key = getCanonicalGameKey(game);
+    if (!key || key === '__skip__') continue;
+    if (seenIds.has(game.id) || seenKeys.has(key)) continue;
+
+    seenIds.add(game.id);
+    seenKeys.add(key);
+    unique.push(game);
   }
   return unique;
 }
@@ -117,7 +122,8 @@ export function useGamesStore() {
         'owen_watermelon_v3_games_v40',
         'owen_watermelon_v3_games_v41',
         'owen_watermelon_v3_games_v42',
-        'owen_watermelon_v3_games_v43'
+        'owen_watermelon_v3_games_v43',
+        'owen_watermelon_v3_games_v44'
       ].forEach(k => {
         localStorage.removeItem(k);
       });

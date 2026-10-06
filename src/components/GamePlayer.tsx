@@ -71,17 +71,30 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
   // Alternative working mirrors support
   const mirrorsList = game.mirrors && game.mirrors.length > 0 ? game.mirrors : [game.iframeSrc];
   const [currentMirrorIndex, setCurrentMirrorIndex] = useState(0);
-  const [useProxy, setUseProxy] = useState(false);
 
   const isLocalGame = !activeIframeSrc.startsWith('http://') && !activeIframeSrc.startsWith('https://') && !activeIframeSrc.startsWith('data:') && !activeIframeSrc.startsWith('blob:');
+
+  const isSecurlyWhitelisted = 
+    activeIframeSrc.includes('academics-study.github.io') ||
+    activeIframeSrc.includes('javaspence.github.io') ||
+    activeIframeSrc.includes('henshmi.github.io') ||
+    activeIframeSrc.includes('joe-the-chicken.github.io');
+
+  // By default, external games on filtered domains are routed through local same-origin proxy
+  // so Securly and school Chromebook filters inspect the iframe as same-origin (safe like Soccer REAL/2026)
+  const [useSecurlyProxy, setUseSecurlyProxy] = useState(!isLocalGame && !isSecurlyWhitelisted);
 
   const resolvedIframeSrc = (() => {
     if (activeCustomHtml) return undefined;
     if (isLocalGame) {
       return resolveAssetUrl(activeIframeSrc);
     }
-    if (useProxy) {
-      return `https://translate.google.com/translate?sl=auto&tl=en&u=${encodeURIComponent(activeIframeSrc)}`;
+    // Static GitHub Pages fallback
+    if (typeof window !== 'undefined' && window.location.hostname.endsWith('github.io')) {
+      return activeIframeSrc;
+    }
+    if (useSecurlyProxy || !isSecurlyWhitelisted) {
+      return `/api/proxy?url=${encodeURIComponent(activeIframeSrc)}`;
     }
     return activeIframeSrc;
   })();
@@ -95,7 +108,9 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
     setShowIframeEditor(false);
     setSavedSuccess(false);
     setCurrentMirrorIndex(0);
-    setUseProxy(false);
+    const isLocal = !game.iframeSrc.startsWith('http://') && !game.iframeSrc.startsWith('https://');
+    const isWhitelisted = game.iframeSrc.includes('academics-study.github.io') || game.iframeSrc.includes('javaspence.github.io');
+    setUseSecurlyProxy(!isLocal && !isWhitelisted);
   }, [game.id, game.iframeSrc, game.iframeCode, game.customHtml]);
 
   const handleNextMirror = () => {
@@ -364,23 +379,25 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
           </div>
 
           <div className="flex items-center gap-1 sm:gap-2">
-            <button
-              onClick={() => {
-                setUseProxy(!useProxy);
-                setKeyCounter(prev => prev + 1);
-              }}
-              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer border"
-              style={{
-                backgroundColor: useProxy ? activeTheme.accent : activeTheme.bgCard,
-                borderColor: useProxy ? activeTheme.accent : activeTheme.border,
-                color: useProxy ? activeTheme.accentText : activeTheme.kicker
-              }}
-              title="Toggle Proxy to bypass school web filters (Securly, GoGuardian, Lightspeed)"
-            >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{useProxy ? 'Unblock Proxy: ON' : '⚡ Unblock Proxy'}</span>
-              <span className="sm:hidden">{useProxy ? 'ON' : 'Unblock'}</span>
-            </button>
+            {!isLocalGame && (
+              <button
+                onClick={() => {
+                  setUseSecurlyProxy(!useSecurlyProxy);
+                  setKeyCounter(prev => prev + 1);
+                }}
+                className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer border"
+                style={{
+                  backgroundColor: useSecurlyProxy ? activeTheme.accent : activeTheme.bgCard,
+                  borderColor: useSecurlyProxy ? activeTheme.accent : activeTheme.border,
+                  color: useSecurlyProxy ? activeTheme.accentText : activeTheme.kicker
+                }}
+                title="Toggle Securly Unblock Engine to route game same-origin"
+              >
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{useSecurlyProxy ? 'Securly Bypass: ON' : '⚡ Unblock Proxy'}</span>
+                <span className="sm:hidden">{useSecurlyProxy ? 'ON' : 'Unblock'}</span>
+              </button>
+            )}
 
             {mirrorsList.length > 1 && (
               <button
@@ -470,7 +487,7 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
           style={{ backgroundColor: activeTheme.bgPrimary }}
         >
           <iframe
-            key={`${game.id}-${keyCounter}-${useProxy ? 'proxied' : 'direct'}`}
+            key={`${game.id}-${keyCounter}-${useSecurlyProxy ? 'proxied' : 'direct'}`}
             ref={iframeRef}
             id="game-area"
             className={`border-0 block game-iframe transition-all duration-200 ${
@@ -509,12 +526,31 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
               }}
             >
               <ShieldCheck className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
-              <span>⚡ 100% Unblocked Local Server (Safe)</span>
+              <span>⚡ 100% Unblocked Local Server (Safe like Soccer REAL & 2026)</span>
+            </span>
+          ) : isSecurlyWhitelisted ? (
+            <span 
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-bold text-xs border"
+              style={{
+                backgroundColor: activeTheme.accentBadge,
+                borderColor: activeTheme.border,
+                color: activeTheme.accent
+              }}
+            >
+              <ShieldCheck className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
+              <span>🎓 Educational Whitelisted Domain (Safe like Drive Mad)</span>
             </span>
           ) : (
-            <span className="flex items-center gap-1.5 text-slate-300">
-              <Info className="w-4 h-4 shrink-0" style={{ color: activeTheme.accent }} />
-              <span>Game blocked or black screen? Try unblocking options:</span>
+            <span 
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-bold text-xs border"
+              style={{
+                backgroundColor: activeTheme.accentBadge,
+                borderColor: activeTheme.border,
+                color: activeTheme.accent
+              }}
+            >
+              <ShieldCheck className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
+              <span>🛡️ Securly Bypass Engine: {useSecurlyProxy ? 'Active (Same-Origin)' : 'Direct'}</span>
             </span>
           )}
         </div>
@@ -522,19 +558,19 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
           {!isLocalGame && (
             <button
               onClick={() => {
-                setUseProxy(!useProxy);
+                setUseSecurlyProxy(!useSecurlyProxy);
                 setKeyCounter(prev => prev + 1);
               }}
               className="px-2.5 py-1 font-semibold rounded-lg border transition-colors cursor-pointer flex items-center gap-1.5"
               style={{
-                backgroundColor: useProxy ? activeTheme.accent : activeTheme.bgCard,
-                borderColor: useProxy ? activeTheme.accent : activeTheme.border,
-                color: useProxy ? activeTheme.accentText : activeTheme.kicker
+                backgroundColor: useSecurlyProxy ? activeTheme.accent : activeTheme.bgCard,
+                borderColor: useSecurlyProxy ? activeTheme.accent : activeTheme.border,
+                color: useSecurlyProxy ? activeTheme.accentText : activeTheme.kicker
               }}
-              title="Route game through secure proxy to bypass web filters"
+              title="Toggle Securly unblock engine to route game same-origin"
             >
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>{useProxy ? '🛡️ Unblock Proxy: Active' : '🛡️ Unblock Proxy'}</span>
+              <span>{useSecurlyProxy ? '🛡️ Securly Bypass: ON' : '🛡️ Direct Mirror'}</span>
             </button>
           )}
 

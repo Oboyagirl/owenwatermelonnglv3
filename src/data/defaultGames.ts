@@ -867,8 +867,6 @@ export const URL_OVERRIDES: Record<string, string> = {
   "drive-mad": "https://academics-study.github.io/drive-mad/",
   "cookie-clicker": "https://7zeb.github.io/homework/cookieclicker.html",
   "1v1-lol": "https://7zeb.github.io/homework/1v1-lol/index.html",
-  "flappy-bird": "https://7zeb.github.io/homework/flappy-bird/index.html",
-  "potatoes-flappy-bird": "https://7zeb.github.io/homework/flappy-bird/index.html",
   "moto3xm": "https://7zeb.github.io/homework/motox3m.html",
   "potatoes-moto-x3m": "https://7zeb.github.io/homework/motox3m.html",
   "crossy-road": "https://7zeb.github.io/homework/crossyroad.html",
@@ -877,7 +875,11 @@ export const URL_OVERRIDES: Record<string, string> = {
   "doodle-jump": "https://7zeb.github.io/homework/doodlejump.html",
   "drift-boss": "https://7zeb.github.io/homework/driftboss.html",
   "bitlife": "https://7zeb.github.io/homework/bit-life/index.html",
-  "2048": "https://7zeb.github.io/homework/2048.html",
+  "2048": "games/2048.html",
+  "flappy-bird": "games/flappy.html",
+  "potatoes-flappy-bird": "games/flappy.html",
+  "tetris": "games/tetris.html",
+  "potatoes-tetris": "games/tetris.html",
   "potatoes-paper-io": "https://7zeb.github.io/homework/paperio2.html",
   "potatoes-hole-io": "https://7zeb.github.io/homework/holeio.html",
   "potatoes-the-impossible-quiz": "https://7zeb.github.io/homework/theimpossiblequiz.html",
@@ -922,8 +924,32 @@ export const URL_OVERRIDES: Record<string, string> = {
   "the-impossible-quiz-deluxe": "https://7zeb.github.io/homework/theimpossiblequiz.html"
 };
 
+export function getCanonicalGameKey(g: { id?: string; title?: string }): string {
+  if (!g) return '';
+  const id = (g.id || '').toLowerCase().trim();
+  if (id === '--test') return '__skip__';
+  if (id === 'soccer-random-1') return 'soccerrandom';
+  if (id === 'papa-scoop-alt') return 'papasscooperia';
+  if (id === 'themanfromthewindow') return 'themaninthewindow';
+
+  const cleanTitle = (g.title || '')
+    .toLowerCase()
+    .replace(/&#39;/g, '')
+    .replace(/&amp;/g, 'and')
+    .replace(/&quot;/g, '')
+    .replace(/[^a-z0-9]/g, '');
+
+  const cleanId = id
+    .replace(/^potatoes-/, '')
+    .replace(/-alt$/, '')
+    .replace(/[^a-z0-9]/g, '');
+
+  return cleanTitle || cleanId;
+}
+
 function buildDefaultGames(): Game[] {
-  const seen = new Set<string>();
+  const seenIds = new Set<string>();
+  const gamesByKey = new Map<string, Game>();
   const games: Game[] = [];
 
   const normalizeGame = (g: Game, defaultCategory: string): Game => {
@@ -937,38 +963,68 @@ function buildDefaultGames(): Game[] {
 
     const { src, mirrors } = resolveGameSource(g.id, g.title, initialSrc, g.mirrors);
 
+    // Decode any HTML entities in title
+    const cleanTitle = (g.title || '')
+      .replace(/&#39;/g, "'")
+      .replace(/&amp;/g, '&')
+      .replace(/&quot;/g, '"');
+
     return {
       ...g,
+      title: cleanTitle,
       iframeSrc: src,
       mirrors,
       sandbox: undefined, // Unrestricted so Unity and HTML5 games load without sandbox errors
-      iframeCode: formatGameIframe(g.title, src),
+      iframeCode: formatGameIframe(cleanTitle, src),
       secondaryCategory: g.secondaryCategory || defaultCategory
     };
   };
 
-  // Add curated games first (priority)
+  const addGameCandidate = (rawGame: Game, defaultCategory: string) => {
+    if (!rawGame || !rawGame.id) return;
+    const key = getCanonicalGameKey(rawGame);
+    if (!key || key === '__skip__') return;
+
+    if (gamesByKey.has(key) || seenIds.has(rawGame.id)) {
+      // Replicate detected! Deduplicate and merge tags/mirrors into existing
+      const existing = gamesByKey.get(key) || games.find(g => g.id === rawGame.id);
+      if (existing) {
+        if (Array.isArray(rawGame.tags)) {
+          const tagSet = new Set(existing.tags || []);
+          rawGame.tags.forEach(t => tagSet.add(t));
+          if (rawGame.secondaryCategory === 'Potato Classics' || rawGame.id.startsWith('potatoes-')) {
+            tagSet.add('Potato Classics');
+          }
+          existing.tags = Array.from(tagSet);
+        }
+        if (Array.isArray(rawGame.mirrors)) {
+          const mirrorSet = new Set(existing.mirrors || []);
+          rawGame.mirrors.forEach(m => mirrorSet.add(m));
+          existing.mirrors = Array.from(mirrorSet);
+        }
+      }
+      return;
+    }
+
+    const game = normalizeGame(rawGame, defaultCategory);
+    gamesByKey.set(key, game);
+    seenIds.add(game.id);
+    games.push(game);
+  };
+
+  // Add curated games first (highest priority)
   for (const g of CURATED_GAMES) {
-    if (g && g.id && !seen.has(g.id)) {
-      seen.add(g.id);
-      games.push(normalizeGame(g, 'Potato Classics'));
-    }
+    addGameCandidate(g, 'Potato Classics');
   }
 
-  // Add all games from TrippleThePotatoes collection
+  // Add all games from TrippleThePotatoes collection (deduplicated against curated)
   for (const g of TRIPPLE_POTATOES_GAMES) {
-    if (g && g.id && !seen.has(g.id)) {
-      seen.add(g.id);
-      games.push(normalizeGame(g, 'Potato Classics'));
-    }
+    addGameCandidate(g, 'Potato Classics');
   }
 
-  // Add ubg filtered games only if not already present
+  // Add ubg filtered games (deduplicated against curated and potatoes)
   for (const g of (ubgGamesList as unknown as Game[])) {
-    if (g && g.id && !seen.has(g.id)) {
-      seen.add(g.id);
-      games.push(normalizeGame(g, 'Unblocked Archive'));
-    }
+    addGameCandidate(g, 'Unblocked Archive');
   }
 
   return games;

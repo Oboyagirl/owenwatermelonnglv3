@@ -195,17 +195,25 @@ Your job:
             body += chunk;
           });
           proxyRes.on('end', () => {
-            // If target belongs to ubghyper, resolve relative assets via jsDelivr CDN to bypass school filters
+            // Determine baseHref for subresources
             let baseHref = targetUrl;
             if (targetUrl.includes('ubghyper.github.io/GameList.github.io/')) {
               const gameMatch = targetUrl.match(/GameList\.github\.io\/([^/]+)/);
               if (gameMatch && gameMatch[1]) {
                 baseHref = `https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@9aa2f58b44aae1f82fb25a1ed8a43293eac3d5cc/${gameMatch[1]}/`;
               }
+            } else if (baseHref.endsWith('.html') || baseHref.endsWith('.htm')) {
+              baseHref = baseHref.substring(0, baseHref.lastIndexOf('/') + 1);
+            } else if (!baseHref.endsWith('/')) {
+              baseHref += '/';
             }
 
             const baseTag = `<base href="${baseHref}">`;
             let modified = body.replace(/<meta[^>]*http-equiv=["']?Content-Security-Policy["']?[^>]*>/gi, '');
+            // Neutralize frame buster scripts so games cannot escape iframe
+            modified = modified.replace(/window\.top\.location/g, 'window.__disabled_top_location');
+            modified = modified.replace(/top\.location\.href/g, 'window.__disabled_top_href');
+
             if (/<head[^>]*>/i.test(modified)) {
               modified = modified.replace(/(<head[^>]*>)/i, `$1\n${baseTag}`);
             } else {
