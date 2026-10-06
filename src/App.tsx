@@ -224,7 +224,6 @@ export default function App() {
   // Categories include primary categories + popular secondaries
   const categories = [
     'All',
-    '2 Player Games',
     'Sawyer For Sawyer',
     'Owen Watermelon OG’s',
     'Favorites',
@@ -260,34 +259,6 @@ export default function App() {
     const catLower = (selectedCategory || '').toLowerCase();
     const secCatLower = (g.secondaryCategory || '').toLowerCase();
     const mainCatLower = (g.category || '').toLowerCase();
-
-    // Special handling for 2 Player Games category
-    if (catLower.includes('2 player') || catLower === '2 player games' || catLower === '2 player' || catLower === 'two player') {
-      const twoPlayerKeywords = [
-        "2 player", "2-player", "two player", "multiplayer", "co-op", "pvp", "versus", "vs",
-        "fireboy", "watergirl", "pong", "tank trouble", "rooftop snipers", "basket random", "soccer random",
-        "boxing random", "volley random", "bad ice cream", "getaway shootout", "1v1", "wrestle jump",
-        "stickman duel", "house of hazards", "a small world cup", "sawyer", "gun mayhem", "super smash", "basketball stars",
-        "basket bros", "football legends", "smash remix", "tag"
-      ];
-      const titleLower = title.toLowerCase();
-      const descLower = desc.toLowerCase();
-      const controlsStr = JSON.stringify(g.controls || []).toLowerCase();
-
-      return (
-        mainCatLower.includes('2 player') ||
-        mainCatLower.includes('multiplayer') ||
-        secCatLower.includes('2 player') ||
-        secCatLower.includes('multiplayer') ||
-        twoPlayerKeywords.some(k => 
-          titleLower.includes(k) || 
-          descLower.includes(k) || 
-          (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && t.toLowerCase().includes(k)))
-        ) ||
-        controlsStr.includes('player 2') ||
-        controlsStr.includes('p2')
-      );
-    }
     
     // Special handling for Sawyer For Sawyer category
     if (catLower.includes('sawyer')) {

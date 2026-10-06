@@ -96,7 +96,6 @@ const PRESERVED_LOCAL_GAMES = new Set([
   "games/soccer-real.html",
   "games/fifa.html",
   "games/sawyer-for-sawyer.html",
-  "games/a-small-world-cup/index.html",
   "games/getting-over-it.html",
   "games/kindergarten.html",
   "games/kindergarten-2.html",

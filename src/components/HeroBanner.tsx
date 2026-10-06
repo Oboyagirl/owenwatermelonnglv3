@@ -33,13 +33,6 @@ export const CATEGORY_CARDS_DATA: Record<string, CategoryCardMeta> = {
     accent: '#38bdf8',
     badge: 'Special Edition'
   },
-  '2 Player Games': {
-    name: '2 Player Games',
-    emoji: '👥',
-    image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=500&auto=format&fit=crop&q=80',
-    accent: '#8b5cf6',
-    badge: '1v1 & Co-Op'
-  },
   'Favorites': {
     name: 'Favorites',
     emoji: '⭐',
