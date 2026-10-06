@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0d1b2a">
+  <title>FIFA World Cup Championship 2002</title>
+  <script src="https://cdn.jsdelivr.net/gh/unbilgicox/zambi@main/sdkgon.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/unbilgicox/zambi@main/images/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/unbilgicox/zambi@main/images/GLTFLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/unbilgicox/zambi@main/images/SkeletonUtils.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/unbilgicox/zambi@main/game.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #0b132b;
+      position: fixed;
+      inset: 0;
+    }
+    canvas {
+      display: block;
+      outline: 0;
+      touch-action: none;
+    }
+    #chf2 {
+      position: absolute;
+      inset: 0;
+    }
+    #launch-screen {
+      position: fixed;
+      z-index: 1000;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at center, rgba(16, 37, 66, 0.95) 0%, rgba(7, 13, 26, 0.98) 100%);
+      backdrop-filter: blur(8px);
+      padding: 20px;
+    }
+    .launch-card {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 24px;
+      padding: 32px 40px;
+      text-align: center;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(56, 189, 248, 0.15);
+      animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .trophy-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(234, 179, 8, 0.12);
+      border: 1px solid rgba(234, 179, 8, 0.3);
+      color: #facc15;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+    h1 span {
+      color: #38bdf8;
+      text-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+    }
+    p {
+      margin: 0 0 24px;
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+    .controls-hint {
+      background: rgba(30, 41, 59, 0.6);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      font-size: 12px;
+      color: #cbd5e1;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .key-badge {
+      background: #334155;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-weight: bold;
+      color: #38bdf8;
+    }
+    .btn-kickoff {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: #fff;
+      border: 0;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.4);
+      transition: all 0.2s ease;
+    }
+    .btn-kickoff:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px -5px rgba(2, 132, 199, 0.6);
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    }
+  </style>
+  <script>
+    (function(){
+      var LANG = 'en';
+      function dummy(){ return Promise.resolve(); }
+      function deep(){ return new Proxy(dummy, { get:function(t,p){ return p==="then"?undefined:deep(); } }); }
+      var proxied = new Proxy({}, {
+        get:function(t,p){
+          if(p==="then"||p==="catch"||p==="finally") return undefined;
+          if(p in t) return t[p];
+          if(typeof p==="symbol") return undefined;
+          return deep();
+        }
+      });
+      window.YaGames = { init:function(){ return Promise.resolve(proxied); } };
+      window.ysdkLang = LANG;
+    })();
+  </script>
+</head>
+<body>
+  <canvas id="myCanvas" aria-label="FIFA Soccer field"></canvas>
+  <div id="chf2"><canvas id="gcvs"></canvas></div>
+  <div id="launch-screen">
+    <div class="launch-card">
+      <div class="trophy-badge">🏆 World Cup Tournament Edition</div>
+      <h1>FIFA <span>2002</span></h1>
+      <p>Lead your national squad to international football glory in full 3D match gameplay!</p>
+      
+      <div class="controls-hint">
+        <div class="controls-row">
+          <span>Move & Sprint:</span>
+          <span class="key-badge">WASD / Arrow Keys</span>
+        </div>
+        <div class="controls-row">
+          <span>Shoot / Tackle:</span>
+          <span class="key-badge">Space / Left Click</span>
+        </div>
+        <div class="controls-row">
+          <span>Pass / Through Ball:</span>
+          <span class="key-badge">C / Shift</span>
+        </div>
+      </div>
+
+      <button id="start-button" class="btn-kickoff" type="button">⚽ KICK OFF MATCH</button>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      function resize() {
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        var c1 = document.getElementById('myCanvas');
+        var c2 = document.getElementById('gcvs');
+        if (c1) { c1.width = w; c1.height = h; c1.style.width = w + 'px'; c1.style.height = h + 'px'; }
+        if (c2) { c2.width = w; c2.height = h; c2.style.width = w + 'px'; c2.style.height = h + 'px'; }
+      }
+      window.addEventListener('resize', resize);
+      window.addEventListener('orientationchange', resize);
+      setTimeout(resize, 100);
+
+      var startBtn = document.getElementById('start-button');
+      var launchScreen = document.getElementById('launch-screen');
+      if (startBtn && launchScreen) {
+        startBtn.addEventListener('click', function() {
+          launchScreen.style.display = 'none';
+        });
+      }
+    })();
+  </script>
+  <script type="module" src="https://cdn.jsdelivr.net/gh/unbilgicox/zambi@main/bootstrap.js"></script>
+</body>
+</html>

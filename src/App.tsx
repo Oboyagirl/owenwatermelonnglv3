@@ -224,6 +224,7 @@ export default function App() {
   // Categories include primary categories + popular secondaries
   const categories = [
     'All',
+    'Sawyer For Sawyer',
     'Owen Watermelon OG’s',
     'Favorites',
     'Potato Classics',
@@ -259,6 +260,18 @@ export default function App() {
     const secCatLower = (g.secondaryCategory || '').toLowerCase();
     const mainCatLower = (g.category || '').toLowerCase();
     
+    // Special handling for Sawyer For Sawyer category
+    if (catLower.includes('sawyer')) {
+      return (
+        mainCatLower.includes('sawyer') ||
+        secCatLower.includes('sawyer') ||
+        (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && t.toLowerCase().includes('sawyer'))) ||
+        g.id.includes('sawyer') ||
+        (g.title || '').toLowerCase().includes('sawyer') ||
+        (g.title || '').toLowerCase().includes('a small world cup')
+      );
+    }
+
     // Special handling for Owen Watermelon OG's category
     if (catLower.includes('owen') && catLower.includes('og')) {
       return isOwenWatermelonOG(g);

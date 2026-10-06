@@ -143,6 +143,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {!isCollapsed && <span>Arcade Hub</span>}
           </button>
 
+          {/* Sawyer For Sawyer */}
+          <button
+            onClick={() => {
+              onSelectTab('games');
+              onSelectCategory('Sawyer For Sawyer');
+            }}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border ${
+              isGames && activeCategory === 'Sawyer For Sawyer'
+                ? 'shadow-md'
+                : 'border-transparent text-slate-300 hover:text-white hover:bg-white/5'
+            }`}
+            style={{
+              backgroundColor: isGames && activeCategory === 'Sawyer For Sawyer' ? activeTheme.accentBadge : undefined,
+              borderColor: isGames && activeCategory === 'Sawyer For Sawyer' ? activeTheme.borderActive : undefined,
+              color: isGames && activeCategory === 'Sawyer For Sawyer' ? '#38bdf8' : undefined
+            }}
+            title="Sawyer For Sawyer Category"
+          >
+            <span className="text-base shrink-0 leading-none">🏆</span>
+            {!isCollapsed && (
+              <div className="flex items-center justify-between w-full">
+                <span>Sawyer For Sawyer</span>
+                <span className="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase bg-sky-500/20 text-sky-300">
+                  New
+                </span>
+              </div>
+            )}
+          </button>
+
           {/* Starred Favorites */}
           <button
             onClick={() => {

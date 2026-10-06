@@ -26,6 +26,13 @@ export const CATEGORY_CARDS_DATA: Record<string, CategoryCardMeta> = {
     accent: '#10b981',
     badge: 'OG Hall of Fame'
   },
+  'Sawyer For Sawyer': {
+    name: 'Sawyer For Sawyer',
+    emoji: '🏆',
+    image: 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=500&auto=format&fit=crop&q=80',
+    accent: '#38bdf8',
+    badge: 'Special Edition'
+  },
   'Favorites': {
     name: 'Favorites',
     emoji: '⭐',

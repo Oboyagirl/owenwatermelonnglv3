@@ -6,19 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #0d1117;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    iframe {
+    html, body, iframe {
       width: 100%;
       height: 100%;
       border: 0;
+      overflow: hidden;
+      background: #0d1117;
       display: block;
     }
   </style>
@@ -26,23 +19,9 @@
 <body>
   <iframe 
     id="game-frame"
-    src="https://gameinclassroom.github.io/soccer-random/" 
+    src="./soccer-random/index.html" 
     allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" 
     allowfullscreen
   ></iframe>
-  <script>
-    // Fallback if primary fails
-    const frame = document.getElementById('game-frame');
-    const backupMirrors = [
-      "https://ubghyper.github.io/GameList.github.io/Soccer-Random/",
-      "https://7zeb.github.io/homework/soccer-random/index.html"
-    ];
-    let mirrorIdx = 0;
-    frame.onerror = function() {
-      if (mirrorIdx < backupMirrors.length) {
-        frame.src = backupMirrors[mirrorIdx++];
-      }
-    };
-  </script>
 </body>
 </html>

@@ -5,6 +5,32 @@ import { resolveGameSource } from './unblockedResolver';
 
 const CURATED_GAMES: Game[] = [
   {
+    id: "sawyer-for-sawyer",
+    source: "unblocked",
+    title: "A Small World Cup (Sawyer For Sawyer)",
+    description: "Launch your ragdoll player across the pitch, headbutt the soccer ball, and score thrilling goals in the explosive A Small World Cup tournament!",
+    category: "Sawyer For Sawyer",
+    secondaryCategory: "Sawyer For Sawyer",
+    thumbnail: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&auto=format&fit=crop&q=80",
+    mirrors: [
+      "games/sawyer-for-sawyer.html",
+      "https://asmallworldcup.gitlab.io/file/",
+      "https://7zeb.github.io/homework/steal-a-brainrot/go/a-small-world-cup.html"
+    ],
+    tags: ["Sawyer For Sawyer", "A Small World Cup", "Soccer", "Ragdoll", "Physics", "Tournament", "Unblocked"],
+    rating: 5.0,
+    plays: 142000,
+    author: "Rasto",
+    featured: true,
+    iframeSrc: "games/sawyer-for-sawyer.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="A Small World Cup (Sawyer For Sawyer)" src="games/sawyer-for-sawyer.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Mouse Drag & Release", action: "Aim & Sling Player" },
+      { key: "Touch & Flick", action: "Launch Ragdoll" }
+    ]
+  },
+  {
     id: "soccer-2026",
     source: "unblocked",
     title: "Soccer 2026",
@@ -764,11 +790,31 @@ export const URL_OVERRIDES: Record<string, string> = {
   "soccer-random-1": "games/soccer-random.html",
   "potatoes-soccer-random": "games/soccer-random.html",
   "potatoes-soccer-skils": "games/soccer-random.html",
-  "potatoes-fifa-2002": "games/soccer-random.html",
+  "potatoes-fifa-2002": "games/fifa.html",
+  "fifa-2002": "games/fifa.html",
+  "fifa": "games/fifa.html",
   "volley-random": "games/volley-random.html",
   "potatoes-volley-random": "games/volley-random.html",
   "boxing-random": "games/boxing-random.html",
+  "potatoes-boxing-random": "games/boxing-random.html",
   "potatoes-rag-doll-games-boxing": "games/boxing-random.html",
+
+  // Wheely Series (Flash Player Runner with unblocked jsDelivr SWFs)
+  "wheely": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Wheely/Wheely.swf&title=Wheely",
+  "wheely-2": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Wheely-2/Wheely-2.swf&title=Wheely+2",
+  "wheely-3": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Wheely-3/Wheely-3.swf&title=Wheely+3",
+  "wheely-4": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Wheely-4/Wheely-4.swf&title=Wheely+4",
+  "wheely-5": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Wheely-5/Wheely-5.swf&title=Wheely+5",
+  "wheely-6": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Wheely-6/Wheely-6.swf&title=Wheely+6",
+  "wheely-7": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Wheely-7/Wheely-7.swf&title=Wheely+7",
+  "wheely-8": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Wheely-8/Wheely-8.swf&title=Wheely+8",
+  "potatoes-wheely": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Wheely/Wheely.swf&title=Wheely",
+
+  // Happy Wheels & The Binding of Isaac (Unblocked Flash Runners)
+  "happy-wheels": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Happy-Wheels/happywheels.swf&title=Happy+Wheels",
+  "the-binding-of-isaac": "games/flash-player.html?swf=/api/proxy?url=https://raw.githubusercontent.com/UBGHyper/GameList.github.io/main/The-Binding-Of-Isaac/thebindingofissac.swf&title=The+Binding+of+Isaac",
+  "binding-of-isaac": "games/flash-player.html?swf=/api/proxy?url=https://raw.githubusercontent.com/UBGHyper/GameList.github.io/main/The-Binding-Of-Isaac/thebindingofissac.swf&title=The+Binding+of+Isaac",
+  "potatoes-the-binding-of-isaac": "games/flash-player.html?swf=/api/proxy?url=https://raw.githubusercontent.com/UBGHyper/GameList.github.io/main/The-Binding-Of-Isaac/thebindingofissac.swf&title=The+Binding+of+Isaac",
 
   // Fruit Ninja (Clean Local HTML5 Engine)
   "fruit-ninja": "games/fruit-ninja.html",

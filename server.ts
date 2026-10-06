@@ -200,7 +200,7 @@ Your job:
             if (targetUrl.includes('ubghyper.github.io/GameList.github.io/')) {
               const gameMatch = targetUrl.match(/GameList\.github\.io\/([^/]+)/);
               if (gameMatch && gameMatch[1]) {
-                baseHref = `https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@9aa2f58b44aae1f82fb25a1ed8a43293eac3d5cc/${gameMatch[1]}/`;
+                baseHref = `https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/${gameMatch[1]}/`;
               }
             } else if (baseHref.endsWith('.html') || baseHref.endsWith('.htm')) {
               baseHref = baseHref.substring(0, baseHref.lastIndexOf('/') + 1);
@@ -213,6 +213,19 @@ Your job:
             // Neutralize frame buster scripts so games cannot escape iframe
             modified = modified.replace(/window\.top\.location/g, 'window.__disabled_top_location');
             modified = modified.replace(/top\.location\.href/g, 'window.__disabled_top_href');
+
+            // CRITICAL FOR SECURLY: Rewrite Ruffle scripts and assets to open-source jsDelivr CDN
+            modified = modified.replace(/https?:\/\/ubghyper\.github\.io\/GameList\.github\.io\/ruffle\/ruffle\.js/g, 'https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle');
+            modified = modified.replace(/"ruffle\/ruffle\.js"/g, '"https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle"');
+            modified = modified.replace(/'ruffle\/ruffle\.js'/g, "'https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle'");
+            modified = modified.replace(/https?:\/\/ubghyper\.github\.io\/GameList\.github\.io\//g, 'https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/');
+            modified = modified.replace(/https?:\/\/ubghyper\.github\.io\//g, 'https://cdn.jsdelivr.net/gh/UBGHyper/');
+            modified = modified.replace(/https?:\/\/flyingsully\.github\.io\/GameList\.github\.io\//g, 'https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/');
+
+            // Upstream fix for The Binding of Isaac which incorrectly pointed to super smash flash 2
+            if (targetUrl.toLowerCase().includes('binding-of-isaac') || targetUrl.toLowerCase().includes('the-binding-of-isaac')) {
+              modified = modified.replace(/super-smash-flash-2\.swf/g, 'thebindingofissac.swf');
+            }
 
             if (/<head[^>]*>/i.test(modified)) {
               modified = modified.replace(/(<head[^>]*>)/i, `$1\n${baseTag}`);

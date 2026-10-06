@@ -94,6 +94,8 @@ const PRESERVED_LOCAL_GAMES = new Set([
   "games/pong.html",
   "games/soccer-2026.html",
   "games/soccer-real.html",
+  "games/fifa.html",
+  "games/sawyer-for-sawyer.html",
   "games/getting-over-it.html",
   "games/kindergarten.html",
   "games/kindergarten-2.html",
@@ -103,6 +105,7 @@ const PRESERVED_LOCAL_GAMES = new Set([
   "games/fruit-ninja.html",
   "games/papas-scooperia.html",
   "games/soccer-random.html",
+  "games/soccer-random/index.html",
   "games/volley-random.html",
   "games/basket-random.html",
   "games/boxing-random.html"
