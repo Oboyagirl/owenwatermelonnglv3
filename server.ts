@@ -250,6 +250,54 @@ Your job:
     }
   });
 
+  // Dedicated SWF Proxy - Streams Flash games with guaranteed application/x-shockwave-flash MIME and CORS
+  app.get('/api/swf', (req, res) => {
+    let targetUrl = req.query.url as string;
+    if (!targetUrl) {
+      return res.status(400).send('Missing url parameter');
+    }
+
+    if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+      targetUrl = 'https://' + targetUrl;
+    }
+
+    try {
+      const parsed = new URL(targetUrl);
+      const isHttps = parsed.protocol === 'https:';
+      const client = isHttps ? https : http;
+
+      const proxyReq = client.get(targetUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+          'Accept': '*/*'
+        }
+      }, (proxyRes) => {
+        if (proxyRes.statusCode && proxyRes.statusCode >= 300 && proxyRes.statusCode < 400 && proxyRes.headers.location) {
+          const redirectUrl = new URL(proxyRes.headers.location, targetUrl).href;
+          return res.redirect(`/api/swf?url=${encodeURIComponent(redirectUrl)}`);
+        }
+
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+        res.setHeader('Content-Type', 'application/x-shockwave-flash');
+        res.setHeader('Cache-Control', 'public, max-age=604800');
+
+        if (proxyRes.headers['content-length']) {
+          res.setHeader('Content-Length', proxyRes.headers['content-length']);
+        }
+
+        res.status(proxyRes.statusCode || 200);
+        proxyRes.pipe(res);
+      });
+
+      proxyReq.on('error', (err) => {
+        res.status(502).send('SWF Proxy error: ' + err.message);
+      });
+    } catch (err: any) {
+      res.status(400).send('Invalid SWF URL: ' + err.message);
+    }
+  });
+
   // Serve static games directly with relaxed framing headers
   app.use('/games', (req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');

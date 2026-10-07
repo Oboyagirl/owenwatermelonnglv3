@@ -14,13 +14,12 @@ import { ThemeModal } from './components/ThemeModal';
 import { Sidebar } from './components/Sidebar';
 import { PasscodeGate, PASSCODE_STORAGE_KEY } from './components/PasscodeGate';
 import { WelcomeAnimation } from './components/WelcomeAnimation';
-import { AIChatModal } from './components/AIChatModal';
 import { useGamesStore } from './services/gamesStore';
 import { useSiteSettingsStore } from './services/siteSettingsStore';
 import { useThemeStore } from './services/themeStore';
 import { Game } from './types/game';
 import { triggerPanic } from './data/cloakPresets';
-import { Heart, Sparkles, ExternalLink, Palette } from 'lucide-react';
+import { Heart, Gamepad2, ExternalLink, Palette, RotateCcw } from 'lucide-react';
 
 export function isOwenWatermelonOG(game: Game): boolean {
   if (!game) return false;
@@ -70,6 +69,72 @@ export function isOwenWatermelonOG(game: Game): boolean {
   return false;
 }
 
+export function isTwoPlayerGame(g: Game): boolean {
+  if (!g) return false;
+  const titleLower = (g.title || '').toLowerCase();
+  const descLower = (g.description || '').toLowerCase();
+  const mainCatLower = (g.category || '').toLowerCase();
+  const secCatLower = (g.secondaryCategory || '').toLowerCase();
+  const controlsStr = JSON.stringify(g.controls || []).toLowerCase();
+
+  const twoPlayerKeywords = [
+    "2 player", "2-player", "two player", "multiplayer", "co-op", "pvp", "versus", "vs",
+    "fireboy", "watergirl", "pong", "tank trouble", "rooftop snipers", "basket random", "soccer random",
+    "boxing random", "volley random", "bad ice cream", "getaway shootout", "1v1", "wrestle jump",
+    "stickman duel", "house of hazards", "a small world cup", "sawyer", "gun mayhem", "super smash", "basketball stars",
+    "basket bros", "football legends", "smash remix", "tag", "connect 4", "chess", "checkers", "air hockey"
+  ];
+
+  return (
+    mainCatLower.includes('2 player') ||
+    mainCatLower.includes('multiplayer') ||
+    secCatLower.includes('2 player') ||
+    secCatLower.includes('multiplayer') ||
+    twoPlayerKeywords.some(k => 
+      titleLower.includes(k) || 
+      descLower.includes(k) || 
+      (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && t.toLowerCase().includes(k)))
+    ) ||
+    controlsStr.includes('player 2') ||
+    controlsStr.includes('p2')
+  );
+}
+
+export function isSawyerGame(g: Game): boolean {
+  if (!g) return false;
+  const mainCatLower = (g.category || '').toLowerCase();
+  const secCatLower = (g.secondaryCategory || '').toLowerCase();
+  const titleLower = (g.title || '').toLowerCase();
+  return (
+    mainCatLower.includes('sawyer') ||
+    secCatLower.includes('sawyer') ||
+    (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && t.toLowerCase().includes('sawyer'))) ||
+    g.id.includes('sawyer') ||
+    titleLower.includes('sawyer') ||
+    titleLower.includes('a small world cup')
+  );
+}
+
+// Categories include primary categories + popular secondaries
+const APP_CATEGORIES = [
+  'All',
+  '2 Player Games',
+  'Sawyer For Sawyer',
+  'Owen Watermelon OG’s',
+  'Favorites',
+  'Potato Classics',
+  'Sports',
+  'Action',
+  'Racing',
+  'Cooking Sim',
+  'Multiplayer',
+  'Arcade',
+  'Puzzle',
+  'Horror',
+  'Retro',
+  'Casual'
+];
+
 export default function App() {
   const {
     games,
@@ -115,7 +180,6 @@ export default function App() {
   const [visibleCount, setVisibleCount] = useState(48);
   const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
   const [themeModalTab, setThemeModalTab] = useState<'gallery' | 'studio'>('gallery');
-  const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(false);
 
   const handleOpenThemeGallery = () => {
@@ -221,26 +285,6 @@ export default function App() {
     setSelectedGame(null);
   };
 
-  // Categories include primary categories + popular secondaries
-  const categories = [
-    'All',
-    '2 Player Games',
-    'Sawyer For Sawyer',
-    'Owen Watermelon OG’s',
-    'Favorites',
-    'Potato Classics',
-    'Sports',
-    'Action',
-    'Racing',
-    'Cooking Sim',
-    'Multiplayer',
-    'Arcade',
-    'Puzzle',
-    'Horror',
-    'Retro',
-    'Casual'
-  ];
-
   const filteredGames = games.filter(g => {
     if (!g) return false;
     const title = (g.title || '').toLowerCase();
@@ -263,42 +307,12 @@ export default function App() {
 
     // Special handling for 2 Player Games category
     if (catLower.includes('2 player') || catLower === '2 player games' || catLower === '2 player' || catLower === 'two player') {
-      const twoPlayerKeywords = [
-        "2 player", "2-player", "two player", "multiplayer", "co-op", "pvp", "versus", "vs",
-        "fireboy", "watergirl", "pong", "tank trouble", "rooftop snipers", "basket random", "soccer random",
-        "boxing random", "volley random", "bad ice cream", "getaway shootout", "1v1", "wrestle jump",
-        "stickman duel", "house of hazards", "a small world cup", "sawyer", "gun mayhem", "super smash", "basketball stars",
-        "basket bros", "football legends", "smash remix", "tag"
-      ];
-      const titleLower = title.toLowerCase();
-      const descLower = desc.toLowerCase();
-      const controlsStr = JSON.stringify(g.controls || []).toLowerCase();
-
-      return (
-        mainCatLower.includes('2 player') ||
-        mainCatLower.includes('multiplayer') ||
-        secCatLower.includes('2 player') ||
-        secCatLower.includes('multiplayer') ||
-        twoPlayerKeywords.some(k => 
-          titleLower.includes(k) || 
-          descLower.includes(k) || 
-          (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && t.toLowerCase().includes(k)))
-        ) ||
-        controlsStr.includes('player 2') ||
-        controlsStr.includes('p2')
-      );
+      return isTwoPlayerGame(g);
     }
     
     // Special handling for Sawyer For Sawyer category
     if (catLower.includes('sawyer')) {
-      return (
-        mainCatLower.includes('sawyer') ||
-        secCatLower.includes('sawyer') ||
-        (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && t.toLowerCase().includes('sawyer'))) ||
-        g.id.includes('sawyer') ||
-        (g.title || '').toLowerCase().includes('sawyer') ||
-        (g.title || '').toLowerCase().includes('a small world cup')
-      );
+      return isSawyerGame(g);
     }
 
     // Special handling for Owen Watermelon OG's category
@@ -329,6 +343,8 @@ export default function App() {
     );
   });
 
+  const categories = APP_CATEGORIES;
+
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = {
       All: games.length,
@@ -338,7 +354,11 @@ export default function App() {
     for (const cat of categories) {
       if (counts[cat] !== undefined) continue;
       const catLower = cat.toLowerCase();
-      if (catLower === 'potato classics') {
+      if (catLower.includes('2 player')) {
+        counts[cat] = games.filter(isTwoPlayerGame).length;
+      } else if (catLower.includes('sawyer')) {
+        counts[cat] = games.filter(isSawyerGame).length;
+      } else if (catLower === 'potato classics') {
         counts[cat] = games.filter(g => 
           (g.secondaryCategory || '').toLowerCase() === 'potato classics' ||
           (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && (t.toLowerCase().includes('potato') || t.toLowerCase().includes('tripplethepotatoes')))) ||
@@ -405,7 +425,6 @@ export default function App() {
         siteSettings={siteSettings}
         activeTheme={activeTheme}
         onOpenThemeModal={handleOpenThemeGallery}
-        onOpenAIChat={() => setIsAIChatOpen(true)}
         onLockSite={handleLockSite}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -435,7 +454,6 @@ export default function App() {
           }}
           onOpenThemeModal={handleOpenThemeGallery}
           onOpenCustomThemeStudio={handleOpenCustomThemeStudio}
-          onOpenAIChat={() => setIsAIChatOpen(true)}
           onLockSite={handleLockSite}
           activeTheme={activeTheme}
           totalGames={games.length}
@@ -479,10 +497,6 @@ export default function App() {
                   handleOpenCustomThemeStudio();
                   setIsMobileSidebarOpen(false);
                 }}
-                onOpenAIChat={() => {
-                  setIsAIChatOpen(true);
-                  setIsMobileSidebarOpen(false);
-                }}
                 onLockSite={handleLockSite}
                 activeTheme={activeTheme}
                 totalGames={games.length}
@@ -513,7 +527,7 @@ export default function App() {
               <>
                 {/* ARCADE GAMES HUB */}
                 {currentTab === 'games' && (
-                  <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6 flex flex-col gap-10">
+                  <div className="max-w-7xl mx-auto px-4 lg:px-8 py-5 flex flex-col gap-6">
                     {/* Hero Spotlight & Filters */}
                     <HeroBanner
                       featuredGame={featuredGame}
@@ -534,12 +548,12 @@ export default function App() {
 
                     {/* Quick Favorites Section if any */}
                     {selectedCategory === 'All' && !searchTerm && favoriteGamesList.length > 0 && (
-                      <div className="flex flex-col gap-4">
+                      <div className="flex flex-col gap-3">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Heart className="w-4 h-4 text-[#ff2d55] fill-current" />
-                            <h2 className="text-lg font-bold text-white tracking-tight">
-                              Your Starred Favorites
+                            <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                              Starred Favorites
                             </h2>
                           </div>
                           <span className="text-xs text-slate-400 font-mono tabular-nums">
@@ -547,7 +561,7 @@ export default function App() {
                           </span>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                           {favoriteGamesList.slice(0, 4).map(game => (
                             <GameCard
                               key={game.id}
@@ -563,11 +577,11 @@ export default function App() {
                     )}
 
                     {/* All Filtered Games Grid */}
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-3.5">
                       <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-                          <Sparkles className="w-4 h-4" style={{ color: activeTheme.accent }} />
-                          <span>{selectedCategory === 'All' ? 'Complete Games Catalog' : `${selectedCategory} Games`}</span>
+                        <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
+                          <Gamepad2 className="w-4 h-4" style={{ color: activeTheme.accent }} />
+                          <span>{selectedCategory === 'All' ? 'Games Catalog' : `${selectedCategory} Games`}</span>
                         </h2>
                         <span className="text-xs text-slate-400 font-mono tabular-nums">
                           Showing {Math.min(visibleCount, filteredGames.length)} of {filteredGames.length} {filteredGames.length === games.length ? 'games' : `(from ${games.length} total)`}
@@ -692,18 +706,8 @@ export default function App() {
                   style={{ color: activeTheme.accent }}
                   title="Replay Welcome To The WatermelonBase Intro"
                 >
-                  <Sparkles className="w-3.5 h-3.5" />
+                  <RotateCcw className="w-3.5 h-3.5" />
                   <span>Replay Intro</span>
-                </button>
-
-                <button
-                  onClick={() => setIsAIChatOpen(true)}
-                  className="hover:text-white transition-colors flex items-center gap-1.5 font-medium cursor-pointer"
-                  style={{ color: activeTheme.accent }}
-                  title="Open AI Chatbot"
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>AI Chatbot</span>
                 </button>
 
                 <button
@@ -741,20 +745,6 @@ export default function App() {
         onUpdateCustomTheme={updateCustomTheme}
         onResetCustomTheme={resetCustomTheme}
         initialTab={themeModalTab}
-      />
-
-      {/* MelonBot AI Chatbot Modal */}
-      <AIChatModal
-        isOpen={isAIChatOpen}
-        onClose={() => setIsAIChatOpen(false)}
-        activeTheme={activeTheme}
-        onSelectGameTitle={(title) => {
-          setIsAIChatOpen(false);
-          setSearchTerm(title);
-          setSelectedCategory('All');
-          setCurrentTab('games');
-          setSelectedGame(null);
-        }}
       />
 
       {/* "Welcome To The WatermelonBase" Animated Intro Overlay (shown after password unlock) */}

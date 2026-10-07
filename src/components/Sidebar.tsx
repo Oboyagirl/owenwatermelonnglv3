@@ -12,7 +12,6 @@ import {
   ChevronRight,
   Sparkles,
   ExternalLink,
-  Bot,
   Users
 } from 'lucide-react';
 import { ThemeConfig } from '../services/themeStore';
@@ -27,7 +26,6 @@ interface SidebarProps {
   onRandomGame: () => void;
   onOpenThemeModal: () => void;
   onOpenCustomThemeStudio?: () => void;
-  onOpenAIChat?: () => void;
   onLockSite?: () => void;
   activeTheme: ThemeConfig;
   totalGames: number;
@@ -44,7 +42,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onRandomGame,
   onOpenThemeModal,
   onOpenCustomThemeStudio,
-  onOpenAIChat,
   onLockSite,
   activeTheme,
   totalGames,
@@ -166,7 +163,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {!isCollapsed && (
               <div className="flex items-center justify-between w-full">
                 <span>2 Player Games</span>
-                <span className="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold uppercase bg-violet-500/20 text-violet-300">
+                <span className="text-[10px] font-mono text-violet-300">
                   1v1
                 </span>
               </div>
@@ -195,8 +192,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {!isCollapsed && (
               <div className="flex items-center justify-between w-full">
                 <span>Sawyer For Sawyer</span>
-                <span className="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase bg-sky-500/20 text-sky-300">
-                  New
+                <span className="text-[10px] font-mono text-sky-300">
+                  Cup
                 </span>
               </div>
             )}
@@ -252,40 +249,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {!isCollapsed && (
               <div className="flex items-center justify-between w-full">
                 <span>Tab Cloaker</span>
-                <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">
+                <span className="text-[10px] font-mono text-emerald-400 font-bold">
                   Stealth
                 </span>
               </div>
             )}
           </button>
-
-          {/* AI Chatbot Navigation Button */}
-          {onOpenAIChat && (
-            <button
-              onClick={onOpenAIChat}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border border-transparent text-slate-300 hover:text-white hover:bg-white/5 group"
-              style={{
-                color: activeTheme.accent
-              }}
-              title="Talk with WatermelonBase AI (MelonBot)"
-            >
-              <Bot className="w-4 h-4 shrink-0 animate-pulse" />
-              {!isCollapsed && (
-                <div className="flex items-center justify-between w-full">
-                  <span>AI Chatbot</span>
-                  <span 
-                    className="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold uppercase tracking-wider"
-                    style={{
-                      backgroundColor: activeTheme.accentBadge,
-                      color: activeTheme.accent
-                    }}
-                  >
-                    AI
-                  </span>
-                </div>
-              )}
-            </button>
-          )}
         </div>
 
         {/* Themes & Custom Creator */}
