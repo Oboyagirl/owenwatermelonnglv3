@@ -95,7 +95,10 @@
     <script>
       window.addEventListener('error', function(e) {
         var msg = (e && (e.message || (e.error && e.error.message))) || '';
-        if (msg.indexOf('WebSocket') !== -1 || msg.indexOf('websocket') !== -1) return;
+        // Suppress benign WebSocket noise and cross-origin iframe Script error
+        if (msg.indexOf('WebSocket') !== -1 || msg.indexOf('websocket') !== -1 || msg === 'Script error.' || !msg) {
+          return;
+        }
         var diag = document.getElementById('boot-diagnostic');
         var text = document.getElementById('boot-error-text');
         if (diag && text) {
@@ -105,7 +108,9 @@
       });
       window.addEventListener('unhandledrejection', function(e) {
         var str = '' + (e && e.reason && (e.reason.message || e.reason));
-        if (str.indexOf('WebSocket') !== -1 || str.indexOf('websocket') !== -1) return;
+        if (str.indexOf('WebSocket') !== -1 || str.indexOf('websocket') !== -1 || str === 'Script error.' || !str) {
+          return;
+        }
         var diag = document.getElementById('boot-diagnostic');
         var text = document.getElementById('boot-error-text');
         if (diag && text) {
@@ -117,37 +122,5 @@
 
     <!-- Primary entry point: Vite transforms this to compiled bundle in dist/ -->
     <script type="module" src="/src/main.tsx"></script>
-
-    <!-- Fallback loader for GitHub Pages serving directly from root branch -->
-    <script>
-      setTimeout(function() {
-        var bootContainer = document.getElementById('boot-container');
-        if (bootContainer) {
-          // If the dev script /src/main.tsx failed to mount React (e.g. static GitHub Pages root), inject the compiled production bundle
-          if (!document.getElementById('compiled-bundle-script')) {
-            console.log('Activating static bundle fallback...');
-            var css = document.createElement('link');
-            css.rel = 'stylesheet';
-            css.href = './assets/index.css';
-            document.head.appendChild(css);
-
-            var s = document.createElement('script');
-            s.id = 'compiled-bundle-script';
-            s.type = 'module';
-            s.crossOrigin = 'anonymous';
-            s.src = './assets/index.js';
-            s.onerror = function() {
-              // Try fallback to /dist/assets if deployed from repo root
-              var s2 = document.createElement('script');
-              s2.type = 'module';
-              s2.crossOrigin = 'anonymous';
-              s2.src = './dist/assets/index.js';
-              document.body.appendChild(s2);
-            };
-            document.body.appendChild(s);
-          }
-        }
-      }, 350);
-    </script>
   </body>
 </html>

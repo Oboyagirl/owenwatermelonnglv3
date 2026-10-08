@@ -92,5 +92,9 @@ export async function testConnection(): Promise<boolean> {
   }
 }
 
-// Auto-run connection check quietly
-testConnection().catch(() => {});
+// Auto-run connection check quietly after initial app boot
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    testConnection().catch(() => {});
+  }, 200);
+}
