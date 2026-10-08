@@ -214,13 +214,16 @@ Your job:
             modified = modified.replace(/window\.top\.location/g, 'window.__disabled_top_location');
             modified = modified.replace(/top\.location\.href/g, 'window.__disabled_top_href');
 
-            // CRITICAL FOR SECURLY: Rewrite Ruffle scripts and assets to open-source jsDelivr CDN
+            // CRITICAL FOR SECURLY: Rewrite Ruffle scripts to modern CDN
             modified = modified.replace(/https?:\/\/ubghyper\.github\.io\/GameList\.github\.io\/ruffle\/ruffle\.js/g, 'https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle');
             modified = modified.replace(/"ruffle\/ruffle\.js"/g, '"https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle"');
             modified = modified.replace(/'ruffle\/ruffle\.js'/g, "'https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle'");
-            modified = modified.replace(/https?:\/\/ubghyper\.github\.io\/GameList\.github\.io\//g, 'https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/');
-            modified = modified.replace(/https?:\/\/ubghyper\.github\.io\//g, 'https://cdn.jsdelivr.net/gh/UBGHyper/');
-            modified = modified.replace(/https?:\/\/flyingsully\.github\.io\/GameList\.github\.io\//g, 'https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/');
+            
+            // Block ad/affiliate redirects (e.g. argix/agrix domain redirects)
+            modified = modified.replace(/(location\.(href|replace|assign)\s*=\s*|window\.open\()['"][^'"]*(argix|agrix|traffic|adservice|monetiz)[^'"]*['"]/gi, '/* blocked ad redirect */');
+
+            // For non-SWF assets, can use jsDelivr; keep SWFs on direct github / api/swf to prevent 403 (files >20MB blocked by jsDelivr)
+            modified = modified.replace(/https?:\/\/ubghyper\.github\.io\/GameList\.github\.io\/(?!.*\.swf)([^"'\s>]+)/g, 'https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/$1');
 
             // Upstream fix for The Binding of Isaac which incorrectly pointed to super smash flash 2
             if (targetUrl.toLowerCase().includes('binding-of-isaac') || targetUrl.toLowerCase().includes('the-binding-of-isaac')) {

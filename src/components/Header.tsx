@@ -7,11 +7,15 @@ import {
   X, 
   Menu, 
   Dices, 
-  EyeOff
+  EyeOff,
+  Cloud,
+  User as UserIcon
 } from 'lucide-react';
 import { triggerPanic } from '../data/cloakPresets';
 import { SiteSettings } from '../types/game';
 import { ThemeConfig } from '../services/themeStore';
+import { useAuth } from '../context/AuthContext';
+import { AVATAR_PRESETS } from '../services/cloudSaveService';
 
 export const REQUEST_GAME_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScEvS0_M84dApQkx9FOJCDq1kYtCwRHw1BWcJkGemU-fsLAkw/viewform';
 
@@ -21,6 +25,7 @@ interface HeaderProps {
   siteSettings: SiteSettings;
   activeTheme: ThemeConfig;
   onOpenThemeModal: () => void;
+  onOpenAccountModal?: () => void;
   onLockSite?: () => void;
   searchTerm?: string;
   onSearchChange?: (val: string) => void;
@@ -34,12 +39,15 @@ export const Header: React.FC<HeaderProps> = ({
   siteSettings,
   activeTheme,
   onOpenThemeModal,
+  onOpenAccountModal,
   onLockSite,
   searchTerm = '',
   onSearchChange,
   onToggleMobileSidebar,
   onRandomGame
 }) => {
+  const { user, profile, saves, isGuest } = useAuth();
+  const currentAvatar = AVATAR_PRESETS.find(a => a.id === (profile?.avatarId || 'melon_classic')) || AVATAR_PRESETS[0];
   return (
     <>
       {/* Top Announcement Banner if enabled */}
@@ -181,6 +189,35 @@ export const Header: React.FC<HeaderProps> = ({
               <EyeOff className="w-3.5 h-3.5" />
               <span className="hidden md:inline">{currentTab === 'cloaker' ? 'Cloaker Active' : 'Cloak'}</span>
             </button>
+
+            {/* Gamer Account & Cloud Saves Vault */}
+            {onOpenAccountModal && (
+              <button
+                onClick={onOpenAccountModal}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer relative"
+                style={{
+                  backgroundColor: user ? activeTheme.accentBadge : activeTheme.bgCard,
+                  borderColor: user ? activeTheme.borderActive : activeTheme.border,
+                  color: user ? activeTheme.accent : '#cbd5e1'
+                }}
+                title={user ? `Signed in as ${profile?.displayName || 'Gamer'} (${saves.length} cloud saves synced)` : 'Sign in to sync game saves across devices'}
+              >
+                {user ? (
+                  <>
+                    <span className="text-sm leading-none">{currentAvatar.icon}</span>
+                    <span className="hidden md:inline font-bold max-w-[100px] truncate">
+                      {profile?.displayName || 'Gamer'}
+                    </span>
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0 animate-pulse" title="Cloud Sync Active" />
+                  </>
+                ) : (
+                  <>
+                    <Cloud className="w-3.5 h-3.5 text-emerald-400" />
+                    <span className="hidden sm:inline font-medium">Cloud Saves</span>
+                  </>
+                )}
+              </button>
+            )}
 
             {/* Theme Selector */}
             <button

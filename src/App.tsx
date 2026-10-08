@@ -11,6 +11,7 @@ import { GamePlayer } from './components/GamePlayer';
 import { TabCloaker } from './components/TabCloaker';
 import { StarfieldBackground } from './components/StarfieldBackground';
 import { ThemeModal } from './components/ThemeModal';
+import { UserAccountModal } from './components/UserAccountModal';
 import { Sidebar } from './components/Sidebar';
 import { PasscodeGate, PASSCODE_STORAGE_KEY } from './components/PasscodeGate';
 import { WelcomeAnimation } from './components/WelcomeAnimation';
@@ -115,9 +116,21 @@ export function isSawyerGame(g: Game): boolean {
   );
 }
 
+export function isTrendingGame(g: Game): boolean {
+  if (!g) return false;
+  // Games with recent high play counts (>= 50,000 plays) or featured status
+  const plays = g.plays || 0;
+  return (
+    plays >= 50000 || 
+    !!g.featured || 
+    (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && t.toLowerCase().includes('trending')))
+  );
+}
+
 // Categories include primary categories + popular secondaries
 const APP_CATEGORIES = [
   'All',
+  'Trending',
   '2 Player Games',
   'Sawyer For Sawyer',
   'Owen Watermelon OG’s',
@@ -179,6 +192,7 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [visibleCount, setVisibleCount] = useState(48);
   const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
+  const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   const [themeModalTab, setThemeModalTab] = useState<'gallery' | 'studio'>('gallery');
   const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(false);
 
@@ -285,63 +299,76 @@ export default function App() {
     setSelectedGame(null);
   };
 
-  const filteredGames = games.filter(g => {
-    if (!g) return false;
-    const title = (g.title || '').toLowerCase();
-    const desc = (g.description || '').toLowerCase();
-    const cleanSearch = (searchTerm || '').toLowerCase();
+  const filteredGames = useMemo(() => {
+    const list = games.filter(g => {
+      if (!g) return false;
+      const title = (g.title || '').toLowerCase();
+      const desc = (g.description || '').toLowerCase();
+      const cleanSearch = (searchTerm || '').toLowerCase();
 
-    const matchesSearch = 
-      title.includes(cleanSearch) ||
-      desc.includes(cleanSearch) ||
-      (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && t.toLowerCase().includes(cleanSearch)));
+      const matchesSearch = 
+        title.includes(cleanSearch) ||
+        desc.includes(cleanSearch) ||
+        (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && t.toLowerCase().includes(cleanSearch)));
 
-    if (!matchesSearch) return false;
+      if (!matchesSearch) return false;
 
-    if (selectedCategory === 'All') return true;
-    if (selectedCategory === 'Favorites') return favorites.includes(g.id);
+      if (selectedCategory === 'All') return true;
+      if (selectedCategory === 'Favorites') return favorites.includes(g.id);
 
-    const catLower = (selectedCategory || '').toLowerCase();
-    const secCatLower = (g.secondaryCategory || '').toLowerCase();
-    const mainCatLower = (g.category || '').toLowerCase();
+      const catLower = (selectedCategory || '').toLowerCase();
+      const secCatLower = (g.secondaryCategory || '').toLowerCase();
+      const mainCatLower = (g.category || '').toLowerCase();
 
-    // Special handling for 2 Player Games category
-    if (catLower.includes('2 player') || catLower === '2 player games' || catLower === '2 player' || catLower === 'two player') {
-      return isTwoPlayerGame(g);
-    }
-    
-    // Special handling for Sawyer For Sawyer category
-    if (catLower.includes('sawyer')) {
-      return isSawyerGame(g);
-    }
+      // Special handling for Trending category (most recent play counts)
+      if (catLower === 'trending') {
+        return isTrendingGame(g);
+      }
 
-    // Special handling for Owen Watermelon OG's category
-    if (catLower.includes('owen') && catLower.includes('og')) {
-      return isOwenWatermelonOG(g);
-    }
+      // Special handling for 2 Player Games category
+      if (catLower.includes('2 player') || catLower === '2 player games' || catLower === '2 player' || catLower === 'two player') {
+        return isTwoPlayerGame(g);
+      }
+      
+      // Special handling for Sawyer For Sawyer category
+      if (catLower.includes('sawyer')) {
+        return isSawyerGame(g);
+      }
 
-    // Special handling for Potato Classics category
-    if (catLower === 'potato classics') {
+      // Special handling for Owen Watermelon OG's category
+      if (catLower.includes('owen') && catLower.includes('og')) {
+        return isOwenWatermelonOG(g);
+      }
+
+      // Special handling for Potato Classics category
+      if (catLower === 'potato classics') {
+        return (
+          secCatLower === 'potato classics' ||
+          (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && (t.toLowerCase().includes('potato') || t.toLowerCase().includes('tripplethepotatoes')))) ||
+          (typeof g.id === 'string' && g.id.startsWith('potatoes-'))
+        );
+      }
+
+      if (catLower === 'cooking sim') {
+        return (
+          secCatLower === 'cooking sim' ||
+          (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && (t.toLowerCase().includes('cooking') || t.toLowerCase().includes('papa louie'))))
+        );
+      }
+
       return (
-        secCatLower === 'potato classics' ||
-        (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && (t.toLowerCase().includes('potato') || t.toLowerCase().includes('tripplethepotatoes')))) ||
-        (typeof g.id === 'string' && g.id.startsWith('potatoes-'))
+        mainCatLower === catLower ||
+        secCatLower === catLower ||
+        (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && t.toLowerCase() === catLower))
       );
+    });
+
+    if (selectedCategory === 'Trending') {
+      return [...list].sort((a, b) => (b.plays || 0) - (a.plays || 0));
     }
 
-    if (catLower === 'cooking sim') {
-      return (
-        secCatLower === 'cooking sim' ||
-        (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && (t.toLowerCase().includes('cooking') || t.toLowerCase().includes('papa louie'))))
-      );
-    }
-
-    return (
-      mainCatLower === catLower ||
-      secCatLower === catLower ||
-      (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && t.toLowerCase() === catLower))
-    );
-  });
+    return list;
+  }, [games, searchTerm, selectedCategory, favorites]);
 
   const categories = APP_CATEGORIES;
 
@@ -349,32 +376,42 @@ export default function App() {
     const counts: Record<string, number> = {
       All: games.length,
       Favorites: favorites.length,
-      'Owen Watermelon OG’s': games.filter(isOwenWatermelonOG).length,
+      Trending: 0,
+      'Owen Watermelon OG’s': 0,
+      '2 Player Games': 0,
+      'Sawyer For Sawyer': 0,
+      'Potato Classics': 0,
+      'Cooking Sim': 0
     };
+
     for (const cat of categories) {
-      if (counts[cat] !== undefined) continue;
-      const catLower = cat.toLowerCase();
-      if (catLower.includes('2 player')) {
-        counts[cat] = games.filter(isTwoPlayerGame).length;
-      } else if (catLower.includes('sawyer')) {
-        counts[cat] = games.filter(isSawyerGame).length;
-      } else if (catLower === 'potato classics') {
-        counts[cat] = games.filter(g => 
-          (g.secondaryCategory || '').toLowerCase() === 'potato classics' ||
-          (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && (t.toLowerCase().includes('potato') || t.toLowerCase().includes('tripplethepotatoes')))) ||
-          (typeof g.id === 'string' && g.id.startsWith('potatoes-'))
-        ).length;
-      } else if (catLower === 'cooking sim') {
-        counts[cat] = games.filter(g =>
-          (g.secondaryCategory || '').toLowerCase() === 'cooking sim' ||
-          (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && (t.toLowerCase().includes('cooking') || t.toLowerCase().includes('papa louie'))))
-        ).length;
-      } else {
-        counts[cat] = games.filter(g =>
-          (g.category || '').toLowerCase() === catLower ||
-          (g.secondaryCategory || '').toLowerCase() === catLower ||
-          (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && t.toLowerCase() === catLower))
-        ).length;
+      if (counts[cat] === undefined) counts[cat] = 0;
+    }
+
+    for (let i = 0; i < games.length; i++) {
+      const g = games[i];
+      if (isTrendingGame(g)) counts.Trending++;
+      if (isOwenWatermelonOG(g)) counts['Owen Watermelon OG’s']++;
+      if (isTwoPlayerGame(g)) counts['2 Player Games']++;
+      if (isSawyerGame(g)) counts['Sawyer For Sawyer']++;
+
+      const secLower = (g.secondaryCategory || '').toLowerCase();
+      const mainLower = (g.category || '').toLowerCase();
+      const isPotato = secLower === 'potato classics' || (typeof g.id === 'string' && g.id.startsWith('potatoes-'));
+      if (isPotato) counts['Potato Classics']++;
+
+      const isCooking = secLower === 'cooking sim' || (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && (t.toLowerCase().includes('cooking') || t.toLowerCase().includes('papa louie'))));
+      if (isCooking) counts['Cooking Sim']++;
+
+      for (let c = 0; c < categories.length; c++) {
+        const cat = categories[c];
+        if (cat === 'All' || cat === 'Favorites' || cat === 'Trending' || cat === 'Owen Watermelon OG’s' || cat === '2 Player Games' || cat === 'Sawyer For Sawyer' || cat === 'Potato Classics' || cat === 'Cooking Sim') {
+          continue;
+        }
+        const catLower = cat.toLowerCase();
+        if (mainLower === catLower || secLower === catLower || (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && t.toLowerCase() === catLower))) {
+          counts[cat]++;
+        }
       }
     }
     return counts;
@@ -425,6 +462,7 @@ export default function App() {
         siteSettings={siteSettings}
         activeTheme={activeTheme}
         onOpenThemeModal={handleOpenThemeGallery}
+        onOpenAccountModal={() => setIsAccountModalOpen(true)}
         onLockSite={handleLockSite}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -745,6 +783,15 @@ export default function App() {
         onUpdateCustomTheme={updateCustomTheme}
         onResetCustomTheme={resetCustomTheme}
         initialTab={themeModalTab}
+      />
+
+      {/* Cross-Device Gamer Account & Cloud Saves Modal */}
+      <UserAccountModal
+        isOpen={isAccountModalOpen}
+        onClose={() => setIsAccountModalOpen(false)}
+        allGames={games}
+        onSelectGame={handleSelectGame}
+        theme={activeTheme}
       />
 
       {/* "Welcome To The WatermelonBase" Animated Intro Overlay (shown after password unlock) */}

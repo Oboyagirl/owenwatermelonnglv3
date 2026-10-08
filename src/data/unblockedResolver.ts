@@ -108,6 +108,7 @@ const PRESERVED_LOCAL_GAMES = new Set([
   "games/the-man-in-the-window.html",
   "games/case-opener.html",
   "games/flash-player.html",
+  "games/happy-wheels.html",
   "games/fruit-ninja.html",
   "games/papas-scooperia.html",
   "games/soccer-random.html",

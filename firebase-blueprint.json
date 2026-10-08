@@ -1,0 +1,178 @@
+{
+  "entities": {
+    "userProfile": {
+      "title": "User Profile",
+      "description": "User profile with avatar, favorites, and settings",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The Firebase Auth user ID",
+          "maxLength": 128
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The gamer display name",
+          "maxLength": 64
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "Avatar image URL or emoji preset",
+          "maxLength": 512
+        },
+        "avatarId": {
+          "type": "string",
+          "description": "Watermelon avatar theme icon ID",
+          "maxLength": 64
+        },
+        "favoriteGameIds": {
+          "type": "array",
+          "description": "List of favorite game identifiers"
+        },
+        "recentGameIds": {
+          "type": "array",
+          "description": "Recently played game IDs"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of profile creation",
+          "maxLength": 64
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last update",
+          "maxLength": 64
+        }
+      },
+      "required": ["userId", "displayName"]
+    },
+    "gameSave": {
+      "title": "Game Save",
+      "description": "Cloud save state for games across devices",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Save document identifier",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth user ID owner",
+          "maxLength": 128
+        },
+        "gameId": {
+          "type": "string",
+          "description": "The unique game slug or id",
+          "maxLength": 128
+        },
+        "slot": {
+          "type": "string",
+          "description": "Save slot name: slot1, slot2, slot3, auto, or manual",
+          "maxLength": 32
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the game",
+          "maxLength": 128
+        },
+        "saveData": {
+          "type": "string",
+          "description": "Serialized save payload JSON or base64 data string",
+          "maxLength": 500000
+        },
+        "saveType": {
+          "type": "string",
+          "description": "Storage format type: localstorage, state, json, or sol",
+          "maxLength": 32
+        },
+        "score": {
+          "type": "number",
+          "description": "Optional recorded high score or level numeric"
+        },
+        "level": {
+          "type": "string",
+          "description": "Optional level or milestone name",
+          "maxLength": 64
+        },
+        "deviceLabel": {
+          "type": "string",
+          "description": "Device or browser identifier where save originated",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp",
+          "maxLength": 64
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last updated timestamp",
+          "maxLength": 64
+        }
+      },
+      "required": ["id", "userId", "gameId", "slot", "saveData"]
+    },
+    "gameStats": {
+      "title": "Game Stats",
+      "description": "User statistics and playtime for an individual game",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Game identifier",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth user ID owner",
+          "maxLength": 128
+        },
+        "gameId": {
+          "type": "string",
+          "description": "Game ID",
+          "maxLength": 128
+        },
+        "playCount": {
+          "type": "number",
+          "description": "Total times game launched"
+        },
+        "playTimeSeconds": {
+          "type": "number",
+          "description": "Total seconds played"
+        },
+        "lastPlayedAt": {
+          "type": "string",
+          "description": "Last played ISO timestamp",
+          "maxLength": 64
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update ISO timestamp",
+          "maxLength": 64
+        }
+      },
+      "required": ["id", "userId", "gameId"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/userProfile"
+      },
+      "description": "Individual user gamer profile with preferences, avatar, and favorites"
+    },
+    "/users/{userId}/saves/{saveId}": {
+      "schema": {
+        "$ref": "#/entities/gameSave"
+      },
+      "description": "User game save states isolated per account and synced across devices"
+    },
+    "/users/{userId}/stats/{gameId}": {
+      "schema": {
+        "$ref": "#/entities/gameStats"
+      },
+      "description": "Individual user play statistics and game timers"
+    }
+  }
+}

@@ -12,7 +12,8 @@ import {
   ChevronRight,
   Sparkles,
   ExternalLink,
-  Users
+  Users,
+  TrendingUp
 } from 'lucide-react';
 import { ThemeConfig } from '../services/themeStore';
 import { triggerPanic } from '../data/cloakPresets';
@@ -139,6 +140,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             <Gamepad2 className="w-4 h-4 shrink-0" />
             {!isCollapsed && <span>Arcade Hub</span>}
+          </button>
+
+          {/* Trending */}
+          <button
+            onClick={() => {
+              onSelectTab('games');
+              onSelectCategory('Trending');
+            }}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border ${
+              isGames && activeCategory === 'Trending'
+                ? 'shadow-md'
+                : 'border-transparent text-slate-300 hover:text-white hover:bg-white/5'
+            }`}
+            style={{
+              backgroundColor: isGames && activeCategory === 'Trending' ? activeTheme.accentBadge : undefined,
+              borderColor: isGames && activeCategory === 'Trending' ? activeTheme.borderActive : undefined,
+              color: isGames && activeCategory === 'Trending' ? '#f43f5e' : undefined
+            }}
+            title="Trending Games (Most Played)"
+          >
+            <TrendingUp className="w-4 h-4 shrink-0 text-[#f43f5e]" />
+            {!isCollapsed && (
+              <div className="flex items-center justify-between w-full">
+                <span>Trending</span>
+                <span className="text-[10px] font-mono text-rose-400 font-bold">
+                  Hot
+                </span>
+              </div>
+            )}
           </button>
 
           {/* 2 Player Games */}

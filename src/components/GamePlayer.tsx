@@ -17,11 +17,14 @@ import {
   Server,
   RefreshCw,
   ShieldCheck,
-  Scan
+  Scan,
+  Cloud
 } from 'lucide-react';
 import { Game } from '../types/game';
 import { openAboutBlankGame, resolveAssetUrl } from '../services/gamesStore';
 import { ThemeConfig, THEMES } from '../services/themeStore';
+import { CloudSaveModal } from './CloudSaveModal';
+import { useAuth } from '../context/AuthContext';
 
 interface GamePlayerProps {
   game: Game;
@@ -63,6 +66,9 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
   // Live Iframe HTML Replacement State
   const defaultIframeCode = game.iframeCode || `<iframe class="game-iframe" id="game-area" title="${game.title}" src="${game.iframeSrc}" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`;
   const [showIframeEditor, setShowIframeEditor] = useState(false);
+  const [showCloudSaveModal, setShowCloudSaveModal] = useState(false);
+  const { user, profile, getSavesForGame } = useAuth();
+  const gameSaves = getSavesForGame(game.id);
   const [iframeHtmlInput, setIframeHtmlInput] = useState(defaultIframeCode);
   const [activeIframeSrc, setActiveIframeSrc] = useState(game.iframeSrc);
   const [activeCustomHtml, setActiveCustomHtml] = useState<string | undefined>(game.customHtml);
@@ -221,6 +227,20 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowCloudSaveModal(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer border relative"
+            style={{
+              backgroundColor: gameSaves.length > 0 ? activeTheme.accentBadge : activeTheme.bgCard,
+              borderColor: gameSaves.length > 0 ? activeTheme.accent : activeTheme.border,
+              color: gameSaves.length > 0 ? activeTheme.accent : activeTheme.kicker
+            }}
+            title="Cross-Device Cloud Saves: Save progress across school Chromebooks and home computers"
+          >
+            <Cloud className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Cloud Saves {gameSaves.length > 0 ? `(${gameSaves.length})` : ''}</span>
+          </button>
+
           <button
             onClick={() => setShowIframeEditor(!showIframeEditor)}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer border"
@@ -425,6 +445,20 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
               title="Replace or Edit Iframe HTML"
             >
               <Code className="w-4 h-4" />
+            </button>
+
+            <button
+              onClick={() => setShowCloudSaveModal(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer border"
+              style={{
+                backgroundColor: gameSaves.length > 0 ? 'rgba(16, 185, 129, 0.15)' : activeTheme.bgCard,
+                borderColor: gameSaves.length > 0 ? '#10b981' : activeTheme.border,
+                color: gameSaves.length > 0 ? '#34d399' : activeTheme.kicker
+              }}
+              title="Cross-Device Cloud Saves: Save progress across school Chromebooks and home computers"
+            >
+              <Cloud className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="hidden sm:inline">Cloud Save</span>
             </button>
 
             <button
@@ -796,6 +830,15 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Cloud Saves Modal */}
+      <CloudSaveModal
+        game={game}
+        isOpen={showCloudSaveModal}
+        onClose={() => setShowCloudSaveModal(false)}
+        onReloadGame={handleReload}
+        theme={activeTheme}
+      />
     </div>
   );
 };

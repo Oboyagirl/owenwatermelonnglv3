@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Game } from '../types/game';
 import { DEFAULT_GAMES, formatGameIframe, URL_OVERRIDES, getCanonicalGameKey } from '../data/defaultGames';
 
-const STORAGE_KEY = 'owen_watermelon_v3_games_v50';
+const OVERRIDES_STORAGE_KEY = 'owen_game_overrides_v1';
 const FAVORITES_KEY = 'owen_watermelon_v3_favorites';
 
 export function resolveAssetUrl(url: string): string {
@@ -96,57 +96,47 @@ function sanitizeGame(game: Game): Game {
 }
 
 export function useGamesStore() {
-  const [games, setGames] = useState<Game[]>(() => {
-    // Clean up older storage keys that might have stored duplicate game IDs or old paths
+  // Overrides map: gameId -> partial game fields (e.g. customized plays, custom iframe, custom html)
+  const [overrides, setOverrides] = useState<Record<string, Partial<Game>>>(() => {
+    // Purge legacy multi-megabyte keys to immediately free browser memory & quota
     try {
-      [
-        'owen_watermelon_v3_games_v1', 
-        'owen_watermelon_v3_games_v2', 
-        'owen_watermelon_v3_games_v10', 
-        'owen_watermelon_v3_games_v11', 
-        'owen_watermelon_v3_games_v12', 
-        'owen_watermelon_v3_games_v13',
-        'owen_watermelon_v3_games_v27',
-        'owen_watermelon_v3_games_v28',
-        'owen_watermelon_v3_games_v29',
-        'owen_watermelon_v3_games_v30',
-        'owen_watermelon_v3_games_v31',
-        'owen_watermelon_v3_games_v32',
-        'owen_watermelon_v3_games_v33',
-        'owen_watermelon_v3_games_v34',
-        'owen_watermelon_v3_games_v35',
-        'owen_watermelon_v3_games_v36',
-        'owen_watermelon_v3_games_v37',
-        'owen_watermelon_v3_games_v38',
-        'owen_watermelon_v3_games_v39',
-        'owen_watermelon_v3_games_v40',
-        'owen_watermelon_v3_games_v41',
-        'owen_watermelon_v3_games_v42',
-        'owen_watermelon_v3_games_v43',
-        'owen_watermelon_v3_games_v44'
-      ].forEach(k => {
-        localStorage.removeItem(k);
-      });
+      for (let i = 1; i <= 55; i++) {
+        localStorage.removeItem(`owen_watermelon_v3_games_v${i}`);
+      }
     } catch {}
 
     try {
-      const cached = localStorage.getItem(STORAGE_KEY);
+      const cached = localStorage.getItem(OVERRIDES_STORAGE_KEY);
       if (cached) {
-        const parsed: Game[] = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          const sanitized = deduplicateGames(parsed.map(sanitizeGame));
-          const existingIds = new Set(sanitized.map(g => g.id));
-          const missingDefaults = DEFAULT_GAMES.filter(dg => !existingIds.has(dg.id));
-          if (missingDefaults.length > 0) {
-            return deduplicateGames([...sanitized, ...missingDefaults]);
-          }
-          return sanitized;
+        const parsed = JSON.parse(cached);
+        if (parsed && typeof parsed === 'object') {
+          return parsed;
         }
       }
     } catch (e) {
-      console.error('Failed to parse cached games', e);
+      console.warn('Failed to parse cached game overrides', e);
     }
-    return DEFAULT_GAMES;
+    return {};
+  });
+
+  const [games, setGames] = useState<Game[]>(() => {
+    // Read any existing overrides directly
+    let initialOverrides: Record<string, Partial<Game>> = {};
+    try {
+      const cached = localStorage.getItem(OVERRIDES_STORAGE_KEY);
+      if (cached) {
+        initialOverrides = JSON.parse(cached) || {};
+      }
+    } catch {}
+
+    if (Object.keys(initialOverrides).length === 0) {
+      return DEFAULT_GAMES;
+    }
+
+    return DEFAULT_GAMES.map(g => {
+      const mod = initialOverrides[g.id];
+      return mod ? { ...g, ...mod } : g;
+    });
   });
 
   const [favorites, setFavorites] = useState<string[]>(() => {
@@ -160,14 +150,18 @@ export function useGamesStore() {
 
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
 
-  // Sync to localStorage
+  // Sync ONLY the tiny overrides dictionary to localStorage (a few KB, never multi-megabytes)
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
+      if (Object.keys(overrides).length > 0) {
+        localStorage.setItem(OVERRIDES_STORAGE_KEY, JSON.stringify(overrides));
+      } else {
+        localStorage.removeItem(OVERRIDES_STORAGE_KEY);
+      }
     } catch (e) {
-      console.error('Failed to save games to localStorage', e);
+      console.error('Failed to save game overrides', e);
     }
-  }, [games]);
+  }, [overrides]);
 
   useEffect(() => {
     try {
@@ -187,12 +181,22 @@ export function useGamesStore() {
     setGames(prev =>
       prev.map(g => (g.id === gameId ? { ...g, plays: g.plays + 1 } : g))
     );
+    setOverrides(prev => {
+      const curr = prev[gameId] || {};
+      const baseGame = defaultGamesMap.get(gameId);
+      const newPlays = ((curr.plays !== undefined) ? curr.plays : (baseGame?.plays || 0)) + 1;
+      return { ...prev, [gameId]: { ...curr, plays: newPlays } };
+    });
   };
 
   const updateGame = (gameId: string, updates: Partial<Game>) => {
     setGames(prev =>
       prev.map(g => (g.id === gameId ? { ...g, ...updates } : g))
     );
+    setOverrides(prev => ({
+      ...prev,
+      [gameId]: { ...(prev[gameId] || {}), ...updates }
+    }));
     if (selectedGame?.id === gameId) {
       setSelectedGame(prev => (prev ? { ...prev, ...updates } : null));
     }
@@ -211,8 +215,9 @@ export function useGamesStore() {
 
   const resetGames = () => {
     setGames(DEFAULT_GAMES);
+    setOverrides({});
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_GAMES));
+      localStorage.removeItem(OVERRIDES_STORAGE_KEY);
     } catch {}
   };
 

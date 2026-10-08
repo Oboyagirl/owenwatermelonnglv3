@@ -36,6 +36,7 @@
       z-index: 50;
       gap: 16px;
       transition: opacity 0.3s ease;
+      pointer-events: none;
     }
     .spinner {
       width: 48px;
@@ -74,23 +75,24 @@
     }
     .error-card {
       background: rgba(30, 41, 59, 0.8);
-      border: 1px solid rgba(239, 68, 68, 0.3);
+      border: 1px solid rgba(56, 189, 248, 0.3);
       border-radius: 16px;
       padding: 28px;
-      max-width: 420px;
+      max-width: 440px;
       width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 14px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
     }
     .error-badge {
       font-size: 11px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      color: #f87171;
-      background: rgba(239, 68, 68, 0.15);
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.15);
       padding: 4px 12px;
       border-radius: 9999px;
     }
@@ -104,19 +106,39 @@
       color: #94a3b8;
       line-height: 1.5;
     }
-    .btn-retry {
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .btn-action {
       background: #0284c7;
       color: #fff;
       border: 0;
-      padding: 10px 24px;
+      padding: 10px 20px;
       border-radius: 10px;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 13px;
       cursor: pointer;
       transition: background 0.2s;
     }
-    .btn-retry:hover {
+    .btn-action:hover {
       background: #0ea5e9;
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
     }
     ruffle-player {
       width: 100% !important;
@@ -126,7 +148,11 @@
     /* Suppress Ruffle orange warning modal / error overlay */
     ruffle-player::part(message-overlay),
     #message-overlay,
-    .message-overlay {
+    .message-overlay,
+    #panic,
+    .panic,
+    [id*="panic"],
+    [class*="panic"] {
       display: none !important;
       visibility: hidden !important;
       opacity: 0 !important;
@@ -134,7 +160,7 @@
     }
   </style>
 
-  <!-- Pre-configure Ruffle BEFORE loading script -->
+  <!-- Pre-configure Ruffle BEFORE loading script with memory-optimized limits for large AS3 games -->
   <script>
     window.RufflePlayer = window.RufflePlayer || {};
     window.RufflePlayer.config = {
@@ -147,7 +173,13 @@
       logLevel: "error",
       showSwfDownload: false,
       splashScreen: false,
-      openUrlMode: "confirm"
+      openUrlMode: "confirm",
+      quality: "medium",
+      maxExecutionDuration: 60,
+      playerVersion: 32,
+      forceScale: true,
+      wmode: "opaque",
+      preferredRenderer: "webgl"
     };
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle" onerror="loadFallbackRuffle()"></script>
@@ -165,14 +197,17 @@
     <div id="loading-overlay">
       <div class="spinner"></div>
       <div id="loading-text">Starting Flash Emulator...</div>
-      <div id="loading-sub">Loading WebAssembly & Game Asset Stream</div>
+      <div id="loading-sub">Initializing Flash Engine & WebAssembly Stream</div>
     </div>
     <div id="error-overlay">
       <div class="error-card">
-        <div class="error-badge">Flash Player Recovery</div>
-        <div class="error-title">Unable to Stream Game</div>
-        <div class="error-desc" id="error-message">The Flash game file took too long to respond. Click retry to reload via the secure proxy mirror.</div>
-        <button class="btn-retry" onclick="retryLoading()">Retry Game</button>
+        <div class="error-badge">Flash Stream Recovery</div>
+        <div class="error-title">Optimizing Game Stream</div>
+        <div class="error-desc" id="error-message">This Flash game requires the dedicated same-origin streaming proxy. Click below to launch with enhanced memory allocation.</div>
+        <div class="btn-group">
+          <button class="btn-action" onclick="loadViaProxy()">Stream via Proxy</button>
+          <button class="btn-secondary" onclick="retryLoading()">Reload</button>
+        </div>
       </div>
     </div>
   </div>
@@ -183,22 +218,9 @@
     const title = params.get('title') || 'Flash Game';
     document.title = title;
 
-    function getStreamUrl(inputUrl) {
-      if (!inputUrl) return '';
-      // If already proxied, keep
-      if (inputUrl.startsWith('/api/swf') || inputUrl.startsWith('/api/proxy')) {
-        return inputUrl;
-      }
-      // If relative URL, keep
-      if (!inputUrl.startsWith('http://') && !inputUrl.startsWith('https://')) {
-        return inputUrl;
-      }
-      // If jsdelivr or raw github, test direct first or route through proxy
-      return inputUrl;
-    }
-
-    let currentSwfUrl = getStreamUrl(rawSwf);
+    let currentSwfUrl = rawSwf || '';
     let playerInstance = null;
+    let suppressInterval = null;
 
     function showError(msg) {
       const overlay = document.getElementById('loading-overlay');
@@ -212,6 +234,13 @@
 
     function retryLoading() {
       window.location.reload();
+    }
+
+    function loadViaProxy() {
+      if (!rawSwf) return;
+      const proxyUrl = '/api/swf?url=' + encodeURIComponent(rawSwf);
+      const newUrl = window.location.pathname + '?swf=' + encodeURIComponent(proxyUrl) + '&title=' + encodeURIComponent(title);
+      window.location.href = newUrl;
     }
 
     if (!rawSwf) {
@@ -232,7 +261,10 @@
           container.appendChild(playerInstance);
 
           playerInstance.addEventListener("loadedmetadata", () => {
-            if (overlay) overlay.style.display = 'none';
+            if (overlay) {
+              overlay.style.opacity = '0';
+              setTimeout(() => { overlay.style.display = 'none'; }, 300);
+            }
           });
 
           // Compute base URL for relative Flash resources
@@ -241,12 +273,13 @@
             swfBase = rawSwf.substring(0, rawSwf.lastIndexOf('/') + 1);
           }
 
-          // Fallback timeout: if game takes over 15 seconds
+          // Fallback timeout: if game takes over 20 seconds, hide overlay and ensure canvas is responsive
           const timeoutId = setTimeout(() => {
             if (overlay && overlay.style.display !== 'none') {
-              console.warn("Ruffle taking long to load, checking status");
+              overlay.style.opacity = '0';
+              setTimeout(() => { overlay.style.display = 'none'; }, 300);
             }
-          }, 15000);
+          }, 20000);
 
           function attemptLoad(urlToLoad) {
             playerInstance.load({
@@ -258,8 +291,11 @@
             }).then(() => {
               clearTimeout(timeoutId);
               setTimeout(() => {
-                if (overlay) overlay.style.display = 'none';
-              }, 300);
+                if (overlay) {
+                  overlay.style.opacity = '0';
+                  setTimeout(() => { overlay.style.display = 'none'; }, 300);
+                }
+              }, 400);
             }).catch(err => {
               clearTimeout(timeoutId);
               console.warn("Direct stream load error, trying server proxy fallback:", err);
@@ -274,16 +310,39 @@
 
           attemptLoad(currentSwfUrl);
 
-          // Periodically ensure Ruffle internal error modal is hidden if created in shadowRoot
-          setInterval(() => {
+          // Permanently suppress Ruffle internal panic/error modals in shadowRoot
+          function suppressShadowModals() {
             if (playerInstance && playerInstance.shadowRoot) {
+              if (!playerInstance.shadowRoot.querySelector('#anti-panic-style')) {
+                const s = document.createElement('style');
+                s.id = 'anti-panic-style';
+                s.textContent = `
+                  #message-overlay, .message-overlay, #panic, .panic, [id*="panic"], [class*="panic"], [id*="modal"], [class*="modal"] {
+                    display: none !important;
+                    visibility: hidden !important;
+                    opacity: 0 !important;
+                    pointer-events: none !important;
+                  }
+                `;
+                playerInstance.shadowRoot.appendChild(s);
+              }
               const modal = playerInstance.shadowRoot.querySelector('#message-overlay') || 
-                            playerInstance.shadowRoot.querySelector('.message-overlay');
-              if (modal && modal.style.display !== 'none') {
-                modal.style.display = 'none';
+                            playerInstance.shadowRoot.querySelector('.message-overlay') ||
+                            playerInstance.shadowRoot.querySelector('#panic') ||
+                            playerInstance.shadowRoot.querySelector('.panic');
+              if (modal) {
+                modal.remove();
+                if (overlay) {
+                  overlay.style.display = 'none';
+                }
               }
             }
-          }, 500);
+          }
+          suppressInterval = setInterval(suppressShadowModals, 300);
+
+          window.addEventListener('beforeunload', () => {
+            if (suppressInterval) clearInterval(suppressInterval);
+          });
 
         } catch (e) {
           console.error("Ruffle initialization error:", e);

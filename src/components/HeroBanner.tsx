@@ -21,7 +21,8 @@ import {
   Swords, 
   Star,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  TrendingUp
 } from 'lucide-react';
 import { Game } from '../types/game';
 import { ThemeId, ThemeConfig, THEMES } from '../services/themeStore';
@@ -41,6 +42,13 @@ export const CATEGORY_METADATA: Record<string, CategoryMeta> = {
     tagline: 'Complete Library',
     accent: '#10b981',
     badge: 'All'
+  },
+  'Trending': {
+    name: 'Trending',
+    icon: TrendingUp,
+    tagline: 'Most Played Now',
+    accent: '#f43f5e',
+    badge: 'Hot'
   },
   '2 Player Games': {
     name: '2 Player Games',
