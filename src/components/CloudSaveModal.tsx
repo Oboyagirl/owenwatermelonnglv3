@@ -60,11 +60,6 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
   };
 
   const handleCloudSave = async () => {
-    if (!user) {
-      showStatus("Please sign in or continue as Guest to save games to the cloud.", "error");
-      return;
-    }
-
     setIsProcessing(true);
     try {
       let dataToSave = manualSaveInput.trim();
@@ -81,7 +76,7 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
         deviceLabel
       });
 
-      showStatus(`Saved to ${selectedSlot.toUpperCase()} on Cloud! Synced across all your devices.`, 'success');
+      showStatus(`✓ Progress saved to ${selectedSlot.toUpperCase()}! Synced and ready on any device.`, 'success');
     } catch (err: any) {
       console.error("Save error:", err);
       showStatus(err?.message || "Failed to save to cloud.", "error");

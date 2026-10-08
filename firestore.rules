@@ -30,12 +30,12 @@ service cloud.firestore {
         data.keys().hasOnly(['userId', 'displayName', 'photoURL', 'avatarId', 'favoriteGameIds', 'recentGameIds', 'createdAt', 'updatedAt']) &&
         data.userId is string && data.userId == request.auth.uid &&
         data.displayName is string && data.displayName.size() > 0 && data.displayName.size() <= 64 &&
-        (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() <= 512)) &&
-        (!('avatarId' in data) || (data.avatarId is string && data.avatarId.size() <= 64)) &&
-        (!('favoriteGameIds' in data) || (data.favoriteGameIds is list && data.favoriteGameIds.size() <= 100)) &&
-        (!('recentGameIds' in data) || (data.recentGameIds is list && data.recentGameIds.size() <= 50)) &&
-        (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 64)) &&
-        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 64));
+        (!('photoURL' in data) || data.photoURL == null || (data.photoURL is string && data.photoURL.size() <= 2048)) &&
+        (!('avatarId' in data) || data.avatarId == null || (data.avatarId is string && data.avatarId.size() <= 64)) &&
+        (!('favoriteGameIds' in data) || data.favoriteGameIds == null || (data.favoriteGameIds is list && data.favoriteGameIds.size() <= 100)) &&
+        (!('recentGameIds' in data) || data.recentGameIds == null || (data.recentGameIds is list && data.recentGameIds.size() <= 50)) &&
+        (!('createdAt' in data) || data.createdAt == null || (data.createdAt is string && data.createdAt.size() <= 64)) &&
+        (!('updatedAt' in data) || data.updatedAt == null || (data.updatedAt is string && data.updatedAt.size() <= 64));
     }
 
     function isValidGameSave(data) {
@@ -46,13 +46,13 @@ service cloud.firestore {
         data.gameId is string && data.gameId.size() > 0 && data.gameId.size() <= 128 &&
         data.slot is string && data.slot.size() > 0 && data.slot.size() <= 32 &&
         data.saveData is string && data.saveData.size() <= 500000 &&
-        (!('title' in data) || (data.title is string && data.title.size() <= 128)) &&
-        (!('saveType' in data) || (data.saveType is string && data.saveType.size() <= 32)) &&
-        (!('score' in data) || (data.score is number)) &&
-        (!('level' in data) || (data.level is string && data.level.size() <= 64)) &&
-        (!('deviceLabel' in data) || (data.deviceLabel is string && data.deviceLabel.size() <= 128)) &&
-        (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 64)) &&
-        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 64));
+        (!('title' in data) || data.title == null || (data.title is string && data.title.size() <= 128)) &&
+        (!('saveType' in data) || data.saveType == null || (data.saveType is string && data.saveType.size() <= 32)) &&
+        (!('score' in data) || data.score == null || (data.score is number)) &&
+        (!('level' in data) || data.level == null || (data.level is string && data.level.size() <= 64)) &&
+        (!('deviceLabel' in data) || data.deviceLabel == null || (data.deviceLabel is string && data.deviceLabel.size() <= 128)) &&
+        (!('createdAt' in data) || data.createdAt == null || (data.createdAt is string && data.createdAt.size() <= 64)) &&
+        (!('updatedAt' in data) || data.updatedAt == null || (data.updatedAt is string && data.updatedAt.size() <= 64));
     }
 
     function isValidGameStats(data) {
@@ -61,25 +61,24 @@ service cloud.firestore {
         data.id is string && data.id.size() > 0 && data.id.size() <= 128 &&
         data.userId is string && data.userId == request.auth.uid &&
         data.gameId is string && data.gameId.size() > 0 && data.gameId.size() <= 128 &&
-        (!('playCount' in data) || (data.playCount is number)) &&
-        (!('playTimeSeconds' in data) || (data.playTimeSeconds is number)) &&
-        (!('lastPlayedAt' in data) || (data.lastPlayedAt is string && data.lastPlayedAt.size() <= 64)) &&
-        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 64));
+        (!('playCount' in data) || data.playCount == null || (data.playCount is number)) &&
+        (!('playTimeSeconds' in data) || data.playTimeSeconds == null || (data.playTimeSeconds is number)) &&
+        (!('lastPlayedAt' in data) || data.lastPlayedAt == null || (data.lastPlayedAt is string && data.lastPlayedAt.size() <= 64)) &&
+        (!('updatedAt' in data) || data.updatedAt == null || (data.updatedAt is string && data.updatedAt.size() <= 64));
     }
 
     // User Profile Document
     match /users/{userId} {
-      allow get: if isSignedIn() && request.auth.uid == userId && isValidId(userId);
-      allow create: if isSignedIn() && request.auth.uid == userId && isValidId(userId) && isValidUserProfile(incoming());
-      allow update: if isSignedIn() && request.auth.uid == userId && isValidId(userId) && isValidUserProfile(incoming()) && incoming().userId == existing().userId;
-      allow delete: if isSignedIn() && request.auth.uid == userId && isValidId(userId);
+      allow get: if isSignedIn() && request.auth.uid == userId;
+      allow create: if isSignedIn() && request.auth.uid == userId && isValidUserProfile(incoming());
+      allow update: if isSignedIn() && request.auth.uid == userId && isValidUserProfile(incoming()) && incoming().userId == existing().userId;
+      allow delete: if isSignedIn() && request.auth.uid == userId;
 
       // Cloud Game Saves Subcollection
       match /saves/{saveId} {
         allow get: if isSignedIn() && request.auth.uid == userId && isValidId(saveId);
         allow list: if isSignedIn() && request.auth.uid == userId;
-        allow create: if isSignedIn() && request.auth.uid == userId && isValidId(saveId) && isValidGameSave(incoming());
-        allow update: if isSignedIn() && request.auth.uid == userId && isValidId(saveId) && isValidGameSave(incoming()) && incoming().userId == existing().userId;
+        allow create, update: if isSignedIn() && request.auth.uid == userId && isValidId(saveId) && isValidGameSave(incoming());
         allow delete: if isSignedIn() && request.auth.uid == userId && isValidId(saveId);
       }
 
@@ -87,8 +86,7 @@ service cloud.firestore {
       match /stats/{gameId} {
         allow get: if isSignedIn() && request.auth.uid == userId && isValidId(gameId);
         allow list: if isSignedIn() && request.auth.uid == userId;
-        allow create: if isSignedIn() && request.auth.uid == userId && isValidId(gameId) && isValidGameStats(incoming());
-        allow update: if isSignedIn() && request.auth.uid == userId && isValidId(gameId) && isValidGameStats(incoming()) && incoming().userId == existing().userId;
+        allow create, update: if isSignedIn() && request.auth.uid == userId && isValidId(gameId) && isValidGameStats(incoming());
         allow delete: if isSignedIn() && request.auth.uid == userId && isValidId(gameId);
       }
     }

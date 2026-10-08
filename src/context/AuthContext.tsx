@@ -6,6 +6,7 @@ import {
   loginAsGuest,
   logoutUser,
   getUserProfile,
+  syncInitialProfile,
   updateUserProfile,
   subscribeToUserGameSaves,
   saveGameSlot,
@@ -48,10 +49,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let unsubscribeSaves: (() => void) | null = null;
 
     const unsubscribeAuth = subscribeToAuth(async (currentUser) => {
-      setUser(currentUser);
       if (currentUser) {
+        setUser(currentUser);
         try {
-          const prof = await getUserProfile(currentUser.uid);
+          let prof = await getUserProfile(currentUser.uid);
+          if (!prof) {
+            prof = await syncInitialProfile(currentUser);
+          }
           setProfile(prof);
 
           // Real-time subscribe to this user's cloud saves
@@ -63,11 +67,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.warn('Failed to load user profile or saves:', err);
         }
       } else {
-        setProfile(null);
-        setSaves([]);
-        if (unsubscribeSaves) {
-          unsubscribeSaves();
-          unsubscribeSaves = null;
+        // Automatically initialize guest profile so saves work instantly on any computer or Chromebook
+        try {
+          const guestUser = await loginAsGuest();
+          setUser(guestUser);
+          const prof = await syncInitialProfile(guestUser);
+          setProfile(prof);
+          if (unsubscribeSaves) unsubscribeSaves();
+          unsubscribeSaves = subscribeToUserGameSaves(guestUser.uid, (userSaves) => {
+            setSaves(userSaves);
+          });
+        } catch (guestErr) {
+          console.warn('Guest auto-login skipped:', guestErr);
+          setProfile(null);
+          setSaves([]);
         }
       }
       setLoading(false);
@@ -83,7 +96,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     try {
       const loggedUser = await loginWithGoogle();
-      const prof = await getUserProfile(loggedUser.uid);
+      setUser(loggedUser);
+      const prof = await syncInitialProfile(loggedUser);
       setProfile(prof);
     } finally {
       setLoading(false);
@@ -94,7 +108,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     try {
       const loggedUser = await loginAsGuest(name);
-      const prof = await getUserProfile(loggedUser.uid);
+      setUser(loggedUser);
+      const prof = await syncInitialProfile(loggedUser);
       setProfile(prof);
     } finally {
       setLoading(false);
@@ -105,9 +120,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     try {
       await logoutUser();
-      setUser(null);
-      setProfile(null);
-      setSaves([]);
+      const newGuest = await loginAsGuest();
+      setUser(newGuest);
+      const prof = await syncInitialProfile(newGuest);
+      setProfile(prof);
     } finally {
       setLoading(false);
     }
@@ -122,25 +138,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const saveCurrentGame = async (
     gameId: string, 
     slot: string, 
-    data: { title?: string; saveData: string; saveType?: string; score?: number; level?: string }
-  ) => {
-    if (!user) {
-      throw new Error("You must be signed in to save games to the cloud.");
+    data: { title?: string; saveData: string; saveType?: string; score?: number; level?: string; deviceLabel?: string }
+  ): Promise<GameSave> => {
+    let activeUser = user;
+    if (!activeUser) {
+      activeUser = await loginAsGuest();
+      setUser(activeUser);
     }
-    const saved = await saveGameSlot(user.uid, gameId, slot, {
+    const saved = await saveGameSlot(activeUser.uid, gameId, slot, {
       ...data,
-      deviceLabel
+      deviceLabel: data.deviceLabel || deviceLabel
+    });
+    // Optimistically update saves list immediately so it NEVER disappears
+    setSaves(prev => {
+      const filtered = prev.filter(s => s.id !== saved.id);
+      return [saved, ...filtered];
     });
     return saved;
   };
 
   const deleteSave = async (gameId: string, slot: string) => {
     if (!user) return;
+    const cleanGameId = (gameId.replace(/[^a-zA-Z0-9_\-]/g, '_').slice(0, 60)) || 'game';
+    const cleanSlot = (slot.replace(/[^a-zA-Z0-9_\-]/g, '_').slice(0, 20)) || 'slot1';
+    const saveId = `${cleanGameId}_${cleanSlot}`;
+
     await deleteGameSlot(user.uid, gameId, slot);
+    setSaves(prev => prev.filter(s => s.id !== saveId));
   };
 
   const getSavesForGame = (gameId: string) => {
-    return saves.filter(s => s.gameId === gameId);
+    const cleanId = (gameId.replace(/[^a-zA-Z0-9_\-]/g, '_').slice(0, 60)).toLowerCase();
+    const rawLower = gameId.toLowerCase();
+    return saves.filter(s => 
+      s.gameId === gameId || 
+      s.gameId.toLowerCase() === rawLower ||
+      s.id.toLowerCase().startsWith(`${cleanId}_`)
+    );
   };
 
   const isGuest = !!(user && user.isAnonymous);

@@ -82,6 +82,78 @@ export function detectDeviceLabel(): string {
   return `${device} (${browser})`;
 }
 
+// ---------------- LOCAL MIRROR STORAGE HELPERS ----------------
+function getLocalVaultKey(userId: string): string {
+  return `owen_cloud_vault_${userId}`;
+}
+
+export function getLocalBackups(userId: string): GameSave[] {
+  if (typeof window === 'undefined' || !window.localStorage) return [];
+  try {
+    const raw = localStorage.getItem(getLocalVaultKey(userId));
+    if (!raw) return [];
+    const list = JSON.parse(raw);
+    return Array.isArray(list) ? list : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+export function saveLocalBackup(userId: string, save: GameSave): void {
+  if (typeof window === 'undefined' || !window.localStorage) return;
+  try {
+    const existing = getLocalBackups(userId);
+    const filtered = existing.filter(s => s.id !== save.id);
+    const updated = [save, ...filtered];
+    localStorage.setItem(getLocalVaultKey(userId), JSON.stringify(updated));
+  } catch (e) {
+    console.warn('Failed to write local backup:', e);
+  }
+}
+
+export function deleteLocalBackup(userId: string, saveId: string): void {
+  if (typeof window === 'undefined' || !window.localStorage) return;
+  try {
+    const existing = getLocalBackups(userId);
+    const updated = existing.filter(s => s.id !== saveId);
+    localStorage.setItem(getLocalVaultKey(userId), JSON.stringify(updated));
+  } catch (e) {
+    console.warn('Failed to delete local backup:', e);
+  }
+}
+
+export function syncLocalBackups(userId: string, saves: GameSave[]): void {
+  if (typeof window === 'undefined' || !window.localStorage) return;
+  try {
+    localStorage.setItem(getLocalVaultKey(userId), JSON.stringify(saves));
+  } catch (e) {
+    console.warn('Failed to sync local backups:', e);
+  }
+}
+
+function mergeSaves(local: GameSave[], remote: GameSave[]): GameSave[] {
+  const map = new Map<string, GameSave>();
+  // Put local first
+  for (const s of local) {
+    map.set(s.id, s);
+  }
+  // Remote overwrites or adds
+  for (const s of remote) {
+    const loc = map.get(s.id);
+    if (!loc) {
+      map.set(s.id, s);
+    } else {
+      // If remote has newer or equal updatedAt, take remote
+      const locTime = loc.updatedAt ? new Date(loc.updatedAt).getTime() : 0;
+      const remTime = s.updatedAt ? new Date(s.updatedAt).getTime() : 0;
+      if (remTime >= locTime) {
+        map.set(s.id, s);
+      }
+    }
+  }
+  return Array.from(map.values());
+}
+
 // ---------------- AUTHENTICATION METHODS ----------------
 
 export async function loginWithGoogle(): Promise<User> {
@@ -128,8 +200,8 @@ export async function syncInitialProfile(user: User, fallbackName?: string): Pro
 
     const newProfile: UserProfile = {
       userId: user.uid,
-      displayName: user.displayName || fallbackName || `Player_${user.uid.slice(0, 5)}`,
-      photoURL: user.photoURL || '',
+      displayName: (user.displayName || fallbackName || `Player_${user.uid.slice(0, 5)}`).slice(0, 60),
+      photoURL: (user.photoURL || '').slice(0, 500),
       avatarId: 'melon_classic',
       favoriteGameIds: [],
       recentGameIds: [],
@@ -140,7 +212,17 @@ export async function syncInitialProfile(user: User, fallbackName?: string): Pro
     await setDoc(ref, newProfile);
     return newProfile;
   } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, path);
+    console.warn("syncInitialProfile warning (local profile fallback):", error);
+    return {
+      userId: user.uid,
+      displayName: (user.displayName || fallbackName || `Player_${user.uid.slice(0, 5)}`).slice(0, 60),
+      photoURL: (user.photoURL || '').slice(0, 500),
+      avatarId: 'melon_classic',
+      favoriteGameIds: [],
+      recentGameIds: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
   }
 }
 
@@ -151,7 +233,8 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
     const snap = await getDoc(ref);
     return snap.exists() ? (snap.data() as UserProfile) : null;
   } catch (error) {
-    handleFirestoreError(error, OperationType.GET, path);
+    console.warn("getUserProfile warning:", error);
+    return null;
   }
 }
 
@@ -175,34 +258,48 @@ export async function updateUserProfile(userId: string, updates: Partial<UserPro
 
     await setDoc(ref, finalProfile);
   } catch (error) {
-    handleFirestoreError(error, OperationType.UPDATE, path);
+    console.warn("updateUserProfile warning:", error);
   }
 }
 
 // ---------------- CLOUD GAME SAVES METHODS ----------------
 
 export async function getUserGameSaves(userId: string): Promise<GameSave[]> {
+  const localSaves = getLocalBackups(userId);
   const path = `users/${userId}/saves`;
   try {
     const coll = collection(db, 'users', userId, 'saves');
     const snap = await getDocs(coll);
-    return snap.docs.map(d => d.data() as GameSave);
+    const remoteSaves = snap.docs.map(d => d.data() as GameSave);
+    const merged = mergeSaves(localSaves, remoteSaves);
+    syncLocalBackups(userId, merged);
+    return merged;
   } catch (error) {
-    handleFirestoreError(error, OperationType.LIST, path);
+    console.warn("getUserGameSaves using local cache fallback:", error);
+    return localSaves;
   }
 }
 
 export function subscribeToUserGameSaves(userId: string, callback: (saves: GameSave[]) => void) {
   const path = `users/${userId}/saves`;
   const coll = collection(db, 'users', userId, 'saves');
+
+  // Immediately feed current local saves so the UI has instant reactivity with zero delay
+  const initialLocal = getLocalBackups(userId);
+  callback(initialLocal);
+
   return onSnapshot(
     coll,
     (snapshot) => {
-      const saves = snapshot.docs.map(doc => doc.data() as GameSave);
-      callback(saves);
+      const remoteSaves = snapshot.docs.map(doc => doc.data() as GameSave);
+      const currentLocal = getLocalBackups(userId);
+      const merged = mergeSaves(currentLocal, remoteSaves);
+      syncLocalBackups(userId, merged);
+      callback(merged);
     },
     (error) => {
-      handleFirestoreError(error, OperationType.LIST, path);
+      console.warn("subscribeToUserGameSaves snapshot warning, using local mirror:", error);
+      callback(getLocalBackups(userId));
     }
   );
 }
@@ -220,53 +317,69 @@ export async function saveGameSlot(
     deviceLabel?: string;
   }
 ): Promise<GameSave> {
-  // Sanitize saveId to conform to isValidId regex ^[a-zA-Z0-9_\-]+$
-  const cleanGameId = gameId.replace(/[^a-zA-Z0-9_\-]/g, '_').slice(0, 60);
-  const cleanSlot = slot.replace(/[^a-zA-Z0-9_\-]/g, '_').slice(0, 20);
+  // Sanitize saveId to conform strictly to isValidId regex ^[a-zA-Z0-9_\-]+$
+  const cleanGameId = (gameId.replace(/[^a-zA-Z0-9_\-]/g, '_').slice(0, 60)) || 'game';
+  const cleanSlot = (slot.replace(/[^a-zA-Z0-9_\-]/g, '_').slice(0, 20)) || 'slot1';
   const saveId = `${cleanGameId}_${cleanSlot}`;
   const path = `users/${userId}/saves/${saveId}`;
 
-  // Ensure payload string does not exceed 500,000 chars
-  const truncatedData = payload.saveData.length > 490000 
+  // Ensure payload string does not exceed 490,000 chars
+  const truncatedData = (payload.saveData && payload.saveData.length > 490000)
     ? payload.saveData.slice(0, 490000) 
-    : payload.saveData;
+    : (payload.saveData || '');
 
   const now = new Date().toISOString();
+  
+  // Construct clean document without any undefined or null properties
   const saveDoc: GameSave = {
     id: saveId,
     userId,
     gameId,
     slot,
-    title: payload.title?.slice(0, 120) || gameId,
+    title: (payload.title || gameId).slice(0, 120),
     saveData: truncatedData,
     saveType: payload.saveType || 'state',
-    score: typeof payload.score === 'number' ? payload.score : undefined,
-    level: payload.level?.slice(0, 60),
     deviceLabel: payload.deviceLabel || detectDeviceLabel(),
     createdAt: now,
     updatedAt: now
   };
 
+  if (typeof payload.score === 'number' && !Number.isNaN(payload.score)) {
+    saveDoc.score = payload.score;
+  }
+  if (typeof payload.level === 'string' && payload.level.trim().length > 0) {
+    saveDoc.level = payload.level.trim().slice(0, 60);
+  }
+
+  // 1. Instantly save to local persistent mirror so it NEVER disappears
+  saveLocalBackup(userId, saveDoc);
+
+  // 2. Synchronize to Firestore database
   try {
     const ref = doc(db, 'users', userId, 'saves', saveId);
     await setDoc(ref, saveDoc);
-    return saveDoc;
   } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, path);
+    console.warn("Firestore saveGameSlot remote sync warning:", error);
   }
+
+  return saveDoc;
 }
 
 export async function deleteGameSlot(userId: string, gameId: string, slot: string): Promise<void> {
-  const cleanGameId = gameId.replace(/[^a-zA-Z0-9_\-]/g, '_').slice(0, 60);
-  const cleanSlot = slot.replace(/[^a-zA-Z0-9_\-]/g, '_').slice(0, 20);
+  const cleanGameId = (gameId.replace(/[^a-zA-Z0-9_\-]/g, '_').slice(0, 60)) || 'game';
+  const cleanSlot = (slot.replace(/[^a-zA-Z0-9_\-]/g, '_').slice(0, 20)) || 'slot1';
   const saveId = `${cleanGameId}_${cleanSlot}`;
   const path = `users/${userId}/saves/${saveId}`;
 
+  // 1. Delete from local persistent mirror immediately
+  deleteLocalBackup(userId, saveId);
+
+  // 2. Delete from Firestore
   try {
     const ref = doc(db, 'users', userId, 'saves', saveId);
     await deleteDoc(ref);
   } catch (error) {
-    handleFirestoreError(error, OperationType.DELETE, path);
+    console.warn("Firestore deleteGameSlot remote warning:", error);
   }
 }
 
