@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Game } from '../types/game';
 import { DEFAULT_GAMES, formatGameIframe, URL_OVERRIDES, getCanonicalGameKey } from '../data/defaultGames';
 
-const OVERRIDES_STORAGE_KEY = 'owen_game_overrides_v1';
+const OVERRIDES_STORAGE_KEY = 'owen_game_overrides_v2';
 const FAVORITES_KEY = 'owen_watermelon_v3_favorites';
 
 export function resolveAssetUrl(url: string): string {

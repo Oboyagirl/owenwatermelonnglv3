@@ -263,7 +263,7 @@
 
         storage.addWebStore(
           [storage.AssetType.ImageVector, storage.AssetType.ImageBitmap, storage.AssetType.Sound],
-          (asset) => new URL('./assets/' + asset.assetId + '.' + asset.dataFormat, location).href
+          (asset) => 'https://ubg98.github.io/GettingOverIt/assets/' + asset.assetId + '.' + asset.dataFormat
         );
         return () => new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
@@ -283,7 +283,7 @@
           }
         };
         xhr.responseType = 'arraybuffer';
-        xhr.open('GET', "./assets/project.json");
+        xhr.open('GET', "https://ubg98.github.io/GettingOverIt/assets/project.json");
         xhr.send();
       });
       })();

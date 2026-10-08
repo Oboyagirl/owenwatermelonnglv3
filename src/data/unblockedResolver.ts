@@ -102,7 +102,6 @@ const PRESERVED_LOCAL_GAMES = new Set([
   "games/a-small-world-cup.html",
   "games/a-small-world-cup/index.html",
   "games/dumb-ways-to-die.html",
-  "games/getting-over-it.html",
   "games/kindergarten.html",
   "games/kindergarten-2.html",
   "games/the-man-in-the-window.html",
@@ -138,6 +137,71 @@ export function resolveGameSource(
   const safeTitle = String(title || "");
   const safeSrc = String(currentSrc || "");
   const safeMirrors = Array.isArray(mirrors) ? mirrors : [];
+
+  // Specialized top-priority handlers for requested games
+  if (safeId === 'retro-bowl' || safeId === 'potatoes-retro-bowl') {
+    return {
+      src: 'https://retro--bowl.pages.dev/',
+      mirrors: [
+        'https://retro--bowl.pages.dev/',
+        'https://javaspence.github.io/retrobowl/',
+        'https://ubghyper.github.io/GameList.github.io/retro-bowl/'
+      ]
+    };
+  }
+
+  if (safeId.includes('paper-io') || safeTitle.toLowerCase().includes('paper io') || safeTitle.toLowerCase().includes('paper.io')) {
+    return {
+      src: 'https://gameinclassroom.github.io/paper-io-2/',
+      mirrors: [
+        'https://gameinclassroom.github.io/paper-io-2/',
+        'https://ubghyper.github.io/GameList.github.io/Paper-IO-2/'
+      ]
+    };
+  }
+
+  if (safeId.includes('getting-over-it') || safeTitle.toLowerCase().includes('getting over it')) {
+    return {
+      src: 'https://gameinclassroom.github.io/getting-over-it/',
+      mirrors: [
+        'https://gameinclassroom.github.io/getting-over-it/',
+        'games/getting-over-it.html',
+        'https://freeonlinewebtools.github.io/gamelist6.github.io/Getting-Over-It/',
+        'https://ubg98.github.io/GettingOverIt/'
+      ]
+    };
+  }
+
+  if (safeId === 'achievement-unlocked' || safeTitle.toLowerCase() === 'achievement unlocked') {
+    return {
+      src: 'https://gameinclassroom.github.io/achievement-unlocked/',
+      mirrors: [
+        'https://gameinclassroom.github.io/achievement-unlocked/',
+        'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked/achievementunlocked.swf&title=Achievement+Unlocked',
+        'https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked/'
+      ]
+    };
+  }
+
+  if (safeId === 'achievement-unlocked-2' || safeTitle.toLowerCase() === 'achievement unlocked 2') {
+    return {
+      src: 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked-2/achievementunlocked2.swf&title=Achievement+Unlocked+2',
+      mirrors: [
+        'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked-2/achievementunlocked2.swf&title=Achievement+Unlocked+2',
+        'https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked-2/'
+      ]
+    };
+  }
+
+  if (safeId === 'achievement-unlocked-3' || safeTitle.toLowerCase() === 'achievement unlocked 3') {
+    return {
+      src: 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked-3/achievementunlocked3.swf&title=Achievement+Unlocked+3',
+      mirrors: [
+        'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked-3/achievementunlocked3.swf&title=Achievement+Unlocked+3',
+        'https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked-3/'
+      ]
+    };
+  }
 
   // If preserved local game (or flash player wrapper with query), keep as-is
   if (PRESERVED_LOCAL_GAMES.has(safeSrc) || safeSrc.startsWith("games/flash-player.html")) {
@@ -212,7 +276,12 @@ export function resolveGameSource(
   // Construct clean prioritized mirrors list
   const cleanMirrorsList = [
     resolvedSrc,
-    ...mirrors.filter(m => m !== resolvedSrc && !m.includes('ubghyper') && !m.includes('blobby-boi') && !m.includes('gamedistribution.com'))
+    ...mirrors.filter(m => m !== resolvedSrc && 
+      !m.includes('blobby-boi') && 
+      !m.includes('gamedistribution.com') &&
+      m !== 'games/paper-io-2/index.html' &&
+      m !== 'games/retro-bowl/index.html'
+    )
   ];
 
   return {

@@ -208,10 +208,11 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "games/retro-bowl/index.html",
-    "iframeCode": "<iframe src=\"games/retro-bowl/index.html\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
+    "iframeSrc": "https://retro--bowl.pages.dev/",
+    "iframeCode": "<iframe src=\"https://retro--bowl.pages.dev/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
-      "games/retro-bowl/index.html",
+      "https://retro--bowl.pages.dev/",
+      "https://javaspence.github.io/retrobowl/",
       "https://ubghyper.github.io/GameList.github.io/retro-bowl/"
     ],
     "controls": [
@@ -1115,11 +1116,11 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "games/paper-io-2/index.html",
-    "iframeCode": "<iframe src=\"games/paper-io-2/index.html\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
+    "iframeSrc": "https://gameinclassroom.github.io/paper-io-2/",
+    "iframeCode": "<iframe src=\"https://gameinclassroom.github.io/paper-io-2/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
-      "games/paper-io-2/index.html",
-      "https://ubghyper.github.io/GameList.github.io/paper-io-2/"
+      "https://gameinclassroom.github.io/paper-io-2/",
+      "https://ubghyper.github.io/GameList.github.io/Paper-IO-2/"
     ],
     "controls": [
       {
@@ -1266,12 +1267,11 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Paper-io-3D/",
-    "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Paper-io-3D/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
+    "iframeSrc": "https://gameinclassroom.github.io/paper-io-2/",
+    "iframeCode": "<iframe src=\"https://gameinclassroom.github.io/paper-io-2/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
-      "https://ubghyper.github.io/GameList.github.io/Paper-io-3D/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Paper-io-3D/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Paper-io-3D/"
+      "https://gameinclassroom.github.io/paper-io-2/",
+      "https://ubghyper.github.io/GameList.github.io/Paper-io-3D/"
     ],
     "controls": [
       {
@@ -1569,12 +1569,11 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Rooftop-Sniper-2/",
-    "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Rooftop-Sniper-2/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
+    "iframeSrc": "https://gameinclassroom.github.io/rooftop-snipers-2/",
+    "iframeCode": "<iframe src=\"https://gameinclassroom.github.io/rooftop-snipers-2/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
-      "https://ubghyper.github.io/GameList.github.io/Rooftop-Sniper-2/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Rooftop-Sniper-2/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Rooftop-Sniper-2/"
+      "https://gameinclassroom.github.io/rooftop-snipers-2/",
+      "https://gameinclassroom.github.io/rooftop-snipers/"
     ],
     "controls": [
       {
@@ -2134,12 +2133,13 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "author": "TrippleThePotatoes Archive",
     "source": "unblocked",
     "featured": false,
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Getting-over-it/",
-    "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Getting-over-it/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
+    "iframeSrc": "https://gameinclassroom.github.io/getting-over-it/",
+    "iframeCode": "<iframe src=\"https://gameinclassroom.github.io/getting-over-it/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
-      "https://ubghyper.github.io/GameList.github.io/Getting-over-it/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Getting-over-it/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Getting-over-it/"
+      "https://gameinclassroom.github.io/getting-over-it/",
+      "games/getting-over-it.html",
+      "https://freeonlinewebtools.github.io/gamelist6.github.io/Getting-Over-It/",
+      "https://ubg98.github.io/GettingOverIt/"
     ],
     "controls": [
       {
