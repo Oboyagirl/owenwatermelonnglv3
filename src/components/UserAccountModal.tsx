@@ -82,6 +82,18 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
     }
   };
 
+  const handleCreateGuest = async () => {
+    setIsUpdating(true);
+    try {
+      await loginGuest(guestNameInput);
+      setGuestNameInput('');
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   // Group saves by game
   const gamesMap = new Map(allGames.map(g => [g.id, g]));
 
@@ -257,10 +269,11 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                     style={{ borderColor: theme.border }}
                   />
                   <button
-                    onClick={() => loginGuest(guestNameInput)}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer whitespace-nowrap"
+                    onClick={handleCreateGuest}
+                    disabled={isUpdating}
+                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer whitespace-nowrap disabled:opacity-50"
                   >
-                    Quick Guest Profile
+                    {isUpdating ? 'Creating...' : 'Quick Guest Profile'}
                   </button>
                 </div>
               </div>

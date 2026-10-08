@@ -15,7 +15,8 @@ import {
   LogIn, 
   Copy,
   Sparkles,
-  ShieldCheck
+  ShieldCheck,
+  Zap
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Game } from '../types/game';
@@ -254,7 +255,7 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
               {['slot1', 'slot2', 'slot3', 'auto'].map((slotId) => {
                 const save = gameSaves.find(s => s.slot === slotId);
                 const isSelected = selectedSlot === slotId;
-                const slotTitle = slotId === 'slot1' ? 'Slot 1 (School)' : slotId === 'slot2' ? 'Slot 2 (Home)' : slotId === 'slot3' ? 'Slot 3 (Backup)' : 'Auto-Save';
+                const slotTitle = slotId === 'slot1' ? 'Slot 1 (Quick Save)' : slotId === 'slot2' ? 'Slot 2 (Home)' : slotId === 'slot3' ? 'Slot 3 (Backup)' : 'Auto-Save';
 
                 return (
                   <button
@@ -341,11 +342,11 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
               <button
                 onClick={handleCloudSave}
                 disabled={isProcessing}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer disabled:opacity-50 hover:scale-[1.01]"
                 style={{ backgroundColor: theme.accent, color: theme.accentText }}
               >
-                <CloudUpload className="w-4 h-4" />
-                <span>{isProcessing ? 'Saving to Cloud...' : `Backup Progress to ${selectedSlot.toUpperCase()}`}</span>
+                <Zap className="w-4 h-4 text-amber-300 fill-current" />
+                <span>{isProcessing ? 'Saving to Vault...' : `⚡ Quick Save to ${selectedSlot.toUpperCase()}`}</span>
               </button>
 
               {currentSlotSave && (

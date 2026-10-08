@@ -154,111 +154,218 @@ function mergeSaves(local: GameSave[], remote: GameSave[]): GameSave[] {
   return Array.from(map.values());
 }
 
+export interface AppUser {
+  uid: string;
+  displayName: string | null;
+  email: string | null;
+  photoURL: string | null;
+  isAnonymous: boolean;
+}
+
+const GUEST_STORAGE_KEY = 'owen_local_guest_session';
+
+export function getOrCreateLocalGuest(customName?: string): AppUser {
+  if (typeof window === 'undefined' || !window.localStorage) {
+    return {
+      uid: 'guest_default',
+      displayName: customName || 'Player',
+      email: null,
+      photoURL: null,
+      isAnonymous: true
+    };
+  }
+
+  try {
+    const raw = localStorage.getItem(GUEST_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as AppUser;
+      if (customName && customName.trim()) {
+        parsed.displayName = customName.trim();
+        localStorage.setItem(GUEST_STORAGE_KEY, JSON.stringify(parsed));
+      }
+      return parsed;
+    }
+  } catch (e) {}
+
+  const newUid = `guest_${Math.random().toString(36).slice(2, 10)}`;
+  const guestUser: AppUser = {
+    uid: newUid,
+    displayName: customName?.trim() || `Player_${Math.floor(1000 + Math.random() * 9000)}`,
+    email: null,
+    photoURL: null,
+    isAnonymous: true
+  };
+  try {
+    localStorage.setItem(GUEST_STORAGE_KEY, JSON.stringify(guestUser));
+  } catch (e) {}
+  return guestUser;
+}
+
 // ---------------- AUTHENTICATION METHODS ----------------
 
-export async function loginWithGoogle(): Promise<User> {
+export async function loginWithGoogle(): Promise<AppUser> {
   try {
     const cred = await signInWithPopup(auth, googleProvider);
-    await syncInitialProfile(cred.user);
-    return cred.user;
+    const appUser: AppUser = {
+      uid: cred.user.uid,
+      displayName: cred.user.displayName,
+      email: cred.user.email,
+      photoURL: cred.user.photoURL,
+      isAnonymous: false
+    };
+    await syncInitialProfile(appUser);
+    return appUser;
   } catch (err) {
     console.error("Google sign-in error:", err);
     throw err;
   }
 }
 
-export async function loginAsGuest(customName?: string): Promise<User> {
+export async function loginAsGuest(customName?: string): Promise<AppUser> {
+  // Try Firebase anonymous login, and if project has admin-only restriction, fallback to local guest session
   try {
     const cred = await signInAnonymously(auth);
     const generatedName = customName?.trim() || `Player_${Math.floor(1000 + Math.random() * 9000)}`;
-    await syncInitialProfile(cred.user, generatedName);
-    return cred.user;
-  } catch (err) {
-    console.error("Guest login error:", err);
-    throw err;
+    const appUser: AppUser = {
+      uid: cred.user.uid,
+      displayName: cred.user.displayName || generatedName,
+      email: null,
+      photoURL: null,
+      isAnonymous: true
+    };
+    await syncInitialProfile(appUser, generatedName);
+    return appUser;
+  } catch (err: any) {
+    console.warn("Using instant local guest session (Firebase anonymous auth bypassed):", err?.message || err);
+    const localGuest = getOrCreateLocalGuest(customName);
+    await syncInitialProfile(localGuest, customName);
+    return localGuest;
   }
 }
 
 export async function logoutUser(): Promise<void> {
-  await signOut(auth);
+  try {
+    if (auth.currentUser) {
+      await signOut(auth);
+    }
+  } catch (e) {}
+  if (typeof window !== 'undefined' && window.localStorage) {
+    localStorage.removeItem(GUEST_STORAGE_KEY);
+  }
 }
 
-export function subscribeToAuth(callback: (user: User | null) => void) {
-  return onAuthStateChanged(auth, callback);
+export function subscribeToAuth(callback: (user: AppUser | null) => void) {
+  return onAuthStateChanged(auth, (fbUser) => {
+    if (fbUser) {
+      callback({
+        uid: fbUser.uid,
+        displayName: fbUser.displayName,
+        email: fbUser.email,
+        photoURL: fbUser.photoURL,
+        isAnonymous: fbUser.isAnonymous
+      });
+    } else {
+      const guest = getOrCreateLocalGuest();
+      callback(guest);
+    }
+  });
 }
 
 // ---------------- USER PROFILE METHODS ----------------
 
-export async function syncInitialProfile(user: User, fallbackName?: string): Promise<UserProfile> {
-  const path = `users/${user.uid}`;
+export async function syncInitialProfile(user: AppUser, fallbackName?: string): Promise<UserProfile> {
+  const localProfKey = `owen_profile_${user.uid}`;
+  let localProf: UserProfile | null = null;
   try {
-    const ref = doc(db, 'users', user.uid);
-    const snap = await getDoc(ref);
-    if (snap.exists()) {
-      return snap.data() as UserProfile;
+    const raw = localStorage.getItem(localProfKey);
+    if (raw) localProf = JSON.parse(raw);
+  } catch (e) {}
+
+  const displayName = user.displayName || fallbackName || localProf?.displayName || `Player_${user.uid.slice(0, 5)}`;
+  const newProfile: UserProfile = {
+    userId: user.uid,
+    displayName: displayName.slice(0, 60),
+    photoURL: (user.photoURL || localProf?.photoURL || '').slice(0, 500),
+    avatarId: localProf?.avatarId || 'melon_classic',
+    favoriteGameIds: localProf?.favoriteGameIds || [],
+    recentGameIds: localProf?.recentGameIds || [],
+    createdAt: localProf?.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  try {
+    localStorage.setItem(localProfKey, JSON.stringify(newProfile));
+  } catch (e) {}
+
+  if (auth.currentUser && auth.currentUser.uid === user.uid) {
+    try {
+      const ref = doc(db, 'users', user.uid);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        return snap.data() as UserProfile;
+      }
+      await setDoc(ref, newProfile);
+    } catch (e) {
+      console.warn("Firestore profile sync warning:", e);
     }
-
-    const newProfile: UserProfile = {
-      userId: user.uid,
-      displayName: (user.displayName || fallbackName || `Player_${user.uid.slice(0, 5)}`).slice(0, 60),
-      photoURL: (user.photoURL || '').slice(0, 500),
-      avatarId: 'melon_classic',
-      favoriteGameIds: [],
-      recentGameIds: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-
-    await setDoc(ref, newProfile);
-    return newProfile;
-  } catch (error) {
-    console.warn("syncInitialProfile warning (local profile fallback):", error);
-    return {
-      userId: user.uid,
-      displayName: (user.displayName || fallbackName || `Player_${user.uid.slice(0, 5)}`).slice(0, 60),
-      photoURL: (user.photoURL || '').slice(0, 500),
-      avatarId: 'melon_classic',
-      favoriteGameIds: [],
-      recentGameIds: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
   }
+
+  return newProfile;
 }
 
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
-  const path = `users/${userId}`;
+  const localProfKey = `owen_profile_${userId}`;
+  let localProf: UserProfile | null = null;
   try {
-    const ref = doc(db, 'users', userId);
-    const snap = await getDoc(ref);
-    return snap.exists() ? (snap.data() as UserProfile) : null;
-  } catch (error) {
-    console.warn("getUserProfile warning:", error);
-    return null;
+    const raw = localStorage.getItem(localProfKey);
+    if (raw) localProf = JSON.parse(raw);
+  } catch (e) {}
+
+  if (auth.currentUser && auth.currentUser.uid === userId) {
+    try {
+      const ref = doc(db, 'users', userId);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        const remoteProf = snap.data() as UserProfile;
+        try {
+          localStorage.setItem(localProfKey, JSON.stringify(remoteProf));
+        } catch (e) {}
+        return remoteProf;
+      }
+    } catch (e) {
+      console.warn("Firestore getUserProfile warning:", e);
+    }
   }
+
+  return localProf;
 }
 
 export async function updateUserProfile(userId: string, updates: Partial<UserProfile>): Promise<void> {
-  const path = `users/${userId}`;
+  const localProfKey = `owen_profile_${userId}`;
+  let existing = await getUserProfile(userId) || {
+    userId,
+    displayName: 'Player',
+    createdAt: new Date().toISOString()
+  };
+
+  const finalProfile: UserProfile = {
+    ...existing,
+    ...updates,
+    userId,
+    updatedAt: new Date().toISOString()
+  };
+
   try {
-    const ref = doc(db, 'users', userId);
-    const existingSnap = await getDoc(ref);
-    const existing = existingSnap.exists() ? (existingSnap.data() as UserProfile) : {
-      userId,
-      displayName: 'Player',
-      createdAt: new Date().toISOString()
-    };
+    localStorage.setItem(localProfKey, JSON.stringify(finalProfile));
+  } catch (e) {}
 
-    const finalProfile: UserProfile = {
-      ...existing,
-      ...updates,
-      userId, // keep immutable
-      updatedAt: new Date().toISOString()
-    };
-
-    await setDoc(ref, finalProfile);
-  } catch (error) {
-    console.warn("updateUserProfile warning:", error);
+  if (auth.currentUser && auth.currentUser.uid === userId) {
+    try {
+      const ref = doc(db, 'users', userId);
+      await setDoc(ref, finalProfile);
+    } catch (e) {
+      console.warn("Firestore updateUserProfile warning:", e);
+    }
   }
 }
 

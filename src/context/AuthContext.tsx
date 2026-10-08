@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User } from 'firebase/auth';
 import {
   subscribeToAuth,
   loginWithGoogle,
@@ -13,11 +12,12 @@ import {
   deleteGameSlot,
   UserProfile,
   GameSave,
+  AppUser,
   detectDeviceLabel
 } from '../services/cloudSaveService';
 
 interface AuthContextType {
-  user: User | null;
+  user: AppUser | null;
   profile: UserProfile | null;
   loading: boolean;
   saves: GameSave[];
@@ -35,7 +35,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [saves, setSaves] = useState<GameSave[]>([]);
   const [loading, setLoading] = useState(true);

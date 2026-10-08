@@ -18,13 +18,15 @@ import {
   RefreshCw,
   ShieldCheck,
   Scan,
-  Cloud
+  Cloud,
+  Zap
 } from 'lucide-react';
 import { Game } from '../types/game';
 import { openAboutBlankGame, resolveAssetUrl } from '../services/gamesStore';
 import { ThemeConfig, THEMES } from '../services/themeStore';
 import { CloudSaveModal } from './CloudSaveModal';
 import { useAuth } from '../context/AuthContext';
+import { captureBrowserGameState } from '../services/cloudSaveService';
 
 interface GamePlayerProps {
   game: Game;
@@ -67,8 +69,29 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
   const defaultIframeCode = game.iframeCode || `<iframe class="game-iframe" id="game-area" title="${game.title}" src="${game.iframeSrc}" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`;
   const [showIframeEditor, setShowIframeEditor] = useState(false);
   const [showCloudSaveModal, setShowCloudSaveModal] = useState(false);
-  const { user, profile, getSavesForGame } = useAuth();
+  const [isQuickSaving, setIsQuickSaving] = useState(false);
+  const [quickSaved, setQuickSaved] = useState(false);
+  const { user, profile, deviceLabel, saveCurrentGame, getSavesForGame } = useAuth();
   const gameSaves = getSavesForGame(game.id);
+
+  const handleQuickSave = async () => {
+    setIsQuickSaving(true);
+    try {
+      const dataToSave = captureBrowserGameState(game.id);
+      await saveCurrentGame(game.id, 'slot1', {
+        title: game.title,
+        saveData: dataToSave,
+        saveType: 'localStorage',
+        deviceLabel
+      });
+      setQuickSaved(true);
+      setTimeout(() => setQuickSaved(false), 3000);
+    } catch (e) {
+      console.error("Quick save error:", e);
+    } finally {
+      setIsQuickSaving(false);
+    }
+  };
   const [iframeHtmlInput, setIframeHtmlInput] = useState(defaultIframeCode);
   const [activeIframeSrc, setActiveIframeSrc] = useState(game.iframeSrc);
   const [activeCustomHtml, setActiveCustomHtml] = useState<string | undefined>(game.customHtml);
@@ -227,6 +250,31 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
+          {/* 1-Click Quick Save */}
+          <button
+            onClick={handleQuickSave}
+            disabled={isQuickSaving}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer border shadow-sm"
+            style={{
+              backgroundColor: quickSaved ? 'rgba(16, 185, 129, 0.25)' : activeTheme.accent,
+              borderColor: quickSaved ? '#10b981' : activeTheme.accent,
+              color: quickSaved ? '#34d399' : activeTheme.accentText
+            }}
+            title="1-Click Quick Save: Snapshot current progress to Slot 1 instantly"
+          >
+            {quickSaved ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <span>Quick Saved!</span>
+              </>
+            ) : (
+              <>
+                <Zap className="w-3.5 h-3.5 shrink-0" />
+                <span>{isQuickSaving ? 'Saving...' : 'Quick Save'}</span>
+              </>
+            )}
+          </button>
+
           <button
             onClick={() => setShowCloudSaveModal(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer border relative"
@@ -445,6 +493,31 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
               title="Replace or Edit Iframe HTML"
             >
               <Code className="w-4 h-4" />
+            </button>
+
+            {/* 1-Click Quick Save Button */}
+            <button
+              onClick={handleQuickSave}
+              disabled={isQuickSaving}
+              className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer border"
+              style={{
+                backgroundColor: quickSaved ? 'rgba(16, 185, 129, 0.25)' : activeTheme.bgCard,
+                borderColor: quickSaved ? '#10b981' : activeTheme.border,
+                color: quickSaved ? '#34d399' : activeTheme.kicker
+              }}
+              title="1-Click Quick Save: Snapshot progress to Slot 1 instantly"
+            >
+              {quickSaved ? (
+                <>
+                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Saved!</span>
+                </>
+              ) : (
+                <>
+                  <Zap className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="hidden sm:inline">Quick Save</span>
+                </>
+              )}
             </button>
 
             <button
