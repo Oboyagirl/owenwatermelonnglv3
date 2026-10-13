@@ -110,6 +110,10 @@ const PRESERVED_LOCAL_GAMES = new Set([
   "games/happy-wheels.html",
   "games/fruit-ninja.html",
   "games/papas-scooperia.html",
+  "games/serenitrove.html",
+  "games/pokemon-emerald.html",
+  "games/pokemon-red.html",
+  "games/gba-player.html",
   "games/soccer-random.html",
   "games/soccer-random/index.html",
   "games/volley-random.html",
@@ -199,6 +203,195 @@ export function resolveGameSource(
       mirrors: [
         'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked-3/achievementunlocked3.swf&title=Achievement+Unlocked+3',
         'https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked-3/'
+      ]
+    };
+  }
+
+  // Pokemon series (100% reliable local GBA WebAssembly emulation + verified roms)
+  if (safeId === 'pokemonemerald' || safeId === 'pokemon-emerald' || safeTitle.toLowerCase().includes('pokemon emerald')) {
+    return {
+      src: 'games/pokemon-emerald.html',
+      mirrors: [
+        'games/pokemon-emerald.html',
+        'games/gba-player.html?rom=https://freeonlinewebtools.github.io/gamelist3.github.io/pokemonemerald.gba&title=Pokemon+Emerald',
+        'https://freeonlinewebtools.github.io/gamelist3.github.io/pokemonemerald.html',
+        'https://ubghyper.github.io/GameList.github.io/PokemonEmerald/'
+      ]
+    };
+  }
+
+  if (safeId === 'pokemonred' || safeId === 'pokemon-red' || safeTitle.toLowerCase().includes('pokemon red')) {
+    return {
+      src: 'games/pokemon-red.html',
+      mirrors: [
+        'games/pokemon-red.html',
+        'games/gba-player.html?rom=https://freeonlinewebtools.github.io/gamelist3.github.io/pokemonred.gba&title=Pokemon+Red',
+        'https://freeonlinewebtools.github.io/gamelist3.github.io/pokemonred.html',
+        'https://ubghyper.github.io/GameList.github.io/PokemonRed/'
+      ]
+    };
+  }
+
+  // Serenitrove (100% unblocked local client-side build with online fallback)
+  if (safeId === 'serenitrove' || safeTitle.toLowerCase().includes('serenitrove')) {
+    return {
+      src: 'games/serenitrove.html',
+      mirrors: [
+        'games/serenitrove.html',
+        'https://freeonlinewebtools.github.io/gamelist3.github.io/serenitrove_v1.1.7/'
+      ]
+    };
+  }
+
+  // Flash Flight Simulator & Spaceflight Simulator
+  if (safeId.includes('flash-flight') || safeId.includes('spaceflight-simulator') || safeTitle.toLowerCase().includes('flight simulator')) {
+    const swf = 'https://ubghyper.github.io/GameList.github.io/Flash-Flight-Simulator-1/flashflightsimulator.swf';
+    return {
+      src: `games/flash-player.html?swf=${swf}&title=Flash+Flight+Simulator`,
+      mirrors: [
+        `games/flash-player.html?swf=${swf}&title=Flash+Flight+Simulator`,
+        'https://ubghyper.github.io/GameList.github.io/Flash-Flight-Simulator-1/',
+        '/g/Flash-Flight-Simulator-1'
+      ]
+    };
+  }
+
+  // Gunblood
+  if (safeId === 'gunblood' || safeTitle.toLowerCase().includes('gunblood')) {
+    const swf = 'https://ubghyper.github.io/GameList.github.io/Gunblood/gunblood.swf';
+    return {
+      src: `games/flash-player.html?swf=${swf}&title=Gunblood`,
+      mirrors: [
+        `games/flash-player.html?swf=${swf}&title=Gunblood`,
+        'https://ubghyper.github.io/GameList.github.io/Gunblood/'
+      ]
+    };
+  }
+
+  // Road of the Dead series
+  if (safeId === 'road-of-the-dead-2' || safeTitle.toLowerCase().includes('road of the dead 2')) {
+    const swf = 'https://ubghyper.github.io/GameList.github.io/Road-of-the-dead-2/road_of_the_deads_2.swf';
+    return {
+      src: `games/flash-player.html?swf=${swf}&title=Road+of+the+Dead+2`,
+      mirrors: [
+        `games/flash-player.html?swf=${swf}&title=Road+of+the+Dead+2`,
+        'https://ubghyper.github.io/GameList.github.io/Road-of-the-dead-2/',
+        '/g/Road-of-the-dead-2'
+      ]
+    };
+  }
+
+  if (safeId === 'road-of-the-dead' || safeTitle.toLowerCase() === 'road of the dead') {
+    const swf = 'https://ubghyper.github.io/GameList.github.io/Road-of-the-dead/roadofthedead.swf';
+    return {
+      src: `games/flash-player.html?swf=${swf}&title=Road+of+the+Dead`,
+      mirrors: [
+        `games/flash-player.html?swf=${swf}&title=Road+of+the+Dead`,
+        'https://ubghyper.github.io/GameList.github.io/Road-of-the-dead/',
+        '/g/Road-of-the-dead'
+      ]
+    };
+  }
+
+  // Fireboy & Watergirl series (Verified working HTML5 and Flash engines)
+  if (safeId === 'fireboy-and-watergirl-3' || safeTitle.toLowerCase().includes('watergirl 3') || safeTitle.toLowerCase().includes('ice temple')) {
+    return {
+      src: 'https://gameinclassroom.github.io/fireboy-watergirl-3-ice-temple/',
+      mirrors: [
+        'https://gameinclassroom.github.io/fireboy-watergirl-3-ice-temple/',
+        'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-3/fboy3.swf&title=Fireboy+and+Watergirl+3',
+        'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-3/'
+      ]
+    };
+  }
+
+  if (safeId === 'fireboy-and-watergirl-2' || safeId === 'fireboy-and-watergirl-2-light-temple' || safeTitle.toLowerCase().includes('watergirl 2') || safeTitle.toLowerCase().includes('light temple')) {
+    return {
+      src: 'https://gameinclassroom.github.io/fireboy-and-watergirl-2-light-temple/',
+      mirrors: [
+        'https://gameinclassroom.github.io/fireboy-and-watergirl-2-light-temple/',
+        'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-2/'
+      ]
+    };
+  }
+
+  if (safeId === 'fireboy-and-watergirl-4' || safeTitle.toLowerCase().includes('watergirl 4') || safeTitle.toLowerCase().includes('crystal temple')) {
+    return {
+      src: 'https://gameinclassroom.github.io/fireboy-and-watergirl-4-crystal-temple/',
+      mirrors: [
+        'https://gameinclassroom.github.io/fireboy-and-watergirl-4-crystal-temple/',
+        'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-4/'
+      ]
+    };
+  }
+
+  if (safeId === 'fireboy-and-watergirl-5' || safeTitle.toLowerCase().includes('watergirl 5') || safeTitle.toLowerCase().includes('elements')) {
+    return {
+      src: 'https://gameinclassroom.github.io/fireboy-and-watergirl-5-elements/',
+      mirrors: [
+        'https://gameinclassroom.github.io/fireboy-and-watergirl-5-elements/',
+        'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-5/'
+      ]
+    };
+  }
+
+  if (safeId === 'fireboy-and-watergirl-6' || safeTitle.toLowerCase().includes('watergirl 6') || safeTitle.toLowerCase().includes('fairy tales')) {
+    return {
+      src: 'https://gameinclassroom.github.io/fireboy-watergirl-6-fairy-tales/',
+      mirrors: [
+        'https://gameinclassroom.github.io/fireboy-watergirl-6-fairy-tales/',
+        'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-6/'
+      ]
+    };
+  }
+
+  if (safeId === 'fireboy-and-watergirl' || safeId === 'fireboy-and-watergirl-1' || safeTitle.toLowerCase().includes('watergirl')) {
+    return {
+      src: 'https://gameinclassroom.github.io/fireboy-and-watergirl-forest-temple/',
+      mirrors: [
+        'https://gameinclassroom.github.io/fireboy-and-watergirl-forest-temple/',
+        'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl/'
+      ]
+    };
+  }
+
+  // Papa's Restaurant Management Series
+  if (safeId.includes('papas-scooperia') || safeId.includes('papa-scoop')) {
+    return {
+      src: 'games/papas-scooperia.html',
+      mirrors: [
+        'games/papas-scooperia.html',
+        'games/flash-player.html?swf=https://raw.githubusercontent.com/sz-games/Games9/main/papasscooperia.swf&title=Papa%27s+Scooperia'
+      ]
+    };
+  }
+
+  if (safeId.includes('freezeria')) {
+    return {
+      src: 'games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papasfreezeria.swf&title=Papa%27s+Freezeria',
+      mirrors: [
+        'games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papasfreezeria.swf&title=Papa%27s+Freezeria',
+        'https://gameinclassroom.github.io/papas-freezeria/'
+      ]
+    };
+  }
+
+  if (safeId.includes('burgeria')) {
+    return {
+      src: 'games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papasburgeria.swf&title=Papa%27s+Burgeria',
+      mirrors: [
+        'games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papasburgeria.swf&title=Papa%27s+Burgeria',
+        'https://gameinclassroom.github.io/papas-burgeria/'
+      ]
+    };
+  }
+
+  if (safeId.includes('sushiria')) {
+    return {
+      src: 'games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papassushiria.swf&title=Papa%27s+Sushiria',
+      mirrors: [
+        'games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papassushiria.swf&title=Papa%27s+Sushiria',
+        'https://gameinclassroom.github.io/papas-sushiria/'
       ]
     };
   }

@@ -61,7 +61,17 @@
       color: #fef08a;
     }
   </style>
-  <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+  <script>
+    window.RufflePlayer = window.RufflePlayer || {};
+    window.RufflePlayer.config = {
+      letterbox: "on",
+      autoplay: "on",
+      unmuteOverlay: "hidden",
+      backgroundColor: "#000000",
+      publicPath: "https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/"
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/ruffle.js"></script>
 </head>
 <body>
   <div id="player-container">
@@ -73,14 +83,6 @@
   </div>
 
   <script>
-    window.RufflePlayer = window.RufflePlayer || {};
-    window.RufflePlayer.config = {
-      letterbox: "on",
-      autoplay: "on",
-      unmuteOverlay: "hidden",
-      backgroundColor: "#000000"
-    };
-
     window.addEventListener("DOMContentLoaded", () => {
       try {
         const ruffle = window.RufflePlayer.newest();
@@ -94,8 +96,11 @@
           if (overlay) overlay.remove();
         });
 
+        const targetSwf = "https://raw.githubusercontent.com/sz-games/Games9/main/papasscooperia.swf";
+        const proxyUrl = window.location.protocol.startsWith('http') ? ('/api/swf?url=' + encodeURIComponent(targetSwf)) : targetSwf;
+
         player.load({
-          url: "https://raw.githubusercontent.com/sz-games/Games9/main/papasscooperia.swf",
+          url: proxyUrl,
           parameters: "",
           autoplay: "auto",
           backgroundColor: "#000000"
@@ -104,10 +109,15 @@
             if (overlay) overlay.remove();
           }, 400);
         }).catch(err => {
-          console.error("Ruffle load error:", err);
-          setTimeout(() => {
+          console.error("Ruffle load error via proxy, trying direct:", err);
+          player.load({
+            url: targetSwf,
+            parameters: "",
+            autoplay: "auto",
+            backgroundColor: "#000000"
+          }).finally(() => {
             if (overlay) overlay.remove();
-          }, 1200);
+          });
         });
       } catch (e) {
         console.error("Ruffle init error:", e);

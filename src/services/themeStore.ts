@@ -42,10 +42,10 @@ export interface ThemeConfig {
 export const THEMES: Record<Exclude<ThemeId, 'custom'>, ThemeConfig> = {
   petezah: {
     id: 'petezah',
-    name: 'PeteZah Obsidian',
+    name: 'OwenWatermelon Obsidian',
     category: 'Dark',
-    emoji: '🍕',
-    description: 'The ultra-sleek PeteZah chrome portal style with obsidian glass and electric cyan.',
+    emoji: '🍉',
+    description: 'The ultra-sleek OwenWatermelonV3 portal style with obsidian glass and electric cyan.',
     bgPrimary: '#020810',
     bgSecondary: '#07101c',
     bgCard: '#0c1626',

@@ -12,15 +12,21 @@ import { TabCloaker } from './components/TabCloaker';
 import { StarfieldBackground } from './components/StarfieldBackground';
 import { ThemeModal } from './components/ThemeModal';
 import { UserAccountModal } from './components/UserAccountModal';
-import { Sidebar } from './components/Sidebar';
+import { Sidebar, TabItem } from './components/Sidebar';
 import { PasscodeGate, PASSCODE_STORAGE_KEY } from './components/PasscodeGate';
 import { WelcomeAnimation } from './components/WelcomeAnimation';
+import { HomeDashboard } from './components/HomeDashboard';
+import { ProxyView } from './components/ProxyView';
+import { AppsView } from './components/AppsView';
+import { MusicView } from './components/MusicView';
+import { AIChatView } from './components/AIChatView';
+import { CloudSaveModal } from './components/CloudSaveModal';
 import { useGamesStore } from './services/gamesStore';
 import { useSiteSettingsStore } from './services/siteSettingsStore';
 import { useThemeStore } from './services/themeStore';
 import { Game } from './types/game';
 import { triggerPanic } from './data/cloakPresets';
-import { Heart, Gamepad2, ExternalLink, Palette, RotateCcw } from 'lucide-react';
+import { Heart, Gamepad2, ExternalLink, RotateCcw, Search, Sparkles, Flame, Globe, Bot, X } from 'lucide-react';
 
 export function isOwenWatermelonOG(game: Game): boolean {
   if (!game) return false;
@@ -32,29 +38,16 @@ export function isOwenWatermelonOG(game: Game): boolean {
   if (sec.includes('owen') && sec.includes('og')) return true;
   if (tags.some(t => t.includes('owen') && t.includes('og')) || tags.includes('og')) return true;
 
-  // Explicitly requested games:
-  // 1. "the games we just added":
   if (id === 'soccer-2026' || id === 'soccer-real') return true;
   if (id.includes('stickman-climb') || title.includes('stickman climb')) return true;
   if (id.includes('people-playground') || id.includes('melon-playground') || title.includes('playground')) return true;
   if (id.includes('getting-over-it') || title.includes('getting over it')) return true;
-
-  // 2. Foundation watermelon title:
   if (id === 'watermelon-merge' || title.includes('watermelon')) return true;
-
-  // 3. "Basket Random":
   if (id.includes('basket-random') || title.includes('basket random')) return true;
-
-  // 4. "Ovo, Ovo 2":
   if (id.startsWith('ovo') || title.startsWith('ovo')) return true;
-
-  // 5. "all the Duck Life’s":
   if (id.includes('duck-life') || title.includes('duck life') || title.includes('ducklife')) return true;
-
-  // 6. "cut the rope":
   if (id.includes('cut-the-rope') || title.includes('cut the rope')) return true;
 
-  // 7. "and yeah" (core hall-of-fame student OGs):
   const ogList = [
     'retro-bowl', 'retro-bowl-college', '1v1-lol', 'slope', 'slope-2',
     'cookie-clicker', 'drift-hunters', 'subway-surfers', 'bitlife',
@@ -63,11 +56,7 @@ export function isOwenWatermelonOG(game: Game): boolean {
     'happywheels', 'happy-wheels', 'basket-bros', 'getaway-shootout',
     'rooftop-snipers', 'snow-rider-3d', 'tunnel-rush'
   ];
-  if (ogList.some(k => id === k || id.startsWith(k + '-') || id.endsWith('-' + k))) {
-    return true;
-  }
-
-  return false;
+  return ogList.some(k => id === k || id.startsWith(k + '-') || id.endsWith('-' + k));
 }
 
 export function isTwoPlayerGame(g: Game): boolean {
@@ -118,7 +107,6 @@ export function isSawyerGame(g: Game): boolean {
 
 export function isTrendingGame(g: Game): boolean {
   if (!g) return false;
-  // Games with recent high play counts (>= 50,000 plays) or featured status
   const plays = g.plays || 0;
   return (
     plays >= 50000 || 
@@ -127,7 +115,6 @@ export function isTrendingGame(g: Game): boolean {
   );
 }
 
-// Categories include primary categories + popular secondaries
 const APP_CATEGORIES = [
   'All',
   'Trending',
@@ -147,6 +134,8 @@ const APP_CATEGORIES = [
   'Retro',
   'Casual'
 ];
+
+type SpaceType = 'home' | 'games' | 'proxy' | 'ai' | 'apps' | 'music' | 'tools' | 'saved';
 
 export default function App() {
   const {
@@ -169,44 +158,48 @@ export default function App() {
     resetCustomTheme 
   } = useThemeStore();
 
-  // Sync document root background and CSS custom properties when theme changes
+  // Root background and theme variables setup
   useEffect(() => {
     try {
       const root = document.documentElement;
       root.style.setProperty('--theme-bg-primary', activeTheme.bgPrimary);
       root.style.setProperty('--theme-bg-secondary', activeTheme.bgSecondary);
       root.style.setProperty('--theme-bg-card', activeTheme.bgCard);
+      root.style.setProperty('--theme-bg-header', activeTheme.bgHeader);
       root.style.setProperty('--theme-border', activeTheme.border);
       root.style.setProperty('--theme-border-active', activeTheme.borderActive);
       root.style.setProperty('--theme-accent', activeTheme.accent);
       root.style.setProperty('--theme-accent-hover', activeTheme.accentHover);
-      root.style.setProperty('--theme-accent-text', activeTheme.accentText);
-      root.style.setProperty('--theme-kicker', activeTheme.kicker);
+      root.style.setProperty('--theme-accent-badge', activeTheme.accentBadge);
+      root.style.setProperty('--theme-accent-glow', activeTheme.accentGlow);
       document.body.style.backgroundColor = activeTheme.bgPrimary;
       root.style.backgroundColor = activeTheme.bgPrimary;
     } catch {}
   }, [activeTheme]);
 
-  const [currentTab, setCurrentTab] = useState<'games' | 'cloaker'>('games');
+  // Browser Tabs Management
+  const [tabs, setTabs] = useState<TabItem[]>([
+    { id: 'tab_home', title: 'Home', spaceType: 'home', icon: '🏠' },
+    { id: 'tab_games', title: 'Games', spaceType: 'games', icon: '🎮' },
+    { id: 'tab_proxy', title: 'Web Proxy', spaceType: 'proxy', icon: '🌐' }
+  ]);
+  const [activeTabId, setActiveTabId] = useState<string>('tab_home');
+  const [splitTabId, setSplitTabId] = useState<string | null>(null);
+
+  // Active space corresponds to active tab's spaceType
+  const currentTab = tabs.find(t => t.id === activeTabId) || tabs[0];
+  const activeSpace = currentTab?.spaceType || 'home';
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [visibleCount, setVisibleCount] = useState(48);
   const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
-  const [themeModalTab, setThemeModalTab] = useState<'gallery' | 'studio'>('gallery');
+  const [isCloakerOpen, setIsCloakerOpen] = useState(false);
   const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(false);
+  const [proxyTargetUrl, setProxyTargetUrl] = useState<string>('https://duckduckgo.com/lite');
 
-  const handleOpenThemeGallery = () => {
-    setThemeModalTab('gallery');
-    setIsThemeModalOpen(true);
-  };
-
-  const handleOpenCustomThemeStudio = () => {
-    setThemeModalTab('studio');
-    setIsThemeModalOpen(true);
-  };
-
-  // Authentication gate state with persistence (Passcode: owenpan2244)
+  // Passcode Gate (owenpan2244)
   const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
     try {
       return localStorage.getItem(PASSCODE_STORAGE_KEY) === 'unlocked' ||
@@ -230,12 +223,7 @@ export default function App() {
     setShowWelcomeAnimation(false);
   };
 
-  // Reset pagination when filter/search changes
-  useEffect(() => {
-    setVisibleCount(48);
-  }, [searchTerm, selectedCategory]);
-
-  // Sidebar collapse & mobile drawer state (PeteZah layout)
+  // Sidebar collapse & mobile drawer
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
     try {
       return localStorage.getItem('owen_sidebar_collapsed') === 'true';
@@ -256,18 +244,12 @@ export default function App() {
 
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-  const handleRandomGame = () => {
-    if (games.length === 0) return;
-    const randomIndex = Math.floor(Math.random() * games.length);
-    handleSelectGame(games[randomIndex]);
-  };
-
-  // Keyboard shortcut listener: Cmd/Ctrl + K focuses omnibar search
+  // Keyboard shortcut listener: Cmd/Ctrl + K focuses omnibar
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        const searchInput = document.querySelector('input[type="text"][placeholder*="Search"]') as HTMLInputElement;
+        const searchInput = document.querySelector('header input[type="text"]') as HTMLInputElement;
         if (searchInput) {
           searchInput.focus();
           searchInput.select();
@@ -281,24 +263,132 @@ export default function App() {
   // Global Panic Key Listener (Esc)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !selectedGame && !isThemeModalOpen) {
+      if (e.key === 'Escape' && !selectedGame && !isThemeModalOpen && !isAccountModalOpen) {
         triggerPanic();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedGame, isThemeModalOpen]);
+  }, [selectedGame, isThemeModalOpen, isAccountModalOpen]);
+
+  // Tab Switching & Mutation
+  const handleSelectSpace = (space: SpaceType) => {
+    // If a tab already matches this space, activate it
+    const existing = tabs.find(t => t.spaceType === space);
+    if (existing) {
+      setActiveTabId(existing.id);
+    } else {
+      const spaceEmojiMap: Record<SpaceType, string> = {
+        home: '🏠',
+        games: '🎮',
+        proxy: '🌐',
+        ai: '🤖',
+        apps: '📱',
+        music: '🎵',
+        tools: '🛠️',
+        saved: '💾'
+      };
+      const spaceNameMap: Record<SpaceType, string> = {
+        home: 'Home',
+        games: 'Games',
+        proxy: 'Web Proxy',
+        ai: 'AI Assistant',
+        apps: 'Apps',
+        music: 'Music',
+        tools: 'Tab Cloaker',
+        saved: 'Cloud Saves'
+      };
+      const newTabItem: TabItem = {
+        id: 'tab_' + Date.now(),
+        title: spaceNameMap[space] || space,
+        spaceType: space,
+        icon: spaceEmojiMap[space] || '📄'
+      };
+      setTabs(prev => [...prev, newTabItem]);
+      setActiveTabId(newTabItem.id);
+    }
+
+    if (space !== 'games') {
+      setSelectedGame(null);
+    }
+  };
+
+  const handleSelectTab = (tabId: string) => {
+    setActiveTabId(tabId);
+    const tab = tabs.find(t => t.id === tabId);
+    if (tab && tab.spaceType !== 'games') {
+      setSelectedGame(null);
+    }
+  };
+
+  const handleCloseTab = (tabId: string) => {
+    if (tabs.length <= 1) return;
+    const remaining = tabs.filter(t => t.id !== tabId);
+    setTabs(remaining);
+    if (splitTabId === tabId) setSplitTabId(null);
+    if (activeTabId === tabId) {
+      setActiveTabId(remaining[0].id);
+    }
+  };
+
+  const handleNewTab = () => {
+    const newTabItem: TabItem = {
+      id: 'tab_' + Date.now(),
+      title: 'New Tab',
+      spaceType: 'home',
+      icon: '🍉'
+    };
+    setTabs(prev => [...prev, newTabItem]);
+    setActiveTabId(newTabItem.id);
+    setSelectedGame(null);
+  };
+
+  const handleToggleSplit = (targetId?: string) => {
+    if (!splitTabId) {
+      // Find an alternate tab to split with
+      const other = tabs.find(t => t.id !== (targetId || activeTabId));
+      if (other) {
+        setSplitTabId(other.id);
+      }
+    } else {
+      setSplitTabId(null);
+    }
+  };
+
+  const handleOmnibarSubmit = (query: string) => {
+    const clean = query.trim();
+    if (!clean) return;
+
+    // Detect if user typed a URL or domain
+    const isUrl = /^(https?:\/\/|[a-zA-Z0-9-]+\.[a-zA-Z]{2,})(\/.*)?$/.test(clean);
+    if (isUrl || clean.startsWith('http')) {
+      const url = clean.startsWith('http') ? clean : 'https://' + clean;
+      setProxyTargetUrl(url);
+      handleSelectSpace('proxy');
+      return;
+    }
+
+    // Check if query matches a game title
+    const gameMatch = games.find(g => g.title.toLowerCase().includes(clean.toLowerCase()));
+    if (gameMatch) {
+      setSearchTerm(clean);
+      handleSelectSpace('games');
+      return;
+    }
+
+    // Default to search proxy
+    setProxyTargetUrl(`https://duckduckgo.com/lite/?q=${encodeURIComponent(clean)}`);
+    handleSelectSpace('proxy');
+  };
 
   const handleSelectGame = (game: Game) => {
     setSelectedGame(game);
     recordPlay(game.id);
+    handleSelectSpace('games');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleBackToHub = () => {
-    setSelectedGame(null);
-  };
-
+  // Filtered games
   const filteredGames = useMemo(() => {
     const list = games.filter(g => {
       if (!g) return false;
@@ -320,27 +410,10 @@ export default function App() {
       const secCatLower = (g.secondaryCategory || '').toLowerCase();
       const mainCatLower = (g.category || '').toLowerCase();
 
-      // Special handling for Trending category (most recent play counts)
-      if (catLower === 'trending') {
-        return isTrendingGame(g);
-      }
-
-      // Special handling for 2 Player Games category
-      if (catLower.includes('2 player') || catLower === '2 player games' || catLower === '2 player' || catLower === 'two player') {
-        return isTwoPlayerGame(g);
-      }
-      
-      // Special handling for Sawyer For Sawyer category
-      if (catLower.includes('sawyer')) {
-        return isSawyerGame(g);
-      }
-
-      // Special handling for Owen Watermelon OG's category
-      if (catLower.includes('owen') && catLower.includes('og')) {
-        return isOwenWatermelonOG(g);
-      }
-
-      // Special handling for Potato Classics category
+      if (catLower === 'trending') return isTrendingGame(g);
+      if (catLower.includes('2 player') || catLower === '2 player games') return isTwoPlayerGame(g);
+      if (catLower.includes('sawyer')) return isSawyerGame(g);
+      if (catLower.includes('owen') && catLower.includes('og')) return isOwenWatermelonOG(g);
       if (catLower === 'potato classics') {
         return (
           secCatLower === 'potato classics' ||
@@ -348,7 +421,6 @@ export default function App() {
           (typeof g.id === 'string' && g.id.startsWith('potatoes-'))
         );
       }
-
       if (catLower === 'cooking sim') {
         return (
           secCatLower === 'cooking sim' ||
@@ -366,67 +438,16 @@ export default function App() {
     if (selectedCategory === 'Trending') {
       return [...list].sort((a, b) => (b.plays || 0) - (a.plays || 0));
     }
-
     return list;
   }, [games, searchTerm, selectedCategory, favorites]);
 
-  const categories = APP_CATEGORIES;
+  const featuredGamesList = useMemo(() => games.filter(g => g.featured).slice(0, 8), [games]);
+  const trendingGamesList = useMemo(() => games.filter(isTrendingGame).slice(0, 8), [games]);
 
-  const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = {
-      All: games.length,
-      Favorites: favorites.length,
-      Trending: 0,
-      'Owen Watermelon OG’s': 0,
-      '2 Player Games': 0,
-      'Sawyer For Sawyer': 0,
-      'Potato Classics': 0,
-      'Cooking Sim': 0
-    };
-
-    for (const cat of categories) {
-      if (counts[cat] === undefined) counts[cat] = 0;
-    }
-
-    for (let i = 0; i < games.length; i++) {
-      const g = games[i];
-      if (isTrendingGame(g)) counts.Trending++;
-      if (isOwenWatermelonOG(g)) counts['Owen Watermelon OG’s']++;
-      if (isTwoPlayerGame(g)) counts['2 Player Games']++;
-      if (isSawyerGame(g)) counts['Sawyer For Sawyer']++;
-
-      const secLower = (g.secondaryCategory || '').toLowerCase();
-      const mainLower = (g.category || '').toLowerCase();
-      const isPotato = secLower === 'potato classics' || (typeof g.id === 'string' && g.id.startsWith('potatoes-'));
-      if (isPotato) counts['Potato Classics']++;
-
-      const isCooking = secLower === 'cooking sim' || (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && (t.toLowerCase().includes('cooking') || t.toLowerCase().includes('papa louie'))));
-      if (isCooking) counts['Cooking Sim']++;
-
-      for (let c = 0; c < categories.length; c++) {
-        const cat = categories[c];
-        if (cat === 'All' || cat === 'Favorites' || cat === 'Trending' || cat === 'Owen Watermelon OG’s' || cat === '2 Player Games' || cat === 'Sawyer For Sawyer' || cat === 'Potato Classics' || cat === 'Cooking Sim') {
-          continue;
-        }
-        const catLower = cat.toLowerCase();
-        if (mainLower === catLower || secLower === catLower || (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && t.toLowerCase() === catLower))) {
-          counts[cat]++;
-        }
-      }
-    }
-    return counts;
-  }, [games, favorites, categories]);
-
-  const featuredGame = games.find(g => g.featured) || games[0];
-  const favoriteGamesList = games.filter(g => favorites.includes(g.id));
-
-  // If site is locked with passcode, display PasscodeGate screen (Passcode: owenpan2244)
+  // If site is locked with passcode, display PasscodeGate
   if (!isUnlocked) {
     return (
-      <div 
-        className="min-h-screen text-slate-100 flex flex-col relative transition-colors duration-300"
-        style={{ backgroundColor: activeTheme.bgPrimary }}
-      >
+      <div className="min-h-screen text-slate-100 flex flex-col relative bg-[#020810]">
         <StarfieldBackground
           speedMultiplier={siteSettings.starSpeed}
           densityMultiplier={siteSettings.starDensity}
@@ -438,12 +459,260 @@ export default function App() {
     );
   }
 
+  // Render a specific space view
+  const renderSpaceContent = (space: SpaceType) => {
+    if (space === 'home') {
+      return (
+        <HomeDashboard
+          onNavigateTab={handleSelectSpace}
+          onSelectGame={handleSelectGame}
+          featuredGames={featuredGamesList}
+          trendingGames={trendingGamesList}
+          onSearchSubmit={(q) => {
+            setSearchTerm(q);
+            handleSelectSpace('games');
+          }}
+          onOpenThemeModal={() => setIsThemeModalOpen(true)}
+          activeTheme={activeTheme}
+        />
+      );
+    }
+
+    if (space === 'proxy') {
+      return (
+        <ProxyView
+          activeTheme={activeTheme}
+          initialUrl={proxyTargetUrl}
+          onOpenInTab={(title, url, icon) => {
+            const newTab: TabItem = {
+              id: 'tab_' + Date.now(),
+              title,
+              spaceType: 'proxy',
+              icon: icon || '🌐',
+              url
+            };
+            setTabs(prev => [...prev, newTab]);
+            setActiveTabId(newTab.id);
+          }}
+        />
+      );
+    }
+
+    if (space === 'ai') {
+      return (
+        <AIChatView
+          activeTheme={activeTheme}
+          onSelectGameTitle={(title) => {
+            setSearchTerm(title);
+            handleSelectSpace('games');
+          }}
+        />
+      );
+    }
+
+    if (space === 'apps') {
+      return <AppsView activeTheme={activeTheme} />;
+    }
+
+    if (space === 'music') {
+      return <MusicView activeTheme={activeTheme} />;
+    }
+
+    if (space === 'tools') {
+      return (
+        <div 
+          className="flex-1 p-6 md:p-10 max-w-4xl mx-auto w-full"
+          style={{ backgroundColor: activeTheme.bgPrimary }}
+        >
+          <div 
+            className="p-6 md:p-8 rounded-3xl border shadow-2xl flex flex-col gap-6"
+            style={{ backgroundColor: activeTheme.bgCard, borderColor: activeTheme.border }}
+          >
+            <div>
+              <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                <span>Tab Cloaker & School Cloak Tools</span>
+              </h2>
+              <p className="text-xs text-slate-400 mt-1">
+                Disguise this browser tab to look like Google Classroom, Canvas, or Google Drive.
+              </p>
+            </div>
+            <TabCloaker />
+          </div>
+        </div>
+      );
+    }
+
+    if (space === 'saved') {
+      return (
+        <div 
+          className="flex-1 p-6 md:p-10 max-w-4xl mx-auto w-full"
+          style={{ backgroundColor: activeTheme.bgPrimary }}
+        >
+          <div 
+            className="p-6 md:p-8 rounded-3xl border shadow-2xl flex flex-col gap-6"
+            style={{ backgroundColor: activeTheme.bgCard, borderColor: activeTheme.border }}
+          >
+            <div>
+              <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                <span>Universal Cross-Device Cloud Saves</span>
+              </h2>
+              <p className="text-xs text-slate-400 mt-1">
+                Your game saves automatically sync across school Chromebooks, iPads, and home PCs.
+              </p>
+            </div>
+            <div 
+              className="p-4 rounded-2xl border flex items-center justify-between"
+              style={{
+                backgroundColor: activeTheme.accentBadge,
+                borderColor: activeTheme.borderActive
+              }}
+            >
+              <div>
+                <span className="text-sm font-bold text-white">Save Engine Status: Online</span>
+                <p className="text-xs text-slate-400">Captures LocalStorage, SessionStorage, EmulatorJS RAM states, and IndexedDB snapshots.</p>
+              </div>
+              <button
+                onClick={() => handleSelectSpace('games')}
+                className="px-4 py-2 rounded-xl text-black font-extrabold text-xs cursor-pointer shadow-md"
+                style={{ backgroundColor: activeTheme.accent }}
+              >
+                Go to Games
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Default to Games catalog
+    return (
+      <div 
+        className="flex-1 flex flex-col min-h-screen text-slate-100 p-4 md:p-6 lg:p-8"
+        style={{ backgroundColor: activeTheme.bgPrimary }}
+      >
+        {selectedGame ? (
+          <GamePlayer
+            game={selectedGame}
+            onBack={() => setSelectedGame(null)}
+            onToggleFavorite={toggleFavorite}
+            isFavorite={favorites.includes(selectedGame.id)}
+            onUpdateGame={updateGame}
+            allGames={games}
+            onSelectGame={handleSelectGame}
+          />
+        ) : (
+          <div className="max-w-7xl mx-auto w-full flex flex-col gap-8">
+            {/* Header Title & Search */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex flex-col gap-1 w-full md:w-auto">
+                <h1 className="text-2xl md:text-3xl font-extrabold text-white flex items-center gap-2">
+                  <Gamepad2 className="w-7 h-7" style={{ color: activeTheme.accent }} />
+                  <span>Unblocked Games Catalog</span>
+                  <span 
+                    className="text-xs font-mono px-2.5 py-1 rounded-full border ml-2"
+                    style={{
+                      backgroundColor: activeTheme.accentBadge,
+                      borderColor: activeTheme.borderActive,
+                      color: activeTheme.accent
+                    }}
+                  >
+                    {filteredGames.length} Available
+                  </span>
+                </h1>
+                <p className="text-xs text-slate-400">
+                  Click any game card to launch with 1-Click Quick Save, full screen, and mirror fallbacks.
+                </p>
+              </div>
+
+              {/* Game Search Bar */}
+              <div className="relative w-full md:w-80">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Filter games by title or tag..."
+                  className="w-full pl-10 pr-4 py-2.5 rounded-2xl border text-xs text-white placeholder-slate-500 focus:outline-none shadow-md"
+                  style={{
+                    backgroundColor: activeTheme.bgCard,
+                    borderColor: activeTheme.border
+                  }}
+                />
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Category Pills Carousel */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+              {APP_CATEGORIES.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap border transition-all cursor-pointer ${
+                    selectedCategory === cat
+                      ? 'text-black shadow-lg font-extrabold'
+                      : 'text-slate-300 hover:bg-white/10'
+                  }`}
+                  style={{
+                    backgroundColor: selectedCategory === cat ? activeTheme.accent : activeTheme.bgCard,
+                    borderColor: selectedCategory === cat ? activeTheme.accent : activeTheme.border
+                  }}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Games Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-5">
+              {filteredGames.slice(0, visibleCount).map(game => (
+                <GameCard
+                  key={game.id}
+                  game={game}
+                  onPlay={handleSelectGame}
+                  onToggleFavorite={toggleFavorite}
+                  isFavorite={favorites.includes(game.id)}
+                  activeTheme={activeTheme}
+                />
+              ))}
+            </div>
+
+            {/* Load More Button */}
+            {visibleCount < filteredGames.length && (
+              <div className="flex justify-center py-6">
+                <button
+                  onClick={() => setVisibleCount(c => c + 48)}
+                  className="px-6 py-2.5 rounded-2xl border text-xs font-bold text-white transition-all cursor-pointer shadow-lg hover:scale-105"
+                  style={{
+                    backgroundColor: activeTheme.bgCard,
+                    borderColor: activeTheme.border
+                  }}
+                >
+                  Load More Games ({filteredGames.length - visibleCount} remaining)
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const splitTab = tabs.find(t => t.id === splitTabId);
+
   return (
     <div 
-      className="min-h-screen text-slate-100 flex flex-col relative transition-colors duration-300"
+      className="h-screen w-screen text-slate-100 flex overflow-hidden font-sans select-none"
       style={{ backgroundColor: activeTheme.bgPrimary }}
     >
-      {/* Animated Starfield Background Layer across the entire site */}
+      {/* Background Starfield */}
       <StarfieldBackground
         speedMultiplier={siteSettings.starSpeed}
         densityMultiplier={siteSettings.starDensity}
@@ -451,341 +720,100 @@ export default function App() {
         starColors={activeTheme.starColors}
       />
 
-      {/* Top Bar Header (PeteZah Chrome Bar) */}
-      <Header
-        currentTab={currentTab}
-        onSelectTab={tab => {
-          setCurrentTab(tab);
-          setSelectedGame(null);
-          setIsMobileSidebarOpen(false);
-        }}
-        siteSettings={siteSettings}
-        activeTheme={activeTheme}
-        onOpenThemeModal={handleOpenThemeGallery}
+      {/* Welcome Animation on First Unlock */}
+      {showWelcomeAnimation && (
+        <WelcomeAnimation
+          activeTheme={activeTheme}
+          onComplete={() => setShowWelcomeAnimation(false)}
+        />
+      )}
+
+      {/* OwenWatermelon Left Sidebar */}
+      <Sidebar
+        activeSpace={activeSpace}
+        onSelectSpace={handleSelectSpace}
+        tabs={tabs}
+        activeTabId={activeTabId}
+        onSelectTab={handleSelectTab}
+        onCloseTab={handleCloseTab}
+        onNewTab={handleNewTab}
+        splitTabId={splitTabId}
+        onToggleSplitTab={handleToggleSplit}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={toggleSidebarCollapse}
         onOpenAccountModal={() => setIsAccountModalOpen(true)}
+        onOpenThemeModal={() => setIsThemeModalOpen(true)}
         onLockSite={handleLockSite}
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        onToggleMobileSidebar={() => setIsMobileSidebarOpen(prev => !prev)}
-        onRandomGame={handleRandomGame}
+        activeTheme={activeTheme}
+        totalGames={games.length}
       />
 
-      {/* Main PeteZah Split Layout: Sidebar + Canvas */}
-      <div className="flex flex-1 w-full relative z-10 min-h-0">
-        {/* Desktop Browser Sidebar */}
-        <Sidebar
-          currentTab={currentTab}
-          onSelectTab={tab => {
-            setCurrentTab(tab);
+      {/* Main Browser Viewport */}
+      <div 
+        className="flex-1 flex flex-col h-screen overflow-hidden backdrop-blur-md"
+        style={{ backgroundColor: activeTheme.bgPrimary }}
+      >
+        {/* Top Omnibar Header */}
+        <Header
+          onBack={() => {
+            if (selectedGame) setSelectedGame(null);
+            else handleSelectSpace('home');
+          }}
+          onForward={() => {}}
+          onReload={() => window.location.reload()}
+          onHome={() => {
             setSelectedGame(null);
-            setIsMobileSidebarOpen(false);
+            handleSelectSpace('home');
           }}
-          activeCategory={selectedCategory}
-          onSelectCategory={cat => {
-            setSelectedCategory(cat);
-            setSelectedGame(null);
-            setIsMobileSidebarOpen(false);
-          }}
-          onRandomGame={() => {
-            handleRandomGame();
-            setIsMobileSidebarOpen(false);
-          }}
-          onOpenThemeModal={handleOpenThemeGallery}
-          onOpenCustomThemeStudio={handleOpenCustomThemeStudio}
-          onLockSite={handleLockSite}
+          omnibarValue={searchTerm}
+          onOmnibarSubmit={handleOmnibarSubmit}
+          onToggleSplit={() => handleToggleSplit()}
+          isSplitActive={Boolean(splitTabId)}
+          onOpenCloakerModal={() => setIsCloakerOpen(true)}
+          onOpenAccountModal={() => setIsAccountModalOpen(true)}
+          onOpenThemeModal={() => setIsThemeModalOpen(true)}
+          onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
           activeTheme={activeTheme}
-          totalGames={games.length}
-          favoriteCount={favoriteGamesList.length}
-          isCollapsed={isSidebarCollapsed}
-          onToggleCollapse={toggleSidebarCollapse}
+          siteSettings={siteSettings}
         />
 
-        {/* Mobile Sidebar Drawer Overlay */}
-        {isMobileSidebarOpen && (
-          <div 
-            className="md:hidden fixed inset-0 z-50 flex bg-black/75 backdrop-blur-sm animate-in fade-in duration-200"
-            onClick={() => setIsMobileSidebarOpen(false)}
-          >
-            <div 
-              className="w-72 max-w-[85vw] h-full shadow-2xl flex flex-col animate-in slide-in-from-left duration-200"
-              onClick={e => e.stopPropagation()}
-            >
-              <Sidebar
-                currentTab={currentTab}
-                onSelectTab={tab => {
-                  setCurrentTab(tab);
-                  setSelectedGame(null);
-                  setIsMobileSidebarOpen(false);
-                }}
-                activeCategory={selectedCategory}
-                onSelectCategory={cat => {
-                  setSelectedCategory(cat);
-                  setSelectedGame(null);
-                  setIsMobileSidebarOpen(false);
-                }}
-                onRandomGame={() => {
-                  handleRandomGame();
-                  setIsMobileSidebarOpen(false);
-                }}
-                onOpenThemeModal={() => {
-                  handleOpenThemeGallery();
-                  setIsMobileSidebarOpen(false);
-                }}
-                onOpenCustomThemeStudio={() => {
-                  handleOpenCustomThemeStudio();
-                  setIsMobileSidebarOpen(false);
-                }}
-                onLockSite={handleLockSite}
-                activeTheme={activeTheme}
-                totalGames={games.length}
-                favoriteCount={favoriteGamesList.length}
-                isCollapsed={false}
-                onToggleCollapse={() => setIsMobileSidebarOpen(false)}
-              />
-            </div>
+        {/* Content Area with Split Screen Support */}
+        <main className="flex-1 overflow-y-auto relative flex">
+          {/* Primary Active Tab View */}
+          <div className={`flex-1 flex flex-col ${splitTabId ? 'w-1/2 border-r' : 'w-full'}`} style={{ borderColor: activeTheme.border }}>
+            {renderSpaceContent(activeSpace)}
           </div>
-        )}
 
-        {/* Main Content Viewport */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-y-auto">
-          <main className="flex-1 w-full pb-16 relative z-10">
-            {/* GAME PLAYER VIEW */}
-            {selectedGame ? (
-              <GamePlayer
-                game={selectedGame}
-                isFavorite={favorites.includes(selectedGame.id)}
-                onToggleFavorite={toggleFavorite}
-                onBack={handleBackToHub}
-                onSelectGame={handleSelectGame}
-                allGames={games}
-                onUpdateGame={(id, updates) => updateGame(id, updates)}
-                activeTheme={activeTheme}
-              />
-            ) : (
-              <>
-                {/* ARCADE GAMES HUB */}
-                {currentTab === 'games' && (
-                  <div className="max-w-7xl mx-auto px-4 lg:px-8 py-5 flex flex-col gap-6">
-                    {/* Hero Spotlight & Filters */}
-                    <HeroBanner
-                      featuredGame={featuredGame}
-                      onPlay={handleSelectGame}
-                      searchTerm={searchTerm}
-                      onSearchChange={setSearchTerm}
-                      activeCategory={selectedCategory}
-                      onSelectCategory={setSelectedCategory}
-                      categories={categories}
-                      totalGames={games.length}
-                      categoryCounts={categoryCounts}
-                      activeTheme={activeTheme}
-                      activeThemeId={themeId}
-                      onSelectTheme={setTheme}
-                      onOpenThemeGallery={handleOpenThemeGallery}
-                      onOpenCustomThemeStudio={handleOpenCustomThemeStudio}
-                    />
-
-                    {/* Quick Favorites Section if any */}
-                    {selectedCategory === 'All' && !searchTerm && favoriteGamesList.length > 0 && (
-                      <div className="flex flex-col gap-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Heart className="w-4 h-4 text-[#ff2d55] fill-current" />
-                            <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                              Starred Favorites
-                            </h2>
-                          </div>
-                          <span className="text-xs text-slate-400 font-mono tabular-nums">
-                            {favoriteGamesList.length} {favoriteGamesList.length === 1 ? 'game' : 'games'}
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                          {favoriteGamesList.slice(0, 4).map(game => (
-                            <GameCard
-                              key={game.id}
-                              game={game}
-                              isFavorite={true}
-                              onToggleFavorite={toggleFavorite}
-                              onPlay={handleSelectGame}
-                              activeTheme={activeTheme}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* All Filtered Games Grid */}
-                    <div className="flex flex-col gap-3.5">
-                      <div className="flex items-center justify-between">
-                        <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
-                          <Gamepad2 className="w-4 h-4" style={{ color: activeTheme.accent }} />
-                          <span>{selectedCategory === 'All' ? 'Games Catalog' : `${selectedCategory} Games`}</span>
-                        </h2>
-                        <span className="text-xs text-slate-400 font-mono tabular-nums">
-                          Showing {Math.min(visibleCount, filteredGames.length)} of {filteredGames.length} {filteredGames.length === games.length ? 'games' : `(from ${games.length} total)`}
-                        </span>
-                      </div>
-
-                      {filteredGames.length > 0 ? (
-                        <>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-                            {filteredGames.slice(0, visibleCount).map(game => (
-                              <GameCard
-                                key={game.id}
-                                game={game}
-                                isFavorite={favorites.includes(game.id)}
-                                onToggleFavorite={toggleFavorite}
-                                onPlay={handleSelectGame}
-                                activeTheme={activeTheme}
-                              />
-                            ))}
-                          </div>
-
-                          {visibleCount < filteredGames.length && (
-                            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-6 pb-2">
-                              <button
-                                onClick={() => setVisibleCount(prev => Math.min(prev + 48, filteredGames.length))}
-                                className="px-6 py-3 font-bold text-sm rounded-xl transition-all shadow-lg hover:-translate-y-0.5 cursor-pointer flex items-center gap-2"
-                                style={{
-                                  backgroundColor: activeTheme.accent,
-                                  color: activeTheme.accentText,
-                                  boxShadow: `0 10px 25px ${activeTheme.accentGlow}`
-                                }}
-                              >
-                                <span>Load More Games (+48)</span>
-                                <span className="text-xs px-2 py-0.5 rounded-full font-mono bg-black/20">
-                                  {filteredGames.length - visibleCount} left
-                                </span>
-                              </button>
-                              <button
-                                onClick={() => setVisibleCount(filteredGames.length)}
-                                className="px-5 py-3 border font-semibold text-sm rounded-xl transition-colors cursor-pointer"
-                                style={{
-                                  backgroundColor: activeTheme.bgCard,
-                                  borderColor: activeTheme.border,
-                                  color: activeTheme.kicker
-                                }}
-                              >
-                                Show All {filteredGames.length} Games
-                              </button>
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        <div 
-                          className="p-12 text-center border rounded-2xl flex flex-col items-center justify-center gap-3"
-                          style={{
-                            backgroundColor: activeTheme.bgCard,
-                            borderColor: activeTheme.border
-                          }}
-                        >
-                          <span className="text-4xl">{activeTheme.emoji}</span>
-                          <h3 className="text-base font-bold text-white">No matching games found</h3>
-                          <p className="text-xs text-slate-400 max-w-sm">
-                            Try adjusting your search query or request a game to be added.
-                          </p>
-                          <div className="flex items-center gap-3 mt-2">
-                            <button
-                              onClick={() => { setSearchTerm(''); setSelectedCategory('All'); }}
-                              className="px-4 py-2 font-bold text-xs rounded-lg transition-colors cursor-pointer shadow-md"
-                              style={{
-                                backgroundColor: activeTheme.accent,
-                                color: activeTheme.accentText
-                              }}
-                            >
-                              Clear Filters
-                            </button>
-                            <a
-                              href={REQUEST_GAME_URL}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="px-4 py-2 border font-bold text-xs rounded-lg transition-colors flex items-center gap-1.5"
-                              style={{
-                                backgroundColor: activeTheme.bgSecondary,
-                                borderColor: activeTheme.border,
-                                color: activeTheme.kicker
-                              }}
-                            >
-                              <span>Request This Game</span>
-                              <ExternalLink className="w-3.5 h-3.5" />
-                            </a>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* TAB CLOAKER & CAMOUFLAGE TAB */}
-                {currentTab === 'cloaker' && <TabCloaker activeTheme={activeTheme} />}
-              </>
-            )}
-          </main>
-
-          {/* Footer */}
-          <footer 
-            className="w-full border-t px-4 lg:px-8 py-8 mt-auto relative z-10 backdrop-blur-xs transition-colors"
-            style={{
-              backgroundColor: activeTheme.bgHeader,
-              borderColor: activeTheme.border
-            }}
-          >
-            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-white">{siteSettings.siteTitle || 'Owen Watermelon V3'}</span>
-                <span>·</span>
-                <span>PeteZah Unblocked Arcade Browser & Tab Cloaker</span>
+          {/* Secondary Split Screen Tab View */}
+          {splitTabId && splitTab && (
+            <div 
+              className="w-1/2 flex flex-col relative border-l"
+              style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
+            >
+              <div 
+                className="h-8 px-3 flex items-center justify-between border-b text-xs text-slate-300"
+                style={{ backgroundColor: activeTheme.bgHeader, borderColor: activeTheme.border }}
+              >
+                <span className="font-bold flex items-center gap-1.5">
+                  <span>{splitTab.icon || '📄'}</span>
+                  <span>{splitTab.title}</span>
+                </span>
+                <button
+                  onClick={() => setSplitTabId(null)}
+                  className="p-1 hover:text-white text-slate-500"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
               </div>
-
-              <div className="flex flex-wrap items-center gap-4">
-                <button
-                  onClick={() => setShowWelcomeAnimation(true)}
-                  className="hover:text-white transition-colors flex items-center gap-1.5 font-medium cursor-pointer"
-                  style={{ color: activeTheme.accent }}
-                  title="Replay Welcome To The WatermelonBase Intro"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Replay Intro</span>
-                </button>
-
-                <button
-                  onClick={() => setIsThemeModalOpen(true)}
-                  className="hover:text-white transition-colors flex items-center gap-1.5 font-medium cursor-pointer"
-                  style={{ color: activeTheme.accent }}
-                >
-                  <Palette className="w-3.5 h-3.5" />
-                  <span>Theme: {activeTheme.name}</span>
-                </button>
-
-                <a
-                  href={REQUEST_GAME_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-white transition-colors flex items-center gap-1.5 font-medium"
-                  style={{ color: activeTheme.accent }}
-                >
-                  <span>Request Game</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
+              <div className="flex-1 overflow-y-auto">
+                {renderSpaceContent(splitTab.spaceType)}
               </div>
             </div>
-          </footer>
-        </div>
+          )}
+        </main>
       </div>
 
-      {/* Theme Gallery & Custom Studio Modal */}
-      <ThemeModal
-        isOpen={isThemeModalOpen}
-        onClose={() => setIsThemeModalOpen(false)}
-        activeThemeId={themeId}
-        onSelectTheme={setTheme}
-        customTheme={customTheme}
-        onUpdateCustomTheme={updateCustomTheme}
-        onResetCustomTheme={resetCustomTheme}
-        initialTab={themeModalTab}
-      />
-
-      {/* Cross-Device Gamer Account & Cloud Saves Modal */}
+      {/* Account & Profile Modal */}
       <UserAccountModal
         isOpen={isAccountModalOpen}
         onClose={() => setIsAccountModalOpen(false)}
@@ -794,12 +822,32 @@ export default function App() {
         theme={activeTheme}
       />
 
-      {/* "Welcome To The WatermelonBase" Animated Intro Overlay (shown after password unlock) */}
-      {showWelcomeAnimation && (
-        <WelcomeAnimation
-          onComplete={() => setShowWelcomeAnimation(false)}
-          activeTheme={activeTheme}
-        />
+      {/* Theme Studio Modal */}
+      <ThemeModal
+        isOpen={isThemeModalOpen}
+        onClose={() => setIsThemeModalOpen(false)}
+        activeThemeId={themeId}
+        onSelectTheme={setTheme}
+        customTheme={customTheme}
+        onUpdateCustomTheme={updateCustomTheme}
+        onResetCustomTheme={resetCustomTheme}
+      />
+
+      {/* Tab Cloaker Dialog Modal */}
+      {isCloakerOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="w-full max-w-lg bg-[#080f1d] border border-white/10 p-6 rounded-3xl shadow-2xl relative">
+            <button
+              onClick={() => setIsCloakerOpen(false)}
+              className="absolute top-5 right-5 text-slate-400 hover:text-white p-1 rounded-xl hover:bg-white/5"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h2 className="text-xl font-bold text-white mb-2">School Tab Cloaker</h2>
+            <p className="text-xs text-slate-400 mb-6">Change tab title and favicon to look like school software.</p>
+            <TabCloaker />
+          </div>
+        </div>
       )}
     </div>
   );

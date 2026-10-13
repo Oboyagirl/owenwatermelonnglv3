@@ -1,82 +1,106 @@
 import React from 'react';
 import { 
   Gamepad2, 
-  Flame, 
-  Heart, 
-  EyeOff, 
-  Palette, 
-  Dices, 
-  Lock, 
-  ShieldAlert, 
+  Globe, 
+  Bot, 
+  LayoutGrid, 
+  Radio, 
+  ShieldCheck, 
+  Cloud, 
+  Plus, 
+  X, 
+  Columns, 
   ChevronLeft, 
-  ChevronRight,
-  Sparkles,
-  ExternalLink,
-  Users,
-  TrendingUp
+  ChevronRight, 
+  Palette, 
+  Home
 } from 'lucide-react';
 import { ThemeConfig } from '../services/themeStore';
 import { triggerPanic } from '../data/cloakPresets';
-import { REQUEST_GAME_URL } from './Header';
+import { useAuth } from '../context/AuthContext';
+import { AVATAR_PRESETS } from '../services/cloudSaveService';
 
-interface SidebarProps {
-  currentTab: 'games' | 'cloaker';
-  onSelectTab: (tab: 'games' | 'cloaker') => void;
-  activeCategory: string;
-  onSelectCategory: (category: string) => void;
-  onRandomGame: () => void;
+export interface TabItem {
+  id: string;
+  title: string;
+  icon?: string;
+  spaceType: 'home' | 'games' | 'proxy' | 'ai' | 'apps' | 'music' | 'tools' | 'saved';
+  url?: string;
+}
+
+interface OwenSidebarProps {
+  activeSpace: 'home' | 'games' | 'proxy' | 'ai' | 'apps' | 'music' | 'tools' | 'saved';
+  onSelectSpace: (space: 'home' | 'games' | 'proxy' | 'ai' | 'apps' | 'music' | 'tools' | 'saved') => void;
+  tabs: TabItem[];
+  activeTabId: string;
+  onSelectTab: (id: string) => void;
+  onCloseTab: (id: string) => void;
+  onNewTab: () => void;
+  splitTabId?: string | null;
+  onToggleSplitTab?: (id: string) => void;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
+  onOpenAccountModal: () => void;
   onOpenThemeModal: () => void;
-  onOpenCustomThemeStudio?: () => void;
   onLockSite?: () => void;
   activeTheme: ThemeConfig;
   totalGames: number;
-  favoriteCount: number;
-  isCollapsed: boolean;
-  onToggleCollapse: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({
-  currentTab,
+export const Sidebar: React.FC<OwenSidebarProps> = ({
+  activeSpace,
+  onSelectSpace,
+  tabs,
+  activeTabId,
   onSelectTab,
-  activeCategory,
-  onSelectCategory,
-  onRandomGame,
+  onCloseTab,
+  onNewTab,
+  splitTabId,
+  onToggleSplitTab,
+  isCollapsed,
+  onToggleCollapse,
+  onOpenAccountModal,
   onOpenThemeModal,
-  onOpenCustomThemeStudio,
   onLockSite,
   activeTheme,
-  totalGames,
-  favoriteCount,
-  isCollapsed,
-  onToggleCollapse
+  totalGames
 }) => {
-  const isGames = currentTab === 'games';
+  const { profile } = useAuth();
+  const currentAvatar = AVATAR_PRESETS.find(a => a.id === (profile?.avatarId || 'melon_classic')) || AVATAR_PRESETS[0];
+
+  const NAV_ITEMS = [
+    { id: 'home', label: 'Home', icon: Home, emoji: '🏠' },
+    { id: 'games', label: 'Games', icon: Gamepad2, emoji: '🎮' },
+    { id: 'proxy', label: 'Proxy', icon: Globe, emoji: '🌐' },
+    { id: 'ai', label: 'AI Chat', icon: Bot, emoji: '🤖' },
+    { id: 'apps', label: 'Apps', icon: LayoutGrid, emoji: '📱' },
+    { id: 'music', label: 'Music', icon: Radio, emoji: '🎵' },
+    { id: 'tools', label: 'Cloaker', icon: ShieldCheck, emoji: '🛠️' },
+    { id: 'saved', label: 'Saves', icon: Cloud, emoji: '💾' }
+  ] as const;
 
   return (
-    <aside
-      className={`hidden md:flex flex-col shrink-0 select-none z-30 transition-all duration-300 border-r backdrop-blur-xl ${
-        isCollapsed ? 'w-18' : 'w-60'
+    <aside 
+      className={`hidden md:flex flex-col shrink-0 select-none z-30 transition-all duration-300 border-r text-slate-200 ${
+        isCollapsed ? 'w-18' : 'w-64'
       }`}
       style={{
-        backgroundColor: activeTheme.bgHeader,
+        backgroundColor: activeTheme.bgHeader || activeTheme.bgPrimary,
         borderColor: activeTheme.border
       }}
     >
-      {/* Top Brand Area */}
+      {/* Top OwenWatermelonV3 Brand Area */}
       <div 
-        className="h-16 px-4 flex items-center justify-between border-b shrink-0"
+        className="h-16 px-3.5 flex items-center justify-between border-b shrink-0"
         style={{ borderColor: activeTheme.border }}
       >
         <button
-          onClick={() => {
-            onSelectTab('games');
-            onSelectCategory('All');
-          }}
+          onClick={() => onSelectSpace('home')}
           className="flex items-center gap-3 cursor-pointer text-left overflow-hidden group"
-          title="Return to Home"
+          title="OwenWatermelonV3 OS"
         >
           <div 
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0 border shadow-md transition-transform group-hover:scale-105"
+            className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl shrink-0 shadow-lg group-hover:scale-105 transition-transform border"
             style={{
               backgroundColor: activeTheme.accentBadge,
               borderColor: activeTheme.borderActive
@@ -87,12 +111,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {!isCollapsed && (
             <div className="flex flex-col truncate">
-              <span className="font-extrabold text-sm text-white tracking-tight leading-tight flex items-center gap-1.5 truncate">
-                <span>Owen</span>
-                <span style={{ color: activeTheme.accent }}>V3</span>
+              <span className="font-extrabold text-sm text-white tracking-tight leading-tight flex items-center gap-1 truncate">
+                <span>OwenWatermelon</span>
+                <span className="font-mono text-xs" style={{ color: activeTheme.accent }}>V3</span>
               </span>
               <span className="text-[10px] font-mono text-slate-400 truncate">
-                {totalGames} unblocked
+                {totalGames} unblocked games
               </span>
             </div>
           )}
@@ -100,298 +124,202 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <button
           onClick={onToggleCollapse}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-white transition-colors cursor-pointer ml-auto border border-transparent hover:border-white/10"
-          style={{
-            color: '#94a3b8'
-          }}
-          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          className="p-1.5 rounded-xl hover:bg-white/5 text-slate-400 hover:text-white transition-colors cursor-pointer border border-transparent hover:border-white/10"
+          title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
         >
           {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </button>
       </div>
 
-      {/* Main Navigation Stack */}
-      <div className="flex-1 overflow-y-auto px-2.5 py-4 flex flex-col gap-5 custom-scrollbar">
-        {/* Core Navigation */}
-        <div className="flex flex-col gap-1">
-          {!isCollapsed && (
-            <span className="px-2.5 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              Navigation
-            </span>
-          )}
-
-          {/* Arcade Games Hub */}
-          <button
-            onClick={() => {
-              onSelectTab('games');
-              onSelectCategory('All');
-            }}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border ${
-              isGames && activeCategory === 'All'
-                ? 'shadow-md'
-                : 'border-transparent text-slate-300 hover:text-white hover:bg-white/5'
-            }`}
-            style={{
-              backgroundColor: isGames && activeCategory === 'All' ? activeTheme.accentBadge : undefined,
-              borderColor: isGames && activeCategory === 'All' ? activeTheme.borderActive : undefined,
-              color: isGames && activeCategory === 'All' ? activeTheme.accent : undefined
-            }}
-            title="Arcade Hub"
-          >
-            <Gamepad2 className="w-4 h-4 shrink-0" />
-            {!isCollapsed && <span>Arcade Hub</span>}
-          </button>
-
-          {/* Trending */}
-          <button
-            onClick={() => {
-              onSelectTab('games');
-              onSelectCategory('Trending');
-            }}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border ${
-              isGames && activeCategory === 'Trending'
-                ? 'shadow-md'
-                : 'border-transparent text-slate-300 hover:text-white hover:bg-white/5'
-            }`}
-            style={{
-              backgroundColor: isGames && activeCategory === 'Trending' ? activeTheme.accentBadge : undefined,
-              borderColor: isGames && activeCategory === 'Trending' ? activeTheme.borderActive : undefined,
-              color: isGames && activeCategory === 'Trending' ? '#f43f5e' : undefined
-            }}
-            title="Trending Games (Most Played)"
-          >
-            <TrendingUp className="w-4 h-4 shrink-0 text-[#f43f5e]" />
-            {!isCollapsed && (
-              <div className="flex items-center justify-between w-full">
-                <span>Trending</span>
-                <span className="text-[10px] font-mono text-rose-400 font-bold">
-                  Hot
-                </span>
-              </div>
-            )}
-          </button>
-
-          {/* 2 Player Games */}
-          <button
-            onClick={() => {
-              onSelectTab('games');
-              onSelectCategory('2 Player Games');
-            }}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border ${
-              isGames && (activeCategory === '2 Player Games' || activeCategory === '2 Player')
-                ? 'shadow-md'
-                : 'border-transparent text-slate-300 hover:text-white hover:bg-white/5'
-            }`}
-            style={{
-              backgroundColor: isGames && (activeCategory === '2 Player Games' || activeCategory === '2 Player') ? activeTheme.accentBadge : undefined,
-              borderColor: isGames && (activeCategory === '2 Player Games' || activeCategory === '2 Player') ? activeTheme.borderActive : undefined,
-              color: isGames && (activeCategory === '2 Player Games' || activeCategory === '2 Player') ? '#a78bfa' : undefined
-            }}
-            title="2 Player Games (Local 1v1 & Co-op)"
-          >
-            <Users className="w-4 h-4 shrink-0" style={{ color: '#a78bfa' }} />
-            {!isCollapsed && (
-              <div className="flex items-center justify-between w-full">
-                <span>2 Player Games</span>
-                <span className="text-[10px] font-mono text-violet-300">
-                  1v1
-                </span>
-              </div>
-            )}
-          </button>
-
-          {/* Sawyer For Sawyer */}
-          <button
-            onClick={() => {
-              onSelectTab('games');
-              onSelectCategory('Sawyer For Sawyer');
-            }}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border ${
-              isGames && activeCategory === 'Sawyer For Sawyer'
-                ? 'shadow-md'
-                : 'border-transparent text-slate-300 hover:text-white hover:bg-white/5'
-            }`}
-            style={{
-              backgroundColor: isGames && activeCategory === 'Sawyer For Sawyer' ? activeTheme.accentBadge : undefined,
-              borderColor: isGames && activeCategory === 'Sawyer For Sawyer' ? activeTheme.borderActive : undefined,
-              color: isGames && activeCategory === 'Sawyer For Sawyer' ? '#38bdf8' : undefined
-            }}
-            title="Sawyer For Sawyer Category"
-          >
-            <span className="text-base shrink-0 leading-none">🏆</span>
-            {!isCollapsed && (
-              <div className="flex items-center justify-between w-full">
-                <span>Sawyer For Sawyer</span>
-                <span className="text-[10px] font-mono text-sky-300">
-                  Cup
-                </span>
-              </div>
-            )}
-          </button>
-
-          {/* Starred Favorites */}
-          <button
-            onClick={() => {
-              onSelectTab('games');
-              onSelectCategory('Favorites');
-            }}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border ${
-              isGames && activeCategory === 'Favorites'
-                ? 'shadow-md'
-                : 'border-transparent text-slate-300 hover:text-white hover:bg-white/5'
-            }`}
-            style={{
-              backgroundColor: isGames && activeCategory === 'Favorites' ? activeTheme.accentBadge : undefined,
-              borderColor: isGames && activeCategory === 'Favorites' ? activeTheme.borderActive : undefined,
-              color: isGames && activeCategory === 'Favorites' ? '#ff2d55' : undefined
-            }}
-            title="Starred Favorites"
-          >
-            <Heart className="w-4 h-4 shrink-0 text-[#ff2d55]" />
-            {!isCollapsed && (
-              <div className="flex items-center justify-between w-full">
-                <span>Favorites</span>
-                {favoriteCount > 0 && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full font-mono bg-[#ff2d55]/20 text-[#ff7597] font-bold">
-                    {favoriteCount}
-                  </span>
+      {/* Main Spaces Rail */}
+      <div 
+        className="p-2.5 flex flex-col gap-1 border-b shrink-0"
+        style={{ borderColor: activeTheme.border }}
+      >
+        {!isCollapsed && (
+          <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 px-2 py-1">
+            Spaces
+          </span>
+        )}
+        <div className="flex flex-col gap-0.5">
+          {NAV_ITEMS.map(item => {
+            const isActive = activeSpace === item.id;
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.id}
+                onClick={() => onSelectSpace(item.id)}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer relative group ${
+                  isActive
+                    ? 'text-white border shadow-md'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
+                }`}
+                style={{
+                  backgroundColor: isActive ? activeTheme.accentBadge : undefined,
+                  borderColor: isActive ? activeTheme.borderActive : 'transparent'
+                }}
+                title={item.label}
+              >
+                <div className="flex items-center justify-center shrink-0">
+                  <Icon 
+                    className="w-4 h-4 transition-colors" 
+                    style={{ color: isActive ? activeTheme.accent : undefined }} 
+                  />
+                </div>
+                {!isCollapsed && (
+                  <span className="truncate">{item.label}</span>
                 )}
-              </div>
-            )}
-          </button>
-
-          {/* Tab Cloaker & Stealth */}
-          <button
-            onClick={() => onSelectTab('cloaker')}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border ${
-              currentTab === 'cloaker'
-                ? 'shadow-md'
-                : 'border-transparent text-slate-300 hover:text-white hover:bg-white/5'
-            }`}
-            style={{
-              backgroundColor: currentTab === 'cloaker' ? activeTheme.accentBadge : undefined,
-              borderColor: currentTab === 'cloaker' ? activeTheme.borderActive : undefined,
-              color: currentTab === 'cloaker' ? activeTheme.accent : undefined
-            }}
-            title="Tab Cloaker & Stealth Camouflage"
-          >
-            <EyeOff className="w-4 h-4 shrink-0" />
-            {!isCollapsed && (
-              <div className="flex items-center justify-between w-full">
-                <span>Tab Cloaker</span>
-                <span className="text-[10px] font-mono text-emerald-400 font-bold">
-                  Stealth
-                </span>
-              </div>
-            )}
-          </button>
-        </div>
-
-        {/* Themes & Custom Creator */}
-        <div className="flex flex-col gap-1 pt-2 border-t" style={{ borderColor: activeTheme.border }}>
-          {!isCollapsed && (
-            <span className="px-2.5 mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              Themes & Styles
-            </span>
-          )}
-
-          {/* Make Custom Theme Button */}
-          <button
-            onClick={() => onOpenCustomThemeStudio ? onOpenCustomThemeStudio() : onOpenThemeModal()}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border shadow-sm group hover:scale-[1.02]"
-            style={{
-              backgroundColor: activeTheme.accentBadge,
-              borderColor: activeTheme.borderActive,
-              color: activeTheme.kicker
-            }}
-            title="Create your own custom theme"
-          >
-            <Sparkles className="w-4 h-4 shrink-0 animate-pulse" style={{ color: activeTheme.accent }} />
-            {!isCollapsed && (
-              <div className="flex items-center justify-between w-full">
-                <span>Custom Theme</span>
-                <span className="text-[9px] px-1.5 py-0.5 rounded font-mono bg-purple-500/20 text-purple-300 font-bold uppercase">
-                  Studio
-                </span>
-              </div>
-            )}
-          </button>
-
-          {/* Theme Gallery */}
-          <button
-            onClick={onOpenThemeModal}
-            className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
-            title="Theme Gallery"
-          >
-            <Palette className="w-4 h-4 shrink-0" style={{ color: activeTheme.accent }} />
-            {!isCollapsed && (
-              <div className="flex items-center justify-between w-full">
-                <span>Theme Gallery</span>
-                <span className="text-[10px] text-slate-400">{activeTheme.emoji}</span>
-              </div>
-            )}
-          </button>
-        </div>
-
-        {/* Quick Utilities / PeteZah Tools */}
-        <div className="flex flex-col gap-1 pt-2 border-t" style={{ borderColor: activeTheme.border }}>
-          {!isCollapsed && (
-            <span className="px-2.5 mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              Utilities
-            </span>
-          )}
-
-          {/* Random Game */}
-          <button
-            onClick={onRandomGame}
-            className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
-            title="Launch Random Game"
-          >
-            <Dices className="w-4 h-4 shrink-0" style={{ color: activeTheme.accent }} />
-            {!isCollapsed && <span>Random Game</span>}
-          </button>
-
-          {/* Request Game */}
-          <a
-            href={REQUEST_GAME_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
-            title="Request a new game"
-          >
-            <ExternalLink className="w-4 h-4 shrink-0" style={{ color: activeTheme.accent }} />
-            {!isCollapsed && <span>Request Game</span>}
-          </a>
+                {isActive && (
+                  <span 
+                    className="absolute right-2 w-1.5 h-1.5 rounded-full" 
+                    style={{ backgroundColor: activeTheme.accent, boxShadow: `0 0 8px ${activeTheme.accent}` }}
+                  />
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Bottom Footer Actions (Lock & Panic) */}
-      <div 
-        className="p-3 border-t flex flex-col gap-2 shrink-0"
-        style={{ borderColor: activeTheme.border }}
-      >
-        {onLockSite && (
+      {/* Browser Tabs Section */}
+      <div className="flex-1 flex flex-col p-2.5 overflow-hidden">
+        <div className="flex items-center justify-between px-2 py-1.5">
+          {!isCollapsed && (
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
+              Tabs ({tabs.length})
+            </span>
+          )}
           <button
-            onClick={onLockSite}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white border transition-colors cursor-pointer"
-            style={{
-              backgroundColor: activeTheme.bgCard,
-              borderColor: activeTheme.border
-            }}
-            title="Lock site with passcode (owenpan2244)"
+            onClick={onNewTab}
+            className="p-1 rounded-lg bg-white/5 hover:bg-white/10 transition-all cursor-pointer border"
+            style={{ borderColor: activeTheme.border, color: activeTheme.accent }}
+            title="New Tab"
           >
-            <Lock className="w-3.5 h-3.5 text-slate-400" />
-            {!isCollapsed && <span>Lock Site</span>}
+            <Plus className="w-3.5 h-3.5" />
           </button>
-        )}
+        </div>
 
+        <div className="flex-1 overflow-y-auto space-y-1 pr-1 scrollbar-none">
+          {tabs.map(tab => {
+            const isTabActive = tab.id === activeTabId;
+            const isSplit = tab.id === splitTabId;
+            return (
+              <div
+                key={tab.id}
+                onClick={() => onSelectTab(tab.id)}
+                className={`group flex items-center justify-between px-2.5 py-2 rounded-xl text-xs transition-all cursor-pointer border ${
+                  isTabActive
+                    ? 'text-white shadow-md'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                }`}
+                style={{
+                  backgroundColor: isTabActive ? activeTheme.bgCard : activeTheme.bgSecondary,
+                  borderColor: isTabActive ? activeTheme.borderActive : activeTheme.border
+                }}
+                title={tab.title}
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <span className="text-sm shrink-0">{tab.icon || '📄'}</span>
+                  {!isCollapsed && (
+                    <span className="truncate font-medium text-[11px]">{tab.title}</span>
+                  )}
+                </div>
+
+                {!isCollapsed && (
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {onToggleSplitTab && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onToggleSplitTab(tab.id);
+                        }}
+                        className={`p-1 rounded hover:bg-white/10 ${isSplit ? 'text-white' : 'text-slate-500 hover:text-white'}`}
+                        style={{ color: isSplit ? activeTheme.accent : undefined }}
+                        title="Split view"
+                      >
+                        <Columns className="w-3 h-3" />
+                      </button>
+                    )}
+                    {tabs.length > 1 && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onCloseTab(tab.id);
+                        }}
+                        className="p-1 rounded hover:bg-white/10 text-slate-500 hover:text-rose-400"
+                        title="Close tab"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Bottom Profile, Themes & Stealth Toolbar */}
+      <div 
+        className="p-2.5 border-t flex flex-col gap-1.5 shrink-0"
+        style={{ borderColor: activeTheme.border, backgroundColor: activeTheme.bgSecondary }}
+      >
+        {/* Themes Button */}
+        <button
+          onClick={onOpenThemeModal}
+          className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 transition-all cursor-pointer"
+          title="Change Theme & Custom Studio"
+        >
+          <div 
+            className="w-6 h-6 rounded-lg flex items-center justify-center text-xs shrink-0 border"
+            style={{
+              backgroundColor: activeTheme.accentBadge,
+              borderColor: activeTheme.borderActive
+            }}
+          >
+            <Palette className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
+          </div>
+          {!isCollapsed && <span>Themes ({activeTheme.name || 'Theme'})</span>}
+        </button>
+
+        {/* Panic Button */}
         <button
           onClick={triggerPanic}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-white bg-[#ff2d55] hover:bg-[#e11d48] transition-colors cursor-pointer shadow-md shadow-[#ff2d55]/20"
-          title="Emergency Panic: Immediately hides tab"
+          className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-bold text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/30 transition-all cursor-pointer"
+          title="Emergency Panic Button (Redirect to Google Classroom immediately)"
         >
-          <ShieldAlert className="w-3.5 h-3.5 text-white" />
-          {!isCollapsed && <span>Panic (Esc)</span>}
+          <div className="w-6 h-6 rounded-lg bg-rose-500/20 flex items-center justify-center shrink-0">
+            🚨
+          </div>
+          {!isCollapsed && <span>Panic Key (Esc)</span>}
+        </button>
+
+        {/* User Account / Profile */}
+        <button
+          onClick={onOpenAccountModal}
+          className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 transition-all cursor-pointer"
+          title="Account & Cloud Saves"
+        >
+          <div 
+            className="w-6 h-6 rounded-lg flex items-center justify-center text-xs shrink-0 border"
+            style={{
+              backgroundColor: activeTheme.accentBadge,
+              borderColor: activeTheme.borderActive
+            }}
+          >
+            {currentAvatar.icon || '👤'}
+          </div>
+          {!isCollapsed && (
+            <div className="flex flex-col text-left truncate">
+              <span className="truncate text-[11px] font-bold text-white">
+                {profile?.displayName || 'Guest Player'}
+              </span>
+              <span className="truncate text-[9px] text-slate-500 font-mono">
+                Cloud Sync Active
+              </span>
+            </div>
+          )}
         </button>
       </div>
     </aside>

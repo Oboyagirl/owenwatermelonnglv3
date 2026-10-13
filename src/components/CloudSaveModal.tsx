@@ -22,6 +22,8 @@ import { useAuth } from '../context/AuthContext';
 import { Game } from '../types/game';
 import { ThemeConfig } from '../services/themeStore';
 import { 
+  captureUniversalGameState, 
+  restoreUniversalGameState,
   captureBrowserGameState, 
   restoreBrowserGameState 
 } from '../services/cloudSaveService';
@@ -32,6 +34,7 @@ interface CloudSaveModalProps {
   onClose: () => void;
   onReloadGame: () => void;
   theme: ThemeConfig;
+  contentWindow?: Window | null;
 }
 
 export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
@@ -39,7 +42,8 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
   isOpen,
   onClose,
   onReloadGame,
-  theme
+  theme,
+  contentWindow
 }) => {
   const { user, profile, deviceLabel, isGuest, loginGoogle, loginGuest, saveCurrentGame, deleteSave, getSavesForGame } = useAuth();
   
@@ -65,15 +69,15 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
     try {
       let dataToSave = manualSaveInput.trim();
 
-      // If no custom text was entered, capture current browser localStorage
+      // If no custom text was entered, capture current browser & engine state universally
       if (!dataToSave || !useCustomInput) {
-        dataToSave = captureBrowserGameState(game.id);
+        dataToSave = await captureUniversalGameState(game.id, contentWindow);
       }
 
       await saveCurrentGame(game.id, selectedSlot, {
         title: game.title,
         saveData: dataToSave,
-        saveType: useCustomInput ? 'manual' : 'localStorage',
+        saveType: useCustomInput ? 'manual' : 'universal',
         deviceLabel
       });
 
@@ -86,17 +90,18 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
     }
   };
 
-  const handleCloudRestore = () => {
+  const handleCloudRestore = async () => {
     if (!currentSlotSave) return;
+    setIsProcessing(true);
 
     try {
-      const restored = restoreBrowserGameState(game.id, currentSlotSave.saveData);
+      const restored = await restoreUniversalGameState(game.id, currentSlotSave.saveData, contentWindow);
       if (restored) {
-        showStatus("Save restored! Refreshing game session...", "success");
+        showStatus("✓ Save restored into game engine! Refreshing session...", "success");
         setTimeout(() => {
           onReloadGame();
           onClose();
-        }, 1200);
+        }, 1100);
       } else {
         // If not standard JSON snapshot, copy to clipboard for games with code inputs (like Cookie Clicker)
         navigator.clipboard.writeText(currentSlotSave.saveData);
@@ -104,6 +109,8 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
       }
     } catch (err: any) {
       showStatus("Could not inject save data automatically.", "error");
+    } finally {
+      setIsProcessing(false);
     }
   };
 

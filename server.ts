@@ -3,11 +3,35 @@ import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import https from 'https';
 import http from 'http';
+import fs from 'fs';
 import { GoogleGenAI } from '@google/genai';
 
 async function startServer() {
   const app = express();
-  const PORT = Number(process.env.PORT) || 3000;
+
+  // Parse CLI arguments (e.g. tsx server.ts --port 3000 --host 0.0.0.0)
+  const portArgIndex = process.argv.indexOf('--port');
+  let chosenPort = 3000;
+  if (portArgIndex !== -1 && process.argv[portArgIndex + 1]) {
+    const parsed = Number(process.argv[portArgIndex + 1]);
+    if (!Number.isNaN(parsed) && parsed > 0) {
+      chosenPort = parsed;
+    }
+  } else if (process.env.PORT) {
+    const envPort = Number(process.env.PORT);
+    // In our container environment, Nginx is bound to 8080 and proxies traffic to 3000.
+    // If process.env.PORT is 8080, keep port 3000 to prevent EADDRINUSE collisions.
+    if (!Number.isNaN(envPort) && envPort !== 8080 && envPort > 0) {
+      chosenPort = envPort;
+    }
+  }
+  const PORT = chosenPort;
+
+  const hostArgIndex = process.argv.indexOf('--host');
+  let chosenHost = '0.0.0.0';
+  if (hostArgIndex !== -1 && process.argv[hostArgIndex + 1]) {
+    chosenHost = process.argv[hostArgIndex + 1];
+  }
 
   app.use(express.json());
 
@@ -147,7 +171,7 @@ Your job:
     });
   });
 
-  // Unblock Proxy Endpoint - Routes external games through server so school filters (Securly, GoGuardian) cannot block them
+  // Unblock Proxy Endpoint - Routes external websites and games through server so school filters (Securly, GoGuardian) cannot block them
   app.get('/api/proxy', (req, res) => {
     let targetUrl = req.query.url as string;
     if (!targetUrl) {
@@ -158,99 +182,150 @@ Your job:
       targetUrl = 'https://' + targetUrl;
     }
 
-    try {
-      const parsed = new URL(targetUrl);
-      const isHttps = parsed.protocol === 'https:';
-      const client = isHttps ? https : http;
+    const fetchUrlWithRedirects = (currentUrl: string, hopsRemaining = 5) => {
+      if (hopsRemaining <= 0) {
+        return res.status(508).send('Too many redirects encountered');
+      }
 
-      const proxyReq = client.get(targetUrl, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-          'Accept-Language': 'en-US,en;q=0.5',
-        }
-      }, (proxyRes) => {
-        // Follow redirects
-        if (proxyRes.statusCode && proxyRes.statusCode >= 300 && proxyRes.statusCode < 400 && proxyRes.headers.location) {
-          const redirectUrl = new URL(proxyRes.headers.location, targetUrl).href;
-          return res.redirect(`/api/proxy?url=${encodeURIComponent(redirectUrl)}`);
-        }
+      try {
+        const parsed = new URL(currentUrl);
+        const isHttps = parsed.protocol === 'https:';
+        const client = isHttps ? https : http;
 
-        res.status(proxyRes.statusCode || 200);
-        const contentType = proxyRes.headers['content-type'] || '';
-        
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
-        // Strip blocking headers to allow iframe embedding anywhere
-        res.removeHeader('X-Frame-Options');
-        res.removeHeader('Content-Security-Policy');
-        res.removeHeader('Cross-Origin-Embedder-Policy');
-        res.removeHeader('Cross-Origin-Opener-Policy');
-
-        if (contentType.includes('text/html')) {
-          res.setHeader('Content-Type', 'text/html; charset=utf-8');
-          let body = '';
-          proxyRes.setEncoding('utf-8');
-          proxyRes.on('data', chunk => {
-            body += chunk;
-          });
-          proxyRes.on('end', () => {
-            // Determine baseHref for subresources
-            let baseHref = targetUrl;
-            if (targetUrl.includes('ubghyper.github.io/GameList.github.io/')) {
-              const gameMatch = targetUrl.match(/GameList\.github\.io\/([^/]+)/);
-              if (gameMatch && gameMatch[1]) {
-                baseHref = `https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/${gameMatch[1]}/`;
-              }
-            } else if (baseHref.endsWith('.html') || baseHref.endsWith('.htm')) {
-              baseHref = baseHref.substring(0, baseHref.lastIndexOf('/') + 1);
-            } else if (!baseHref.endsWith('/')) {
-              baseHref += '/';
-            }
-
-            const baseTag = `<base href="${baseHref}">`;
-            let modified = body.replace(/<meta[^>]*http-equiv=["']?Content-Security-Policy["']?[^>]*>/gi, '');
-            // Neutralize frame buster scripts so games cannot escape iframe
-            modified = modified.replace(/window\.top\.location/g, 'window.__disabled_top_location');
-            modified = modified.replace(/top\.location\.href/g, 'window.__disabled_top_href');
-
-            // CRITICAL FOR SECURLY: Rewrite Ruffle scripts to modern CDN
-            modified = modified.replace(/https?:\/\/ubghyper\.github\.io\/GameList\.github\.io\/ruffle\/ruffle\.js/g, 'https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle');
-            modified = modified.replace(/"ruffle\/ruffle\.js"/g, '"https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle"');
-            modified = modified.replace(/'ruffle\/ruffle\.js'/g, "'https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle'");
-            
-            // Block ad/affiliate redirects (e.g. argix/agrix domain redirects)
-            modified = modified.replace(/(location\.(href|replace|assign)\s*=\s*|window\.open\()['"][^'"]*(argix|agrix|traffic|adservice|monetiz)[^'"]*['"]/gi, '/* blocked ad redirect */');
-
-            // For non-SWF assets, can use jsDelivr; keep SWFs on direct github / api/swf to prevent 403 (files >20MB blocked by jsDelivr)
-            modified = modified.replace(/https?:\/\/ubghyper\.github\.io\/GameList\.github\.io\/(?!.*\.swf)([^"'\s>]+)/g, 'https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/$1');
-
-            // Upstream fix for The Binding of Isaac which incorrectly pointed to super smash flash 2
-            if (targetUrl.toLowerCase().includes('binding-of-isaac') || targetUrl.toLowerCase().includes('the-binding-of-isaac')) {
-              modified = modified.replace(/super-smash-flash-2\.swf/g, 'thebindingofissac.swf');
-            }
-
-            if (/<head[^>]*>/i.test(modified)) {
-              modified = modified.replace(/(<head[^>]*>)/i, `$1\n${baseTag}`);
-            } else {
-              modified = baseTag + modified;
-            }
-            res.send(modified);
-          });
-        } else {
-          if (contentType) {
-            res.setHeader('Content-Type', contentType);
+        const proxyReq = client.get(currentUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'identity', // Prevent gzip/br compression so text rewriting works
           }
-          proxyRes.pipe(res);
-        }
-      });
+        }, (proxyRes) => {
+          // Follow redirects internally on server so client iframe never sees redirect block
+          if (proxyRes.statusCode && proxyRes.statusCode >= 300 && proxyRes.statusCode < 400 && proxyRes.headers.location) {
+            const redirectUrl = new URL(proxyRes.headers.location, currentUrl).href;
+            return fetchUrlWithRedirects(redirectUrl, hopsRemaining - 1);
+          }
 
-      proxyReq.on('error', (err) => {
-        res.status(502).send('Proxy error: ' + err.message);
-      });
-    } catch (err: any) {
-      res.status(400).send('Invalid URL: ' + err.message);
+          res.status(proxyRes.statusCode || 200);
+          const contentType = proxyRes.headers['content-type'] || '';
+          
+          res.setHeader('Access-Control-Allow-Origin', '*');
+          res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, POST, OPTIONS');
+          res.setHeader('Access-Control-Allow-Headers', '*');
+          // Strip blocking headers to allow iframe embedding anywhere
+          res.removeHeader('X-Frame-Options');
+          res.removeHeader('Frame-Options');
+          res.removeHeader('Content-Security-Policy');
+          res.removeHeader('Cross-Origin-Embedder-Policy');
+          res.removeHeader('Cross-Origin-Opener-Policy');
+          res.setHeader('Content-Security-Policy', "frame-ancestors *");
+
+          if (contentType.includes('text/html')) {
+            res.setHeader('Content-Type', 'text/html; charset=utf-8');
+            let body = '';
+            proxyRes.setEncoding('utf-8');
+            proxyRes.on('data', chunk => {
+              body += chunk;
+            });
+            proxyRes.on('end', () => {
+              // Determine baseHref for subresources
+              let baseHref = currentUrl;
+              if (currentUrl.includes('ubghyper.github.io/GameList.github.io/')) {
+                const gameMatch = currentUrl.match(/GameList\.github\.io\/([^/]+)/);
+                if (gameMatch && gameMatch[1]) {
+                  baseHref = `https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/${gameMatch[1]}/`;
+                }
+              } else if (baseHref.endsWith('.html') || baseHref.endsWith('.htm')) {
+                baseHref = baseHref.substring(0, baseHref.lastIndexOf('/') + 1);
+              } else if (!baseHref.endsWith('/')) {
+                baseHref += '/';
+              }
+
+              const baseTag = `<base href="${baseHref}">`;
+              let modified = body.replace(/<meta[^>]*http-equiv=["']?Content-Security-Policy["']?[^>]*>/gi, '');
+              modified = modified.replace(/<meta[^>]*http-equiv=["']?X-Frame-Options["']?[^>]*>/gi, '');
+              // Neutralize frame buster scripts so pages cannot escape iframe
+              modified = modified.replace(/window\.top\.location/g, 'window.__disabled_top_location');
+              modified = modified.replace(/top\.location\.href/g, 'window.__disabled_top_href');
+              modified = modified.replace(/parent\.location/g, 'window.__disabled_parent_location');
+              modified = modified.replace(/if\s*\(\s*top\s*!==?\s*self\s*\)/g, 'if(false)');
+              modified = modified.replace(/if\s*\(\s*window\s*!==?\s*window\.top\s*\)/g, 'if(false)');
+
+              // CRITICAL FOR SECURLY: Rewrite Ruffle scripts to modern CDN with ruffle.js
+              modified = modified.replace(/https?:\/\/ubghyper\.github\.io\/GameList\.github\.io\/ruffle\/ruffle\.js/g, 'https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/ruffle.js');
+              modified = modified.replace(/"ruffle\/ruffle\.js"/g, '"https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/ruffle.js"');
+              modified = modified.replace(/'ruffle\/ruffle\.js'/g, "'https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/ruffle.js'");
+              
+              if (modified.includes('ruffle') || modified.includes('RufflePlayer')) {
+                const ruffleConfig = `<script>window.RufflePlayer = window.RufflePlayer || {}; window.RufflePlayer.config = Object.assign({ publicPath: "https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/" }, window.RufflePlayer.config || {});</script>`;
+                modified = modified.replace(/(<head[^>]*>)/i, `$1\n${ruffleConfig}`);
+              }
+
+              if (body.includes('requirejs') || body.includes('require.js') || body.includes('bower_components/requirejs')) {
+                const requireConfig = `<script>window.require = window.require || {}; window.require.baseUrl = "${baseHref}";</script>`;
+                modified = modified.replace(/(<head[^>]*>)/i, `$1\n${requireConfig}`);
+              }
+              
+              // Block ad/affiliate redirects
+              modified = modified.replace(/(location\.(href|replace|assign)\s*=\s*|window\.open\()['"][^'"]*(argix|agrix|traffic|adservice|monetiz)[^'"]*['"]/gi, '/* blocked ad redirect */');
+
+              // For non-SWF assets, can use jsDelivr
+              modified = modified.replace(/https?:\/\/ubghyper\.github\.io\/GameList\.github\.io\/(?!.*\.swf)([^"'\s>]+)/g, 'https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/$1');
+
+              const interceptorScript = `
+<script>
+(function() {
+  try {
+    Object.defineProperty(window, 'top', { get: function() { return window; } });
+    Object.defineProperty(window, 'parent', { get: function() { return window; } });
+  } catch(e) {}
+  document.addEventListener('click', function(e) {
+    var a = e.target && e.target.closest ? e.target.closest('a') : null;
+    if (a && a.href && !a.href.startsWith('javascript:') && !a.href.startsWith('#')) {
+      e.preventDefault();
+      window.location.href = '/api/proxy?url=' + encodeURIComponent(a.href);
     }
+  }, true);
+  document.addEventListener('submit', function(e) {
+    var form = e.target;
+    if (form && form.action) {
+      var method = (form.method || 'GET').toUpperCase();
+      if (method === 'GET') {
+        e.preventDefault();
+        var formData = new FormData(form);
+        var params = new URLSearchParams(formData).toString();
+        var dest = form.action + (form.action.indexOf('?') !== -1 ? '&' : '?') + params;
+        window.location.href = '/api/proxy?url=' + encodeURIComponent(dest);
+      }
+    }
+  }, true);
+})();
+</script>`;
+
+              if (/<head[^>]*>/i.test(modified)) {
+                modified = modified.replace(/(<head[^>]*>)/i, `$1\n${baseTag}\n${interceptorScript}`);
+              } else {
+                modified = baseTag + interceptorScript + modified;
+              }
+              res.send(modified);
+            });
+          } else {
+            if (contentType) {
+              res.setHeader('Content-Type', contentType);
+            }
+            proxyRes.pipe(res);
+          }
+        });
+
+        proxyReq.on('error', (err) => {
+          res.status(502).send('Proxy error: ' + err.message);
+        });
+      } catch (err: any) {
+        res.status(400).send('Invalid URL: ' + err.message);
+      }
+    };
+
+    fetchUrlWithRedirects(targetUrl);
   });
 
   // Dedicated SWF Proxy - Streams Flash games with guaranteed application/x-shockwave-flash MIME and CORS
@@ -308,6 +383,68 @@ Your job:
     next();
   }, express.static(path.resolve('public/games')));
 
+  // Serve static real MP3 music with byte-range streaming support (compatible with iOS iPad Safari & Chrome)
+  const streamAudioFile = (filename: string, req: express.Request, res: express.Response) => {
+    const cleanFilename = path.basename(filename);
+    const musicDir = path.resolve('public/music');
+    const filePath = path.join(musicDir, cleanFilename);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).send('Audio file not found: ' + cleanFilename);
+    }
+
+    const stat = fs.statSync(filePath);
+    const fileSize = stat.size;
+    const range = req.headers.range;
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Accept-Ranges', 'bytes');
+    res.setHeader('Content-Type', 'audio/mpeg');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+
+    if (range) {
+      const parts = range.replace(/bytes=/, '').split('-');
+      const start = parseInt(parts[0], 10);
+      const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+
+      if (start >= fileSize || end >= fileSize) {
+        res.setHeader('Content-Range', `bytes */${fileSize}`);
+        return res.status(416).send('Requested range not satisfiable');
+      }
+
+      const chunkSize = end - start + 1;
+      const fileStream = fs.createReadStream(filePath, { start, end });
+      res.writeHead(206, {
+        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': chunkSize,
+        'Content-Type': 'audio/mpeg',
+      });
+      fileStream.pipe(res);
+    } else {
+      res.writeHead(200, {
+        'Content-Length': fileSize,
+        'Accept-Ranges': 'bytes',
+        'Content-Type': 'audio/mpeg',
+      });
+      fs.createReadStream(filePath).pipe(res);
+    }
+  };
+
+  app.get('/music/:filename', (req, res) => {
+    streamAudioFile(req.params.filename, req, res);
+  });
+
+  app.get('/api/music/:filename', (req, res) => {
+    streamAudioFile(req.params.filename, req, res);
+  });
+
+  app.use('/music', (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Accept-Ranges', 'bytes');
+    next();
+  }, express.static(path.resolve('public/music')));
+
   const httpServer = http.createServer(app);
 
   if (process.env.NODE_ENV === 'production') {
@@ -319,17 +456,15 @@ Your job:
     const vite = await createViteServer({
       server: {
         middlewareMode: true,
-        hmr: {
-          server: httpServer,
-        },
+        hmr: false,
       },
       appType: 'spa',
     });
     app.use(vite.middlewares);
   }
 
-  httpServer.listen(PORT, '0.0.0.0', () => {
-    console.log(`Owen Watermelon V3 Server running on port ${PORT}`);
+  httpServer.listen(PORT, chosenHost, () => {
+    console.log(`Owen Watermelon V3 Server running on http://${chosenHost}:${PORT}`);
   });
 }
 

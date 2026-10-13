@@ -174,20 +174,21 @@
       showSwfDownload: false,
       splashScreen: false,
       openUrlMode: "confirm",
-      quality: "medium",
+      quality: "high",
       maxExecutionDuration: 60,
       playerVersion: 32,
       forceScale: true,
       wmode: "opaque",
-      preferredRenderer: "webgl"
+      preferredRenderer: "webgl",
+      publicPath: "https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/"
     };
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle" onerror="loadFallbackRuffle()"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/ruffle.js" onerror="loadFallbackRuffle()"></script>
   <script>
     function loadFallbackRuffle() {
       console.warn("Primary Ruffle CDN failed, loading fallback from unpkg...");
       const s = document.createElement("script");
-      s.src = "https://unpkg.com/@ruffle-rs/ruffle/ruffle.js";
+      s.src = "https://unpkg.com/@ruffle-rs/ruffle@0.7.1/ruffle.js";
       document.head.appendChild(s);
     }
   </script>
@@ -281,7 +282,17 @@
             }
           }, 20000);
 
-          function attemptLoad(urlToLoad) {
+          // Prefer same-origin proxy when available to guarantee bypass of school filters and CORS
+          let primaryUrl = rawSwf;
+          let fallbackUrl = null;
+          if (rawSwf && (rawSwf.startsWith('http://') || rawSwf.startsWith('https://'))) {
+            if (window.location.protocol.startsWith('http') && !rawSwf.startsWith(window.location.origin)) {
+              primaryUrl = '/api/swf?url=' + encodeURIComponent(rawSwf);
+              fallbackUrl = rawSwf;
+            }
+          }
+
+          function attemptLoad(urlToLoad, isRetry = false) {
             playerInstance.load({
               url: urlToLoad,
               base: swfBase,
@@ -297,18 +308,21 @@
                 }
               }, 400);
             }).catch(err => {
-              clearTimeout(timeoutId);
-              console.warn("Direct stream load error, trying server proxy fallback:", err);
-              if (!urlToLoad.startsWith('/api/swf')) {
+              console.warn("Stream load failed for " + urlToLoad + ":", err);
+              if (!isRetry && fallbackUrl && urlToLoad !== fallbackUrl) {
+                console.log("Attempting fallback URL:", fallbackUrl);
+                attemptLoad(fallbackUrl, true);
+              } else if (!isRetry && !urlToLoad.startsWith('/api/swf')) {
                 const proxyUrl = '/api/swf?url=' + encodeURIComponent(rawSwf);
-                attemptLoad(proxyUrl);
+                attemptLoad(proxyUrl, true);
               } else {
+                clearTimeout(timeoutId);
                 showError("Flash asset error: " + (err.message || "Failed to load game stream"));
               }
             });
           }
 
-          attemptLoad(currentSwfUrl);
+          attemptLoad(primaryUrl);
 
           // Permanently suppress Ruffle internal panic/error modals in shadowRoot
           function suppressShadowModals() {
@@ -342,6 +356,21 @@
 
           window.addEventListener('beforeunload', () => {
             if (suppressInterval) clearInterval(suppressInterval);
+          });
+
+          // Universal Save & Restore message listener for Flash Player SharedObjects
+          window.addEventListener('message', (e) => {
+            if (e.data && (e.data.type === 'UNIVERSAL_GAME_RESTORE' || e.data.type === 'RESTORE_FLASH_SAVE')) {
+              const payload = e.data.payload || e.data;
+              const storageData = payload?.storage?.localStorage || payload?.localStorageSnapshot || payload?.saves;
+              if (storageData && typeof storageData === 'object') {
+                for (const [k, v] of Object.entries(storageData)) {
+                  if (typeof v === 'string') {
+                    try { localStorage.setItem(k, v); } catch (err) {}
+                  }
+                }
+              }
+            }
           });
 
         } catch (e) {

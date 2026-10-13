@@ -809,6 +809,31 @@ export const URL_OVERRIDES: Record<string, string> = {
   "crush-the-castle": "games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Crush-The-Castle/crushthecastle.swf&title=Crush+The+Castle",
   "crush-the-castle-2": "games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Crush-The-Castle-2/crushthecastle2.swf&title=Crush+The+Castle+2",
 
+  // Pokemon Series (Dedicated Local GBA Engine)
+  "pokemonemerald": "games/pokemon-emerald.html",
+  "pokemon-emerald": "games/pokemon-emerald.html",
+  "pokemonred": "games/pokemon-red.html",
+  "pokemon-red": "games/pokemon-red.html",
+
+  // Flight Simulators & Gunblood
+  "flash-flight-simulator-1": "games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Flash-Flight-Simulator-1/flashflightsimulator.swf&title=Flash+Flight+Simulator",
+  "flash-flight-simulator": "games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Flash-Flight-Simulator-1/flashflightsimulator.swf&title=Flash+Flight+Simulator",
+  "spaceflight-simulator": "games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Flash-Flight-Simulator-1/flashflightsimulator.swf&title=Flash+Flight+Simulator",
+  "gunblood": "games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Gunblood/gunblood.swf&title=Gunblood",
+
+  // Fireboy and Watergirl Series (Native HTML5 Engines)
+  "fireboy-and-watergirl": "https://gameinclassroom.github.io/fireboy-and-watergirl-forest-temple/",
+  "fireboy-and-watergirl-1": "https://gameinclassroom.github.io/fireboy-and-watergirl-forest-temple/",
+  "fireboy-and-watergirl-2": "https://gameinclassroom.github.io/fireboy-and-watergirl-2-light-temple/",
+  "fireboy-and-watergirl-2-light-temple": "https://gameinclassroom.github.io/fireboy-and-watergirl-2-light-temple/",
+  "fireboy-and-watergirl-3": "https://gameinclassroom.github.io/fireboy-watergirl-3-ice-temple/",
+  "fireboy-and-watergirl-4": "https://gameinclassroom.github.io/fireboy-and-watergirl-4-crystal-temple/",
+  "fireboy-and-watergirl-5": "https://gameinclassroom.github.io/fireboy-and-watergirl-5-elements/",
+  "fireboy-and-watergirl-6": "https://gameinclassroom.github.io/fireboy-watergirl-6-fairy-tales/",
+
+  // Serenitrove (Relaxing Digging Game)
+  "serenitrove": "games/serenitrove.html",
+
   // .io Games (Direct Working Clones without ad/argix redirects)
   "agar-io": "https://7zeb.github.io/homework/agariolite.html",
   "potatoes-agar-io": "https://7zeb.github.io/homework/agariolite.html",

@@ -26,7 +26,7 @@ import { openAboutBlankGame, resolveAssetUrl } from '../services/gamesStore';
 import { ThemeConfig, THEMES } from '../services/themeStore';
 import { CloudSaveModal } from './CloudSaveModal';
 import { useAuth } from '../context/AuthContext';
-import { captureBrowserGameState } from '../services/cloudSaveService';
+import { captureUniversalGameState, captureBrowserGameState } from '../services/cloudSaveService';
 
 interface GamePlayerProps {
   game: Game;
@@ -77,11 +77,12 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
   const handleQuickSave = async () => {
     setIsQuickSaving(true);
     try {
-      const dataToSave = captureBrowserGameState(game.id);
+      const contentWindow = iframeRef.current?.contentWindow || null;
+      const dataToSave = await captureUniversalGameState(game.id, contentWindow);
       await saveCurrentGame(game.id, 'slot1', {
         title: game.title,
         saveData: dataToSave,
-        saveType: 'localStorage',
+        saveType: 'universal',
         deviceLabel
       });
       setQuickSaved(true);
@@ -107,7 +108,9 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
     activeIframeSrc.includes('academics-study.github.io') ||
     activeIframeSrc.includes('javaspence.github.io') ||
     activeIframeSrc.includes('henshmi.github.io') ||
-    activeIframeSrc.includes('joe-the-chicken.github.io');
+    activeIframeSrc.includes('joe-the-chicken.github.io') ||
+    activeIframeSrc.includes('gameinclassroom.github.io') ||
+    activeIframeSrc.includes('pages.dev');
 
   // By default, external games on filtered domains are routed through local same-origin proxy
   // so Securly and school Chromebook filters inspect the iframe as same-origin (safe like Soccer REAL/2026)
@@ -138,7 +141,11 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
     setSavedSuccess(false);
     setCurrentMirrorIndex(0);
     const isLocal = !game.iframeSrc.startsWith('http://') && !game.iframeSrc.startsWith('https://');
-    const isWhitelisted = game.iframeSrc.includes('academics-study.github.io') || game.iframeSrc.includes('javaspence.github.io');
+    const isWhitelisted = 
+      game.iframeSrc.includes('academics-study.github.io') || 
+      game.iframeSrc.includes('javaspence.github.io') ||
+      game.iframeSrc.includes('gameinclassroom.github.io') ||
+      game.iframeSrc.includes('pages.dev');
     setUseSecurlyProxy(!isLocal && !isWhitelisted);
   }, [game.id, game.iframeSrc, game.iframeCode, game.customHtml]);
 
@@ -911,6 +918,7 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
         onClose={() => setShowCloudSaveModal(false)}
         onReloadGame={handleReload}
         theme={activeTheme}
+        contentWindow={iframeRef.current?.contentWindow || null}
       />
     </div>
   );
