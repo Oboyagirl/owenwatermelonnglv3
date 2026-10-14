@@ -50,6 +50,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
   const [isShuffle, setIsShuffle] = useState<boolean>(false);
   const [isLoop, setIsLoop] = useState<boolean>(false);
   const [playerMode, setPlayerMode] = useState<'stream' | 'spotify' | 'youtube'>('stream');
+  const [showSpotifyAlbumEmbed, setShowSpotifyAlbumEmbed] = useState<boolean>(false);
   const [audioError, setAudioError] = useState<string | null>(null);
   const [customTracks, setCustomTracks] = useState<CustomTrack[]>(() => {
     try {
@@ -68,7 +69,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
   const [likedTrackIds, setLikedTrackIds] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('owen_liked_music');
-      return saved ? JSON.parse(saved) : ['tyler-see-you-again', 'alex-g-mary', 'kanye-flashing-lights'];
+      return saved ? JSON.parse(saved) : ['album-flower-boy-track-4', 'album-trick-track-12', 'album-graduation-track-8'];
     } catch {
       return [];
     }
@@ -81,6 +82,12 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
   const allTracks: CustomTrack[] = useMemo(() => {
     return [...customTracks, ...REAL_MUSIC_CATALOG];
   }, [customTracks]);
+
+  // Selected Album details object
+  const selectedAlbum = useMemo(() => {
+    if (!selectedAlbumId) return null;
+    return POPULAR_ALBUMS.find(a => a.id === selectedAlbumId) || null;
+  }, [selectedAlbumId]);
 
   // Filtered albums
   const filteredAlbums = useMemo(() => {
@@ -100,21 +107,20 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
 
   // Filtered tracks
   const filteredTracks = useMemo(() => {
-    return allTracks.filter(t => {
+    let result = allTracks.filter(t => {
       if (selectedAlbumId) {
         if (t.albumId !== selectedAlbumId && t.album.toLowerCase() !== selectedAlbumId.toLowerCase()) {
-          // If searching by title or album id match
           const albumObj = POPULAR_ALBUMS.find(a => a.id === selectedAlbumId);
           if (!albumObj || t.album.toLowerCase() !== albumObj.title.toLowerCase()) {
             return false;
           }
         }
-      }
-
-      if (selectedArtist === 'My Uploads') {
-        if (!t.isCustom) return false;
-      } else if (selectedArtist !== 'All') {
-        if (!t.artist.toLowerCase().includes(selectedArtist.toLowerCase())) return false;
+      } else {
+        if (selectedArtist === 'My Uploads') {
+          if (!t.isCustom) return false;
+        } else if (selectedArtist !== 'All') {
+          if (!t.artist.toLowerCase().includes(selectedArtist.toLowerCase())) return false;
+        }
       }
 
       if (!searchQuery.trim()) return true;
@@ -126,6 +132,11 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
         t.genre.toLowerCase().includes(q)
       );
     });
+
+    if (selectedAlbumId) {
+      result = [...result].sort((a, b) => (a.trackNumber || 0) - (b.trackNumber || 0));
+    }
+    return result;
   }, [allTracks, selectedArtist, searchQuery, selectedAlbumId]);
 
   const currentTrack: CustomTrack = filteredTracks[currentTrackIndex] || allTracks[0] || REAL_MUSIC_CATALOG[0];
@@ -254,20 +265,23 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
     }
   };
 
-  const handlePlayAlbum = (album: MusicAlbum) => {
+  const handleOpenAlbum = (album: MusicAlbum, autoPlay: boolean = false) => {
     setSelectedAlbumId(album.id);
-    setSelectedArtist(album.artist);
-    const albumTrackIdx = allTracks.findIndex(t => 
-      t.albumId === album.id || t.album.toLowerCase() === album.title.toLowerCase() || t.artist.toLowerCase() === album.artist.toLowerCase()
-    );
-    if (albumTrackIdx !== -1) {
-      setCurrentTrackIndex(albumTrackIdx);
-      const target = allTracks[albumTrackIdx];
-      if (target) {
-        playTrack(target);
+    setSelectedArtist('All');
+    setActiveTab('tracks');
+    setCurrentTrackIndex(0);
+    setShowSpotifyAlbumEmbed(false);
+    if (autoPlay) {
+      const albumTracks = allTracks.filter(t => t.albumId === album.id || t.album.toLowerCase() === album.title.toLowerCase());
+      const first = albumTracks.sort((a, b) => (a.trackNumber || 0) - (b.trackNumber || 0))[0];
+      if (first) {
+        playTrack(first);
       }
     }
-    setActiveTab('tracks');
+  };
+
+  const handlePlayAlbum = (album: MusicAlbum) => {
+    handleOpenAlbum(album, true);
   };
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -425,6 +439,10 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
               <span className="px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[11px] font-mono flex items-center gap-1">
                 <AlbumIcon className="w-3 h-3" />
                 {POPULAR_ALBUMS.length} Official Albums
+              </span>
+              <span className="px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[11px] font-mono flex items-center gap-1">
+                <ListMusic className="w-3 h-3" />
+                {allTracks.length} Full Album Tracks
               </span>
             </div>
             <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
@@ -590,14 +608,36 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                   style={{ color: accent }}
                 >
                   <Disc3 className={`w-3.5 h-3.5 ${isPlaying ? 'animate-spin' : ''}`} />
-                  {currentTrack.genre} · {currentTrack.album}
+                  {currentTrack.trackNumber ? `Track ${currentTrack.trackNumber} · ` : ''}{currentTrack.genre} · {currentTrack.album}
                 </span>
                 <h2 className="text-2xl md:text-3xl font-extrabold text-white mt-1">
                   {currentTrack.title}
                 </h2>
-                <p className="text-sm md:text-base font-semibold text-slate-300">
-                  {currentTrack.artist}
-                </p>
+                <div className="flex items-center gap-2.5 flex-wrap mt-1">
+                  <p className="text-sm md:text-base font-semibold text-slate-300">
+                    {currentTrack.artist}
+                  </p>
+                  {currentTrack.hasLocalAudio ? (
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono font-bold">
+                      🎧 Downloaded Studio MP3
+                    </span>
+                  ) : (
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[10px] font-mono">
+                        🎵 Studio Stream
+                      </span>
+                      {currentTrack.youtubeId && playerMode !== 'youtube' && (
+                        <button
+                          onClick={() => setPlayerMode('youtube')}
+                          className="px-2 py-0.5 rounded-full bg-red-500/15 text-red-300 hover:bg-red-500/25 border border-red-500/30 text-[10px] font-mono font-bold flex items-center gap-1 transition-all cursor-pointer"
+                        >
+                          <Play className="w-2.5 h-2.5 fill-red-300" />
+                          <span>Switch to YouTube Player</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Mode Badges */}
@@ -792,7 +832,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                 Official Albums by Popular Artists ({filteredAlbums.length})
               </span>
               <span className="text-xs text-slate-400 font-mono">
-                Click any album to explore & play
+                Click any album to explore all full tracks
               </span>
             </div>
 
@@ -802,7 +842,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                 return (
                   <div
                     key={album.id}
-                    onClick={() => handlePlayAlbum(album)}
+                    onClick={() => handleOpenAlbum(album, false)}
                     className="p-4 rounded-3xl border transition-all cursor-pointer flex flex-col gap-3 group hover:scale-[1.02] shadow-xl"
                     style={{
                       backgroundColor: isSelected ? activeTheme?.accentBadge || 'rgba(16, 185, 129, 0.15)' : cardBg,
@@ -816,13 +856,18 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                         onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_COVER_FALLBACK; }}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <div 
-                          className="w-12 h-12 rounded-full flex items-center justify-center text-black shadow-xl font-bold"
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePlayAlbum(album);
+                          }}
+                          className="w-12 h-12 rounded-full flex items-center justify-center text-black shadow-xl font-bold cursor-pointer hover:scale-110 transition-transform"
                           style={{ backgroundColor: accent }}
+                          title="Play album from Track 1"
                         >
                           <Play className="w-5 h-5 fill-black ml-0.5" />
-                        </div>
+                        </button>
                       </div>
                       <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded-md bg-black/80 text-[10px] font-mono text-white border border-white/10">
                         {album.year}
@@ -839,9 +884,35 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                       <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
                         {album.description}
                       </p>
-                      <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono mt-1 pt-2 border-t border-white/5">
+                      <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono mt-1 pt-2 border-t border-white/5">
                         <span>{album.genre}</span>
-                        <span>{album.tracksCount} Tracks</span>
+                        <span className="px-2 py-0.5 rounded-full bg-white/5 font-bold text-white">
+                          {album.tracksCount} Full Tracks
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePlayAlbum(album);
+                          }}
+                          className="flex-1 py-1.5 rounded-xl text-[11px] font-bold text-black flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md"
+                          style={{ backgroundColor: accent }}
+                        >
+                          <Play className="w-3.5 h-3.5 fill-black" />
+                          <span>Play Album</span>
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenAlbum(album, false);
+                          }}
+                          className="flex-1 py-1.5 rounded-xl text-[11px] font-bold text-slate-300 hover:text-white border border-white/10 hover:bg-white/10 flex items-center justify-center gap-1 transition-all cursor-pointer"
+                        >
+                          <span>Tracklist</span>
+                          <ArrowRight className="w-3 h-3" />
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -850,58 +921,172 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
             </div>
           </div>
         ) : (
-          /* Tracks View with Album Shelf Row */
+          /* Tracks View */
           <div className="flex flex-col gap-8">
-            {/* Quick Albums Shelf */}
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                  <AlbumIcon className="w-3.5 h-3.5" style={{ color: accent }} />
-                  Albums by {selectedArtist === 'All' ? 'Artists' : selectedArtist}
-                </span>
-                <button
-                  onClick={() => setActiveTab('albums')}
-                  className="text-xs font-bold flex items-center gap-1 hover:underline cursor-pointer"
-                  style={{ color: accent }}
-                >
-                  <span>View All Albums</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
-                {filteredAlbums.slice(0, 10).map((album) => (
-                  <div
-                    key={album.id}
-                    onClick={() => handlePlayAlbum(album)}
-                    className="flex items-center gap-3 p-2.5 pr-4 rounded-2xl border transition-all cursor-pointer hover:bg-white/5 shrink-0"
-                    style={{
-                      backgroundColor: selectedAlbumId === album.id ? activeTheme?.accentBadge : cardBg,
-                      borderColor: selectedAlbumId === album.id ? accent : border
-                    }}
-                  >
-                    <img
-                      src={resolveAssetUrl(album.cover)}
-                      alt={album.title}
-                      onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_COVER_FALLBACK; }}
-                      className="w-12 h-12 rounded-xl object-cover shrink-0 shadow-md border border-white/5"
-                    />
-                    <div className="flex flex-col max-w-[130px]">
-                      <span className="text-xs font-bold text-white truncate">{album.title}</span>
-                      <span className="text-[10px] text-slate-400 truncate">{album.artist}</span>
-                      <span className="text-[9px] font-mono text-cyan-400">{album.year}</span>
-                    </div>
+            
+            {/* If an album is selected, show Dedicated Album Showcase Header */}
+            {selectedAlbum ? (
+              <div 
+                className="p-6 md:p-8 rounded-3xl border shadow-2xl flex flex-col md:flex-row items-center md:items-start gap-6 relative overflow-hidden"
+                style={{ backgroundColor: cardBg, borderColor: border }}
+              >
+                <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden shadow-2xl shrink-0 border border-white/10 group">
+                  <img
+                    src={resolveAssetUrl(selectedAlbum.cover)}
+                    alt={selectedAlbum.title}
+                    onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_COVER_FALLBACK; }}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded-md bg-black/80 text-[10px] font-mono text-white border border-white/10">
+                    {selectedAlbum.year}
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
 
-            {/* Tracks List Grid */}
+                <div className="flex-1 flex flex-col gap-2.5 text-center md:text-left w-full">
+                  <div className="flex items-center justify-center md:justify-start gap-2 flex-wrap">
+                    <span 
+                      className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider border"
+                      style={{ backgroundColor: activeTheme?.accentBadge || 'rgba(16, 185, 129, 0.15)', borderColor: accent, color: accent }}
+                    >
+                      Complete Official Album
+                    </span>
+                    <span className="text-xs text-slate-400 font-mono">
+                      {selectedAlbum.year} · {selectedAlbum.genre}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-xs text-cyan-300 font-mono font-bold">
+                      {filteredTracks.length} Complete Tracks
+                    </span>
+                  </div>
+
+                  <h2 className="text-2xl md:text-4xl font-black text-white tracking-tight">
+                    {selectedAlbum.title}
+                  </h2>
+                  <button 
+                    onClick={() => setSelectedArtist(selectedAlbum.artist)}
+                    className="text-base font-bold text-slate-300 hover:underline w-fit mx-auto md:mx-0 cursor-pointer"
+                    style={{ color: accent }}
+                  >
+                    {selectedAlbum.artist}
+                  </button>
+
+                  <p className="text-xs md:text-sm text-slate-400 leading-relaxed max-w-2xl">
+                    {selectedAlbum.description}
+                  </p>
+
+                  <div className="flex items-center justify-center md:justify-start gap-3 pt-3 flex-wrap">
+                    <button
+                      onClick={() => {
+                        if (filteredTracks.length > 0) {
+                          handleSelectTrack(0);
+                        }
+                      }}
+                      className="px-5 py-2.5 rounded-xl font-bold text-black text-xs flex items-center gap-2 shadow-xl hover:scale-105 transition-all cursor-pointer"
+                      style={{ backgroundColor: accent }}
+                    >
+                      <Play className="w-4 h-4 fill-black" />
+                      <span>Play Full Album (Track 1)</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setIsShuffle(true);
+                        handleNext();
+                      }}
+                      className="px-4 py-2.5 rounded-xl font-bold text-white text-xs flex items-center gap-2 border border-white/10 hover:bg-white/10 transition-all cursor-pointer"
+                    >
+                      <Shuffle className="w-4 h-4" />
+                      <span>Shuffle Album</span>
+                    </button>
+
+                    {selectedAlbum.spotifyAlbumId && (
+                      <button
+                        onClick={() => setShowSpotifyAlbumEmbed(!showSpotifyAlbumEmbed)}
+                        className="px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer border border-[#1DB954]/40 bg-[#1DB954]/15 text-[#1DB954] hover:bg-[#1DB954]/25"
+                      >
+                        <Disc3 className="w-4 h-4" />
+                        <span>{showSpotifyAlbumEmbed ? 'Hide Spotify Embed' : 'Spotify Full Album Player'}</span>
+                      </button>
+                    )}
+
+                    <button
+                      onClick={() => setSelectedAlbumId(null)}
+                      className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white border border-white/5 hover:bg-white/5 transition-all cursor-pointer md:ml-auto"
+                    >
+                      ✕ View All Songs & Albums
+                    </button>
+                  </div>
+
+                  {showSpotifyAlbumEmbed && selectedAlbum.spotifyAlbumId && (
+                    <div className="w-full mt-4 h-80 rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+                      <iframe
+                        src={`https://open.spotify.com/embed/album/${selectedAlbum.spotifyAlbumId}?utm_source=generator&theme=0`}
+                        width="100%"
+                        height="100%"
+                        className="border-0"
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              /* Quick Albums Shelf when browsing all tracks */
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <AlbumIcon className="w-3.5 h-3.5" style={{ color: accent }} />
+                    Albums by {selectedArtist === 'All' ? 'Artists' : selectedArtist}
+                  </span>
+                  <button
+                    onClick={() => setActiveTab('albums')}
+                    className="text-xs font-bold flex items-center gap-1 hover:underline cursor-pointer"
+                    style={{ color: accent }}
+                  >
+                    <span>View All Albums</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
+                  {filteredAlbums.map((album) => (
+                    <div
+                      key={album.id}
+                      onClick={() => handleOpenAlbum(album, false)}
+                      className="flex items-center gap-3 p-2.5 pr-4 rounded-2xl border transition-all cursor-pointer hover:bg-white/5 shrink-0"
+                      style={{
+                        backgroundColor: selectedAlbumId === album.id ? activeTheme?.accentBadge : cardBg,
+                        borderColor: selectedAlbumId === album.id ? accent : border
+                      }}
+                    >
+                      <img
+                        src={resolveAssetUrl(album.cover)}
+                        alt={album.title}
+                        onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_COVER_FALLBACK; }}
+                        className="w-12 h-12 rounded-xl object-cover shrink-0 shadow-md border border-white/5"
+                      />
+                      <div className="flex flex-col max-w-[130px]">
+                        <span className="text-xs font-bold text-white truncate">{album.title}</span>
+                        <span className="text-[10px] text-slate-400 truncate">{album.artist}</span>
+                        <span className="text-[9px] font-mono text-cyan-400">{album.tracksCount} Tracks</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Tracks List */}
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-bold text-white flex items-center gap-2">
                   <ListMusic className="w-4 h-4" style={{ color: accent }} />
-                  {selectedArtist === 'All' ? 'Popular MP3 Tracks Catalog' : `${selectedArtist} Tracks`} ({filteredTracks.length})
+                  {selectedAlbum 
+                    ? `${selectedAlbum.title} — Full Album Tracklist (${filteredTracks.length} Songs)`
+                    : selectedArtist === 'All' 
+                      ? `Complete Songs Catalog (${filteredTracks.length})` 
+                      : `${selectedArtist} Tracks (${filteredTracks.length})`
+                  }
                 </span>
                 <button
                   onClick={() => fileInputRef.current?.click()}
@@ -913,77 +1098,166 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {filteredTracks.map((track, idx) => {
-                  const isSelected = track.id === currentTrack.id;
-                  const isLiked = likedTrackIds.includes(track.id);
-                  return (
-                    <div
-                      key={track.id}
-                      onClick={() => handleSelectTrack(idx)}
-                      className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 group ${
-                        isSelected 
-                          ? 'text-white shadow-lg' 
-                          : 'text-slate-300 hover:bg-white/5'
-                      }`}
-                      style={{
-                        backgroundColor: isSelected ? activeTheme?.accentBadge || 'rgba(16, 185, 129, 0.15)' : cardBg,
-                        borderColor: isSelected ? activeTheme?.borderActive || accent : border
-                      }}
-                    >
-                      <div className="flex items-center gap-3 truncate">
-                        <div className="relative w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-slate-900 border border-white/5">
-                          <img 
-                            src={resolveAssetUrl(track.cover)} 
-                            alt={track.title} 
-                            onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_COVER_FALLBACK; }}
-                            className="w-full h-full object-cover" 
-                          />
-                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <Play className="w-4 h-4 text-white fill-white ml-0.5" />
+              {/* Numbered Tracklist for Album view vs Grid for All songs */}
+              {selectedAlbum ? (
+                /* Sleek Numbered Album Tracklist Table */
+                <div 
+                  className="rounded-3xl border overflow-hidden shadow-2xl flex flex-col"
+                  style={{ backgroundColor: cardBg, borderColor: border }}
+                >
+                  {filteredTracks.map((track, idx) => {
+                    const isSelected = track.id === currentTrack.id;
+                    const isLiked = likedTrackIds.includes(track.id);
+                    const trackNum = track.trackNumber || (idx + 1);
+
+                    return (
+                      <div
+                        key={track.id}
+                        onClick={() => handleSelectTrack(idx)}
+                        className={`p-3 md:p-4 border-b last:border-b-0 transition-all cursor-pointer flex items-center justify-between gap-3 group ${
+                          isSelected 
+                            ? 'text-white' 
+                            : 'text-slate-300 hover:bg-white/5'
+                        }`}
+                        style={{
+                          backgroundColor: isSelected ? activeTheme?.accentBadge || 'rgba(16, 185, 129, 0.15)' : 'transparent',
+                          borderColor: border
+                        }}
+                      >
+                        <div className="flex items-center gap-3 md:gap-4 truncate">
+                          {/* Track Number / Play state indicator */}
+                          <div className="w-8 flex items-center justify-center shrink-0">
+                            {isSelected && isPlaying ? (
+                              <div className="w-4 h-4 flex items-end justify-center gap-0.5">
+                                <span className="w-1 bg-current h-full animate-bounce" style={{ color: accent }} />
+                                <span className="w-1 bg-current h-2/3 animate-bounce [animation-delay:0.15s]" style={{ color: accent }} />
+                                <span className="w-1 bg-current h-4/5 animate-bounce [animation-delay:0.3s]" style={{ color: accent }} />
+                              </div>
+                            ) : (
+                              <span className="text-xs font-mono text-slate-500 group-hover:hidden">
+                                {trackNum}
+                              </span>
+                            )}
+                            <Play className={`w-4 h-4 hidden group-hover:block ml-0.5 ${isSelected ? 'fill-current' : 'text-slate-300'}`} style={{ color: isSelected ? accent : undefined }} />
+                          </div>
+
+                          <div className="flex flex-col truncate">
+                            <span 
+                              className="text-xs md:text-sm font-bold truncate"
+                              style={{ color: isSelected ? accent : '#ffffff' }}
+                            >
+                              {track.title}
+                            </span>
+                            <span className="text-[11px] text-slate-400 truncate">
+                              {track.artist}
+                            </span>
                           </div>
                         </div>
-                        <div className="flex flex-col truncate">
-                          <span 
-                            className="text-xs md:text-sm font-bold truncate"
-                            style={{ color: isSelected ? accent : '#ffffff' }}
-                          >
-                            {track.title}
-                          </span>
-                          <span className="text-[11px] text-slate-400 truncate">
-                            {track.artist} · {track.album}
-                          </span>
-                        </div>
-                      </div>
 
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-[11px] font-mono text-slate-500">
-                          {track.duration}
-                        </span>
-                        {track.isCustom ? (
-                          <button
-                            onClick={(e) => handleDeleteCustomTrack(track.id, e)}
-                            className="p-1 text-slate-500 hover:text-rose-400 cursor-pointer"
-                            title="Remove track"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        ) : (
+                        <div className="flex items-center gap-3 shrink-0">
+                          {track.hasLocalAudio ? (
+                            <span className="hidden sm:inline-block px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono">
+                              Real MP3
+                            </span>
+                          ) : (
+                            <span className="hidden sm:inline-block px-2 py-0.5 rounded-full bg-white/5 text-slate-400 border border-white/10 text-[10px] font-mono">
+                              Studio Stream
+                            </span>
+                          )}
+
+                          <span className="text-xs font-mono text-slate-400">
+                            {track.duration}
+                          </span>
+
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               toggleLikeTrack(track.id);
                             }}
-                            className="p-1 text-slate-500 hover:text-rose-400 cursor-pointer"
+                            className="p-1.5 text-slate-500 hover:text-rose-400 cursor-pointer"
+                            title="Favorite song"
                           >
                             <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
                           </button>
-                        )}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                /* All Songs Catalog Grid */
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {filteredTracks.map((track, idx) => {
+                    const isSelected = track.id === currentTrack.id;
+                    const isLiked = likedTrackIds.includes(track.id);
+                    return (
+                      <div
+                        key={track.id}
+                        onClick={() => handleSelectTrack(idx)}
+                        className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 group ${
+                          isSelected 
+                            ? 'text-white shadow-lg' 
+                            : 'text-slate-300 hover:bg-white/5'
+                        }`}
+                        style={{
+                          backgroundColor: isSelected ? activeTheme?.accentBadge || 'rgba(16, 185, 129, 0.15)' : cardBg,
+                          borderColor: isSelected ? activeTheme?.borderActive || accent : border
+                        }}
+                      >
+                        <div className="flex items-center gap-3 truncate">
+                          <div className="relative w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-slate-900 border border-white/5">
+                            <img 
+                              src={resolveAssetUrl(track.cover)} 
+                              alt={track.title} 
+                              onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_COVER_FALLBACK; }}
+                              className="w-full h-full object-cover" 
+                            />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <Play className="w-4 h-4 text-white fill-white ml-0.5" />
+                            </div>
+                          </div>
+                          <div className="flex flex-col truncate">
+                            <span 
+                              className="text-xs md:text-sm font-bold truncate"
+                              style={{ color: isSelected ? accent : '#ffffff' }}
+                            >
+                              {track.title}
+                            </span>
+                            <span className="text-[11px] text-slate-400 truncate">
+                              {track.artist} · {track.album}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="text-[11px] font-mono text-slate-500">
+                            {track.duration}
+                          </span>
+                          {track.isCustom ? (
+                            <button
+                              onClick={(e) => handleDeleteCustomTrack(track.id, e)}
+                              className="p-1 text-slate-500 hover:text-rose-400 cursor-pointer"
+                              title="Remove track"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          ) : (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleLikeTrack(track.id);
+                              }}
+                              className="p-1 text-slate-500 hover:text-rose-400 cursor-pointer"
+                            >
+                              <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         )}
