@@ -172,8 +172,9 @@ Your job:
   });
 
   // Unblock Proxy Endpoint - Routes external websites and games through server so school filters (Securly, GoGuardian) cannot block them
-  app.get('/api/proxy', (req, res) => {
-    let targetUrl = req.query.url as string;
+  // Unblock Proxy Endpoint - Routes external websites and games through server so school filters (Securly, GoGuardian) cannot block them
+  app.all('/api/proxy', (req, res) => {
+    let targetUrl = (req.query.url as string) || (req.body && req.body.url);
     if (!targetUrl) {
       return res.status(400).send('Missing url parameter');
     }
@@ -194,7 +195,7 @@ Your job:
 
         const proxyReq = client.get(currentUrl, {
           headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
             'Accept-Language': 'en-US,en;q=0.9',
             'Accept-Encoding': 'identity', // Prevent gzip/br compression so text rewriting works
@@ -251,7 +252,7 @@ Your job:
               modified = modified.replace(/if\s*\(\s*top\s*!==?\s*self\s*\)/g, 'if(false)');
               modified = modified.replace(/if\s*\(\s*window\s*!==?\s*window\.top\s*\)/g, 'if(false)');
 
-              // CRITICAL FOR SECURLY: Rewrite Ruffle scripts to modern CDN with ruffle.js
+              // Rewrite Ruffle scripts to modern CDN with ruffle.js
               modified = modified.replace(/https?:\/\/ubghyper\.github\.io\/GameList\.github\.io\/ruffle\/ruffle\.js/g, 'https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/ruffle.js');
               modified = modified.replace(/"ruffle\/ruffle\.js"/g, '"https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/ruffle.js"');
               modified = modified.replace(/'ruffle\/ruffle\.js'/g, "'https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/ruffle.js'");
@@ -272,6 +273,7 @@ Your job:
               // For non-SWF assets, can use jsDelivr
               modified = modified.replace(/https?:\/\/ubghyper\.github\.io\/GameList\.github\.io\/(?!.*\.swf)([^"'\s>]+)/g, 'https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/$1');
 
+              // CRITICAL: Prepend window.location.origin to /api/proxy so that the injected <base href> does not redirect clicks to target domain!
               const interceptorScript = `
 <script>
 (function() {
@@ -283,7 +285,13 @@ Your job:
     var a = e.target && e.target.closest ? e.target.closest('a') : null;
     if (a && a.href && !a.href.startsWith('javascript:') && !a.href.startsWith('#')) {
       e.preventDefault();
-      window.location.href = '/api/proxy?url=' + encodeURIComponent(a.href);
+      var proxyOrigin = window.location.origin;
+      var target = a.href;
+      if (target.indexOf(proxyOrigin + '/api/proxy') === 0) {
+        window.location.href = target;
+      } else {
+        window.location.href = proxyOrigin + '/api/proxy?url=' + encodeURIComponent(target);
+      }
     }
   }, true);
   document.addEventListener('submit', function(e) {
@@ -292,10 +300,11 @@ Your job:
       var method = (form.method || 'GET').toUpperCase();
       if (method === 'GET') {
         e.preventDefault();
+        var proxyOrigin = window.location.origin;
         var formData = new FormData(form);
         var params = new URLSearchParams(formData).toString();
         var dest = form.action + (form.action.indexOf('?') !== -1 ? '&' : '?') + params;
-        window.location.href = '/api/proxy?url=' + encodeURIComponent(dest);
+        window.location.href = proxyOrigin + '/api/proxy?url=' + encodeURIComponent(dest);
       }
     }
   }, true);
@@ -318,7 +327,36 @@ Your job:
         });
 
         proxyReq.on('error', (err) => {
-          res.status(502).send('Proxy error: ' + err.message);
+          res.status(502).send(`
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <meta charset="utf-8">
+                <title>Proxy Notice - OwenWatermelon</title>
+                <style>
+                  body { background: #080f1d; color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; padding: 24px; box-sizing: border-box; }
+                  .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 36px; max-width: 500px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+                  h2 { color: #38bdf8; margin: 0 0 12px; font-size: 22px; }
+                  p { color: #94a3b8; font-size: 14px; line-height: 1.6; margin: 0 0 24px; }
+                  .btn { display: inline-block; background: #0284c7; color: white; padding: 10px 20px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 13px; margin: 6px; transition: all 0.2s; }
+                  .btn:hover { background: #0369a1; transform: translateY(-1px); }
+                  .btn-secondary { background: rgba(255,255,255,0.08); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.1); }
+                  .btn-secondary:hover { background: rgba(255,255,255,0.15); color: white; }
+                </style>
+              </head>
+              <body>
+                <div class="card">
+                  <div style="font-size: 44px; margin-bottom: 12px;">🌐</div>
+                  <h2>Proxy Connection Notice</h2>
+                  <p>Could not route request to <strong>${currentUrl.replace(/</g, '&lt;')}</strong> via server proxy (${err.message}). The website may be down, blocking datacenter IPs, or require a direct tab.</p>
+                  <div>
+                    <a href="javascript:location.reload()" class="btn">🔄 Retry Page</a>
+                    <a href="${currentUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">🔗 Open Directly</a>
+                  </div>
+                </div>
+              </body>
+            </html>
+          `);
         });
       } catch (err: any) {
         res.status(400).send('Invalid URL: ' + err.message);
@@ -383,11 +421,26 @@ Your job:
     next();
   }, express.static(path.resolve('public/games')));
 
+  // Serve album covers statically with long-term cache
+  const coversDir = fs.existsSync(path.resolve('public/music/covers'))
+    ? path.resolve('public/music/covers')
+    : path.resolve('dist/music/covers');
+  app.use('/music/covers', (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cache-Control', 'public, max-age=604800');
+    next();
+  }, express.static(coversDir));
+
+  const primaryMusicDir = path.resolve('public/music');
+  const fallbackMusicDir = path.resolve('dist/music');
+
   // Serve static real MP3 music with byte-range streaming support (compatible with iOS iPad Safari & Chrome)
   const streamAudioFile = (filename: string, req: express.Request, res: express.Response) => {
     const cleanFilename = path.basename(filename);
-    const musicDir = path.resolve('public/music');
-    const filePath = path.join(musicDir, cleanFilename);
+    let filePath = path.join(primaryMusicDir, cleanFilename);
+    if (!fs.existsSync(filePath)) {
+      filePath = path.join(fallbackMusicDir, cleanFilename);
+    }
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).send('Audio file not found: ' + cleanFilename);
@@ -405,11 +458,15 @@ Your job:
     if (range) {
       const parts = range.replace(/bytes=/, '').split('-');
       const start = parseInt(parts[0], 10);
-      const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+      let end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
 
-      if (start >= fileSize || end >= fileSize) {
+      if (Number.isNaN(start) || start >= fileSize || start < 0) {
         res.setHeader('Content-Range', `bytes */${fileSize}`);
         return res.status(416).send('Requested range not satisfiable');
+      }
+
+      if (Number.isNaN(end) || end >= fileSize) {
+        end = fileSize - 1;
       }
 
       const chunkSize = end - start + 1;
@@ -421,13 +478,20 @@ Your job:
         'Content-Type': 'audio/mpeg',
       });
       fileStream.pipe(res);
+      req.on('close', () => {
+        fileStream.destroy();
+      });
     } else {
       res.writeHead(200, {
         'Content-Length': fileSize,
         'Accept-Ranges': 'bytes',
         'Content-Type': 'audio/mpeg',
       });
-      fs.createReadStream(filePath).pipe(res);
+      const fileStream = fs.createReadStream(filePath);
+      fileStream.pipe(res);
+      req.on('close', () => {
+        fileStream.destroy();
+      });
     }
   };
 
@@ -443,7 +507,7 @@ Your job:
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Accept-Ranges', 'bytes');
     next();
-  }, express.static(path.resolve('public/music')));
+  }, express.static(fs.existsSync(primaryMusicDir) ? primaryMusicDir : fallbackMusicDir));
 
   const httpServer = http.createServer(app);
 

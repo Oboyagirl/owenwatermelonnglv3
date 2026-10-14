@@ -53,7 +53,12 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
   const [customTracks, setCustomTracks] = useState<CustomTrack[]>(() => {
     try {
       const saved = localStorage.getItem('owen_custom_music_list');
-      return saved ? JSON.parse(saved) : [];
+      if (!saved) return [];
+      const parsed = JSON.parse(saved);
+      // Guard: Only keep tracks that have a non-empty audio source
+      return Array.isArray(parsed) 
+        ? parsed.filter(t => t && typeof t.audioSrc === 'string' && t.audioSrc.trim().length > 0)
+        : [];
     } catch {
       return [];
     }
@@ -128,23 +133,16 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
   const cardBg = activeTheme?.bgCard || '#080f1d';
   const border = activeTheme?.border || 'rgba(255, 255, 255, 0.1)';
 
-  // Sync audio source when currentTrack changes
+  // Sync audio source attribute when currentTrack changes without interrupting active playback
   useEffect(() => {
     if (!audioRef.current || !currentTrack) return;
     const audio = audioRef.current;
-    setAudioError(null);
+    const sourceUrl = currentTrack.audioSrc;
+    if (!sourceUrl) return;
 
-    let sourceUrl = currentTrack.audioSrc;
-    if (audio.src !== sourceUrl) {
+    const isMatching = audio.src.endsWith(sourceUrl) || audio.src === sourceUrl;
+    if (!isMatching) {
       audio.src = sourceUrl;
-      audio.load();
-      if (isPlaying) {
-        audio.play().catch(err => {
-          console.warn("Autoplay was prevented or audio failed:", err);
-          setIsPlaying(false);
-          setAudioError("Click ▶ Play to start playback.");
-        });
-      }
     }
   }, [currentTrack]);
 
@@ -156,34 +154,50 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
     });
   };
 
-  const handleTogglePlay = () => {
-    if (!audioRef.current) return;
+  const playTrack = async (target: CustomTrack) => {
+    if (!audioRef.current || !target || !target.audioSrc) return;
     setAudioError(null);
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      audioRef.current.play().then(() => {
-        setIsPlaying(true);
-      }).catch(err => {
-        console.warn("Audio play error:", err);
-        if (currentTrack.audioSrc.startsWith('/music/')) {
-          const fallback = '/api' + currentTrack.audioSrc;
-          if (audioRef.current) {
-            audioRef.current.src = fallback;
-            audioRef.current.play().then(() => {
-              setIsPlaying(true);
-            }).catch(() => {
-              setAudioError("Tap play again to enable audio in your browser.");
-              setIsPlaying(false);
-            });
-            return;
-          }
+    const audio = audioRef.current;
+    try {
+      const sourceUrl = target.audioSrc;
+      if (!audio.src.endsWith(sourceUrl) && audio.src !== sourceUrl) {
+        audio.src = sourceUrl;
+        audio.load();
+      }
+      await audio.play();
+      setIsPlaying(true);
+      setAudioError(null);
+    } catch (err: any) {
+      console.warn("Primary play failed, trying fallback:", err);
+      if (target.audioSrc.startsWith('/music/')) {
+        try {
+          audio.src = '/api' + target.audioSrc;
+          audio.load();
+          await audio.play();
+          setIsPlaying(true);
+          setAudioError(null);
+          return;
+        } catch (e2) {
+          console.warn("Fallback play also failed:", e2);
         }
-        setAudioError("Tap play again to enable audio in your browser.");
-        setIsPlaying(false);
-      });
+      }
+      setIsPlaying(false);
+      setAudioError("Tap ▶ Play to start playback.");
     }
+  };
+
+  const handleTogglePlay = async () => {
+    if (!audioRef.current || !currentTrack) return;
+    setAudioError(null);
+    const audio = audioRef.current;
+
+    if (isPlaying) {
+      audio.pause();
+      setIsPlaying(false);
+      return;
+    }
+
+    await playTrack(currentTrack);
   };
 
   const handleNext = () => {
@@ -196,7 +210,10 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
       nextIndex = (currentTrackIndex + 1) % filteredTracks.length;
     }
     setCurrentTrackIndex(nextIndex);
-    setIsPlaying(true);
+    const target = filteredTracks[nextIndex];
+    if (target) {
+      playTrack(target);
+    }
   };
 
   const handlePrev = () => {
@@ -204,25 +221,33 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
     setAudioError(null);
     const prevIndex = (currentTrackIndex - 1 + filteredTracks.length) % filteredTracks.length;
     setCurrentTrackIndex(prevIndex);
-    setIsPlaying(true);
+    const target = filteredTracks[prevIndex];
+    if (target) {
+      playTrack(target);
+    }
   };
 
   const handleSelectTrack = (index: number) => {
     setAudioError(null);
     setCurrentTrackIndex(index);
-    setIsPlaying(true);
+    const target = filteredTracks[index];
+    if (target) {
+      playTrack(target);
+    }
   };
 
   const handlePlayAlbum = (album: MusicAlbum) => {
     setSelectedAlbumId(album.id);
     setSelectedArtist(album.artist);
-    // Find first track from this album
     const albumTrackIdx = allTracks.findIndex(t => 
       t.albumId === album.id || t.album.toLowerCase() === album.title.toLowerCase() || t.artist.toLowerCase() === album.artist.toLowerCase()
     );
     if (albumTrackIdx !== -1) {
-      setCurrentTrackIndex(0);
-      setIsPlaying(true);
+      setCurrentTrackIndex(albumTrackIdx);
+      const target = allTracks[albumTrackIdx];
+      if (target) {
+        playTrack(target);
+      }
     }
     setActiveTab('tracks');
   };
@@ -327,7 +352,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
       <audio
         ref={audioRef}
         loop={isLoop}
-        preload="auto"
+        preload="metadata"
         onTimeUpdate={() => {
           if (audioRef.current) {
             setCurrentTime(audioRef.current.currentTime);
@@ -336,8 +361,20 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
         }}
         onEnded={handleNext}
         onError={() => {
-          console.warn("Audio playback error encountered.");
-          setAudioError("Could not stream MP3 file. Tap play again or load a local MP3 file.");
+          const audio = audioRef.current;
+          if (!audio || !audio.src || audio.src === 'about:blank' || audio.src === window.location.href) {
+            return;
+          }
+          if (audio.error && audio.error.code === 1) {
+            // MEDIA_ERR_ABORTED: Normal when skipping or switching tracks
+            return;
+          }
+          console.warn("Audio playback error encountered on:", audio.src, audio.error);
+          if (currentTrack?.isCustom && currentTrack.audioSrc.startsWith('blob:')) {
+            setAudioError("This local audio is no longer loaded in memory. Please tap '+ Load My MP3 File'.");
+          } else {
+            setAudioError("Click ▶ Play to start playback.");
+          }
           setIsPlaying(false);
         }}
         onPlay={() => {

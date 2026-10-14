@@ -197,7 +197,7 @@ export default function App() {
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   const [isCloakerOpen, setIsCloakerOpen] = useState(false);
   const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(false);
-  const [proxyTargetUrl, setProxyTargetUrl] = useState<string>('https://duckduckgo.com/lite');
+  const [proxyTargetUrl, setProxyTargetUrl] = useState<string>('about:home');
 
   // Passcode Gate (owenpan2244)
   const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
@@ -377,7 +377,7 @@ export default function App() {
     }
 
     // Default to search proxy
-    setProxyTargetUrl(`https://duckduckgo.com/lite/?q=${encodeURIComponent(clean)}`);
+    setProxyTargetUrl(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(clean)}`);
     handleSelectSpace('proxy');
   };
 
@@ -482,7 +482,7 @@ export default function App() {
       return (
         <ProxyView
           activeTheme={activeTheme}
-          initialUrl={proxyTargetUrl}
+          initialUrl={currentTab.url || proxyTargetUrl}
           onOpenInTab={(title, url, icon) => {
             const newTab: TabItem = {
               id: 'tab_' + Date.now(),
