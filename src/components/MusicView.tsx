@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { REAL_MUSIC_CATALOG, POPULAR_ARTISTS, POPULAR_ALBUMS, MusicTrack, MusicAlbum } from '../data/musicData';
 import { ThemeConfig } from '../services/themeStore';
+import { resolveAssetUrl } from '../utils/assetUrl';
 
 interface MusicViewProps {
   activeTheme?: ThemeConfig;
@@ -137,10 +138,10 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
   useEffect(() => {
     if (!audioRef.current || !currentTrack) return;
     const audio = audioRef.current;
-    const sourceUrl = currentTrack.audioSrc;
+    const sourceUrl = resolveAssetUrl(currentTrack.audioSrc);
     if (!sourceUrl) return;
 
-    const isMatching = audio.src.endsWith(sourceUrl) || audio.src === sourceUrl;
+    const isMatching = audio.src.endsWith(currentTrack.audioSrc) || audio.src.endsWith(sourceUrl) || audio.src === sourceUrl;
     if (!isMatching) {
       audio.src = sourceUrl;
     }
@@ -158,10 +159,11 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
     if (!audioRef.current || !target || !target.audioSrc) return;
     setAudioError(null);
     const audio = audioRef.current;
+    const targetSource = resolveAssetUrl(target.audioSrc);
+
     try {
-      const sourceUrl = target.audioSrc;
-      if (!audio.src.endsWith(sourceUrl) && audio.src !== sourceUrl) {
-        audio.src = sourceUrl;
+      if (!audio.src.endsWith(target.audioSrc) && audio.src !== targetSource) {
+        audio.src = targetSource;
         audio.load();
       }
       await audio.play();
@@ -169,16 +171,32 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
       setAudioError(null);
     } catch (err: any) {
       console.warn("Primary play failed, trying fallback:", err);
-      if (target.audioSrc.startsWith('/music/')) {
-        try {
-          audio.src = '/api' + target.audioSrc;
+      // Fallback 1: try direct relative ./music/ path
+      try {
+        const cleanPath = './' + target.audioSrc.replace(/^(\.\/|\/)/, '');
+        if (audio.src !== cleanPath) {
+          audio.src = cleanPath;
           audio.load();
-          await audio.play();
-          setIsPlaying(true);
-          setAudioError(null);
-          return;
-        } catch (e2) {
-          console.warn("Fallback play also failed:", e2);
+        }
+        await audio.play();
+        setIsPlaying(true);
+        setAudioError(null);
+        return;
+      } catch (e2) {
+        // Fallback 2: if full-stack server is running with Express /api/music/
+        if (target.audioSrc.includes('music/')) {
+          try {
+            const filename = target.audioSrc.split('/').pop();
+            const serverUrl = '/api/music/' + filename;
+            audio.src = serverUrl;
+            audio.load();
+            await audio.play();
+            setIsPlaying(true);
+            setAudioError(null);
+            return;
+          } catch (e3) {
+            console.warn("All playback attempts failed:", e3);
+          }
         }
       }
       setIsPlaying(false);
@@ -292,7 +310,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
         year: new Date().getFullYear(),
         duration: '3:30',
         durationSec: 210,
-        cover: '/music/covers/tyler_flower_boy.jpg',
+        cover: './music/covers/tyler_flower_boy.jpg',
         genre: 'Local Audio',
         audioSrc: blobUrl,
         isCustom: true
@@ -536,7 +554,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
           {/* Album Cover with Vinyl Spin Effect */}
           <div className="relative w-48 h-48 md:w-56 md:h-56 rounded-3xl overflow-hidden shadow-2xl shrink-0 border border-white/10 group">
             <img
-              src={currentTrack.cover}
+              src={resolveAssetUrl(currentTrack.cover)}
               alt={currentTrack.title}
               onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_COVER_FALLBACK; }}
               className={`w-full h-full object-cover transition-transform duration-700 ${isPlaying ? 'scale-105' : ''}`}
@@ -793,7 +811,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                   >
                     <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-lg bg-black border border-white/5">
                       <img
-                        src={album.cover}
+                        src={resolveAssetUrl(album.cover)}
                         alt={album.title}
                         onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_COVER_FALLBACK; }}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -863,7 +881,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                     }}
                   >
                     <img
-                      src={album.cover}
+                      src={resolveAssetUrl(album.cover)}
                       alt={album.title}
                       onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_COVER_FALLBACK; }}
                       className="w-12 h-12 rounded-xl object-cover shrink-0 shadow-md border border-white/5"
@@ -916,7 +934,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                       <div className="flex items-center gap-3 truncate">
                         <div className="relative w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-slate-900 border border-white/5">
                           <img 
-                            src={track.cover} 
+                            src={resolveAssetUrl(track.cover)} 
                             alt={track.title} 
                             onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_COVER_FALLBACK; }}
                             className="w-full h-full object-cover" 

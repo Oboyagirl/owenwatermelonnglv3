@@ -2,20 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Owen Watermelon V3</title>
   <script>
-    // GitHub Pages SPA redirect
-    var path = window.location.pathname;
-    var segments = path.split('/').filter(Boolean);
-    // If hosted at https://username.github.io/repo-name/
-    if (segments.length > 0) {
-      window.location.replace('/' + segments[0] + '/');
-    } else {
-      window.location.replace('/');
-    }
+    // Universal GitHub Pages SPA Redirect
+    (function() {
+      try {
+        var isGithubIo = window.location.hostname.endsWith('github.io');
+        var path = window.location.pathname;
+        var segments = path.split('/').filter(Boolean);
+        if (isGithubIo && segments.length > 0) {
+          // Repo subdirectory on GitHub Pages (e.g. /owenwatermelonv3/)
+          window.location.replace('/' + segments[0] + '/' + window.location.search + window.location.hash);
+        } else {
+          // Root domain or custom domain
+          window.location.replace('/' + window.location.search + window.location.hash);
+        }
+      } catch (e) {
+        window.location.replace('./');
+      }
+    })();
   </script>
 </head>
-<body style="background: #07130c; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
-  <p>Loading arcade...</p>
+<body style="background: #020810; color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
+  <div style="text-align: center; padding: 20px;">
+    <h2 style="color: #38bdf8; margin: 0 0 8px 0; font-size: 24px;">🍉 OwenWatermelon V3</h2>
+    <p style="color: #94a3b8; margin: 0; font-size: 14px;">Loading unblocked portal...</p>
+  </div>
 </body>
 </html>
