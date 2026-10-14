@@ -122,7 +122,7 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
       return resolveAssetUrl(activeIframeSrc);
     }
     // Static GitHub Pages fallback
-    if (typeof window !== 'undefined' && window.location.hostname.endsWith('github.io')) {
+    if (typeof window !== 'undefined' && (window.location.hostname.endsWith('github.io') || window.location.hostname.includes('github'))) {
       return activeIframeSrc;
     }
     if (useSecurlyProxy || !isSecurlyWhitelisted) {
