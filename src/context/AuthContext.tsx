@@ -1,11 +1,25 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, onAuthStateChanged, signInAnonymously, signOut } from 'firebase/auth';
-import { auth } from '../services/firebase';
-import { UserProfile, GameSave } from '../services/cloudSaveService';
+import {
+  subscribeToAuth,
+  loginWithGoogle,
+  loginAsGuest,
+  logoutUser,
+  getUserProfile,
+  syncInitialProfile,
+  updateUserProfile,
+  subscribeToUserGameSaves,
+  saveGameSlot,
+  deleteGameSlot,
+  UserProfile,
+  GameSave,
+  AppUser,
+  detectDeviceLabel
+} from '../services/cloudSaveService';
 
 interface AuthContextType {
-  user: User | null;
+  user: AppUser | null;
   profile: UserProfile | null;
+  loading: boolean;
   saves: GameSave[];
   deviceLabel: string;
   isGuest: boolean;
@@ -13,149 +27,176 @@ interface AuthContextType {
   loginGuest: (name?: string) => Promise<void>;
   logout: () => Promise<void>;
   updateGamerProfile: (updates: Partial<UserProfile>) => Promise<void>;
-  deleteSave: (gameIdOrId: string, slot?: string) => Promise<void>;
+  saveCurrentGame: (gameId: string, slot: string, data: { title?: string; saveData: string; saveType?: string; score?: number; level?: string; deviceLabel?: string }) => Promise<GameSave>;
+  deleteSave: (gameId: string, slot: string) => Promise<void>;
+  getSavesForGame: (gameId: string) => GameSave[];
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(() => {
-    try {
-      const saved = localStorage.getItem('owen_gamer_profile');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
-  const [saves, setSaves] = useState<GameSave[]>(() => {
-    try {
-      const saved = localStorage.getItem('owen_cloud_saves');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
-
-  const [deviceLabel] = useState<string>(() => {
-    if (typeof window === 'undefined') return 'Browser Device';
-    const ua = navigator.userAgent;
-    if (/iPad|iPhone/i.test(ua)) return 'School iPad';
-    if (/CrOS/i.test(ua)) return 'School Chromebook';
-    if (/Mac/i.test(ua)) return 'MacBook';
-    if (/Windows/i.test(ua)) return 'Windows PC';
-    return 'Web Device';
-  });
+  const [user, setUser] = useState<AppUser | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [saves, setSaves] = useState<GameSave[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [deviceLabel, setDeviceLabel] = useState('Detecting device...');
 
   useEffect(() => {
-    try {
-      const unsubscribe = onAuthStateChanged(auth, (u) => {
-        setUser(u);
-        if (u && !profile) {
-          setProfile({
-            userId: u.uid,
-            displayName: u.displayName || 'Melon Gamer',
-            avatarId: 'melon_classic'
+    setDeviceLabel(detectDeviceLabel());
+  }, []);
+
+  useEffect(() => {
+    let unsubscribeSaves: (() => void) | null = null;
+
+    const unsubscribeAuth = subscribeToAuth(async (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+        try {
+          let prof = await getUserProfile(currentUser.uid);
+          if (!prof) {
+            prof = await syncInitialProfile(currentUser);
+          }
+          setProfile(prof);
+
+          // Real-time subscribe to this user's cloud saves
+          if (unsubscribeSaves) unsubscribeSaves();
+          unsubscribeSaves = subscribeToUserGameSaves(currentUser.uid, (userSaves) => {
+            setSaves(userSaves);
           });
+        } catch (err) {
+          console.warn('Failed to load user profile or saves:', err);
         }
-      });
-      return () => unsubscribe();
-    } catch {
-      // Firebase auth listener fallback
-    }
-  }, [profile]);
+      } else {
+        // Automatically initialize guest profile so saves work instantly on any computer or Chromebook
+        try {
+          const guestUser = await loginAsGuest();
+          setUser(guestUser);
+          const prof = await syncInitialProfile(guestUser);
+          setProfile(prof);
+          if (unsubscribeSaves) unsubscribeSaves();
+          unsubscribeSaves = subscribeToUserGameSaves(guestUser.uid, (userSaves) => {
+            setSaves(userSaves);
+          });
+        } catch (guestErr) {
+          console.warn('Guest auto-login skipped:', guestErr);
+          setProfile(null);
+          setSaves([]);
+        }
+      }
+      setLoading(false);
+    });
+
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeSaves) unsubscribeSaves();
+    };
+  }, []);
 
   const loginGoogle = async () => {
+    setLoading(true);
     try {
-      const { signInWithPopup, GoogleAuthProvider } = await import('firebase/auth');
-      const provider = new GoogleAuthProvider();
-      const res = await signInWithPopup(auth, provider);
-      setUser(res.user);
-      const newProfile: UserProfile = {
-        userId: res.user.uid,
-        displayName: res.user.displayName || 'Melon Player',
-        photoURL: res.user.photoURL || undefined,
-        avatarId: 'melon_classic'
-      };
-      setProfile(newProfile);
-      localStorage.setItem('owen_gamer_profile', JSON.stringify(newProfile));
-    } catch (e) {
-      console.warn("Google sign-in fallback to guest:", e);
-      await loginGuest();
+      const loggedUser = await loginWithGoogle();
+      setUser(loggedUser);
+      const prof = await syncInitialProfile(loggedUser);
+      setProfile(prof);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const loginGuest = async (name: string = 'Guest Player') => {
+  const loginGuest = async (name?: string) => {
+    setLoading(true);
     try {
-      const res = await signInAnonymously(auth);
-      setUser(res.user);
-      const guestProf: UserProfile = {
-        userId: res.user.uid,
-        displayName: name,
-        avatarId: 'melon_classic'
-      };
-      setProfile(guestProf);
-      localStorage.setItem('owen_gamer_profile', JSON.stringify(guestProf));
-    } catch {
-      const localGuest: UserProfile = {
-        userId: 'guest-' + Date.now(),
-        displayName: name,
-        avatarId: 'melon_classic'
-      };
-      setProfile(localGuest);
-      localStorage.setItem('owen_gamer_profile', JSON.stringify(localGuest));
+      const loggedUser = await loginAsGuest(name);
+      setUser(loggedUser);
+      const prof = await syncInitialProfile(loggedUser);
+      setProfile(prof);
+    } finally {
+      setLoading(false);
     }
   };
 
   const logout = async () => {
+    setLoading(true);
     try {
-      await signOut(auth);
-    } catch {}
-    setUser(null);
-    setProfile(null);
-    localStorage.removeItem('owen_gamer_profile');
+      await logoutUser();
+      const newGuest = await loginAsGuest();
+      setUser(newGuest);
+      const prof = await syncInitialProfile(newGuest);
+      setProfile(prof);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const updateGamerProfile = async (updates: Partial<UserProfile>) => {
-    setProfile(prev => {
-      const next = prev ? { ...prev, ...updates } : { userId: 'local', displayName: 'Player', ...updates };
-      try {
-        localStorage.setItem('owen_gamer_profile', JSON.stringify(next));
-      } catch {}
-      return next;
-    });
+    if (!user) return;
+    await updateUserProfile(user.uid, updates);
+    setProfile(prev => prev ? { ...prev, ...updates } : null);
   };
 
-  const deleteSave = async (gameIdOrId: string, slot?: string) => {
+  const saveCurrentGame = async (
+    gameId: string, 
+    slot: string, 
+    data: { title?: string; saveData: string; saveType?: string; score?: number; level?: string; deviceLabel?: string }
+  ): Promise<GameSave> => {
+    let activeUser = user;
+    if (!activeUser) {
+      activeUser = await loginAsGuest();
+      setUser(activeUser);
+    }
+    const saved = await saveGameSlot(activeUser.uid, gameId, slot, {
+      ...data,
+      deviceLabel: data.deviceLabel || deviceLabel
+    });
+    // Optimistically update saves list immediately so it NEVER disappears
     setSaves(prev => {
-      const next = prev.filter(s => {
-        if (slot) {
-          return !(s.gameId === gameIdOrId && s.slot === slot);
-        }
-        return s.id !== gameIdOrId && s.gameId !== gameIdOrId;
-      });
-      try {
-        localStorage.setItem('owen_cloud_saves', JSON.stringify(next));
-      } catch {}
-      return next;
+      const filtered = prev.filter(s => s.id !== saved.id);
+      return [saved, ...filtered];
     });
+    return saved;
   };
 
-  const isGuest = !user || user.isAnonymous;
+  const deleteSave = async (gameId: string, slot: string) => {
+    if (!user) return;
+    const cleanGameId = (gameId.replace(/[^a-zA-Z0-9_\-]/g, '_').slice(0, 60)) || 'game';
+    const cleanSlot = (slot.replace(/[^a-zA-Z0-9_\-]/g, '_').slice(0, 20)) || 'slot1';
+    const saveId = `${cleanGameId}_${cleanSlot}`;
+
+    await deleteGameSlot(user.uid, gameId, slot);
+    setSaves(prev => prev.filter(s => s.id !== saveId));
+  };
+
+  const getSavesForGame = (gameId: string) => {
+    const cleanId = (gameId.replace(/[^a-zA-Z0-9_\-]/g, '_').slice(0, 60)).toLowerCase();
+    const rawLower = gameId.toLowerCase();
+    return saves.filter(s => 
+      s.gameId === gameId || 
+      s.gameId.toLowerCase() === rawLower ||
+      s.id.toLowerCase().startsWith(`${cleanId}_`)
+    );
+  };
+
+  const isGuest = !!(user && user.isAnonymous);
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      profile,
-      saves,
-      deviceLabel,
-      isGuest,
-      loginGoogle,
-      loginGuest,
-      logout,
-      updateGamerProfile,
-      deleteSave
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        profile,
+        loading,
+        saves,
+        deviceLabel,
+        isGuest,
+        loginGoogle,
+        loginGuest,
+        logout,
+        updateGamerProfile,
+        saveCurrentGame,
+        deleteSave,
+        getSavesForGame
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -164,18 +205,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    return {
-      user: null,
-      profile: { userId: 'guest', displayName: 'Gamer', avatarId: 'melon_classic' },
-      saves: [],
-      deviceLabel: 'School Device',
-      isGuest: true,
-      loginGoogle: async () => {},
-      loginGuest: async () => {},
-      logout: async () => {},
-      updateGamerProfile: async () => {},
-      deleteSave: async () => {}
-    };
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };

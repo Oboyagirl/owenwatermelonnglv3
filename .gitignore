@@ -1,0 +1,13 @@
+node_modules/
+build/
+dist/
+docs/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+.dev.pid
+.dev.env.json
+*.tar.gz
+*.zip

@@ -1,4 +1,4 @@
-export interface GameControl {
+export interface ControlMapping {
   key: string;
   action: string;
 }
@@ -6,23 +6,35 @@ export interface GameControl {
 export interface Game {
   id: string;
   title: string;
+  description: string;
   category: string;
   secondaryCategory?: string;
-  description: string;
   thumbnail: string;
   banner?: string;
-  tags: string[];
-  rating?: number;
-  plays?: number;
+  mirrors?: string[];
+  tags?: string[];
+  rating: number;
+  plays: number;
   author?: string;
-  source?: string;
   featured?: boolean;
   iframeSrc: string;
   iframeCode?: string;
-  mirrors?: string[];
-  controls?: GameControl[];
+  controls?: ControlMapping[];
+  source?: string;
   customHtml?: string;
   sandbox?: string;
+}
+
+export interface SiteSettings {
+  siteTitle: string;
+  siteSubtitle: string;
+  announcementText: string;
+  announcementActive: boolean;
+  announcementType: 'info' | 'warning' | 'success';
+  starSpeed: number;
+  starDensity: number;
+  shootingStarsEnabled: boolean;
+  themeColor: 'emerald' | 'cyan' | 'purple' | 'amber';
 }
 
 export interface CloakPreset {
@@ -31,16 +43,4 @@ export interface CloakPreset {
   title: string;
   icon: string;
   faviconUrl: string;
-}
-
-export interface SiteSettings {
-  siteTitle: string;
-  siteSubtitle: string;
-  announcementText: string;
-  announcementActive: boolean;
-  announcementType: string;
-  starSpeed: number;
-  starDensity: number;
-  shootingStarsEnabled: boolean;
-  themeColor: string;
 }
