@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { 
   Play, 
   Pause, 
@@ -22,66 +22,53 @@ import {
   Layers,
   ArrowRight
 } from 'lucide-react';
-import { REAL_MUSIC_CATALOG, POPULAR_ARTISTS, POPULAR_ALBUMS, MusicTrack, MusicAlbum } from '../data/musicData';
+import { POPULAR_ARTISTS, POPULAR_ALBUMS, MusicTrack, MusicAlbum } from '../data/musicData';
 import { ThemeConfig } from '../services/themeStore';
 import { resolveAssetUrl } from '../utils/assetUrl';
+import { useMusic, CustomTrack } from '../context/MusicContext';
 
 interface MusicViewProps {
   activeTheme?: ThemeConfig;
 }
 
-interface CustomTrack extends MusicTrack {
-  isCustom?: boolean;
-}
-
 const DEFAULT_COVER_FALLBACK = 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=60';
 
 export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
+  const {
+    currentTrack,
+    isPlaying,
+    isMuted,
+    volume,
+    currentTime,
+    duration,
+    isShuffle,
+    isLoop,
+    audioError,
+    allTracks,
+    customTracks,
+    likedTrackIds,
+    playTrack,
+    togglePlay,
+    nextTrack,
+    prevTrack,
+    seek,
+    setVolume,
+    toggleMute,
+    toggleShuffle,
+    toggleLoop,
+    toggleLikeTrack,
+    uploadCustomFiles,
+    deleteCustomTrack
+  } = useMusic();
+
   const [selectedArtist, setSelectedArtist] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'tracks' | 'albums'>('tracks');
   const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
-  const [currentTrackIndex, setCurrentTrackIndex] = useState<number>(0);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [volume, setVolume] = useState<number>(0.85);
-  const [currentTime, setCurrentTime] = useState<number>(0);
-  const [duration, setDuration] = useState<number>(180);
-  const [isShuffle, setIsShuffle] = useState<boolean>(false);
-  const [isLoop, setIsLoop] = useState<boolean>(false);
   const [playerMode, setPlayerMode] = useState<'stream' | 'spotify' | 'youtube'>('stream');
   const [showSpotifyAlbumEmbed, setShowSpotifyAlbumEmbed] = useState<boolean>(false);
-  const [audioError, setAudioError] = useState<string | null>(null);
-  const [customTracks, setCustomTracks] = useState<CustomTrack[]>(() => {
-    try {
-      const saved = localStorage.getItem('owen_custom_music_list');
-      if (!saved) return [];
-      const parsed = JSON.parse(saved);
-      // Guard: Only keep tracks that have a non-empty audio source
-      return Array.isArray(parsed) 
-        ? parsed.filter(t => t && typeof t.audioSrc === 'string' && t.audioSrc.trim().length > 0)
-        : [];
-    } catch {
-      return [];
-    }
-  });
 
-  const [likedTrackIds, setLikedTrackIds] = useState<string[]>(() => {
-    try {
-      const saved = localStorage.getItem('owen_liked_music');
-      return saved ? JSON.parse(saved) : ['album-flower-boy-track-4', 'album-trick-track-12', 'album-graduation-track-8'];
-    } catch {
-      return [];
-    }
-  });
-
-  const audioRef = useRef<HTMLAudioElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Combine real catalog with custom uploaded tracks
-  const allTracks: CustomTrack[] = useMemo(() => {
-    return [...customTracks, ...REAL_MUSIC_CATALOG];
-  }, [customTracks]);
 
   // Selected Album details object
   const selectedAlbum = useMemo(() => {
@@ -139,137 +126,14 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
     return result;
   }, [allTracks, selectedArtist, searchQuery, selectedAlbumId]);
 
-  const currentTrack: CustomTrack = filteredTracks[currentTrackIndex] || allTracks[0] || REAL_MUSIC_CATALOG[0];
-
   const accent = activeTheme?.accent || '#10b981';
   const cardBg = activeTheme?.bgCard || '#080f1d';
   const border = activeTheme?.border || 'rgba(255, 255, 255, 0.1)';
-
-  // Sync audio source attribute when currentTrack changes without interrupting active playback
-  useEffect(() => {
-    if (!audioRef.current || !currentTrack) return;
-    const audio = audioRef.current;
-    const sourceUrl = resolveAssetUrl(currentTrack.audioSrc);
-    if (!sourceUrl) return;
-
-    const isMatching = audio.src.endsWith(currentTrack.audioSrc) || audio.src.endsWith(sourceUrl) || audio.src === sourceUrl;
-    if (!isMatching) {
-      audio.src = sourceUrl;
-    }
-  }, [currentTrack]);
-
-  const toggleLikeTrack = (id: string) => {
-    setLikedTrackIds(prev => {
-      const next = prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id];
-      try { localStorage.setItem('owen_liked_music', JSON.stringify(next)); } catch {}
-      return next;
-    });
-  };
-
-  const playTrack = async (target: CustomTrack) => {
-    if (!audioRef.current || !target || !target.audioSrc) return;
-    setAudioError(null);
-    const audio = audioRef.current;
-    const targetSource = resolveAssetUrl(target.audioSrc);
-
-    try {
-      if (!audio.src.endsWith(target.audioSrc) && audio.src !== targetSource) {
-        audio.src = targetSource;
-        audio.load();
-      }
-      await audio.play();
-      setIsPlaying(true);
-      setAudioError(null);
-    } catch (err: any) {
-      console.warn("Primary play failed, trying fallback:", err);
-      // Fallback 1: try direct relative ./music/ path
-      try {
-        const cleanPath = './' + target.audioSrc.replace(/^(\.\/|\/)/, '');
-        if (audio.src !== cleanPath) {
-          audio.src = cleanPath;
-          audio.load();
-        }
-        await audio.play();
-        setIsPlaying(true);
-        setAudioError(null);
-        return;
-      } catch (e2) {
-        // Fallback 2: if full-stack server is running with Express /api/music/
-        if (target.audioSrc.includes('music/')) {
-          try {
-            const filename = target.audioSrc.split('/').pop();
-            const serverUrl = '/api/music/' + filename;
-            audio.src = serverUrl;
-            audio.load();
-            await audio.play();
-            setIsPlaying(true);
-            setAudioError(null);
-            return;
-          } catch (e3) {
-            console.warn("All playback attempts failed:", e3);
-          }
-        }
-      }
-      setIsPlaying(false);
-      setAudioError("Tap ▶ Play to start playback.");
-    }
-  };
-
-  const handleTogglePlay = async () => {
-    if (!audioRef.current || !currentTrack) return;
-    setAudioError(null);
-    const audio = audioRef.current;
-
-    if (isPlaying) {
-      audio.pause();
-      setIsPlaying(false);
-      return;
-    }
-
-    await playTrack(currentTrack);
-  };
-
-  const handleNext = () => {
-    if (filteredTracks.length <= 1) return;
-    setAudioError(null);
-    let nextIndex: number;
-    if (isShuffle) {
-      nextIndex = Math.floor(Math.random() * filteredTracks.length);
-    } else {
-      nextIndex = (currentTrackIndex + 1) % filteredTracks.length;
-    }
-    setCurrentTrackIndex(nextIndex);
-    const target = filteredTracks[nextIndex];
-    if (target) {
-      playTrack(target);
-    }
-  };
-
-  const handlePrev = () => {
-    if (filteredTracks.length <= 1) return;
-    setAudioError(null);
-    const prevIndex = (currentTrackIndex - 1 + filteredTracks.length) % filteredTracks.length;
-    setCurrentTrackIndex(prevIndex);
-    const target = filteredTracks[prevIndex];
-    if (target) {
-      playTrack(target);
-    }
-  };
-
-  const handleSelectTrack = (index: number) => {
-    setAudioError(null);
-    setCurrentTrackIndex(index);
-    const target = filteredTracks[index];
-    if (target) {
-      playTrack(target);
-    }
-  };
 
   const handleOpenAlbum = (album: MusicAlbum, autoPlay: boolean = false) => {
     setSelectedAlbumId(album.id);
     setSelectedArtist('All');
     setActiveTab('tracks');
-    setCurrentTrackIndex(0);
     setShowSpotifyAlbumEmbed(false);
     if (autoPlay) {
       const albumTracks = allTracks.filter(t => t.albumId === album.id || t.album.toLowerCase() === album.title.toLowerCase());
@@ -284,74 +148,22 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
     handleOpenAlbum(album, true);
   };
 
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = Number(e.target.value);
-    setCurrentTime(val);
-    if (audioRef.current) {
-      audioRef.current.currentTime = val;
-    }
+  const handleSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    seek(Number(e.target.value));
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = Number(e.target.value);
-    setVolume(val);
-    if (audioRef.current) {
-      audioRef.current.volume = val;
-      audioRef.current.muted = val === 0;
-      setIsMuted(val === 0);
-    }
+    setVolume(Number(e.target.value));
   };
 
   // Upload custom downloaded MP3 file
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    const newTracks: CustomTrack[] = [];
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const blobUrl = URL.createObjectURL(file);
-      const cleanName = file.name.replace(/\.[^/.]+$/, '');
-      const parts = cleanName.split(' - ');
-      const artist = parts.length > 1 ? parts[0].trim() : 'Downloaded Audio';
-      const title = parts.length > 1 ? parts.slice(1).join(' - ').trim() : cleanName;
-
-      const newTrack: CustomTrack = {
-        id: 'custom-' + Date.now() + '-' + i,
-        title,
-        artist,
-        album: 'My Downloads',
-        year: new Date().getFullYear(),
-        duration: '3:30',
-        durationSec: 210,
-        cover: './music/covers/tyler_flower_boy.jpg',
-        genre: 'Local Audio',
-        audioSrc: blobUrl,
-        isCustom: true
-      };
-      newTracks.push(newTrack);
-    }
-
-    setCustomTracks(prev => {
-      const next = [...newTracks, ...prev];
-      try {
-        const serialized = next.map(t => ({ ...t, audioSrc: t.audioSrc.startsWith('blob:') ? '' : t.audioSrc }));
-        localStorage.setItem('owen_custom_music_list', JSON.stringify(serialized.slice(0, 10)));
-      } catch {}
-      return next;
-    });
-
-    if (newTracks.length > 0) {
+    if (files && files.length > 0) {
+      uploadCustomFiles(files);
       setSelectedArtist('All');
       setSelectedAlbumId(null);
-      setCurrentTrackIndex(0);
-      setIsPlaying(true);
     }
-  };
-
-  const handleDeleteCustomTrack = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCustomTracks(prev => prev.filter(t => t.id !== id));
   };
 
   const formatTime = (secs: number) => {
@@ -374,46 +186,10 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
       <input
         type="file"
         ref={fileInputRef}
-        onChange={handleFileUpload}
+        onChange={handleFileInputChange}
         accept="audio/*,.mp3,.wav,.m4a,.ogg"
         multiple
         className="hidden"
-      />
-
-      {/* Persistent HTML5 Audio Element with byte-range MP3 streaming */}
-      <audio
-        ref={audioRef}
-        loop={isLoop}
-        preload="metadata"
-        onTimeUpdate={() => {
-          if (audioRef.current) {
-            setCurrentTime(audioRef.current.currentTime);
-            setDuration(audioRef.current.duration || currentTrack.durationSec || 180);
-          }
-        }}
-        onEnded={handleNext}
-        onError={() => {
-          const audio = audioRef.current;
-          if (!audio || !audio.src || audio.src === 'about:blank' || audio.src === window.location.href) {
-            return;
-          }
-          if (audio.error && audio.error.code === 1) {
-            // MEDIA_ERR_ABORTED: Normal when skipping or switching tracks
-            return;
-          }
-          console.warn("Audio playback error encountered on:", audio.src, audio.error);
-          if (currentTrack?.isCustom && currentTrack.audioSrc.startsWith('blob:')) {
-            setAudioError("This local audio is no longer loaded in memory. Please tap '+ Load My MP3 File'.");
-          } else {
-            setAudioError("Click ▶ Play to start playback.");
-          }
-          setIsPlaying(false);
-        }}
-        onPlay={() => {
-          setIsPlaying(true);
-          setAudioError(null);
-        }}
-        onPause={() => setIsPlaying(false)}
       />
 
       <div className="max-w-6xl mx-auto w-full flex flex-col gap-8">
@@ -434,22 +210,22 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                 <span>OwenWatermelonV3 Music Studio</span>
               </span>
               <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-mono">
-                Real Downloaded MP3s
+                🎧 Real MP3 Music
               </span>
               <span className="px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[11px] font-mono flex items-center gap-1">
                 <AlbumIcon className="w-3 h-3" />
-                {POPULAR_ALBUMS.length} Official Albums
+                {POPULAR_ALBUMS.length} Albums
               </span>
               <span className="px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[11px] font-mono flex items-center gap-1">
                 <ListMusic className="w-3 h-3" />
-                {allTracks.length} Full Album Tracks
+                {allTracks.length} Genuine MP3 Tracks
               </span>
             </div>
             <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
-              Real Popular Music & Official Albums
+              Real Popular Music & Studio MP3s
             </h1>
             <p className="text-xs md:text-sm text-slate-400">
-              Featuring genuine album artwork & full albums for Tyler, The Creator, Alex G, Kanye West, Drake, Kendrick Lamar, Travis Scott, Frank Ocean, Steve Lacy, The Weeknd & Billie Eilish.
+              Listen to actual MP3s in high quality while playing any game on the site. Featuring Tyler, The Creator, Alex G, Kanye West, Drake, Kendrick Lamar, Travis Scott, Frank Ocean, Steve Lacy, The Weeknd & Billie Eilish.
             </p>
           </div>
 
@@ -503,7 +279,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
               }}
             >
               <ListMusic className="w-4 h-4" />
-              <span>Songs Catalog ({filteredTracks.length})</span>
+              <span>Real MP3 Songs ({filteredTracks.length})</span>
             </button>
             <button
               onClick={() => setActiveTab('albums')}
@@ -595,7 +371,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                 color: accent
               }}
             >
-              {currentTrack.year} · MP3 Stereo
+              {currentTrack.year} · Real MP3
             </div>
           </div>
 
@@ -617,26 +393,12 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                   <p className="text-sm md:text-base font-semibold text-slate-300">
                     {currentTrack.artist}
                   </p>
-                  {currentTrack.hasLocalAudio ? (
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono font-bold">
-                      🎧 Downloaded Studio MP3
-                    </span>
-                  ) : (
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[10px] font-mono">
-                        🎵 Studio Stream
-                      </span>
-                      {currentTrack.youtubeId && playerMode !== 'youtube' && (
-                        <button
-                          onClick={() => setPlayerMode('youtube')}
-                          className="px-2 py-0.5 rounded-full bg-red-500/15 text-red-300 hover:bg-red-500/25 border border-red-500/30 text-[10px] font-mono font-bold flex items-center gap-1 transition-all cursor-pointer"
-                        >
-                          <Play className="w-2.5 h-2.5 fill-red-300" />
-                          <span>Switch to YouTube Player</span>
-                        </button>
-                      )}
-                    </div>
-                  )}
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono font-bold flex items-center gap-1">
+                    <span>✓</span> Real MP3 Audio
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/20 text-[10px] font-mono">
+                    🎮 Plays in Background While Gaming
+                  </span>
                 </div>
               </div>
 
@@ -649,7 +411,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                   }`}
                   style={{ backgroundColor: playerMode === 'stream' ? accent : 'transparent' }}
                 >
-                  Local MP3
+                  Real MP3
                 </button>
                 {currentTrack.spotifyId && (
                   <button
@@ -713,7 +475,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                     max={duration || 180}
                     step={0.5}
                     value={currentTime}
-                    onChange={handleSeek}
+                    onChange={handleSeekChange}
                     className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer"
                     style={{ accentColor: accent }}
                   />
@@ -742,7 +504,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                 <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
                   <div className="flex items-center gap-3">
                     <button
-                      onClick={() => setIsShuffle(!isShuffle)}
+                      onClick={toggleShuffle}
                       className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
                         isShuffle ? 'shadow-md' : 'bg-white/5 border-white/5 text-slate-400 hover:text-white'
                       }`}
@@ -756,14 +518,14 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                       <Shuffle className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={handlePrev}
+                      onClick={prevTrack}
                       className="p-3 rounded-full bg-white/5 hover:bg-white/10 text-white transition-all cursor-pointer border border-white/10"
                       title="Previous track"
                     >
                       <SkipBack className="w-5 h-5" />
                     </button>
                     <button
-                      onClick={handleTogglePlay}
+                      onClick={togglePlay}
                       className="w-14 h-14 rounded-full text-black flex items-center justify-center shadow-2xl transition-all cursor-pointer hover:scale-105"
                       style={{ backgroundColor: accent }}
                       title={isPlaying ? 'Pause' : 'Play'}
@@ -771,14 +533,14 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                       {isPlaying ? <Pause className="w-6 h-6 fill-black" /> : <Play className="w-6 h-6 fill-black ml-1" />}
                     </button>
                     <button
-                      onClick={handleNext}
+                      onClick={nextTrack}
                       className="p-3 rounded-full bg-white/5 hover:bg-white/10 text-white transition-all cursor-pointer border border-white/10"
                       title="Next track"
                     >
                       <SkipForward className="w-5 h-5" />
                     </button>
                     <button
-                      onClick={() => setIsLoop(!isLoop)}
+                      onClick={toggleLoop}
                       className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
                         isLoop ? 'shadow-md' : 'bg-white/5 border-white/5 text-slate-400 hover:text-white'
                       }`}
@@ -796,12 +558,9 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                   {/* Volume Control */}
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => {
-                        const next = !isMuted;
-                        setIsMuted(next);
-                        if (audioRef.current) audioRef.current.muted = next;
-                      }}
+                      onClick={toggleMute}
                       className="p-2 rounded-xl text-slate-400 hover:text-white cursor-pointer"
+                      title={isMuted ? 'Unmute' : 'Mute'}
                     >
                       {isMuted ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4" />}
                     </button>
@@ -814,6 +573,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                       onChange={handleVolumeChange}
                       className="w-24 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer"
                       style={{ accentColor: accent }}
+                      title="Volume control"
                     />
                   </div>
                 </div>
@@ -832,7 +592,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                 Official Albums by Popular Artists ({filteredAlbums.length})
               </span>
               <span className="text-xs text-slate-400 font-mono">
-                Click any album to explore all full tracks
+                Click any album to explore genuine MP3 tracks
               </span>
             </div>
 
@@ -864,7 +624,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                           }}
                           className="w-12 h-12 rounded-full flex items-center justify-center text-black shadow-xl font-bold cursor-pointer hover:scale-110 transition-transform"
                           style={{ backgroundColor: accent }}
-                          title="Play album from Track 1"
+                          title="Play album"
                         >
                           <Play className="w-5 h-5 fill-black ml-0.5" />
                         </button>
@@ -886,8 +646,8 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                       </p>
                       <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono mt-1 pt-2 border-t border-white/5">
                         <span>{album.genre}</span>
-                        <span className="px-2 py-0.5 rounded-full bg-white/5 font-bold text-white">
-                          {album.tracksCount} Full Tracks
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                          {album.tracksCount} Real MP3{album.tracksCount > 1 ? 's' : ''}
                         </span>
                       </div>
 
@@ -901,7 +661,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                           style={{ backgroundColor: accent }}
                         >
                           <Play className="w-3.5 h-3.5 fill-black" />
-                          <span>Play Album</span>
+                          <span>Play</span>
                         </button>
                         <button
                           onClick={(e) => {
@@ -948,13 +708,13 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                       className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider border"
                       style={{ backgroundColor: activeTheme?.accentBadge || 'rgba(16, 185, 129, 0.15)', borderColor: accent, color: accent }}
                     >
-                      Complete Official Album
+                      Official Album
                     </span>
                     <span className="text-xs text-slate-400 font-mono">
                       {selectedAlbum.year} · {selectedAlbum.genre}
                     </span>
-                    <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-xs text-cyan-300 font-mono font-bold">
-                      {filteredTracks.length} Complete Tracks
+                    <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-500/30 text-xs text-emerald-300 font-mono font-bold">
+                      {filteredTracks.length} Real MP3 Track{filteredTracks.length > 1 ? 's' : ''}
                     </span>
                   </div>
 
@@ -977,25 +737,25 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                     <button
                       onClick={() => {
                         if (filteredTracks.length > 0) {
-                          handleSelectTrack(0);
+                          playTrack(filteredTracks[0]);
                         }
                       }}
                       className="px-5 py-2.5 rounded-xl font-bold text-black text-xs flex items-center gap-2 shadow-xl hover:scale-105 transition-all cursor-pointer"
                       style={{ backgroundColor: accent }}
                     >
                       <Play className="w-4 h-4 fill-black" />
-                      <span>Play Full Album (Track 1)</span>
+                      <span>Play Album</span>
                     </button>
 
                     <button
                       onClick={() => {
-                        setIsShuffle(true);
-                        handleNext();
+                        toggleShuffle();
+                        nextTrack();
                       }}
                       className="px-4 py-2.5 rounded-xl font-bold text-white text-xs flex items-center gap-2 border border-white/10 hover:bg-white/10 transition-all cursor-pointer"
                     >
                       <Shuffle className="w-4 h-4" />
-                      <span>Shuffle Album</span>
+                      <span>Shuffle</span>
                     </button>
 
                     {selectedAlbum.spotifyAlbumId && (
@@ -1004,7 +764,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                         className="px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer border border-[#1DB954]/40 bg-[#1DB954]/15 text-[#1DB954] hover:bg-[#1DB954]/25"
                       >
                         <Disc3 className="w-4 h-4" />
-                        <span>{showSpotifyAlbumEmbed ? 'Hide Spotify Embed' : 'Spotify Full Album Player'}</span>
+                        <span>{showSpotifyAlbumEmbed ? 'Hide Spotify' : 'Spotify Album'}</span>
                       </button>
                     )}
 
@@ -1012,7 +772,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                       onClick={() => setSelectedAlbumId(null)}
                       className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white border border-white/5 hover:bg-white/5 transition-all cursor-pointer md:ml-auto"
                     >
-                      ✕ View All Songs & Albums
+                      ✕ View All Songs
                     </button>
                   </div>
 
@@ -1068,7 +828,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                       <div className="flex flex-col max-w-[130px]">
                         <span className="text-xs font-bold text-white truncate">{album.title}</span>
                         <span className="text-[10px] text-slate-400 truncate">{album.artist}</span>
-                        <span className="text-[9px] font-mono text-cyan-400">{album.tracksCount} Tracks</span>
+                        <span className="text-[9px] font-mono text-emerald-400 font-bold">{album.tracksCount} Real MP3</span>
                       </div>
                     </div>
                   ))}
@@ -1082,10 +842,10 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                 <span className="text-sm font-bold text-white flex items-center gap-2">
                   <ListMusic className="w-4 h-4" style={{ color: accent }} />
                   {selectedAlbum 
-                    ? `${selectedAlbum.title} — Full Album Tracklist (${filteredTracks.length} Songs)`
+                    ? `${selectedAlbum.title} — Real MP3 Tracks (${filteredTracks.length})`
                     : selectedArtist === 'All' 
-                      ? `Complete Songs Catalog (${filteredTracks.length})` 
-                      : `${selectedArtist} Tracks (${filteredTracks.length})`
+                      ? `Real MP3 Songs Catalog (${filteredTracks.length})` 
+                      : `${selectedArtist} Real MP3s (${filteredTracks.length})`
                   }
                 </span>
                 <button
@@ -1094,7 +854,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                   style={{ color: accent }}
                 >
                   <FolderOpen className="w-3.5 h-3.5" />
-                  <span>+ Add Your Downloaded MP3s</span>
+                  <span>+ Load Your Own MP3</span>
                 </button>
               </div>
 
@@ -1113,7 +873,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                     return (
                       <div
                         key={track.id}
-                        onClick={() => handleSelectTrack(idx)}
+                        onClick={() => playTrack(track)}
                         className={`p-3 md:p-4 border-b last:border-b-0 transition-all cursor-pointer flex items-center justify-between gap-3 group ${
                           isSelected 
                             ? 'text-white' 
@@ -1155,15 +915,9 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                         </div>
 
                         <div className="flex items-center gap-3 shrink-0">
-                          {track.hasLocalAudio ? (
-                            <span className="hidden sm:inline-block px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono">
-                              Real MP3
-                            </span>
-                          ) : (
-                            <span className="hidden sm:inline-block px-2 py-0.5 rounded-full bg-white/5 text-slate-400 border border-white/10 text-[10px] font-mono">
-                              Studio Stream
-                            </span>
-                          )}
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono font-bold">
+                            Real MP3
+                          </span>
 
                           <span className="text-xs font-mono text-slate-400">
                             {track.duration}
@@ -1187,13 +941,13 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
               ) : (
                 /* All Songs Catalog Grid */
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {filteredTracks.map((track, idx) => {
+                  {filteredTracks.map((track) => {
                     const isSelected = track.id === currentTrack.id;
                     const isLiked = likedTrackIds.includes(track.id);
                     return (
                       <div
                         key={track.id}
-                        onClick={() => handleSelectTrack(idx)}
+                        onClick={() => playTrack(track)}
                         className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 group ${
                           isSelected 
                             ? 'text-white shadow-lg' 
@@ -1213,7 +967,11 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                               className="w-full h-full object-cover" 
                             />
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <Play className="w-4 h-4 text-white fill-white ml-0.5" />
+                              {isSelected && isPlaying ? (
+                                <Pause className="w-4 h-4 text-white fill-white" />
+                              ) : (
+                                <Play className="w-4 h-4 text-white fill-white ml-0.5" />
+                              )}
                             </div>
                           </div>
                           <div className="flex flex-col truncate">
@@ -1235,7 +993,10 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                           </span>
                           {track.isCustom ? (
                             <button
-                              onClick={(e) => handleDeleteCustomTrack(track.id, e)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteCustomTrack(track.id);
+                              }}
                               className="p-1 text-slate-500 hover:text-rose-400 cursor-pointer"
                               title="Remove track"
                             >

@@ -13,7 +13,8 @@ import {
   ChevronLeft, 
   ChevronRight, 
   Palette, 
-  Home
+  Home,
+  Dices
 } from 'lucide-react';
 import { ThemeConfig } from '../services/themeStore';
 import { triggerPanic } from '../data/cloakPresets';
@@ -24,13 +25,13 @@ export interface TabItem {
   id: string;
   title: string;
   icon?: string;
-  spaceType: 'home' | 'games' | 'proxy' | 'ai' | 'apps' | 'music' | 'tools' | 'saved';
+  spaceType: 'home' | 'games' | 'proxy' | 'ai' | 'apps' | 'music' | 'gambling' | 'tools' | 'saved';
   url?: string;
 }
 
 interface OwenSidebarProps {
-  activeSpace: 'home' | 'games' | 'proxy' | 'ai' | 'apps' | 'music' | 'tools' | 'saved';
-  onSelectSpace: (space: 'home' | 'games' | 'proxy' | 'ai' | 'apps' | 'music' | 'tools' | 'saved') => void;
+  activeSpace: 'home' | 'games' | 'proxy' | 'ai' | 'apps' | 'music' | 'gambling' | 'tools' | 'saved';
+  onSelectSpace: (space: 'home' | 'games' | 'proxy' | 'ai' | 'apps' | 'music' | 'gambling' | 'tools' | 'saved') => void;
   tabs: TabItem[];
   activeTabId: string;
   onSelectTab: (id: string) => void;
@@ -71,6 +72,7 @@ export const Sidebar: React.FC<OwenSidebarProps> = ({
   const NAV_ITEMS = [
     { id: 'home', label: 'Home', icon: Home, emoji: '🏠' },
     { id: 'games', label: 'Games', icon: Gamepad2, emoji: '🎮' },
+    { id: 'gambling', label: 'Fake Gambling', icon: Dices, emoji: '🎰' },
     { id: 'proxy', label: 'Proxy', icon: Globe, emoji: '🌐' },
     { id: 'ai', label: 'AI Chat', icon: Bot, emoji: '🤖' },
     { id: 'apps', label: 'Apps', icon: LayoutGrid, emoji: '📱' },

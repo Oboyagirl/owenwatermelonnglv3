@@ -19,6 +19,8 @@ import { HomeDashboard } from './components/HomeDashboard';
 import { ProxyView } from './components/ProxyView';
 import { AppsView } from './components/AppsView';
 import { MusicView } from './components/MusicView';
+import { FloatingMusicPlayer } from './components/FloatingMusicPlayer';
+import { FakeGamblingView } from './components/FakeGamblingView';
 import { AIChatView } from './components/AIChatView';
 import { CloudSaveModal } from './components/CloudSaveModal';
 import { useGamesStore } from './services/gamesStore';
@@ -118,6 +120,7 @@ export function isTrendingGame(g: Game): boolean {
 const APP_CATEGORIES = [
   'All',
   'Trending',
+  'Fake Gambling',
   '2 Player Games',
   'Sawyer For Sawyer',
   'Owen Watermelon OG’s',
@@ -135,7 +138,7 @@ const APP_CATEGORIES = [
   'Casual'
 ];
 
-type SpaceType = 'home' | 'games' | 'proxy' | 'ai' | 'apps' | 'music' | 'tools' | 'saved';
+type SpaceType = 'home' | 'games' | 'proxy' | 'ai' | 'apps' | 'music' | 'gambling' | 'tools' | 'saved';
 
 export default function App() {
   const {
@@ -281,6 +284,7 @@ export default function App() {
       const spaceEmojiMap: Record<SpaceType, string> = {
         home: '🏠',
         games: '🎮',
+        gambling: '🎰',
         proxy: '🌐',
         ai: '🤖',
         apps: '📱',
@@ -291,6 +295,7 @@ export default function App() {
       const spaceNameMap: Record<SpaceType, string> = {
         home: 'Home',
         games: 'Games',
+        gambling: 'Fake Gambling',
         proxy: 'Web Proxy',
         ai: 'AI Assistant',
         apps: 'Apps',
@@ -421,6 +426,15 @@ export default function App() {
           (typeof g.id === 'string' && g.id.startsWith('potatoes-'))
         );
       }
+      if (catLower === 'fake gambling' || catLower.includes('gambling')) {
+        return (
+          mainCatLower.includes('gambling') ||
+          secCatLower.includes('gambling') ||
+          (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && t.toLowerCase().includes('gambling'))) ||
+          (typeof g.id === 'string' && (g.id.includes('plinko') || g.id.startsWith('fakestake-'))) ||
+          (typeof g.title === 'string' && g.title.toLowerCase().includes('plinko'))
+        );
+      }
       if (catLower === 'cooking sim') {
         return (
           secCatLower === 'cooking sim' ||
@@ -518,6 +532,18 @@ export default function App() {
       return <MusicView activeTheme={activeTheme} />;
     }
 
+    if (space === 'gambling') {
+      return (
+        <FakeGamblingView
+          activeTheme={activeTheme}
+          onPlayGame={(game) => {
+            setSelectedGame(game);
+            handleSelectSpace('games');
+          }}
+        />
+      );
+    }
+
     if (space === 'tools') {
       return (
         <div 
@@ -599,6 +625,8 @@ export default function App() {
             onUpdateGame={updateGame}
             allGames={games}
             onSelectGame={handleSelectGame}
+            activeTheme={activeTheme}
+            onOpenMusicSpace={() => handleSelectSpace('music')}
           />
         ) : (
           <div className="max-w-7xl mx-auto w-full flex flex-col gap-8">
@@ -765,6 +793,7 @@ export default function App() {
             setSelectedGame(null);
             handleSelectSpace('home');
           }}
+          onOpenMusic={() => handleSelectSpace('music')}
           omnibarValue={searchTerm}
           onOmnibarSubmit={handleOmnibarSubmit}
           onToggleSplit={() => handleToggleSplit()}
@@ -849,6 +878,14 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Persistent Background Floating Music Player (Available across all games and tabs) */}
+      <FloatingMusicPlayer
+        activeTheme={activeTheme}
+        activeSpace={activeSpace}
+        isGameActive={Boolean(selectedGame)}
+        onOpenMusicSpace={() => handleSelectSpace('music')}
+      />
     </div>
   );
 }

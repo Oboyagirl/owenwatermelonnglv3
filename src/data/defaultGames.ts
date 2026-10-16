@@ -5,6 +5,397 @@ import { resolveGameSource } from './unblockedResolver';
 
 const CURATED_GAMES: Game[] = [
   {
+    id: "free-plinko-game-online",
+    source: "unblocked",
+    title: "Plinko",
+    description: "Drop balls down the classic pegboard pyramid into glowing high-multiplier buckets. Real physics with up to 1000x multiplier payouts!",
+    category: "Fake Gambling",
+    secondaryCategory: "Casual",
+    thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Free-Plinko-Game-Online/Free-Plinko-Game-Online.png",
+    banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Free-Plinko-Game-Online/Free-Plinko-Game-Online.png",
+    mirrors: [
+      "https://freeonlinewebtools.github.io/gamelist4.github.io/Free-Plinko-Game-Online/",
+      "https://ubghyper.github.io/GameList.github.io/Free-Plinko-Game-Online/",
+      "https://fakestake.fun/plinko"
+    ],
+    tags: ["Plinko", "Fake Gambling", "Casino", "Pegs", "Multiplier", "Free Stake", "Arcade", "Trending", "Unblocked"],
+    rating: 5.0,
+    plays: 289400,
+    author: "FreeWebTools",
+    featured: true,
+    iframeSrc: "https://freeonlinewebtools.github.io/gamelist4.github.io/Free-Plinko-Game-Online/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Plinko" src="https://freeonlinewebtools.github.io/gamelist4.github.io/Free-Plinko-Game-Online/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Click / Tap", action: "Drop Ball / Select Risk & Rows" },
+      { key: "Space", action: "Rapid Drop" }
+    ]
+  },
+  {
+    id: "fakestake-plinko",
+    source: "unblocked",
+    title: "FakeStake Plinko",
+    description: "Play official FakeStake.fun Plinko with 8-16 rows, Low/Medium/High risk, and multipliers reaching 1,000x with 100% free virtual currency.",
+    category: "Fake Gambling",
+    secondaryCategory: "Casual",
+    thumbnail: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=1200&auto=format&fit=crop&q=80",
+    mirrors: [
+      "https://fakestake.fun/plinko",
+      "https://freeonlinewebtools.github.io/gamelist4.github.io/Free-Plinko-Game-Online/"
+    ],
+    tags: ["FakeStake", "Plinko", "Fake Gambling", "Casino Simulator", "Originals", "Unblocked"],
+    rating: 4.9,
+    plays: 195000,
+    author: "FakeStake.fun",
+    featured: true,
+    iframeSrc: "https://fakestake.fun/plinko",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="FakeStake Plinko" src="https://fakestake.fun/plinko" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Mouse Click", action: "Place Bet & Drop Plinko Ball" }
+    ]
+  },
+  {
+    id: "fakestake-mines",
+    source: "unblocked",
+    title: "FakeStake Mines",
+    description: "Classic 5x5 grid Mines from FakeStake.fun! Uncover hidden diamonds, avoid the explosive landmines, and cash out before detonating.",
+    category: "Fake Gambling",
+    secondaryCategory: "Puzzle",
+    thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&auto=format&fit=crop&q=80",
+    mirrors: ["https://fakestake.fun/mines"],
+    tags: ["FakeStake", "Mines", "Fake Gambling", "Casino", "Gems", "Originals", "Unblocked"],
+    rating: 4.9,
+    plays: 182000,
+    author: "FakeStake.fun",
+    featured: true,
+    iframeSrc: "https://fakestake.fun/mines",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="FakeStake Mines" src="https://fakestake.fun/mines" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Click Tiles", action: "Uncover Gem / Mine" },
+      { key: "Cashout Button", action: "Lock In Multiplier" }
+    ]
+  },
+  {
+    id: "fakestake-crash",
+    source: "unblocked",
+    title: "FakeStake Crash",
+    description: "Watch the multiplier rocket soar higher into the cosmos! Cash out in the nick of time before the rocket crashes.",
+    category: "Fake Gambling",
+    secondaryCategory: "Arcade",
+    thumbnail: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&auto=format&fit=crop&q=80",
+    mirrors: ["https://fakestake.fun/crash"],
+    tags: ["FakeStake", "Crash", "Fake Gambling", "Rocket", "Multiplier", "Casino", "Unblocked"],
+    rating: 4.9,
+    plays: 210000,
+    author: "FakeStake.fun",
+    featured: true,
+    iframeSrc: "https://fakestake.fun/crash",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="FakeStake Crash" src="https://fakestake.fun/crash" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Space / Click", action: "Start Round / Cashout" }
+    ]
+  },
+  {
+    id: "fakestake-dice",
+    source: "unblocked",
+    title: "FakeStake Dice",
+    description: "Smooth 0-100 slider dice from FakeStake.fun. Adjust your win probability and multiplier to roll Over or Under.",
+    category: "Fake Gambling",
+    secondaryCategory: "Casual",
+    thumbnail: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&auto=format&fit=crop&q=80",
+    mirrors: ["https://fakestake.fun/dice"],
+    tags: ["FakeStake", "Dice", "Fake Gambling", "Probability", "Casino", "Unblocked"],
+    rating: 4.8,
+    plays: 98000,
+    author: "FakeStake.fun",
+    featured: true,
+    iframeSrc: "https://fakestake.fun/dice",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="FakeStake Dice" src="https://fakestake.fun/dice" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Drag Slider", action: "Set Target Number" },
+      { key: "Roll Button", action: "Roll Dice" }
+    ]
+  },
+  {
+    id: "fakestake-limbo",
+    source: "unblocked",
+    title: "FakeStake Limbo",
+    description: "Aim for astronomical target multipliers up to 1,000,000x in this pulse-pounding FakeStake original.",
+    category: "Fake Gambling",
+    secondaryCategory: "Arcade",
+    thumbnail: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=1200&auto=format&fit=crop&q=80",
+    mirrors: ["https://fakestake.fun/limbo"],
+    tags: ["FakeStake", "Limbo", "Fake Gambling", "Multiplier", "Casino", "Unblocked"],
+    rating: 4.8,
+    plays: 87000,
+    author: "FakeStake.fun",
+    featured: false,
+    iframeSrc: "https://fakestake.fun/limbo",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="FakeStake Limbo" src="https://fakestake.fun/limbo" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Click", action: "Set Target & Bet" }
+    ]
+  },
+  {
+    id: "fakestake-roulette",
+    source: "unblocked",
+    title: "FakeStake Roulette",
+    description: "Wheel of fortune European roulette! Bet on Red, Black, Green Zero, odd/even, or specific numbers.",
+    category: "Fake Gambling",
+    secondaryCategory: "Casual",
+    thumbnail: "https://images.unsplash.com/photo-1606167668584-78701c57f13d?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1606167668584-78701c57f13d?w=1200&auto=format&fit=crop&q=80",
+    mirrors: ["https://fakestake.fun/roulette"],
+    tags: ["FakeStake", "Roulette", "Fake Gambling", "Wheel", "Casino", "Table Games", "Unblocked"],
+    rating: 4.8,
+    plays: 112000,
+    author: "FakeStake.fun",
+    featured: false,
+    iframeSrc: "https://fakestake.fun/roulette",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="FakeStake Roulette" src="https://fakestake.fun/roulette" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Place Chips", action: "Select Table Positions" },
+      { key: "Spin", action: "Launch Wheel" }
+    ]
+  },
+  {
+    id: "fakestake-blackjack",
+    source: "unblocked",
+    title: "FakeStake Blackjack",
+    description: "Hit, Stand, Double Down, or Split! Beat the dealer to 21 with classic casino rules and virtual money.",
+    category: "Fake Gambling",
+    secondaryCategory: "Casual",
+    thumbnail: "https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=1200&auto=format&fit=crop&q=80",
+    mirrors: ["https://fakestake.fun/blackjack"],
+    tags: ["FakeStake", "Blackjack", "21", "Cards", "Fake Gambling", "Casino", "Unblocked"],
+    rating: 4.9,
+    plays: 135000,
+    author: "FakeStake.fun",
+    featured: true,
+    iframeSrc: "https://fakestake.fun/blackjack",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="FakeStake Blackjack" src="https://fakestake.fun/blackjack" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Deal", action: "Start Hand" },
+      { key: "Hit / Stand / Double", action: "Play Action" }
+    ]
+  },
+  {
+    id: "fakestake-dragontower",
+    source: "unblocked",
+    title: "FakeStake Dragon Tower",
+    description: "Climb the multi-floor dragon tower by guessing safe dragon eggs. The higher you ascend, the larger the payout!",
+    category: "Fake Gambling",
+    secondaryCategory: "Arcade",
+    thumbnail: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1200&auto=format&fit=crop&q=80",
+    mirrors: ["https://fakestake.fun/dragontower"],
+    tags: ["FakeStake", "Dragon Tower", "Fake Gambling", "Tower", "Originals", "Unblocked"],
+    rating: 4.8,
+    plays: 74000,
+    author: "FakeStake.fun",
+    featured: false,
+    iframeSrc: "https://fakestake.fun/dragontower",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="FakeStake Dragon Tower" src="https://fakestake.fun/dragontower" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Click Floor Tile", action: "Select Egg & Climb" }
+    ]
+  },
+  {
+    id: "fakestake-flip",
+    source: "unblocked",
+    title: "FakeStake Coin Flip",
+    description: "Heads or Tails coin flip with streak multipliers. Chain consecutive correct calls for huge payouts.",
+    category: "Fake Gambling",
+    secondaryCategory: "Casual",
+    thumbnail: "https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1544717305-2782549b5136?w=1200&auto=format&fit=crop&q=80",
+    mirrors: ["https://fakestake.fun/flip"],
+    tags: ["FakeStake", "Coin Flip", "Flip", "Fake Gambling", "Casino", "Unblocked"],
+    rating: 4.7,
+    plays: 62000,
+    author: "FakeStake.fun",
+    featured: false,
+    iframeSrc: "https://fakestake.fun/flip",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="FakeStake Coin Flip" src="https://fakestake.fun/flip" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Heads / Tails Button", action: "Flip Coin" }
+    ]
+  },
+  {
+    id: "fakestake-keno",
+    source: "unblocked",
+    title: "FakeStake Keno",
+    description: "Pick your lucky numbers on the 40-tile Keno board and watch the drawing reveal big matching multipliers.",
+    category: "Fake Gambling",
+    secondaryCategory: "Puzzle",
+    thumbnail: "https://images.unsplash.com/photo-1518133910546-b6c2fb7d79e3?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1518133910546-b6c2fb7d79e3?w=1200&auto=format&fit=crop&q=80",
+    mirrors: ["https://fakestake.fun/keno"],
+    tags: ["FakeStake", "Keno", "Numbers", "Fake Gambling", "Lottery", "Unblocked"],
+    rating: 4.7,
+    plays: 58000,
+    author: "FakeStake.fun",
+    featured: false,
+    iframeSrc: "https://fakestake.fun/keno",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="FakeStake Keno" src="https://fakestake.fun/keno" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Select Numbers", action: "Choose 1-10 Tiles" }
+    ]
+  },
+  {
+    id: "fakestake-hilo",
+    source: "unblocked",
+    title: "FakeStake Hilo",
+    description: "Guess whether the next card in the deck will be Higher or Lower. Cash out your winning streak anytime.",
+    category: "Fake Gambling",
+    secondaryCategory: "Casual",
+    thumbnail: "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=1200&auto=format&fit=crop&q=80",
+    mirrors: ["https://fakestake.fun/hilo"],
+    tags: ["FakeStake", "Hilo", "Cards", "Higher Lower", "Fake Gambling", "Unblocked"],
+    rating: 4.7,
+    plays: 51000,
+    author: "FakeStake.fun",
+    featured: false,
+    iframeSrc: "https://fakestake.fun/hilo",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="FakeStake Hilo" src="https://fakestake.fun/hilo" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Higher / Lower Button", action: "Guess Next Card" }
+    ]
+  },
+  {
+    id: "fakestake-wheel",
+    source: "unblocked",
+    title: "FakeStake Wheel",
+    description: "Spin the segmented prize wheel with configurable segment counts and risk levels.",
+    category: "Fake Gambling",
+    secondaryCategory: "Casual",
+    thumbnail: "https://images.unsplash.com/photo-1553481187-be93c21490a9?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1553481187-be93c21490a9?w=1200&auto=format&fit=crop&q=80",
+    mirrors: ["https://fakestake.fun/wheel"],
+    tags: ["FakeStake", "Wheel", "Spin", "Fake Gambling", "Casino", "Unblocked"],
+    rating: 4.7,
+    plays: 49000,
+    author: "FakeStake.fun",
+    featured: false,
+    iframeSrc: "https://fakestake.fun/wheel",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="FakeStake Wheel" src="https://fakestake.fun/wheel" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Spin Button", action: "Launch Wheel" }
+    ]
+  },
+  {
+    id: "fakestake-chicken",
+    source: "unblocked",
+    title: "FakeStake Chicken",
+    description: "Guide the chicken across the highway roasting grill! Step forward lane by lane to multiply your wager.",
+    category: "Fake Gambling",
+    secondaryCategory: "Arcade",
+    thumbnail: "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=1200&auto=format&fit=crop&q=80",
+    mirrors: ["https://fakestake.fun/chicken"],
+    tags: ["FakeStake", "Chicken", "Crossy", "Fake Gambling", "Originals", "Unblocked"],
+    rating: 4.8,
+    plays: 68000,
+    author: "FakeStake.fun",
+    featured: false,
+    iframeSrc: "https://fakestake.fun/chicken",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="FakeStake Chicken" src="https://fakestake.fun/chicken" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Step / Space", action: "Walk Forward" },
+      { key: "Cashout", action: "Claim Multiplier" }
+    ]
+  },
+  {
+    id: "fakestake-cases",
+    source: "unblocked",
+    title: "FakeStake CS2 Cases",
+    description: "Open simulated weapon cases and skin crates! Spin the carousel to unbox Rare Special Items and covert knives.",
+    category: "Fake Gambling",
+    secondaryCategory: "Casual",
+    thumbnail: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&auto=format&fit=crop&q=80",
+    mirrors: ["https://fakestake.fun/cases"],
+    tags: ["FakeStake", "Cases", "CS2", "Crates", "Skins", "Fake Gambling", "Unblocked"],
+    rating: 4.9,
+    plays: 145000,
+    author: "FakeStake.fun",
+    featured: true,
+    iframeSrc: "https://fakestake.fun/cases",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="FakeStake CS2 Cases" src="https://fakestake.fun/cases" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Open Case", action: "Spin Unboxing Reel" }
+    ]
+  },
+  {
+    id: "fakestake-slots-olympus",
+    source: "unblocked",
+    title: "FakeStake: Gates of Olympus 1000",
+    description: "Zeus unleashes lightning bolts with up to 1,000x winged orb multipliers! Tumble reels and free spins simulation.",
+    category: "Fake Gambling",
+    secondaryCategory: "Arcade",
+    thumbnail: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200&auto=format&fit=crop&q=80",
+    mirrors: ["https://fakestake.fun/slots/gates-of-olympus-1000"],
+    tags: ["FakeStake", "Slots", "Gates of Olympus", "Zeus", "Fake Gambling", "Casino", "Unblocked"],
+    rating: 4.9,
+    plays: 230000,
+    author: "FakeStake.fun",
+    featured: true,
+    iframeSrc: "https://fakestake.fun/slots/gates-of-olympus-1000",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="FakeStake: Gates of Olympus 1000" src="https://fakestake.fun/slots/gates-of-olympus-1000" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Space / Spin", action: "Spin Slot Reels" }
+    ]
+  },
+  {
+    id: "fakestake-slots-bonanza",
+    source: "unblocked",
+    title: "FakeStake: Sweet Bonanza 1000",
+    description: "Candy fruit explosions and tumbling symbols with 1000x sugar bomb rainbow multipliers!",
+    category: "Fake Gambling",
+    secondaryCategory: "Casual",
+    thumbnail: "https://images.unsplash.com/photo-1582058091505-f87a2e55a40f?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1582058091505-f87a2e55a40f?w=1200&auto=format&fit=crop&q=80",
+    mirrors: ["https://fakestake.fun/slots/sweet-bonanza-1000"],
+    tags: ["FakeStake", "Slots", "Sweet Bonanza", "Candy", "Fake Gambling", "Casino", "Unblocked"],
+    rating: 4.9,
+    plays: 175000,
+    author: "FakeStake.fun",
+    featured: true,
+    iframeSrc: "https://fakestake.fun/slots/sweet-bonanza-1000",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="FakeStake: Sweet Bonanza 1000" src="https://fakestake.fun/slots/sweet-bonanza-1000" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Space / Spin", action: "Spin Sweet Reels" }
+    ]
+  },
+  {
+    id: "fakestake-slots-wanted",
+    source: "unblocked",
+    title: "FakeStake: Wanted Dead or a Wild",
+    description: "Gritty Western showdown with VS multipliers, Dead Man\x27s Hand, and Great Train Robbery bonus rounds.",
+    category: "Fake Gambling",
+    secondaryCategory: "Action",
+    thumbnail: "https://images.unsplash.com/photo-1533158307587-828f0a76ef46?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1533158307587-828f0a76ef46?w=1200&auto=format&fit=crop&q=80",
+    mirrors: ["https://fakestake.fun/slots/wanted-dead-or-wild"],
+    tags: ["FakeStake", "Slots", "Wanted Dead or a Wild", "Western", "Fake Gambling", "Unblocked"],
+    rating: 4.9,
+    plays: 198000,
+    author: "FakeStake.fun",
+    featured: true,
+    iframeSrc: "https://fakestake.fun/slots/wanted-dead-or-wild",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="FakeStake: Wanted Dead or a Wild" src="https://fakestake.fun/slots/wanted-dead-or-wild" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Space / Spin", action: "Spin Western Reels" }
+    ]
+  },
+  {
     id: "sawyer-for-sawyer",
     source: "unblocked",
     title: "A Small World Cup (Sawyer For Sawyer)",

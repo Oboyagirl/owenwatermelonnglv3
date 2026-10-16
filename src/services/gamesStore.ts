@@ -20,7 +20,7 @@ export function resolveAssetUrl(url: string): string {
     }
   }
 
-  const base = import.meta.env.BASE_URL || './';
+  const base = (import.meta as any).env?.BASE_URL || './';
   if (base.endsWith('/')) {
     return `${base}${clean}`;
   }

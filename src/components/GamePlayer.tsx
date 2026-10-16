@@ -19,13 +19,21 @@ import {
   ShieldCheck,
   Scan,
   Cloud,
-  Zap
+  Zap,
+  Music,
+  Play,
+  Pause,
+  SkipForward,
+  Disc3,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { Game } from '../types/game';
 import { openAboutBlankGame, resolveAssetUrl } from '../services/gamesStore';
 import { ThemeConfig, THEMES } from '../services/themeStore';
 import { CloudSaveModal } from './CloudSaveModal';
 import { useAuth } from '../context/AuthContext';
+import { useMusic } from '../context/MusicContext';
 import { captureUniversalGameState, captureBrowserGameState } from '../services/cloudSaveService';
 
 interface GamePlayerProps {
@@ -37,6 +45,7 @@ interface GamePlayerProps {
   allGames: Game[];
   onUpdateGame?: (gameId: string, updates: Partial<Game>) => void;
   activeTheme?: ThemeConfig;
+  onOpenMusicSpace?: () => void;
 }
 
 export const GamePlayer: React.FC<GamePlayerProps> = ({
@@ -47,8 +56,20 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
   onSelectGame,
   allGames,
   onUpdateGame,
-  activeTheme = THEMES.original
+  activeTheme = THEMES.original,
+  onOpenMusicSpace
 }) => {
+  const { 
+    currentTrack, 
+    isPlaying, 
+    togglePlay, 
+    nextTrack, 
+    prevTrack, 
+    volume, 
+    setVolume, 
+    isMuted, 
+    toggleMute 
+  } = useMusic();
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -257,6 +278,47 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
+          {/* In-Game Real MP3 Music Controller */}
+          <div 
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border shadow-sm transition-all text-xs"
+            style={{
+              backgroundColor: isPlaying ? activeTheme.accentBadge : activeTheme.bgCard,
+              borderColor: isPlaying ? activeTheme.accent : activeTheme.border
+            }}
+          >
+            <button
+              onClick={() => {
+                if (onOpenMusicSpace) onOpenMusicSpace();
+                else togglePlay();
+              }}
+              className="flex items-center gap-1.5 font-bold hover:underline cursor-pointer max-w-[120px] sm:max-w-[170px] truncate"
+              style={{ color: isPlaying ? activeTheme.accent : '#ffffff' }}
+              title={isPlaying ? `Now Playing: ${currentTrack?.title} by ${currentTrack?.artist} (Click to open Music Studio)` : 'Click to listen to real MP3 music while gaming'}
+            >
+              <Disc3 className={`w-3.5 h-3.5 shrink-0 ${isPlaying ? 'animate-spin' : ''}`} />
+              <span className="truncate">
+                {isPlaying ? currentTrack?.title : 'Listen to Music'}
+              </span>
+            </button>
+
+            <button
+              onClick={togglePlay}
+              className="p-1 rounded-md text-black flex items-center justify-center shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-all"
+              style={{ backgroundColor: activeTheme.accent }}
+              title={isPlaying ? 'Pause Music' : 'Play Music'}
+            >
+              {isPlaying ? <Pause className="w-3 h-3 fill-black" /> : <Play className="w-3 h-3 fill-black ml-0.5" />}
+            </button>
+
+            <button
+              onClick={nextTrack}
+              className="p-1 rounded-md hover:bg-white/10 text-slate-300 hover:text-white cursor-pointer shrink-0"
+              title="Next song"
+            >
+              <SkipForward className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
           {/* 1-Click Quick Save */}
           <button
             onClick={handleQuickSave}
@@ -539,6 +601,21 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
             >
               <Cloud className="w-3.5 h-3.5 text-emerald-400" />
               <span className="hidden sm:inline">Cloud Save</span>
+            </button>
+
+            {/* In-Player Real MP3 Music Toggle */}
+            <button
+              onClick={togglePlay}
+              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer border"
+              style={{
+                backgroundColor: isPlaying ? activeTheme.accentBadge : activeTheme.bgCard,
+                borderColor: isPlaying ? activeTheme.accent : activeTheme.border,
+                color: isPlaying ? activeTheme.accent : activeTheme.kicker
+              }}
+              title={isPlaying ? `Background Music: ${currentTrack?.title} (Click to pause)` : 'Listen to real MP3 music while playing'}
+            >
+              <Disc3 className={`w-3.5 h-3.5 ${isPlaying ? 'animate-spin' : ''}`} style={{ color: activeTheme.accent }} />
+              <span className="hidden sm:inline">{isPlaying ? 'Music: ON' : '🎵 Music'}</span>
             </button>
 
             <button
