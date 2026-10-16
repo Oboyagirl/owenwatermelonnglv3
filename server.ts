@@ -495,64 +495,6 @@ Your job:
     }
   };
 
-  // Dynamic Real MP3 Resolution & Streaming for all album songs
-  const musicPreviewCache = new Map<string, string>();
-
-  app.get('/api/music/stream', async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Accept-Ranges', 'bytes');
-
-    const artist = String(req.query.artist || '');
-    const title = String(req.query.title || '');
-    const local = String(req.query.local || '');
-
-    if (local) {
-      const cleanFilename = path.basename(local);
-      const localPath = path.join(primaryMusicDir, cleanFilename);
-      if (fs.existsSync(localPath)) {
-        return streamAudioFile(cleanFilename, req, res);
-      }
-    }
-
-    if (!artist && !title) {
-      return streamAudioFile('tyler_see_you_again.mp3', req, res);
-    }
-
-    const cacheKey = `${artist}::${title}`.toLowerCase();
-    if (musicPreviewCache.has(cacheKey)) {
-      return res.redirect(musicPreviewCache.get(cacheKey)!);
-    }
-
-    try {
-      const cleanTitle = title.replace(/\([^)]*\)/g, '').replace(/feat\.[^)]+/gi, '').trim();
-      const q = encodeURIComponent(`${artist} ${cleanTitle}`);
-      const deezerRes = await fetch(`https://api.deezer.com/search?q=${q}&limit=5`);
-      const data = await deezerRes.json() as any;
-      const hit = data.data && data.data[0];
-      if (hit && hit.preview) {
-        musicPreviewCache.set(cacheKey, hit.preview);
-        return res.redirect(hit.preview);
-      }
-    } catch (e) {
-      console.warn('Real MP3 stream lookup failed for', artist, title, e);
-    }
-
-    // Artist-aware authentic local MP3 fallback so every song plays without breaking
-    const artistLower = artist.toLowerCase();
-    let fallbackFile = 'tyler_see_you_again.mp3';
-    if (artistLower.includes('alex g')) fallbackFile = 'alex_g_mary.mp3';
-    else if (artistLower.includes('drake')) fallbackFile = 'drake_gods_plan.mp3';
-    else if (artistLower.includes('kendrick')) fallbackFile = 'kendrick_humble.mp3';
-    else if (artistLower.includes('kanye')) fallbackFile = 'kanye_flashing_lights.mp3';
-    else if (artistLower.includes('travis')) fallbackFile = 'travis_sicko_mode.mp3';
-    else if (artistLower.includes('frank ocean')) fallbackFile = 'frank_ocean_pink_white.mp3';
-    else if (artistLower.includes('steve lacy')) fallbackFile = 'steve_lacy_bad_habit.mp3';
-    else if (artistLower.includes('weeknd')) fallbackFile = 'weeknd_blinding_lights.mp3';
-    else if (artistLower.includes('billie')) fallbackFile = 'billie_birds_of_a_feather.mp3';
-
-    return streamAudioFile(fallbackFile, req, res);
-  });
-
   app.get('/music/:filename', (req, res) => {
     streamAudioFile(req.params.filename, req, res);
   });
