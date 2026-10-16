@@ -19,6 +19,7 @@ import { HomeDashboard } from './components/HomeDashboard';
 import { ProxyView } from './components/ProxyView';
 import { AppsView } from './components/AppsView';
 import { MusicView } from './components/MusicView';
+import { FloatingMusicPlayer } from './components/FloatingMusicPlayer';
 import { AIChatView } from './components/AIChatView';
 import { CloudSaveModal } from './components/CloudSaveModal';
 import { useGamesStore } from './services/gamesStore';
@@ -599,6 +600,8 @@ export default function App() {
             onUpdateGame={updateGame}
             allGames={games}
             onSelectGame={handleSelectGame}
+            activeTheme={activeTheme}
+            onOpenMusicSpace={() => handleSelectSpace('music')}
           />
         ) : (
           <div className="max-w-7xl mx-auto w-full flex flex-col gap-8">
@@ -765,6 +768,7 @@ export default function App() {
             setSelectedGame(null);
             handleSelectSpace('home');
           }}
+          onOpenMusic={() => handleSelectSpace('music')}
           omnibarValue={searchTerm}
           onOmnibarSubmit={handleOmnibarSubmit}
           onToggleSplit={() => handleToggleSplit()}
@@ -849,6 +853,14 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Persistent Background Floating Music Player (Available across all games and tabs) */}
+      <FloatingMusicPlayer
+        activeTheme={activeTheme}
+        activeSpace={activeSpace}
+        isGameActive={Boolean(selectedGame)}
+        onOpenMusicSpace={() => handleSelectSpace('music')}
+      />
     </div>
   );
 }
