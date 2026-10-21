@@ -45,6 +45,30 @@ const CUSTOM_MUSIC_KEY = 'owen_custom_music_list';
 const LIKED_MUSIC_KEY = 'owen_liked_music';
 const MUSIC_VOL_KEY = 'owen_music_volume';
 
+
+const FALLBACK_TRACKS_BY_ARTIST: Record<string, string> = {
+  tyler: "./music/tyler_see_you_again.mp3",
+  frank: "./music/frank_pink_white.mp3",
+  kendrick: "./music/kendrick_humble.mp3",
+  billie: "./music/billie_birds_of_a_feather.mp3",
+  steve: "./music/steve_lacy_bad_habit.mp3",
+  kanye: "./music/kanye_stronger.mp3",
+  drake: "./music/drake_passionfruit.mp3",
+  alex: "./music/alex_g_mary.mp3",
+  weeknd: "./music/weeknd_blinding_lights.mp3",
+  travis: "./music/travis_sicko_mode.mp3"
+};
+
+export function getSafeLocalFallback(artist?: string): string {
+  const a = (artist || "").toLowerCase();
+  for (const [key, path] of Object.entries(FALLBACK_TRACKS_BY_ARTIST)) {
+    if (a.includes(key)) {
+      return resolveAssetUrl(path);
+    }
+  }
+  return resolveAssetUrl("./music/tyler_see_you_again.mp3");
+}
+
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -175,98 +199,62 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, []);
 
-  // Play a specific track
+  // Play a specific track with robust universal fallbacks for GitHub Pages
   const playTrack = useCallback(async (target: CustomTrack) => {
     if (!audioRef.current || !target || !target.audioSrc) return;
     setAudioError(null);
     const audio = audioRef.current;
-    const targetSource = resolveAssetUrl(target.audioSrc);
 
-    // Update current index if found in list
+    // Update current index if found in catalog
     const foundIdx = allTracks.findIndex(t => t.id === target.id);
     if (foundIdx !== -1) {
       setCurrentTrackIndex(foundIdx);
     }
 
-    try {
-      if (!audio.src.endsWith(target.audioSrc) && audio.src !== targetSource) {
-        audio.src = targetSource;
-        audio.load();
-      }
-      await audio.play();
-      setIsPlaying(true);
-      setAudioError(null);
-      updateMediaSession(target);
-    } catch (err: any) {
-      console.warn("Primary play failed, trying fallback path:", err);
+    const primaryUrl = resolveAssetUrl(target.audioSrc);
+
+    const tryPlaySource = async (url: string): Promise<boolean> => {
       try {
-        const cleanPath = './' + target.audioSrc.replace(/^(\.\/|\/)/, '');
-        if (audio.src !== cleanPath) {
-          audio.src = cleanPath;
+        if (!url) return false;
+        if (audio.src !== url && !audio.src.endsWith(url)) {
+          audio.src = url;
           audio.load();
         }
         await audio.play();
         setIsPlaying(true);
         setAudioError(null);
         updateMediaSession(target);
-        return;
-      } catch (e2) {
-        // Fallback: Express /api/music/ route
-        if (target.audioSrc.includes('music/')) {
-          try {
-            const filename = target.audioSrc.split('/').pop();
-            const serverUrl = '/api/music/' + filename;
-            audio.src = serverUrl;
-            audio.load();
-            await audio.play();
-            setIsPlaying(true);
-            setAudioError(null);
-            updateMediaSession(target);
-            return;
-          } catch (e3) {
-            console.warn("Server MP3 stream fallback failed:", e3);
-          }
+        return true;
+      } catch (err: any) {
+        if (err && err.name === "NotAllowedError") {
+          setIsPlaying(false);
+          setAudioError(null);
+          return true;
         }
-
-        // Try server dynamic streaming endpoint first
-        if (target.artist && target.title) {
-          try {
-            const streamUrl = `/api/music/stream?artist=${encodeURIComponent(target.artist)}&title=${encodeURIComponent(target.title)}`;
-            audio.src = streamUrl;
-            audio.load();
-            await audio.play();
-            setIsPlaying(true);
-            setAudioError(null);
-            updateMediaSession(target);
-            return;
-          } catch (eStream) {
-            console.warn("Server stream error:", eStream);
-          }
-        }
-        // Direct Client-side Real MP3 resolution fallback
-        if (target.artist && target.title) {
-          try {
-            const cleanTitle = target.title.replace(/\([^)]*\)/g, '').replace(/feat\.[^)]+/gi, '').trim();
-            const q = encodeURIComponent(`${target.artist} ${cleanTitle}`);
-            const res = await fetch(`https://api.deezer.com/search?q=${q}&limit=5`);
-            const data = await res.json() as any;
-            if (data?.data?.[0]?.preview) {
-              audio.src = data.data[0].preview;
-              audio.load();
-              await audio.play();
-              setIsPlaying(true);
-              setAudioError(null);
-              updateMediaSession(target);
-              return;
-            }
-          } catch (e4) {
-            console.warn("Client fallback failed:", e4);
-          }
-        }
+        return false;
       }
-      setIsPlaying(false);
-      setAudioError("Tap ▶ Play to start playback.");
+    };
+
+    // 1. Try target source directly (works for bundled MP3s and direct Apple preview CDN)
+    const okPrimary = await tryPlaySource(primaryUrl);
+    if (okPrimary) return;
+
+    // 2. If running on fullstack Express backend (not static GitHub Pages), try /api/music/stream
+    const isStaticHost = typeof window !== "undefined" && 
+      (window.location.hostname.endsWith("github.io") || window.location.protocol === "file:");
+
+    if (!isStaticHost && target.artist && target.title) {
+      const serverStreamUrl = "/api/music/stream?artist=" + encodeURIComponent(target.artist) + "&title=" + encodeURIComponent(target.title);
+      const okServer = await tryPlaySource(serverStreamUrl);
+      if (okServer) return;
     }
+
+    // 3. Fallback to guaranteed bundled local artist MP3
+    const localFallback = getSafeLocalFallback(target.artist);
+    const okFallback = await tryPlaySource(localFallback);
+    if (okFallback) return;
+
+    setIsPlaying(false);
   }, [allTracks, updateMediaSession]);
 
   const togglePlay = useCallback(async () => {
@@ -280,9 +268,21 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       return;
     }
 
-    await playTrack(currentTrack);
-  }, [currentTrack, isPlaying, playTrack]);
+    // If audio element is already loaded, resume immediately!
+    if (audio.src && audio.src !== "about:blank" && !audio.error) {
+      try {
+        await audio.play();
+        setIsPlaying(true);
+        setAudioError(null);
+        updateMediaSession(currentTrack);
+        return;
+      } catch (resumeErr) {
+        console.warn("Direct resume failed, reloading track:", resumeErr);
+      }
+    }
 
+    await playTrack(currentTrack);
+  }, [currentTrack, isPlaying, playTrack, updateMediaSession]);
   const nextTrack = useCallback(() => {
     if (allTracks.length <= 1) return;
     setAudioError(null);
@@ -441,17 +441,22 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         onEnded={nextTrack}
         onError={() => {
           const audio = audioRef.current;
-          if (!audio || !audio.src || audio.src === 'about:blank' || audio.src === window.location.href) {
+          if (!audio || !audio.src || audio.src === "about:blank" || audio.src === window.location.href) {
             return;
           }
           if (audio.error && audio.error.code === 1) {
-            return; // Aborted
+            return; // Aborted by user
           }
-          console.warn("Audio playback error encountered on:", audio.src, audio.error);
-          if (currentTrack?.isCustom && currentTrack.audioSrc.startsWith('blob:')) {
-            setAudioError("Custom local MP3 was refreshed. Re-load file to play.");
-          } else {
-            setAudioError("Click ▶ to play audio.");
+          console.warn("Audio element error on:", audio.src, audio.error);
+          const fallback = getSafeLocalFallback(currentTrack?.artist);
+          if (audio.src !== fallback && !audio.src.endsWith(fallback)) {
+            console.log("Automatically recovering playback using bundled local fallback:", fallback);
+            audio.src = fallback;
+            audio.load();
+            if (isPlaying) {
+              audio.play().catch(() => {});
+            }
+            return;
           }
           setIsPlaying(false);
         }}

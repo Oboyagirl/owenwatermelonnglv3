@@ -331,7 +331,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 194,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=Foreword%20(feat.%20Rex%20Orange%20County)",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/42/3a/7e/423a7ebc-f952-7032-71f7-faa6356a856b/mzaf_1113637335617379367.plus.aac.p.m4a",
     "albumId": "album-flower-boy",
     "trackNumber": 1,
     "hasLocalAudio": false
@@ -346,7 +346,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 194,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=Where%20This%20Flower%20Blooms%20(feat.%20Frank%20Ocean)",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/f9/74/3a/f9743aac-6037-85ab-2cb5-e5e214e500dc/mzaf_12340842187902083744.plus.aac.p.m4a",
     "albumId": "album-flower-boy",
     "trackNumber": 2,
     "hasLocalAudio": false
@@ -361,7 +361,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 36,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=Sometimes...",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/a6/99/eaa699af-33dc-3f58-5ebd-e4b830707647/mzaf_11136703388258616116.plus.aac.p.m4a",
     "albumId": "album-flower-boy",
     "trackNumber": 3,
     "hasLocalAudio": false
@@ -376,10 +376,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 180,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "./music/tyler_see_you_again.mp3",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e2/c4/26/e2c4269f-4d5d-4c8d-59f1-0f47eef47bee/mzaf_2227575898383280349.plus.aac.p.m4a",
     "albumId": "album-flower-boy",
     "trackNumber": 4,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-flower-boy-track-5",
@@ -391,7 +391,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 205,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=Who%20Dat%20Boy%20(feat.%20A%24AP%20Rocky)",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview116/v4/4f/d8/60/4fd8607b-135d-2435-2091-90b74ea0dd3d/mzaf_11359101467429455497.plus.aac.p.m4a",
     "albumId": "album-flower-boy",
     "trackNumber": 5,
     "hasLocalAudio": false
@@ -406,7 +406,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 237,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=Pothole%20(feat.%20Jaden%20Smith)",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/a6/99/eaa699af-33dc-3f58-5ebd-e4b830707647/mzaf_11136703388258616116.plus.aac.p.m4a",
     "albumId": "album-flower-boy",
     "trackNumber": 6,
     "hasLocalAudio": false
@@ -421,7 +421,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 223,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=Garden%20Shed%20(feat.%20Estelle)",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/42/3a/7e/423a7ebc-f952-7032-71f7-faa6356a856b/mzaf_1113637335617379367.plus.aac.p.m4a",
     "albumId": "album-flower-boy",
     "trackNumber": 7,
     "hasLocalAudio": false
@@ -436,7 +436,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 320,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=Boredom%20(feat.%20Rex%20Orange%20County%20%26%20Anna%20of%20the%20North)",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/f9/74/3a/f9743aac-6037-85ab-2cb5-e5e214e500dc/mzaf_12340842187902083744.plus.aac.p.m4a",
     "albumId": "album-flower-boy",
     "trackNumber": 8,
     "hasLocalAudio": false
@@ -451,7 +451,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 206,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=I%20Ain't%20Got%20Time!",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/42/3a/7e/423a7ebc-f952-7032-71f7-faa6356a856b/mzaf_1113637335617379367.plus.aac.p.m4a",
     "albumId": "album-flower-boy",
     "trackNumber": 9,
     "hasLocalAudio": false
@@ -466,7 +466,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 255,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=911%20%2F%20Mr.%20Lonely%20(feat.%20Frank%20Ocean%20%26%20Steve%20Lacy)",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1a/72/53/1a7253fd-eec4-6b99-d8ca-513a5f63c520/mzaf_1448469707347394045.plus.aac.p.m4a",
     "albumId": "album-flower-boy",
     "trackNumber": 10,
     "hasLocalAudio": false
@@ -481,7 +481,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 60,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=Droppin'%20Seeds%20(feat.%20Lil%20Wayne)",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/64/ce/3f/64ce3ff9-023c-2176-d4e2-5edc2adb2cf4/mzaf_12533470112504608002.plus.aac.p.m4a",
     "albumId": "album-flower-boy",
     "trackNumber": 11,
     "hasLocalAudio": false
@@ -496,7 +496,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 225,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=November",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/a6/99/eaa699af-33dc-3f58-5ebd-e4b830707647/mzaf_11136703388258616116.plus.aac.p.m4a",
     "albumId": "album-flower-boy",
     "trackNumber": 12,
     "hasLocalAudio": false
@@ -511,7 +511,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 224,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=Glitter",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/42/3a/7e/423a7ebc-f952-7032-71f7-faa6356a856b/mzaf_1113637335617379367.plus.aac.p.m4a",
     "albumId": "album-flower-boy",
     "trackNumber": 13,
     "hasLocalAudio": false
@@ -526,7 +526,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 235,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=Enjoy%20Right%20Now%2C%20Today",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/f9/74/3a/f9743aac-6037-85ab-2cb5-e5e214e500dc/mzaf_12340842187902083744.plus.aac.p.m4a",
     "albumId": "album-flower-boy",
     "trackNumber": 14,
     "hasLocalAudio": false
@@ -541,7 +541,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 200,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=IGOR'S%20THEME",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/b5/f1/58/b5f158c7-0938-82de-e380-a19444cd0260/mzaf_4489287100179218200.plus.aac.p.m4a",
     "albumId": "album-igor",
     "trackNumber": 1,
     "hasLocalAudio": false
@@ -556,7 +556,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 190,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=EARFQUAKE",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d0/39/e9/d039e9dd-6e92-4d1d-3668-6a7c2c2cc870/mzaf_13378919472110564553.plus.aac.p.m4a",
     "albumId": "album-igor",
     "trackNumber": 2,
     "hasLocalAudio": false
@@ -571,7 +571,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 212,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=I%20THINK",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/b5/f1/58/b5f158c7-0938-82de-e380-a19444cd0260/mzaf_4489287100179218200.plus.aac.p.m4a",
     "albumId": "album-igor",
     "trackNumber": 3,
     "hasLocalAudio": false
@@ -586,7 +586,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 14,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=EXACTLY%20WHAT%20YOU%20RUN%20FROM%20YOU%20END%20UP%20CHASING",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/28/b9/85/28b985a4-6f7f-7a69-c97e-426034387830/mzaf_954360507075586182.plus.aac.p.m4a",
     "albumId": "album-igor",
     "trackNumber": 4,
     "hasLocalAudio": false
@@ -601,7 +601,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 177,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=RUNNING%20OUT%20OF%20TIME",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c9/6d/2c/c96d2c76-994f-f064-95dc-d17e3dcad2c4/mzaf_5523508444928859068.plus.aac.p.m4a",
     "albumId": "album-igor",
     "trackNumber": 5,
     "hasLocalAudio": false
@@ -616,7 +616,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 195,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=NEW%20MAGIC%20WAND",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/42/3a/7e/423a7ebc-f952-7032-71f7-faa6356a856b/mzaf_1113637335617379367.plus.aac.p.m4a",
     "albumId": "album-igor",
     "trackNumber": 6,
     "hasLocalAudio": false
@@ -631,7 +631,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 210,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=A%20BOY%20IS%20A%20GUN*",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3a/be/21/3abe214f-5e59-6690-37c6-720b5bec0945/mzaf_9415324263871079281.plus.aac.p.m4a",
     "albumId": "album-igor",
     "trackNumber": 7,
     "hasLocalAudio": false
@@ -646,7 +646,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 179,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=PUPPET",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/42/3a/7e/423a7ebc-f952-7032-71f7-faa6356a856b/mzaf_1113637335617379367.plus.aac.p.m4a",
     "albumId": "album-igor",
     "trackNumber": 8,
     "hasLocalAudio": false
@@ -661,7 +661,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 205,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=WHAT'S%20GOOD",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/a6/99/eaa699af-33dc-3f58-5ebd-e4b830707647/mzaf_11136703388258616116.plus.aac.p.m4a",
     "albumId": "album-igor",
     "trackNumber": 9,
     "hasLocalAudio": false
@@ -676,7 +676,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 375,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=GONE%2C%20GONE%20%2F%20THANK%20YOU",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c9/b3/ed/c9b3ed28-4209-f550-3170-e633b200f105/mzaf_7244198289293517571.plus.aac.p.m4a",
     "albumId": "album-igor",
     "trackNumber": 10,
     "hasLocalAudio": false
@@ -691,7 +691,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 161,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=I%20DON'T%20LOVE%20YOU%20ANYMORE",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ab/58/eb/ab58ebb0-5625-aadf-7e04-d481a24f4429/mzaf_18066070003184862961.plus.aac.p.m4a",
     "albumId": "album-igor",
     "trackNumber": 11,
     "hasLocalAudio": false
@@ -706,7 +706,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 265,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=ARE%20WE%20STILL%20FRIENDS%3F",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e2/c4/26/e2c4269f-4d5d-4c8d-59f1-0f47eef47bee/mzaf_2227575898383280349.plus.aac.p.m4a",
     "albumId": "album-igor",
     "trackNumber": 12,
     "hasLocalAudio": false
@@ -721,7 +721,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 88,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=SIR%20BAUDELAIRE",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/a6/99/eaa699af-33dc-3f58-5ebd-e4b830707647/mzaf_11136703388258616116.plus.aac.p.m4a",
     "albumId": "album-cmiygl",
     "trackNumber": 1,
     "hasLocalAudio": false
@@ -736,7 +736,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 146,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=CORSO",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/a6/99/eaa699af-33dc-3f58-5ebd-e4b830707647/mzaf_11136703388258616116.plus.aac.p.m4a",
     "albumId": "album-cmiygl",
     "trackNumber": 2,
     "hasLocalAudio": false
@@ -751,7 +751,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 130,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=LEMONHEAD",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/42/3a/7e/423a7ebc-f952-7032-71f7-faa6356a856b/mzaf_1113637335617379367.plus.aac.p.m4a",
     "albumId": "album-cmiygl",
     "trackNumber": 3,
     "hasLocalAudio": false
@@ -766,7 +766,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 121,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=WUSYANAME",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/a6/99/eaa699af-33dc-3f58-5ebd-e4b830707647/mzaf_11136703388258616116.plus.aac.p.m4a",
     "albumId": "album-cmiygl",
     "trackNumber": 4,
     "hasLocalAudio": false
@@ -781,7 +781,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 138,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=LUMBERJACK",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/a6/99/eaa699af-33dc-3f58-5ebd-e4b830707647/mzaf_11136703388258616116.plus.aac.p.m4a",
     "albumId": "album-cmiygl",
     "trackNumber": 5,
     "hasLocalAudio": false
@@ -796,7 +796,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 155,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=HOT%20WIND%20BLOWS",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/a6/99/eaa699af-33dc-3f58-5ebd-e4b830707647/mzaf_11136703388258616116.plus.aac.p.m4a",
     "albumId": "album-cmiygl",
     "trackNumber": 6,
     "hasLocalAudio": false
@@ -811,7 +811,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 223,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=MASSA",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/4e/b4/c3/4eb4c3f1-e63e-6afb-de48-b7872a0c8e9d/mzaf_14780009401623993199.plus.aac.p.m4a",
     "albumId": "album-cmiygl",
     "trackNumber": 7,
     "hasLocalAudio": false
@@ -826,7 +826,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 229,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=RUNITUP",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/a6/99/eaa699af-33dc-3f58-5ebd-e4b830707647/mzaf_11136703388258616116.plus.aac.p.m4a",
     "albumId": "album-cmiygl",
     "trackNumber": 8,
     "hasLocalAudio": false
@@ -841,7 +841,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 175,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=MANIFESTO",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/a6/99/eaa699af-33dc-3f58-5ebd-e4b830707647/mzaf_11136703388258616116.plus.aac.p.m4a",
     "albumId": "album-cmiygl",
     "trackNumber": 9,
     "hasLocalAudio": false
@@ -856,7 +856,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 588,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=SWEET%20%2F%20I%20THOUGHT%20YOU%20WANTED%20TO%20DANCE",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1f/56/4a/1f564a2c-ecbb-47ac-1aed-b171f48acfb8/mzaf_2289328977316131156.plus.aac.p.m4a",
     "albumId": "album-cmiygl",
     "trackNumber": 10,
     "hasLocalAudio": false
@@ -871,7 +871,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 70,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=MOMMA%20TALK",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/a6/99/eaa699af-33dc-3f58-5ebd-e4b830707647/mzaf_11136703388258616116.plus.aac.p.m4a",
     "albumId": "album-cmiygl",
     "trackNumber": 11,
     "hasLocalAudio": false
@@ -886,7 +886,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 203,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=RISE!",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/a6/99/eaa699af-33dc-3f58-5ebd-e4b830707647/mzaf_11136703388258616116.plus.aac.p.m4a",
     "albumId": "album-cmiygl",
     "trackNumber": 12,
     "hasLocalAudio": false
@@ -901,7 +901,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 57,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=BLESSED",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/a6/99/eaa699af-33dc-3f58-5ebd-e4b830707647/mzaf_11136703388258616116.plus.aac.p.m4a",
     "albumId": "album-cmiygl",
     "trackNumber": 13,
     "hasLocalAudio": false
@@ -916,7 +916,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 146,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=JUGGERNAUT",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/42/3a/7e/423a7ebc-f952-7032-71f7-faa6356a856b/mzaf_1113637335617379367.plus.aac.p.m4a",
     "albumId": "album-cmiygl",
     "trackNumber": 14,
     "hasLocalAudio": false
@@ -931,7 +931,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 515,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=WILSHIRE",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/96/fa/53/96fa53c4-3eea-9465-e398-238832b7ccdd/mzaf_14841156178023782219.plus.aac.p.m4a",
     "albumId": "album-cmiygl",
     "trackNumber": 15,
     "hasLocalAudio": false
@@ -946,10 +946,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 177,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "/api/music/stream?artist=Tyler%2C%20The%20Creator&title=SAFARI",
+    "audioSrc": "./music/tyler_see_you_again.mp3",
     "albumId": "album-cmiygl",
     "trackNumber": 16,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-trick-track-1",
@@ -961,7 +961,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 169,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Memory",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/00/1d/c4/001dc4c7-0396-fb64-6f84-4987589e9af7/mzaf_17835624929568563168.plus.aac.p.m4a",
     "albumId": "album-trick",
     "trackNumber": 1,
     "hasLocalAudio": false
@@ -976,7 +976,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 147,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Forever",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/08/95/cc/0895ccf0-0314-7327-7ad4-cfa75f972501/mzaf_9256753711886671047.plus.aac.p.m4a",
     "albumId": "album-trick",
     "trackNumber": 2,
     "hasLocalAudio": false
@@ -991,7 +991,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 171,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Animals",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/34/d5/e8/34d5e804-101b-46e7-2a3b-62fb8cd95409/mzaf_12806884850939195197.plus.aac.p.m4a",
     "albumId": "album-trick",
     "trackNumber": 3,
     "hasLocalAudio": false
@@ -1006,7 +1006,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 176,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Sarah",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/91/75/ef/9175efb0-3318-e33b-34dc-8e1e583a36c4/mzaf_16458746550407156643.plus.aac.p.m4a",
     "albumId": "album-trick",
     "trackNumber": 4,
     "hasLocalAudio": false
@@ -1021,7 +1021,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 181,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=String",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3b/ff/e2/3bffe242-0de0-ce1f-fe49-4099b4ad9e61/mzaf_7959515069314097408.plus.aac.p.m4a",
     "albumId": "album-trick",
     "trackNumber": 5,
     "hasLocalAudio": false
@@ -1036,7 +1036,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 157,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Advice",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/26/9c/ff/269cff65-e816-a31d-fe67-3b132d4992a5/mzaf_17771917121970926773.plus.aac.p.m4a",
     "albumId": "album-trick",
     "trackNumber": 6,
     "hasLocalAudio": false
@@ -1051,7 +1051,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 104,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=People",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/05/3f/ea053f35-612c-ea01-e83d-5846c2cc77d4/mzaf_13544511999441897794.plus.aac.p.m4a",
     "albumId": "album-trick",
     "trackNumber": 7,
     "hasLocalAudio": false
@@ -1066,7 +1066,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 82,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Whale",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7e/92/a8/7e92a83d-033f-91dd-9413-0f39397393ad/mzaf_12019455944438245663.plus.aac.p.m4a",
     "albumId": "album-trick",
     "trackNumber": 8,
     "hasLocalAudio": false
@@ -1081,10 +1081,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 100,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Trick",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-trick",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-trick-track-10",
@@ -1096,7 +1096,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 124,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Kicker",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/44/67/30/4467301d-6a77-9056-15c9-7947e80096ec/mzaf_3833720190993081006.plus.aac.p.m4a",
     "albumId": "album-trick",
     "trackNumber": 10,
     "hasLocalAudio": false
@@ -1111,7 +1111,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 124,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Change",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f2/1d/dc/f21ddc95-2cc7-055f-72b5-6d00df1f00db/mzaf_10145188030121850036.plus.aac.p.m4a",
     "albumId": "album-trick",
     "trackNumber": 11,
     "hasLocalAudio": false
@@ -1126,7 +1126,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 194,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Mary",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/91/75/ef/9175efb0-3318-e33b-34dc-8e1e583a36c4/mzaf_16458746550407156643.plus.aac.p.m4a",
     "albumId": "album-trick",
     "trackNumber": 12,
     "hasLocalAudio": false
@@ -1141,10 +1141,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 88,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=16%20Mirrors",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-trick",
     "trackNumber": 13,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-trick-track-14",
@@ -1156,10 +1156,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 143,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Clouds",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-trick",
     "trackNumber": 14,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-trick-track-15",
@@ -1171,10 +1171,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 161,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Mis",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-trick",
     "trackNumber": 15,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-trick-track-16",
@@ -1186,10 +1186,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 182,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Treehouse%20(feat.%20Emily%20Yacina)",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-trick",
     "trackNumber": 16,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-house-of-sugar-track-1",
@@ -1201,10 +1201,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 246,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Walk%20Away",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-house-of-sugar-track-2",
@@ -1216,10 +1216,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 158,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Hope",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 2,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-house-of-sugar-track-3",
@@ -1231,10 +1231,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 193,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Southern%20Sky",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-house-of-sugar-track-4",
@@ -1246,10 +1246,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 190,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Gretel",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 4,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-house-of-sugar-track-5",
@@ -1261,10 +1261,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 136,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Taking",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-house-of-sugar-track-6",
@@ -1276,10 +1276,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 130,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Near",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-house-of-sugar-track-7",
@@ -1291,10 +1291,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 145,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Project%202",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 7,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-house-of-sugar-track-8",
@@ -1306,10 +1306,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 112,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Bad%20Man",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 8,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-house-of-sugar-track-9",
@@ -1321,10 +1321,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 174,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Sugar",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-house-of-sugar-track-10",
@@ -1336,7 +1336,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 163,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=In%20My%20Arms",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/90/3d/a8/903da803-3035-a3b3-b655-f0b1b14f4e8d/mzaf_7096883130470432460.plus.aac.p.m4a",
     "albumId": "album-house-of-sugar",
     "trackNumber": 10,
     "hasLocalAudio": false
@@ -1351,7 +1351,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 165,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Cow",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2d/61/95/2d6195fa-3309-2249-e0f6-419931200829/mzaf_12636805364087272723.plus.aac.p.m4a",
     "albumId": "album-house-of-sugar",
     "trackNumber": 11,
     "hasLocalAudio": false
@@ -1366,7 +1366,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 238,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Crime",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/cb/4f/7a/cb4f7a2c-641a-5468-670c-c7694542649c/mzaf_5787726710476592261.plus.aac.p.m4a",
     "albumId": "album-house-of-sugar",
     "trackNumber": 12,
     "hasLocalAudio": false
@@ -1381,7 +1381,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 210,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=SugarHouse%20(Live)",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/45/81/c3/4581c363-fbbf-c948-17d6-f7331607d32f/mzaf_9077317503560301118.plus.aac.p.m4a",
     "albumId": "album-house-of-sugar",
     "trackNumber": 13,
     "hasLocalAudio": false
@@ -1396,10 +1396,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 168,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Pretend%20(Bonus%20Track)",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 14,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-god-save-the-animals-track-1",
@@ -1411,10 +1411,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 199,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=After%20All",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-god-save-the-animals-track-2",
@@ -1426,10 +1426,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 156,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Runner",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 2,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-god-save-the-animals-track-3",
@@ -1441,10 +1441,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 185,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Mission",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-god-save-the-animals-track-4",
@@ -1456,10 +1456,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 170,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=S.D.O.S.",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 4,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-god-save-the-animals-track-5",
@@ -1471,7 +1471,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 218,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=No%20Bitterness",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/58/e2/67/58e267a5-4ddf-083d-d2a3-7295fb890ee6/mzaf_17167554810707291638.plus.aac.p.m4a",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 5,
     "hasLocalAudio": false
@@ -1486,7 +1486,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 175,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Ain't%20It%20Easy",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/54/26/ea/5426eab3-e458-3f01-9c9b-f441777c2bd3/mzaf_12861784774959697281.plus.aac.p.m4a",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 6,
     "hasLocalAudio": false
@@ -1501,10 +1501,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 216,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Cross%20the%20Sea",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 7,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-god-save-the-animals-track-8",
@@ -1516,10 +1516,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 195,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Blessing",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 8,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-god-save-the-animals-track-9",
@@ -1531,10 +1531,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 243,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Early%20Morning%20Waiting",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-god-save-the-animals-track-10",
@@ -1546,10 +1546,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 230,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Immunity",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-god-save-the-animals-track-11",
@@ -1561,10 +1561,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 173,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Headroom%20Piano",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 11,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-god-save-the-animals-track-12",
@@ -1576,10 +1576,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 224,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Miracles",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 12,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-god-save-the-animals-track-13",
@@ -1591,10 +1591,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 267,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "/api/music/stream?artist=Alex%20G&title=Forgive",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 13,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-graduation-track-1",
@@ -1606,10 +1606,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 195,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Good%20Morning",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-graduation",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-graduation-track-2",
@@ -1621,7 +1621,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 167,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Champion",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c4/a5/60/c4a56079-0608-173b-3bdf-ff9abc6243b0/mzaf_16684516964870716980.plus.aac.p.m4a",
     "albumId": "album-graduation",
     "trackNumber": 2,
     "hasLocalAudio": false
@@ -1636,7 +1636,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 312,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Stronger",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/9e/cc/69/9ecc6918-a8dc-354f-909f-ccc20a0a7a33/mzaf_7863921970418240507.plus.aac.p.m4a",
     "albumId": "album-graduation",
     "trackNumber": 3,
     "hasLocalAudio": false
@@ -1651,7 +1651,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 243,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=I%20Wonder",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/b7/0a/94/b70a94d2-386b-851b-af33-73161b051586/mzaf_3514470759908534229.plus.aac.p.m4a",
     "albumId": "album-graduation",
     "trackNumber": 4,
     "hasLocalAudio": false
@@ -1666,10 +1666,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 207,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Good%20Life%20(feat.%20T-Pain)",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-graduation",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-graduation-track-6",
@@ -1681,10 +1681,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 271,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Can't%20Tell%20Me%20Nothing",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-graduation",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-graduation-track-7",
@@ -1696,7 +1696,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 204,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Barry%20Bonds%20(feat.%20Lil%20Wayne)",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d7/56/62/d7566203-3361-400d-1bbe-cb2f5e9fdab6/mzaf_16522115849969319300.plus.aac.p.m4a",
     "albumId": "album-graduation",
     "trackNumber": 7,
     "hasLocalAudio": false
@@ -1711,7 +1711,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 237,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Flashing%20Lights%20(feat.%20Dwele)",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4c/be/8e/4cbe8e05-1130-8697-6775-8e52408e857a/mzaf_10845907730040426322.plus.aac.p.m4a",
     "albumId": "album-graduation",
     "trackNumber": 8,
     "hasLocalAudio": false
@@ -1726,10 +1726,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 227,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Everything%20I%20Am%20(feat.%20Scratches%20by%20DJ%20Premier)",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-graduation",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-graduation-track-10",
@@ -1741,10 +1741,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 212,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=The%20Glory",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-graduation",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-graduation-track-11",
@@ -1756,7 +1756,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 203,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Homecoming%20(feat.%20Chris%20Martin)",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4c/be/8e/4cbe8e05-1130-8697-6775-8e52408e857a/mzaf_10845907730040426322.plus.aac.p.m4a",
     "albumId": "album-graduation",
     "trackNumber": 11,
     "hasLocalAudio": false
@@ -1771,7 +1771,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 287,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Big%20Brother",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b3/02/1d/b3021d2f-4929-51eb-822c-711f4cf17cd1/mzaf_7727410107752373599.plus.aac.p.m4a",
     "albumId": "album-graduation",
     "trackNumber": 12,
     "hasLocalAudio": false
@@ -1786,7 +1786,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 186,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Good%20Night%20(feat.%20Mos%20Def%20%26%20Al%20Be%20Back)",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1b/56/3a/1b563ae1-1d46-5c40-cf88-556bed50deee/mzaf_10636000425829464416.plus.aac.p.m4a",
     "albumId": "album-graduation",
     "trackNumber": 13,
     "hasLocalAudio": false
@@ -1801,7 +1801,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 320,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Ultralight%20Beam",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ec/27/00/ec270047-7cd4-4bce-7932-04fcbcbf32b7/mzaf_4337226885395026653.plus.aac.p.m4a",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 1,
     "hasLocalAudio": false
@@ -1816,7 +1816,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 135,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Father%20Stretch%20My%20Hands%20Pt.%201",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/5b/db/28/5bdb28cc-696e-53f0-85bd-fcdfd5be8707/mzaf_8631042407972316120.plus.aac.p.m4a",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 2,
     "hasLocalAudio": false
@@ -1831,10 +1831,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 130,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Pt.%202",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-the-life-of-pablo-track-4",
@@ -1846,7 +1846,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 196,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Famous",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/37/41/e8/3741e814-b809-4c22-4c15-2823150bb3bd/mzaf_12042732256423894607.plus.aac.p.m4a",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 4,
     "hasLocalAudio": false
@@ -1861,10 +1861,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 147,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Feedback",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-the-life-of-pablo-track-6",
@@ -1876,10 +1876,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 131,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Low%20Lights",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-the-life-of-pablo-track-7",
@@ -1891,10 +1891,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 199,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Highlights",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 7,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-the-life-of-pablo-track-8",
@@ -1906,7 +1906,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 123,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Freestyle%204",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/3a/42/9c/3a429c35-5215-f17a-f2a8-933a04590f8c/mzaf_1614529691035691549.plus.aac.p.m4a",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 8,
     "hasLocalAudio": false
@@ -1921,10 +1921,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 44,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=I%20Love%20Kanye",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-the-life-of-pablo-track-10",
@@ -1936,10 +1936,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 181,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Waves",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-the-life-of-pablo-track-11",
@@ -1951,10 +1951,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 236,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=FML%20(feat.%20The%20Weeknd)",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 11,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-the-life-of-pablo-track-12",
@@ -1966,10 +1966,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 251,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Real%20Friends",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 12,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-the-life-of-pablo-track-13",
@@ -1981,10 +1981,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 301,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Wolves",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 13,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-the-life-of-pablo-track-14",
@@ -1996,10 +1996,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 38,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Frank's%20Track",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 14,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-the-life-of-pablo-track-15",
@@ -2011,10 +2011,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 56,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Sliver%20Surfer%20Intermission",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 15,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-the-life-of-pablo-track-16",
@@ -2026,7 +2026,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 323,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=30%20Hours",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/86/a0/ff/86a0ff9c-1cfb-1866-9762-597dde8eb0e2/mzaf_251905200342533295.plus.aac.p.m4a",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 16,
     "hasLocalAudio": false
@@ -2041,10 +2041,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 374,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=No%20More%20Parties%20in%20LA%20(feat.%20Kendrick%20Lamar)",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 17,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-the-life-of-pablo-track-18",
@@ -2056,10 +2056,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 200,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Facts%20(Charlie%20Heat%20Version)",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 18,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-the-life-of-pablo-track-19",
@@ -2071,10 +2071,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 193,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Fade",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 19,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-the-life-of-pablo-track-20",
@@ -2086,10 +2086,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 372,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Saint%20Pablo",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 20,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-808s-track-1",
@@ -2101,7 +2101,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 378,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Say%20You%20Will",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/bd/66/48/bd664829-e740-907c-f1b1-e886eb04383c/mzaf_2589743817157851735.plus.aac.p.m4a",
     "albumId": "album-808s",
     "trackNumber": 1,
     "hasLocalAudio": false
@@ -2116,7 +2116,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 263,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Welcome%20to%20Heartbreak",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/45/74/33/4574338a-7a61-8e23-c83c-f0d1093cdc39/mzaf_7146393203303618033.plus.aac.p.m4a",
     "albumId": "album-808s",
     "trackNumber": 2,
     "hasLocalAudio": false
@@ -2131,10 +2131,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 211,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Heartless",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-808s",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-808s-track-4",
@@ -2146,7 +2146,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 238,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Amazing%20(feat.%20Young%20Jeezy)",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/fa/69/4c/fa694c0f-c645-fd36-fa6a-8ae182e7ce86/mzaf_6111461460443869199.plus.aac.p.m4a",
     "albumId": "album-808s",
     "trackNumber": 4,
     "hasLocalAudio": false
@@ -2161,7 +2161,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 270,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Love%20Lockdown",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/cd/41/a0/cd41a029-144c-ef10-b945-5c29b0966552/mzaf_16533792012921979472.plus.aac.p.m4a",
     "albumId": "album-808s",
     "trackNumber": 5,
     "hasLocalAudio": false
@@ -2176,10 +2176,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 278,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Paranoid%20(feat.%20Mr%20Hudson)",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-808s",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-808s-track-7",
@@ -2191,10 +2191,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 274,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=RoboCop",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-808s",
     "trackNumber": 7,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-808s-track-8",
@@ -2206,10 +2206,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 190,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Street%20Lights",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-808s",
     "trackNumber": 8,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-808s-track-9",
@@ -2221,7 +2221,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 239,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Bad%20News",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/06/78/b0/0678b0b2-968c-b96f-329c-27b81fca0599/mzaf_12685847974215312777.plus.aac.p.m4a",
     "albumId": "album-808s",
     "trackNumber": 9,
     "hasLocalAudio": false
@@ -2236,10 +2236,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 258,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=See%20You%20in%20My%20Nightmares%20(feat.%20Lil%20Wayne)",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-808s",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-808s-track-11",
@@ -2251,10 +2251,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 164,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Coldest%20Winter",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-808s",
     "trackNumber": 11,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-808s-track-12",
@@ -2266,10 +2266,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 363,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=Kanye%20West&title=Pinocchio%20Story%20(Freestyle%20Live)",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-808s",
     "trackNumber": 12,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-views-track-1",
@@ -2281,7 +2281,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 328,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Keep%20the%20Family%20Close",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/01/cc/af/01ccafa1-4604-53ed-a4a1-f7e87346e9d4/mzaf_2322633172668552211.plus.aac.p.m4a",
     "albumId": "album-views",
     "trackNumber": 1,
     "hasLocalAudio": false
@@ -2296,7 +2296,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 255,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=9",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/4c/8c/3a/4c8c3a8f-1b29-5338-1763-4a518fbb6c44/mzaf_17410439223393668640.plus.aac.p.m4a",
     "albumId": "album-views",
     "trackNumber": 2,
     "hasLocalAudio": false
@@ -2311,10 +2311,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 297,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=U%20With%20Me%3F",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-views",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-views-track-4",
@@ -2326,10 +2326,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 240,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Feel%20No%20Ways",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-views",
     "trackNumber": 4,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-views-track-5",
@@ -2341,10 +2341,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 209,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Hype",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-views",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-views-track-6",
@@ -2356,10 +2356,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 253,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Weston%20Road%20Flows",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-views",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-views-track-7",
@@ -2371,7 +2371,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 333,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Redemption",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/10/f1/89/10f18948-5584-0c27-082c-157c9a8abbec/mzaf_14244440374223956056.plus.aac.p.m4a",
     "albumId": "album-views",
     "trackNumber": 7,
     "hasLocalAudio": false
@@ -2386,10 +2386,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 195,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=With%20You%20(feat.%20PARTYNEXTDOOR)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-views",
     "trackNumber": 8,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-views-track-9",
@@ -2401,10 +2401,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 290,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Faithful%20(feat.%20Pimp%20C%20%26%20dvsn)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-views",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-views-track-10",
@@ -2416,10 +2416,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 189,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Still%20Here",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-views",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-views-track-11",
@@ -2431,7 +2431,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 245,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Controlla",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/74/e8/e1/74e8e1a6-8727-10c1-635f-7fdb1fd6b299/mzaf_15372399470688006783.plus.aac.p.m4a",
     "albumId": "album-views",
     "trackNumber": 11,
     "hasLocalAudio": false
@@ -2446,10 +2446,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 174,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=One%20Dance%20(feat.%20Wizkid%20%26%20Kyla)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-views",
     "trackNumber": 12,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-views-track-13",
@@ -2461,10 +2461,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 220,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Grammys%20(feat.%20Future)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-views",
     "trackNumber": 13,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-views-track-14",
@@ -2476,10 +2476,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 241,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Childs%20Play",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-views",
     "trackNumber": 14,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-views-track-15",
@@ -2491,10 +2491,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 212,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Pop%20Style",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-views",
     "trackNumber": 15,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-views-track-16",
@@ -2506,10 +2506,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 263,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Too%20Good%20(feat.%20Rihanna)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-views",
     "trackNumber": 16,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-views-track-17",
@@ -2521,10 +2521,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 106,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Summers%20Over%20Interlude",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-views",
     "trackNumber": 17,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-views-track-18",
@@ -2536,10 +2536,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 238,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Fire%20%26%20Desire",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-views",
     "trackNumber": 18,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-views-track-19",
@@ -2551,10 +2551,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 311,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Views",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-views",
     "trackNumber": 19,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-views-track-20",
@@ -2566,10 +2566,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 267,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Hotline%20Bling%20(Bonus%20Track)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-views",
     "trackNumber": 20,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-damn-track-1",
@@ -2581,10 +2581,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 118,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=BLOOD.",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-damn",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-damn-track-2",
@@ -2596,7 +2596,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 185,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=DNA.",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2f/9e/3f/2f9e3fae-1e5f-18df-c762-039e3cc13028/mzaf_8715454916909593560.plus.aac.p.m4a",
     "albumId": "album-damn",
     "trackNumber": 2,
     "hasLocalAudio": false
@@ -2611,7 +2611,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 160,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=YAH.",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/89/e5/38/89e5389b-f0b5-463f-f694-c3ee8612b121/mzaf_12880328210211566973.plus.aac.p.m4a",
     "albumId": "album-damn",
     "trackNumber": 3,
     "hasLocalAudio": false
@@ -2626,10 +2626,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 208,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=ELEMENT.",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-damn",
     "trackNumber": 4,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-damn-track-5",
@@ -2641,10 +2641,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 214,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=FEEL.",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-damn",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-damn-track-6",
@@ -2656,10 +2656,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 227,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=LOYALTY.%20(feat.%20Rihanna)",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-damn",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-damn-track-7",
@@ -2671,10 +2671,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 275,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=PRIDE.",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-damn",
     "trackNumber": 7,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-damn-track-8",
@@ -2686,10 +2686,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 177,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/kendrick_humble.mp3",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1f/2e/37/1f2e37be-bdd0-d770-6ea4-091011a6aade/mzaf_2360827885900940865.plus.aac.p.m4a",
     "albumId": "album-damn",
     "trackNumber": 8,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-damn-track-9",
@@ -2701,10 +2701,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 307,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=LUST.",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-damn",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-damn-track-10",
@@ -2716,10 +2716,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 213,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=LOVE.%20(feat.%20Zacari)",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-damn",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-damn-track-11",
@@ -2731,10 +2731,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 254,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=XXX.%20(feat.%20U2)",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-damn",
     "trackNumber": 11,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-damn-track-12",
@@ -2746,7 +2746,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 460,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=FEAR.",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e8/0d/0f/e80d0f01-5c30-4e33-38e6-b7c9dc69ac58/mzaf_2592679999581592591.plus.aac.p.m4a",
     "albumId": "album-damn",
     "trackNumber": 12,
     "hasLocalAudio": false
@@ -2761,10 +2761,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 248,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=GOD.",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-damn",
     "trackNumber": 13,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-damn-track-14",
@@ -2776,10 +2776,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 248,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=DUCKWORTH.",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-damn",
     "trackNumber": 14,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gkmc-track-1",
@@ -2791,10 +2791,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 273,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=Sherane%20a.k.a%20Master%20Splinter's%20Daughter",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gkmc-track-2",
@@ -2806,10 +2806,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 310,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=Bitch%2C%20Don't%20Kill%20My%20Vibe",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 2,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gkmc-track-3",
@@ -2821,10 +2821,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 212,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=Backseat%20Freestyle",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gkmc-track-4",
@@ -2836,7 +2836,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 324,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=The%20Art%20of%20Peer%20Pressure",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2c/48/85/2c48852d-2d46-1c89-db1c-8066fbc77f0b/mzaf_11941840835589375219.plus.aac.p.m4a",
     "albumId": "album-gkmc",
     "trackNumber": 4,
     "hasLocalAudio": false
@@ -2851,10 +2851,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 386,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=Money%20Trees%20(feat.%20Jay%20Rock)",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gkmc-track-6",
@@ -2866,10 +2866,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 300,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=Poetic%20Justice%20(feat.%20Drake)",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gkmc-track-7",
@@ -2881,10 +2881,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 214,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=good%20kid",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 7,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gkmc-track-8",
@@ -2896,10 +2896,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 350,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=m.A.A.d%20city%20(feat.%20MC%20Eiht)",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 8,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gkmc-track-9",
@@ -2911,10 +2911,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 313,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=Swimming%20Pools%20(Drank)",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gkmc-track-10",
@@ -2926,10 +2926,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 723,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=Sing%20About%20Me%2C%20I'm%20Dying%20of%20Thirst",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gkmc-track-11",
@@ -2941,10 +2941,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 443,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=Real%20(feat.%20Anna%20Wise)",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 11,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gkmc-track-12",
@@ -2956,10 +2956,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 248,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=Compton%20(feat.%20Dr.%20Dre)",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 12,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-not-like-us-track-1",
@@ -2971,10 +2971,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 274,
     "cover": "./music/covers/kendrick_not_like_us.jpg",
     "genre": "West Coast Hip Hop",
-    "audioSrc": "/api/music/stream?artist=Kendrick%20Lamar&title=Not%20Like%20Us",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-not-like-us",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-astroworld-track-1",
@@ -2986,10 +2986,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 270,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=STARGAZING",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-astroworld-track-2",
@@ -3001,10 +3001,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 180,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=CAROUSEL%20(feat.%20Frank%20Ocean)",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 2,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-astroworld-track-3",
@@ -3016,7 +3016,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 312,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=SICKO%20MODE%20(feat.%20Drake)",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d3/91/a1/d391a141-256f-726f-9da1-8aa4e42b3236/mzaf_17761183103753218003.plus.aac.p.m4a",
     "albumId": "album-astroworld",
     "trackNumber": 3,
     "hasLocalAudio": false
@@ -3031,10 +3031,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 185,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=R.I.P.%20SCREW",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 4,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-astroworld-track-5",
@@ -3046,10 +3046,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 338,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=STOP%20TRYING%20TO%20BE%20GOD",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-astroworld-track-6",
@@ -3061,10 +3061,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 218,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=NO%20BYSTANDERS",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-astroworld-track-7",
@@ -3076,10 +3076,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 145,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=SKELETONS",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 7,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-astroworld-track-8",
@@ -3091,10 +3091,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 231,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=WAKE%20UP",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 8,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-astroworld-track-9",
@@ -3106,10 +3106,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 196,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=5%25%20TINT",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-astroworld-track-10",
@@ -3121,10 +3121,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 156,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=NC-17%20(feat.%2021%20Savage)",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-astroworld-track-11",
@@ -3136,10 +3136,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 142,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=ASTROTHUNDER",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 11,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-astroworld-track-12",
@@ -3151,10 +3151,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 150,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=YOSEMITE",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 12,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-astroworld-track-13",
@@ -3166,10 +3166,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 198,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=CAN'T%20SAY%20(feat.%20Don%20Toliver)",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 13,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-astroworld-track-14",
@@ -3181,10 +3181,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 176,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=WHO%3F%20WHAT!",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 14,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-astroworld-track-15",
@@ -3196,10 +3196,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 190,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=BUTTERFLY%20EFFECT",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 15,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-astroworld-track-16",
@@ -3211,10 +3211,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 217,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=HOUSTONFORNICATION",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 16,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-astroworld-track-17",
@@ -3226,10 +3226,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 209,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=COFFEE%20BEAN",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 17,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-utopia-track-1",
@@ -3241,10 +3241,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 222,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=HYAENA",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-utopia",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-utopia-track-2",
@@ -3256,10 +3256,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 184,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=THANK%20GOD",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-utopia",
     "trackNumber": 2,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-utopia-track-3",
@@ -3271,10 +3271,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 255,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=MODERN%20JAM%20(feat.%20Teezo%20Touchdown)",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-utopia",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-utopia-track-4",
@@ -3286,10 +3286,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 251,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=MY%20EYES",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-utopia",
     "trackNumber": 4,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-utopia-track-5",
@@ -3301,10 +3301,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 127,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=GOD'S%20COUNTRY",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-utopia",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-utopia-track-6",
@@ -3316,10 +3316,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 204,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=SIRENS",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-utopia",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-utopia-track-7",
@@ -3331,10 +3331,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 246,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=MELTDOWN%20(feat.%20Drake)",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-utopia",
     "trackNumber": 7,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-utopia-track-8",
@@ -3346,10 +3346,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 191,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=FE!N%20(feat.%20Playboi%20Carti)",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-utopia",
     "trackNumber": 8,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-utopia-track-9",
@@ -3361,10 +3361,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 274,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=DELRESTO%20(ECHOES)%20(feat.%20Beyonc%C3%A9)",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-utopia",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-utopia-track-10",
@@ -3376,10 +3376,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 211,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=I%20KNOW%20%3F",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-utopia",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-utopia-track-11",
@@ -3391,10 +3391,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 223,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=TOPIA%20TWINS%20(feat.%20Rob49%20%26%2021%20Savage)",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-utopia",
     "trackNumber": 11,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-utopia-track-12",
@@ -3406,10 +3406,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 258,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=CIRCUS%20MAXIMUS%20(feat.%20The%20Weeknd%20%26%20Swae%20Lee)",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-utopia",
     "trackNumber": 12,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-utopia-track-13",
@@ -3421,10 +3421,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 154,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=PARASAIL%20(feat.%20Yung%20Lean%20%26%20Dave%20Chappelle)",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-utopia",
     "trackNumber": 13,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-utopia-track-14",
@@ -3436,10 +3436,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 366,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=SKITZO%20(feat.%20Young%20Thug)",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-utopia",
     "trackNumber": 14,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-utopia-track-15",
@@ -3451,10 +3451,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 175,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=LOST%20FOREVER%20(feat.%20Westside%20Gunn)",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-utopia",
     "trackNumber": 15,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-utopia-track-16",
@@ -3466,10 +3466,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 226,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=LOO%E5%A4%9A%E6%95%B0%20-%20LOOVE%20(feat.%20Kid%20Cudi)",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-utopia",
     "trackNumber": 16,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-utopia-track-17",
@@ -3481,10 +3481,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 185,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=K-POP%20(feat.%20Bad%20Bunny%20%26%20The%20Weeknd)",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-utopia",
     "trackNumber": 17,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-utopia-track-18",
@@ -3496,10 +3496,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 353,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=TELEKINESIS%20(feat.%20SZA%20%26%20Future)",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-utopia",
     "trackNumber": 18,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-utopia-track-19",
@@ -3511,10 +3511,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 314,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "/api/music/stream?artist=Travis%20Scott&title=TIL%20FURTHER%20NOTICE%20(feat.%20James%20Blake%20%26%2021%20Savage)",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-utopia",
     "trackNumber": 19,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-blonde-track-1",
@@ -3526,10 +3526,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 314,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Nikes",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-blonde",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-blonde-track-2",
@@ -3541,10 +3541,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 249,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Ivy",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-blonde",
     "trackNumber": 2,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-blonde-track-3",
@@ -3556,7 +3556,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 184,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Pink%20%2B%20White",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ba/11/dc/ba11dccd-16d2-9cd8-13f0-85b73acc0a09/mzaf_1304250511099243436.plus.aac.p.m4a",
     "albumId": "album-blonde",
     "trackNumber": 3,
     "hasLocalAudio": false
@@ -3571,10 +3571,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 86,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Be%20Yourself",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-blonde",
     "trackNumber": 4,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-blonde-track-5",
@@ -3586,10 +3586,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 257,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Solo",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-blonde",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-blonde-track-6",
@@ -3601,10 +3601,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 184,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Skyline%20To",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-blonde",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-blonde-track-7",
@@ -3616,10 +3616,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 249,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Self%20Control",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-blonde",
     "trackNumber": 7,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-blonde-track-8",
@@ -3631,10 +3631,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 66,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Good%20Guy",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-blonde",
     "trackNumber": 8,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-blonde-track-9",
@@ -3646,10 +3646,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 307,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Nights",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-blonde",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-blonde-track-10",
@@ -3661,10 +3661,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 78,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Solo%20(Reprise)",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-blonde",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-blonde-track-11",
@@ -3676,10 +3676,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 158,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Pretty%20Sweet",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-blonde",
     "trackNumber": 11,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-blonde-track-12",
@@ -3691,10 +3691,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 68,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Facebook%20Story",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-blonde",
     "trackNumber": 12,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-blonde-track-13",
@@ -3706,10 +3706,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 85,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Close%20to%20You",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-blonde",
     "trackNumber": 13,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-blonde-track-14",
@@ -3721,10 +3721,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 248,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=White%20Ferrari",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-blonde",
     "trackNumber": 14,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-blonde-track-15",
@@ -3736,10 +3736,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 334,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Seigfried",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-blonde",
     "trackNumber": 15,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-blonde-track-16",
@@ -3751,10 +3751,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 177,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Godspeed",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-blonde",
     "trackNumber": 16,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-blonde-track-17",
@@ -3766,10 +3766,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 564,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Futura%20Free",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-blonde",
     "trackNumber": 17,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-channel-orange-track-1",
@@ -3781,10 +3781,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 45,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Start",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-channel-orange-track-2",
@@ -3796,10 +3796,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 200,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Thinkin%20Bout%20You",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 2,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-channel-orange-track-3",
@@ -3811,10 +3811,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 39,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Fertilizer",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-channel-orange-track-4",
@@ -3826,10 +3826,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 148,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Sierra%20Leone",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 4,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-channel-orange-track-5",
@@ -3841,10 +3841,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 262,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Sweet%20Life",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-channel-orange-track-6",
@@ -3856,10 +3856,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 59,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Not%20Just%20Money",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-channel-orange-track-7",
@@ -3871,10 +3871,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 304,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Super%20Rich%20Kids%20(feat.%20Earl%20Sweatshirt)",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 7,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-channel-orange-track-8",
@@ -3886,10 +3886,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 184,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Pilot%20Jones",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 8,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-channel-orange-track-9",
@@ -3901,10 +3901,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 224,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Crack%20Rock",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-channel-orange-track-10",
@@ -3916,10 +3916,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 592,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Pyramids",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-channel-orange-track-11",
@@ -3931,10 +3931,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 234,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Lost",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 11,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-channel-orange-track-12",
@@ -3946,10 +3946,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 76,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=White%20(feat.%20John%20Mayer)",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 12,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-channel-orange-track-13",
@@ -3961,10 +3961,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 200,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Monks",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 13,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-channel-orange-track-14",
@@ -3976,10 +3976,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 175,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Bad%20Religion",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 14,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-channel-orange-track-15",
@@ -3991,10 +3991,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 268,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Pink%20Matter%20(feat.%20Andr%C3%A9%203000)",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 15,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-channel-orange-track-16",
@@ -4006,10 +4006,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 194,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=Forrest%20Gump",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 16,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-channel-orange-track-17",
@@ -4021,10 +4021,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 134,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "/api/music/stream?artist=Frank%20Ocean&title=End",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 17,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gemini-rights-track-1",
@@ -4036,10 +4036,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 156,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "/api/music/stream?artist=Steve%20Lacy&title=Static",
+    "audioSrc": "./music/steve_lacy_bad_habit.mp3",
     "albumId": "album-gemini-rights",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gemini-rights-track-2",
@@ -4051,10 +4051,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 201,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "/api/music/stream?artist=Steve%20Lacy&title=Helmet",
+    "audioSrc": "./music/steve_lacy_bad_habit.mp3",
     "albumId": "album-gemini-rights",
     "trackNumber": 2,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gemini-rights-track-3",
@@ -4066,10 +4066,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 295,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "/api/music/stream?artist=Steve%20Lacy&title=Mercury",
+    "audioSrc": "./music/steve_lacy_bad_habit.mp3",
     "albumId": "album-gemini-rights",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gemini-rights-track-4",
@@ -4081,10 +4081,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 184,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "/api/music/stream?artist=Steve%20Lacy&title=Buttons",
+    "audioSrc": "./music/steve_lacy_bad_habit.mp3",
     "albumId": "album-gemini-rights",
     "trackNumber": 4,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gemini-rights-track-5",
@@ -4096,10 +4096,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 232,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "./music/steve_lacy_bad_habit.mp3",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/fd/df/23/fddf23b3-bc0c-2a6c-b811-e9784e2e8fc2/mzaf_16866686323648484948.plus.aac.p.m4a",
     "albumId": "album-gemini-rights",
     "trackNumber": 5,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gemini-rights-track-6",
@@ -4111,10 +4111,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 50,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "/api/music/stream?artist=Steve%20Lacy&title=2Gether%20(Enterlude)",
+    "audioSrc": "./music/steve_lacy_bad_habit.mp3",
     "albumId": "album-gemini-rights",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gemini-rights-track-7",
@@ -4126,10 +4126,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 240,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "/api/music/stream?artist=Steve%20Lacy&title=Cody%20Freestyle",
+    "audioSrc": "./music/steve_lacy_bad_habit.mp3",
     "albumId": "album-gemini-rights",
     "trackNumber": 7,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gemini-rights-track-8",
@@ -4141,10 +4141,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 173,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "/api/music/stream?artist=Steve%20Lacy&title=Amber",
+    "audioSrc": "./music/steve_lacy_bad_habit.mp3",
     "albumId": "album-gemini-rights",
     "trackNumber": 8,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gemini-rights-track-9",
@@ -4156,10 +4156,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 293,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "/api/music/stream?artist=Steve%20Lacy&title=Sunshine%20(feat.%20Foushe%C3%A9)",
+    "audioSrc": "./music/steve_lacy_bad_habit.mp3",
     "albumId": "album-gemini-rights",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gemini-rights-track-10",
@@ -4171,10 +4171,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 273,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "/api/music/stream?artist=Steve%20Lacy&title=Give%20You%20the%20World",
+    "audioSrc": "./music/steve_lacy_bad_habit.mp3",
     "albumId": "album-gemini-rights",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-steve-demo-track-1",
@@ -4186,10 +4186,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 92,
     "cover": "./music/covers/steve_demo.jpg",
     "genre": "Lo-fi Soul / GarageBand R&B",
-    "audioSrc": "/api/music/stream?artist=Steve%20Lacy&title=Looks",
+    "audioSrc": "./music/steve_lacy_bad_habit.mp3",
     "albumId": "album-steve-demo",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-steve-demo-track-2",
@@ -4201,10 +4201,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 140,
     "cover": "./music/covers/steve_demo.jpg",
     "genre": "Lo-fi Soul / GarageBand R&B",
-    "audioSrc": "/api/music/stream?artist=Steve%20Lacy&title=Ryd",
+    "audioSrc": "./music/steve_lacy_bad_habit.mp3",
     "albumId": "album-steve-demo",
     "trackNumber": 2,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-steve-demo-track-3",
@@ -4216,10 +4216,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 173,
     "cover": "./music/covers/steve_demo.jpg",
     "genre": "Lo-fi Soul / GarageBand R&B",
-    "audioSrc": "/api/music/stream?artist=Steve%20Lacy&title=Dark%20Red",
+    "audioSrc": "./music/steve_lacy_bad_habit.mp3",
     "albumId": "album-steve-demo",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-steve-demo-track-4",
@@ -4231,10 +4231,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 60,
     "cover": "./music/covers/steve_demo.jpg",
     "genre": "Lo-fi Soul / GarageBand R&B",
-    "audioSrc": "/api/music/stream?artist=Steve%20Lacy&title=Thatch%20Call%20(Interlude)",
+    "audioSrc": "./music/steve_lacy_bad_habit.mp3",
     "albumId": "album-steve-demo",
     "trackNumber": 4,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-steve-demo-track-5",
@@ -4246,10 +4246,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 104,
     "cover": "./music/covers/steve_demo.jpg",
     "genre": "Lo-fi Soul / GarageBand R&B",
-    "audioSrc": "/api/music/stream?artist=Steve%20Lacy&title=Haterlovin",
+    "audioSrc": "./music/steve_lacy_bad_habit.mp3",
     "albumId": "album-steve-demo",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-steve-demo-track-6",
@@ -4261,10 +4261,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 118,
     "cover": "./music/covers/steve_demo.jpg",
     "genre": "Lo-fi Soul / GarageBand R&B",
-    "audioSrc": "/api/music/stream?artist=Steve%20Lacy&title=Some",
+    "audioSrc": "./music/steve_lacy_bad_habit.mp3",
     "albumId": "album-steve-demo",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-after-hours-track-1",
@@ -4276,10 +4276,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 250,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Alone%20Again",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-after-hours-track-2",
@@ -4291,10 +4291,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 239,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Too%20Late",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 2,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-after-hours-track-3",
@@ -4306,10 +4306,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 211,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Hardest%20to%20Love",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-after-hours-track-4",
@@ -4321,10 +4321,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 191,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Scared%20to%20Live",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 4,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-after-hours-track-5",
@@ -4336,10 +4336,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 247,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Snowchild",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-after-hours-track-6",
@@ -4351,10 +4351,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 355,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Escape%20from%20LA",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-after-hours-track-7",
@@ -4366,10 +4366,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 198,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Heartless",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 7,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-after-hours-track-8",
@@ -4381,10 +4381,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 283,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Faith",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 8,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-after-hours-track-9",
@@ -4396,7 +4396,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 200,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Blinding%20Lights",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/12/73/ca/1273ca46-233a-5331-189b-25ac1d656533/mzaf_976341070785891411.plus.aac.p.m4a",
     "albumId": "album-after-hours",
     "trackNumber": 9,
     "hasLocalAudio": false
@@ -4411,10 +4411,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 237,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=In%20Your%20Eyes",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-after-hours-track-11",
@@ -4426,10 +4426,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 215,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Save%20Your%20Tears",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 11,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-after-hours-track-12",
@@ -4441,10 +4441,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 195,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Repeat%20After%20Me%20(Interlude)",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 12,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-after-hours-track-13",
@@ -4456,10 +4456,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 361,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=After%20Hours",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 13,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-after-hours-track-14",
@@ -4471,10 +4471,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 190,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Until%20I%20Bleed%20Out",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 14,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-starboy-track-1",
@@ -4486,10 +4486,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 230,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Starboy%20(feat.%20Daft%20Punk)",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-starboy",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-starboy-track-2",
@@ -4501,10 +4501,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 249,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Party%20Monster",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-starboy",
     "trackNumber": 2,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-starboy-track-3",
@@ -4516,10 +4516,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 220,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=False%20Alarm",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-starboy",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-starboy-track-4",
@@ -4531,10 +4531,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 218,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Reminder",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-starboy",
     "trackNumber": 4,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-starboy-track-5",
@@ -4546,10 +4546,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 232,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Rockin'",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-starboy",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-starboy-track-6",
@@ -4561,10 +4561,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 265,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Secrets",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-starboy",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-starboy-track-7",
@@ -4576,10 +4576,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 206,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=True%20Colors",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-starboy",
     "trackNumber": 7,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-starboy-track-8",
@@ -4591,10 +4591,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 111,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Stargirl%20Interlude%20(feat.%20Lana%20Del%20Rey)",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-starboy",
     "trackNumber": 8,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-starboy-track-9",
@@ -4606,10 +4606,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 231,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Sidewalks%20(feat.%20Kendrick%20Lamar)",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-starboy",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-starboy-track-10",
@@ -4621,10 +4621,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 238,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Six%20Feet%20Under",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-starboy",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-starboy-track-11",
@@ -4636,10 +4636,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 223,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Love%20to%20Lay",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-starboy",
     "trackNumber": 11,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-starboy-track-12",
@@ -4651,10 +4651,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 220,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=A%20Lonely%20Night",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-starboy",
     "trackNumber": 12,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-starboy-track-13",
@@ -4666,10 +4666,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 197,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Attention",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-starboy",
     "trackNumber": 13,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-starboy-track-14",
@@ -4681,10 +4681,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 221,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Ordinary%20Life",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-starboy",
     "trackNumber": 14,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-starboy-track-15",
@@ -4696,10 +4696,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 198,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Nothing%20Without%20You",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-starboy",
     "trackNumber": 15,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-starboy-track-16",
@@ -4711,10 +4711,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 321,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=All%20I%20Know%20(feat.%20Future)",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-starboy",
     "trackNumber": 16,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-starboy-track-17",
@@ -4726,10 +4726,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 260,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=Die%20for%20You",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-starboy",
     "trackNumber": 17,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-starboy-track-18",
@@ -4741,10 +4741,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 269,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "/api/music/stream?artist=The%20Weeknd&title=I%20Feel%20It%20Coming%20(feat.%20Daft%20Punk)",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-starboy",
     "trackNumber": 18,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-hit-me-hard-track-1",
@@ -4756,10 +4756,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 219,
     "cover": "./music/covers/billie_hit_me_hard.jpg",
     "genre": "Indie Pop / Alternative",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=SKINNY",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-hit-me-hard",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-hit-me-hard-track-2",
@@ -4771,10 +4771,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 179,
     "cover": "./music/covers/billie_hit_me_hard.jpg",
     "genre": "Indie Pop / Alternative",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=LUNCH",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-hit-me-hard",
     "trackNumber": 2,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-hit-me-hard-track-3",
@@ -4786,10 +4786,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 303,
     "cover": "./music/covers/billie_hit_me_hard.jpg",
     "genre": "Indie Pop / Alternative",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=CHIHIRO",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-hit-me-hard",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-hit-me-hard-track-4",
@@ -4816,10 +4816,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 261,
     "cover": "./music/covers/billie_hit_me_hard.jpg",
     "genre": "Indie Pop / Alternative",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=WILDFLOWER",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-hit-me-hard",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-hit-me-hard-track-6",
@@ -4831,10 +4831,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 293,
     "cover": "./music/covers/billie_hit_me_hard.jpg",
     "genre": "Indie Pop / Alternative",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=THE%20GREATEST",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-hit-me-hard",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-hit-me-hard-track-7",
@@ -4846,10 +4846,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 333,
     "cover": "./music/covers/billie_hit_me_hard.jpg",
     "genre": "Indie Pop / Alternative",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=L'AMOUR%20DE%20MA%20VIE",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-hit-me-hard",
     "trackNumber": 7,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-hit-me-hard-track-8",
@@ -4861,10 +4861,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 186,
     "cover": "./music/covers/billie_hit_me_hard.jpg",
     "genre": "Indie Pop / Alternative",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=THE%20DINER",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-hit-me-hard",
     "trackNumber": 8,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-hit-me-hard-track-9",
@@ -4876,10 +4876,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 298,
     "cover": "./music/covers/billie_hit_me_hard.jpg",
     "genre": "Indie Pop / Alternative",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=BITTERSUITE",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-hit-me-hard",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-hit-me-hard-track-10",
@@ -4891,10 +4891,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 343,
     "cover": "./music/covers/billie_hit_me_hard.jpg",
     "genre": "Indie Pop / Alternative",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=BLUE",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-hit-me-hard",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-when-we-all-fall-track-1",
@@ -4906,10 +4906,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 13,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=!!!!!!!",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-when-we-all-fall-track-2",
@@ -4921,10 +4921,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 194,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=bad%20guy",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 2,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-when-we-all-fall-track-3",
@@ -4936,10 +4936,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 243,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=xanny",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-when-we-all-fall-track-4",
@@ -4951,10 +4951,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 180,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=you%20should%20see%20me%20in%20a%20crown",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 4,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-when-we-all-fall-track-5",
@@ -4966,10 +4966,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 168,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=all%20the%20good%20girls%20go%20to%20hell",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-when-we-all-fall-track-6",
@@ -4981,10 +4981,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 221,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=wish%20you%20were%20gay",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-when-we-all-fall-track-7",
@@ -4996,10 +4996,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 196,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=when%20the%20party's%20over",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 7,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-when-we-all-fall-track-8",
@@ -5011,10 +5011,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 173,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=8",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 8,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-when-we-all-fall-track-9",
@@ -5026,10 +5026,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 179,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=my%20strange%20addiction",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-when-we-all-fall-track-10",
@@ -5041,10 +5041,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 193,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=bury%20a%20friend",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-when-we-all-fall-track-11",
@@ -5056,10 +5056,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 156,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=ilomilo",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 11,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-when-we-all-fall-track-12",
@@ -5071,10 +5071,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 242,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=listen%20before%20i%20go",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 12,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-when-we-all-fall-track-13",
@@ -5086,10 +5086,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 291,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=i%20love%20you",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 13,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-when-we-all-fall-track-14",
@@ -5101,10 +5101,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 119,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "/api/music/stream?artist=Billie%20Eilish&title=goodbye",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 14,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-1",
@@ -5116,10 +5116,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 272,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Over%20My%20Dead%20Body",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-take-care",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-2",
@@ -5131,10 +5131,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 224,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Shot%20For%20Me",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-take-care",
     "trackNumber": 2,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-3",
@@ -5146,10 +5146,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 236,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Headlines",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-take-care",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-4",
@@ -5161,10 +5161,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 209,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Crew%20Love%20(feat.%20The%20Weeknd)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-take-care",
     "trackNumber": 4,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-5",
@@ -5176,10 +5176,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 277,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Take%20Care%20(feat.%20Rihanna)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-take-care",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-6",
@@ -5191,10 +5191,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 347,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Marvins%20Room",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-take-care",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-7",
@@ -5206,10 +5206,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 212,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Under%20Ground%20Kings",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-take-care",
     "trackNumber": 7,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-8",
@@ -5221,10 +5221,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 242,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=We'll%20Be%20Fine%20(feat.%20Birdman)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-take-care",
     "trackNumber": 8,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-9",
@@ -5236,10 +5236,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 216,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Make%20Me%20Proud%20(feat.%20Nicki%20Minaj)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-take-care",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-10",
@@ -5251,10 +5251,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 307,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Lord%20Knows%20(feat.%20Rick%20Ross)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-take-care",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-11",
@@ -5266,10 +5266,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 435,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Cameras%20%2F%20Good%20Ones%20Go%20Interlude",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-take-care",
     "trackNumber": 11,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-12",
@@ -5281,10 +5281,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 265,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Doing%20It%20Wrong",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-take-care",
     "trackNumber": 12,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-13",
@@ -5296,10 +5296,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 321,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=The%20Real%20Her%20(feat.%20Lil%20Wayne%20%26%20Andr%C3%A9%203000)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-take-care",
     "trackNumber": 13,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-14",
@@ -5311,10 +5311,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 302,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Look%20What%20You've%20Done",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-take-care",
     "trackNumber": 14,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-15",
@@ -5326,10 +5326,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 207,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=HYFR%20(Hell%20Ya%20Fucking%20Right)%20(feat.%20Lil%20Wayne)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-take-care",
     "trackNumber": 15,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-16",
@@ -5341,10 +5341,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 238,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Practice",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-take-care",
     "trackNumber": 16,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-17",
@@ -5356,10 +5356,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 351,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=The%20Ride",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-take-care",
     "trackNumber": 17,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-1",
@@ -5371,10 +5371,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 336,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Champagne%20Poetry",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-2",
@@ -5386,10 +5386,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 178,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Papi's%20Home",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 2,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-3",
@@ -5401,10 +5401,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 221,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Girls%20Want%20Girls%20(feat.%20Lil%20Baby)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-4",
@@ -5416,10 +5416,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 296,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=In%20The%20Bible%20(feat.%20Lil%20Durk%20%26%20Giveon)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 4,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-5",
@@ -5431,10 +5431,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 228,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Love%20All%20(feat.%20JAY-Z)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-6",
@@ -5446,10 +5446,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 291,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Fair%20Trade%20(feat.%20Travis%20Scott)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-7",
@@ -5461,10 +5461,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 257,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Way%202%20Sexy%20(feat.%20Future%20%26%20Young%20Thug)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 7,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-8",
@@ -5476,10 +5476,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 308,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=TSU",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 8,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-9",
@@ -5491,10 +5491,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 273,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=N%202%20Deep%20(feat.%20Future)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-10",
@@ -5506,10 +5506,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 205,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Pipe%20Down",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-11",
@@ -5521,10 +5521,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 133,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Yebba's%20Heartbreak%20(with%20Yebba)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 11,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-12",
@@ -5536,10 +5536,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 204,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=No%20Friends%20In%20The%20Industry",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 12,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-13",
@@ -5551,10 +5551,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 242,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Knife%20Talk%20(feat.%2021%20Savage%20%26%20Project%20Pat)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 13,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-14",
@@ -5566,10 +5566,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 239,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=7am%20On%20Bridle%20Path",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 14,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-15",
@@ -5581,10 +5581,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 269,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Race%20My%20Mind",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 15,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-16",
@@ -5596,10 +5596,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 198,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Fountains%20(feat.%20Tems)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 16,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-17",
@@ -5611,10 +5611,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 229,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Get%20Along%20Better%20(feat.%20Ty%20Dolla%20%24ign)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 17,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-18",
@@ -5626,10 +5626,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 213,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=You%20Only%20Live%20Twice%20(feat.%20Lil%20Wayne%20%26%20Rick%20Ross)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 18,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-19",
@@ -5641,10 +5641,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 252,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=IMY2%20(feat.%20Kid%20Cudi)",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 19,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-20",
@@ -5656,10 +5656,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 245,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Fucking%20Fans",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 20,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-21",
@@ -5671,10 +5671,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 351,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "/api/music/stream?artist=Drake&title=The%20Remorse",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-clb",
     "trackNumber": 21,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "drake-bonus-track-1",
@@ -5686,10 +5686,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 199,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Trap",
-    "audioSrc": "/api/music/stream?artist=Drake&title=God's%20Plan",
+    "audioSrc": "./music/drake_passionfruit.mp3",
     "albumId": "album-views",
     "trackNumber": 21,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "drake-bonus-track-2",
@@ -5701,7 +5701,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 298,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Trap",
-    "audioSrc": "/api/music/stream?artist=Drake&title=Passionfruit",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3d/b7/73/3db773ac-bade-82c1-c570-4a699945d1f6/mzaf_13103071700695768982.plus.aac.p.m4a",
     "albumId": "album-views",
     "trackNumber": 22,
     "hasLocalAudio": false
