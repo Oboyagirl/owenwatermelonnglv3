@@ -7,7 +7,7 @@ const FAVORITES_KEY = 'owen_watermelon_v3_favorites';
 
 export function resolveAssetUrl(url: string): string {
   if (!url) return '';
-  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:') || url.startsWith('blob:')) {
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:') || url.startsWith('blob:') || url.startsWith('/api/')) {
     return url;
   }
   const clean = url.startsWith('/') ? url.slice(1) : url;
@@ -20,7 +20,7 @@ export function resolveAssetUrl(url: string): string {
     }
   }
 
-  const base = import.meta.env.BASE_URL || './';
+  const base = (import.meta as any).env?.BASE_URL || './';
   if (base.endsWith('/')) {
     return `${base}${clean}`;
   }
@@ -142,7 +142,8 @@ export function useGamesStore() {
   const [favorites, setFavorites] = useState<string[]>(() => {
     try {
       const cached = localStorage.getItem(FAVORITES_KEY);
-      return cached ? JSON.parse(cached) : ['watermelon-merge', 'basket-random', 'retro-bowl'];
+      const parsed = cached ? JSON.parse(cached) : null;
+      return Array.isArray(parsed) ? parsed : ['watermelon-merge', 'basket-random', 'retro-bowl'];
     } catch {
       return ['watermelon-merge', 'basket-random', 'retro-bowl'];
     }
@@ -172,26 +173,31 @@ export function useGamesStore() {
   }, [favorites]);
 
   const toggleFavorite = (gameId: string) => {
-    setFavorites(prev =>
-      prev.includes(gameId) ? prev.filter(id => id !== gameId) : [...prev, gameId]
-    );
+    if (!gameId) return;
+    setFavorites(prev => {
+      const list = Array.isArray(prev) ? prev : [];
+      return list.includes(gameId) ? list.filter(id => id !== gameId) : [...list, gameId];
+    });
   };
 
   const recordPlay = (gameId: string) => {
+    if (!gameId) return;
     setGames(prev =>
-      prev.map(g => (g.id === gameId ? { ...g, plays: g.plays + 1 } : g))
+      prev.map(g => (g && g.id === gameId ? { ...g, plays: (typeof g.plays === 'number' && !isNaN(g.plays) ? g.plays : 0) + 1 } : g))
     );
     setOverrides(prev => {
       const curr = prev[gameId] || {};
       const baseGame = defaultGamesMap.get(gameId);
-      const newPlays = ((curr.plays !== undefined) ? curr.plays : (baseGame?.plays || 0)) + 1;
+      const basePlays = typeof curr.plays === 'number' && !isNaN(curr.plays) ? curr.plays : (typeof baseGame?.plays === 'number' && !isNaN(baseGame.plays) ? baseGame.plays : 0);
+      const newPlays = basePlays + 1;
       return { ...prev, [gameId]: { ...curr, plays: newPlays } };
     });
   };
 
   const updateGame = (gameId: string, updates: Partial<Game>) => {
+    if (!gameId) return;
     setGames(prev =>
-      prev.map(g => (g.id === gameId ? { ...g, ...updates } : g))
+      prev.map(g => (g && g.id === gameId ? { ...g, ...updates } : g))
     );
     setOverrides(prev => ({
       ...prev,

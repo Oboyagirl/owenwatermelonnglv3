@@ -3,6 +3,7 @@ import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import {ErrorBoundary} from './components/ErrorBoundary.tsx';
 import {AuthProvider} from './context/AuthContext.tsx';
+import {MusicProvider} from './context/MusicContext.tsx';
 import './index.css';
 
 function mountApp() {
@@ -18,7 +19,9 @@ function mountApp() {
       <StrictMode>
         <ErrorBoundary>
           <AuthProvider>
-            <App />
+            <MusicProvider>
+              <App />
+            </MusicProvider>
           </AuthProvider>
         </ErrorBoundary>
       </StrictMode>,
@@ -33,4 +36,3 @@ if (document.readyState === 'loading') {
 } else {
   mountApp();
 }
-

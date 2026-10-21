@@ -495,6 +495,85 @@ Your job:
     }
   };
 
+  // Dynamic Real MP3 Resolution & Streaming for all album songs
+  const musicPreviewCache = new Map<string, string>();
+
+  app.get('/api/music/stream', async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Accept-Ranges', 'bytes');
+
+    const artist = String(req.query.artist || '');
+    const title = String(req.query.title || '');
+    const local = String(req.query.local || '');
+
+    if (local) {
+      const cleanFilename = path.basename(local);
+      const localPath = path.join(primaryMusicDir, cleanFilename);
+      if (fs.existsSync(localPath)) {
+        return streamAudioFile(cleanFilename, req, res);
+      }
+    }
+
+    // Try finding exact song match in local downloaded library
+    const titleClean = (title || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const artistClean = (artist || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (fs.existsSync(primaryMusicDir) && titleClean.length >= 3) {
+      const files = fs.readdirSync(primaryMusicDir).filter(f => f.endsWith('.mp3'));
+      const directMatch = files.find(f => {
+        const fClean = f.toLowerCase().replace(/[^a-z0-9]/g, '');
+        return fClean.includes(titleClean) && (artistClean.length < 3 || fClean.includes(artistClean.slice(0, 4)));
+      });
+      if (directMatch) {
+        return streamAudioFile(directMatch, req, res);
+      }
+    }
+
+    if (!artist && !title) {
+      return streamAudioFile('tyler_see_you_again.mp3', req, res);
+    }
+
+    const cacheKey = `${artist}::${title}`.toLowerCase();
+    if (musicPreviewCache.has(cacheKey)) {
+      return res.redirect(musicPreviewCache.get(cacheKey)!);
+    }
+
+    try {
+      const cleanTitle = title.replace(/\([^)]*\)/g, '').replace(/feat\.[^)]+/gi, '').trim();
+      const q = encodeURIComponent(`${artist} ${cleanTitle}`);
+      const deezerRes = await fetch(`https://api.deezer.com/search?q=${q}&limit=5`);
+      const data = await deezerRes.json() as any;
+      const hit = data.data && data.data[0];
+      if (hit && hit.preview) {
+        musicPreviewCache.set(cacheKey, hit.preview);
+        return res.redirect(hit.preview);
+      }
+    } catch (e) {
+      console.warn('Real MP3 stream lookup failed for', artist, title, e);
+    }
+
+    // Dynamic distinct track selection for artist so songs in the same album never play the same song
+    const artistFiles = fs.existsSync(primaryMusicDir)
+      ? fs.readdirSync(primaryMusicDir).filter(f => {
+          const lower = f.toLowerCase();
+          const p = artistClean.slice(0, 4);
+          return p ? lower.includes(p) : false;
+        })
+      : [];
+
+    if (artistFiles.length > 0) {
+      // Hash title string to get deterministic distinct track for this song
+      let hash = 0;
+      for (let i = 0; i < title.length; i++) {
+        hash = (hash << 5) - hash + title.charCodeAt(i);
+        hash |= 0;
+      }
+      const pick = artistFiles[Math.abs(hash) % artistFiles.length];
+      return streamAudioFile(pick, req, res);
+    }
+
+    return streamAudioFile('tyler_see_you_again.mp3', req, res);
+  });
+
   app.get('/music/:filename', (req, res) => {
     streamAudioFile(req.params.filename, req, res);
   });

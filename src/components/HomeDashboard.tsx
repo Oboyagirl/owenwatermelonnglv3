@@ -177,7 +177,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
         </div>
 
         {/* Quick Spaces Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 md:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4">
           <button
             onClick={() => onNavigateTab('games')}
             className="group p-4 md:p-5 rounded-2xl border transition-all duration-300 flex flex-col items-center text-center gap-2.5 cursor-pointer shadow-lg hover:-translate-y-1"
@@ -194,6 +194,25 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             </div>
             <span className="text-xs md:text-sm font-bold text-white group-hover:text-emerald-300">Games</span>
             <span className="text-[10px] text-slate-400">800+ Unblocked</span>
+          </button>
+
+          <button
+            onClick={() => {
+              const plinko = featuredGames.concat(trendingGames).find(g => g.id === 'free-plinko-game-online' || g.title.toLowerCase().includes('plinko'));
+              if (plinko) onSelectGame(plinko);
+              else onNavigateTab('games');
+            }}
+            className="group p-4 md:p-5 rounded-2xl border transition-all duration-300 flex flex-col items-center text-center gap-2.5 cursor-pointer shadow-lg hover:-translate-y-1"
+            style={{
+              backgroundColor: cardBg,
+              borderColor: border
+            }}
+          >
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+              🔴
+            </div>
+            <span className="text-xs md:text-sm font-bold text-white group-hover:text-amber-300">Plinko</span>
+            <span className="text-[10px] text-slate-400">Pegboard Multipliers</span>
           </button>
 
           <button

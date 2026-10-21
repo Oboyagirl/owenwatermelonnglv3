@@ -14,7 +14,8 @@ export function resolveAssetUrl(url: string | undefined | null): string {
     trimmed.startsWith('blob:') ||
     trimmed.startsWith('data:') ||
     trimmed.startsWith('http://') ||
-    trimmed.startsWith('https://')
+    trimmed.startsWith('https://') ||
+    trimmed.startsWith('/api/')
   ) {
     return trimmed;
   }

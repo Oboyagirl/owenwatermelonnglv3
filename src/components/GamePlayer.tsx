@@ -19,13 +19,21 @@ import {
   ShieldCheck,
   Scan,
   Cloud,
-  Zap
+  Zap,
+  Music,
+  Play,
+  Pause,
+  SkipForward,
+  Disc3,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { Game } from '../types/game';
 import { openAboutBlankGame, resolveAssetUrl } from '../services/gamesStore';
 import { ThemeConfig, THEMES } from '../services/themeStore';
 import { CloudSaveModal } from './CloudSaveModal';
 import { useAuth } from '../context/AuthContext';
+import { useMusic } from '../context/MusicContext';
 import { captureUniversalGameState, captureBrowserGameState } from '../services/cloudSaveService';
 
 interface GamePlayerProps {
@@ -37,6 +45,7 @@ interface GamePlayerProps {
   allGames: Game[];
   onUpdateGame?: (gameId: string, updates: Partial<Game>) => void;
   activeTheme?: ThemeConfig;
+  onOpenMusicSpace?: () => void;
 }
 
 export const GamePlayer: React.FC<GamePlayerProps> = ({
@@ -47,8 +56,20 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
   onSelectGame,
   allGames,
   onUpdateGame,
-  activeTheme = THEMES.original
+  activeTheme = THEMES.original,
+  onOpenMusicSpace
 }) => {
+  const { 
+    currentTrack, 
+    isPlaying, 
+    togglePlay, 
+    nextTrack, 
+    prevTrack, 
+    volume, 
+    setVolume, 
+    isMuted, 
+    toggleMute 
+  } = useMusic();
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -65,22 +86,27 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
     });
   };
 
+  // Guard against missing game object
+  const safeTitle = game?.title || 'Game';
+  const safeSrc = game?.iframeSrc || '';
+
   // Live Iframe HTML Replacement State
-  const defaultIframeCode = game.iframeCode || `<iframe class="game-iframe" id="game-area" title="${game.title}" src="${game.iframeSrc}" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`;
+  const defaultIframeCode = game?.iframeCode || `<iframe class="game-iframe" id="game-area" title="${safeTitle}" src="${safeSrc}" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`;
   const [showIframeEditor, setShowIframeEditor] = useState(false);
   const [showCloudSaveModal, setShowCloudSaveModal] = useState(false);
   const [isQuickSaving, setIsQuickSaving] = useState(false);
   const [quickSaved, setQuickSaved] = useState(false);
   const { user, profile, deviceLabel, saveCurrentGame, getSavesForGame } = useAuth();
-  const gameSaves = getSavesForGame(game.id);
+  const gameSaves = (typeof getSavesForGame === 'function' && game?.id ? getSavesForGame(game.id) : []) || [];
 
   const handleQuickSave = async () => {
+    if (typeof saveCurrentGame !== 'function' || !game?.id) return;
     setIsQuickSaving(true);
     try {
       const contentWindow = iframeRef.current?.contentWindow || null;
       const dataToSave = await captureUniversalGameState(game.id, contentWindow);
       await saveCurrentGame(game.id, 'slot1', {
-        title: game.title,
+        title: safeTitle,
         saveData: dataToSave,
         saveType: 'universal',
         deviceLabel
@@ -94,27 +120,30 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
     }
   };
   const [iframeHtmlInput, setIframeHtmlInput] = useState(defaultIframeCode);
-  const [activeIframeSrc, setActiveIframeSrc] = useState(game.iframeSrc);
-  const [activeCustomHtml, setActiveCustomHtml] = useState<string | undefined>(game.customHtml);
+  const [activeIframeSrc, setActiveIframeSrc] = useState(safeSrc);
+  const [activeCustomHtml, setActiveCustomHtml] = useState<string | undefined>(game?.customHtml);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   // Alternative working mirrors support
-  const mirrorsList = game.mirrors && game.mirrors.length > 0 ? game.mirrors : [game.iframeSrc];
+  const mirrorsList = Array.isArray(game?.mirrors) && game.mirrors.length > 0 ? game.mirrors : [safeSrc];
   const [currentMirrorIndex, setCurrentMirrorIndex] = useState(0);
 
-  const isLocalGame = !activeIframeSrc.startsWith('http://') && !activeIframeSrc.startsWith('https://') && !activeIframeSrc.startsWith('data:') && !activeIframeSrc.startsWith('blob:');
+  const isLocalGame = !activeIframeSrc || (!activeIframeSrc.startsWith('http://') && !activeIframeSrc.startsWith('https://') && !activeIframeSrc.startsWith('data:') && !activeIframeSrc.startsWith('blob:'));
 
-  const isSecurlyWhitelisted = 
-    activeIframeSrc.includes('academics-study.github.io') ||
-    activeIframeSrc.includes('javaspence.github.io') ||
-    activeIframeSrc.includes('henshmi.github.io') ||
-    activeIframeSrc.includes('joe-the-chicken.github.io') ||
-    activeIframeSrc.includes('gameinclassroom.github.io') ||
-    activeIframeSrc.includes('pages.dev');
+  const isSecurlyWhitelisted = Boolean(
+    activeIframeSrc && (
+      activeIframeSrc.includes('academics-study.github.io') ||
+      activeIframeSrc.includes('javaspence.github.io') ||
+      activeIframeSrc.includes('henshmi.github.io') ||
+      activeIframeSrc.includes('joe-the-chicken.github.io') ||
+      activeIframeSrc.includes('gameinclassroom.github.io') ||
+      activeIframeSrc.includes('pages.dev')
+    )
+  );
 
-  // By default, external games on filtered domains are routed through local same-origin proxy
-  // so Securly and school Chromebook filters inspect the iframe as same-origin (safe like Soccer REAL/2026)
-  const [useSecurlyProxy, setUseSecurlyProxy] = useState(!isLocalGame && !isSecurlyWhitelisted);
+  // By default, games load directly for full speed and complete asset/WebGL compatibility.
+  // Securly unblock proxy can be toggled on-demand if a user is behind a strict filter.
+  const [useSecurlyProxy, setUseSecurlyProxy] = useState(false);
 
   const resolvedIframeSrc = (() => {
     if (activeCustomHtml) return undefined;
@@ -125,7 +154,7 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
     if (typeof window !== 'undefined' && (window.location.hostname.endsWith('github.io') || window.location.hostname.includes('github'))) {
       return activeIframeSrc;
     }
-    if (useSecurlyProxy || !isSecurlyWhitelisted) {
+    if (useSecurlyProxy) {
       return `/api/proxy?url=${encodeURIComponent(activeIframeSrc)}`;
     }
     return activeIframeSrc;
@@ -133,21 +162,17 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
 
   // Sync state whenever the selected game changes
   useEffect(() => {
-    const code = game.iframeCode || `<iframe class="game-iframe" id="game-area" title="${game.title}" src="${game.iframeSrc}" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`;
+    const src = game?.iframeSrc || '';
+    const title = game?.title || 'Game';
+    const code = game?.iframeCode || `<iframe class="game-iframe" id="game-area" title="${title}" src="${src}" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`;
     setIframeHtmlInput(code);
-    setActiveIframeSrc(game.iframeSrc);
-    setActiveCustomHtml(game.customHtml);
+    setActiveIframeSrc(src);
+    setActiveCustomHtml(game?.customHtml);
     setShowIframeEditor(false);
     setSavedSuccess(false);
     setCurrentMirrorIndex(0);
-    const isLocal = !game.iframeSrc.startsWith('http://') && !game.iframeSrc.startsWith('https://');
-    const isWhitelisted = 
-      game.iframeSrc.includes('academics-study.github.io') || 
-      game.iframeSrc.includes('javaspence.github.io') ||
-      game.iframeSrc.includes('gameinclassroom.github.io') ||
-      game.iframeSrc.includes('pages.dev');
-    setUseSecurlyProxy(!isLocal && !isWhitelisted);
-  }, [game.id, game.iframeSrc, game.iframeCode, game.customHtml]);
+    setUseSecurlyProxy(false);
+  }, [game?.id, game?.iframeSrc, game?.iframeCode, game?.customHtml]);
 
   const handleNextMirror = () => {
     if (mirrorsList.length <= 1) {
@@ -159,7 +184,7 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
     const nextSrc = mirrorsList[nextIdx];
     setActiveIframeSrc(nextSrc);
     setActiveCustomHtml(undefined);
-    setIframeHtmlInput(`<iframe class="game-iframe" id="game-area" title="${game.title}" src="${nextSrc}" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`);
+    setIframeHtmlInput(`<iframe class="game-iframe" id="game-area" title="${safeTitle}" src="${nextSrc}" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`);
     setKeyCounter(prev => prev + 1);
   };
 
@@ -226,16 +251,18 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
   };
 
   const handleResetIframe = () => {
-    const origCode = game.iframeCode || `<iframe src="${game.iframeSrc}" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`;
+    const origCode = game?.iframeCode || `<iframe src="${safeSrc}" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`;
     setIframeHtmlInput(origCode);
-    setActiveIframeSrc(game.iframeSrc);
-    setActiveCustomHtml(game.customHtml);
+    setActiveIframeSrc(safeSrc);
+    setActiveCustomHtml(game?.customHtml);
     setKeyCounter(prev => prev + 1);
   };
 
-  const relatedGames = Array.from(
-    new Map(allGames.filter(g => g.id !== game.id).map(g => [g.id, g])).values()
-  ).slice(0, 4);
+  const relatedGames = Array.isArray(allGames)
+    ? Array.from(
+        new Map(allGames.filter(g => g && g.id && g.id !== (game?.id || '')).map(g => [g.id, g])).values()
+      ).slice(0, 4)
+    : [];
 
   return (
     <div className={`w-full max-w-7xl mx-auto px-4 lg:px-8 py-6 flex flex-col gap-6 ${isTheater ? 'max-w-none px-2 lg:px-4' : ''}`}>
@@ -257,6 +284,47 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
+          {/* In-Game Real MP3 Music Controller */}
+          <div 
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border shadow-sm transition-all text-xs"
+            style={{
+              backgroundColor: isPlaying ? activeTheme.accentBadge : activeTheme.bgCard,
+              borderColor: isPlaying ? activeTheme.accent : activeTheme.border
+            }}
+          >
+            <button
+              onClick={() => {
+                if (onOpenMusicSpace) onOpenMusicSpace();
+                else togglePlay();
+              }}
+              className="flex items-center gap-1.5 font-bold hover:underline cursor-pointer max-w-[120px] sm:max-w-[170px] truncate"
+              style={{ color: isPlaying ? activeTheme.accent : '#ffffff' }}
+              title={isPlaying ? `Now Playing: ${currentTrack?.title} by ${currentTrack?.artist} (Click to open Music Studio)` : 'Click to listen to real MP3 music while gaming'}
+            >
+              <Disc3 className={`w-3.5 h-3.5 shrink-0 ${isPlaying ? 'animate-spin' : ''}`} />
+              <span className="truncate">
+                {isPlaying ? currentTrack?.title : 'Listen to Music'}
+              </span>
+            </button>
+
+            <button
+              onClick={togglePlay}
+              className="p-1 rounded-md text-black flex items-center justify-center shrink-0 cursor-pointer shadow-sm hover:scale-105 transition-all"
+              style={{ backgroundColor: activeTheme.accent }}
+              title={isPlaying ? 'Pause Music' : 'Play Music'}
+            >
+              {isPlaying ? <Pause className="w-3 h-3 fill-black" /> : <Play className="w-3 h-3 fill-black ml-0.5" />}
+            </button>
+
+            <button
+              onClick={nextTrack}
+              className="p-1 rounded-md hover:bg-white/10 text-slate-300 hover:text-white cursor-pointer shrink-0"
+              title="Next song"
+            >
+              <SkipForward className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
           {/* 1-Click Quick Save */}
           <button
             onClick={handleQuickSave}
@@ -541,6 +609,21 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
               <span className="hidden sm:inline">Cloud Save</span>
             </button>
 
+            {/* In-Player Real MP3 Music Toggle */}
+            <button
+              onClick={togglePlay}
+              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer border"
+              style={{
+                backgroundColor: isPlaying ? activeTheme.accentBadge : activeTheme.bgCard,
+                borderColor: isPlaying ? activeTheme.accent : activeTheme.border,
+                color: isPlaying ? activeTheme.accent : activeTheme.kicker
+              }}
+              title={isPlaying ? `Background Music: ${currentTrack?.title} (Click to pause)` : 'Listen to real MP3 music while playing'}
+            >
+              <Disc3 className={`w-3.5 h-3.5 ${isPlaying ? 'animate-spin' : ''}`} style={{ color: activeTheme.accent }} />
+              <span className="hidden sm:inline">{isPlaying ? 'Music: ON' : '🎵 Music'}</span>
+            </button>
+
             <button
               onClick={() => onToggleFavorite(game.id)}
               className={`p-2 rounded-lg transition-colors cursor-pointer ${
@@ -754,9 +837,9 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
                     </span>
                   )}
                   <span aria-hidden="true">·</span>
-                  <span className="font-mono tabular-nums">{game.plays.toLocaleString()} plays</span>
+                  <span className="font-mono tabular-nums">{(typeof game?.plays === 'number' && !isNaN(game.plays) ? game.plays : 0).toLocaleString()} plays</span>
                   <span aria-hidden="true">·</span>
-                  <span className="text-amber-300">Rating: ★ {game.rating.toFixed(1)}</span>
+                  <span className="text-amber-300">Rating: ★ {typeof game?.rating === 'number' && !isNaN(game.rating) ? game.rating.toFixed(1) : '5.0'}</span>
                 </div>
               </div>
 
@@ -900,9 +983,9 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
                     {rel.title}
                   </span>
                   <div className="flex items-center gap-1 text-[11px] text-slate-400 mt-0.5">
-                    <span>{rel.category}</span>
+                    <span>{rel.category || 'Arcade'}</span>
                     <span aria-hidden="true">·</span>
-                    <span className="text-amber-400">★ {rel.rating.toFixed(1)}</span>
+                    <span className="text-amber-400">★ {typeof rel?.rating === 'number' && !isNaN(rel.rating) ? rel.rating.toFixed(1) : '5.0'}</span>
                   </div>
                 </div>
               </div>

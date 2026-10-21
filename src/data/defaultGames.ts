@@ -5,6 +5,56 @@ import { resolveGameSource } from './unblockedResolver';
 
 const CURATED_GAMES: Game[] = [
   {
+    id: "free-plinko-game-online",
+    source: "unblocked",
+    title: "Plinko",
+    description: "Drop balls down the classic pegboard pyramid into glowing high-multiplier buckets. Real physics with up to 1000x multiplier payouts!",
+    category: "Arcade",
+    secondaryCategory: "Casual",
+    thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Free-Plinko-Game-Online/Free-Plinko-Game-Online.png",
+    banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Free-Plinko-Game-Online/Free-Plinko-Game-Online.png",
+    mirrors: [
+      "https://freeonlinewebtools.github.io/gamelist4.github.io/Free-Plinko-Game-Online/",
+      "https://ubghyper.github.io/GameList.github.io/Free-Plinko-Game-Online/",
+      "https://fakestake.fun/plinko"
+    ],
+    tags: ["Plinko", "Pegs", "Multiplier", "Physics", "Arcade", "Trending", "Unblocked"],
+    rating: 5.0,
+    plays: 289400,
+    author: "FreeWebTools",
+    featured: true,
+    iframeSrc: "https://freeonlinewebtools.github.io/gamelist4.github.io/Free-Plinko-Game-Online/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Plinko" src="https://freeonlinewebtools.github.io/gamelist4.github.io/Free-Plinko-Game-Online/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Click / Tap", action: "Drop Ball / Select Risk & Rows" },
+      { key: "Space", action: "Rapid Drop" }
+    ]
+  },
+  {
+    id: "fakestake-plinko",
+    source: "unblocked",
+    title: "FakeStake Plinko",
+    description: "Play official FakeStake.fun Plinko with 8-16 rows, Low/Medium/High risk, and multipliers reaching 1,000x with 100% free virtual currency.",
+    category: "Arcade",
+    secondaryCategory: "Casual",
+    thumbnail: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=1200&auto=format&fit=crop&q=80",
+    mirrors: [
+      "https://fakestake.fun/plinko",
+      "https://freeonlinewebtools.github.io/gamelist4.github.io/Free-Plinko-Game-Online/"
+    ],
+    tags: ["Plinko", "Pegs", "Multiplier", "Physics", "Arcade", "Originals", "Unblocked"],
+    rating: 4.9,
+    plays: 195000,
+    author: "FakeStake.fun",
+    featured: true,
+    iframeSrc: "https://fakestake.fun/plinko",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="FakeStake Plinko" src="https://fakestake.fun/plinko" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Mouse Click", action: "Place Bet & Drop Plinko Ball" }
+    ]
+  },
+  {
     id: "sawyer-for-sawyer",
     source: "unblocked",
     title: "A Small World Cup (Sawyer For Sawyer)",
