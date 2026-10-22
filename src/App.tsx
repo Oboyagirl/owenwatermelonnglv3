@@ -119,6 +119,7 @@ export function isTrendingGame(g: Game): boolean {
 const APP_CATEGORIES = [
   'All',
   'Trending',
+  'StrongDog XP',
   '2 Player Games',
   'Sawyer For Sawyer',
   'Owen Watermelon OG’s',
@@ -415,6 +416,13 @@ export default function App() {
       if (catLower.includes('2 player') || catLower === '2 player games') return isTwoPlayerGame(g);
       if (catLower.includes('sawyer')) return isSawyerGame(g);
       if (catLower.includes('owen') && catLower.includes('og')) return isOwenWatermelonOG(g);
+      if (catLower === 'strongdog xp') {
+        return (
+          mainCatLower === 'strongdog xp' ||
+          secCatLower === 'strongdog xp' ||
+          (Array.isArray(g.tags) && g.tags.some(t => typeof t === 'string' && t.toLowerCase().includes('strongdog')))
+        );
+      }
       if (catLower === 'potato classics') {
         return (
           secCatLower === 'potato classics' ||

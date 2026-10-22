@@ -1,5 +1,6 @@
 import { Game } from '../types/game';
 import ubgGamesList from './ubgFilteredGames.json';
+import strongdogGamesList from './strongdogGames.json';
 import { TRIPPLE_POTATOES_GAMES } from './tripplePotatoesGames';
 import { resolveGameSource } from './unblockedResolver';
 
@@ -1293,6 +1294,11 @@ function buildDefaultGames(): Game[] {
   // Add ubg filtered games (deduplicated against curated and potatoes)
   for (const g of (ubgGamesList as unknown as Game[])) {
     addGameCandidate(g, 'Unblocked Archive');
+  }
+
+  // Add all StrongDog XP games (deduplicated against all above with tag & mirror merge)
+  for (const g of (strongdogGamesList as unknown as Game[])) {
+    addGameCandidate(g, 'StrongDog XP');
   }
 
   return games;
