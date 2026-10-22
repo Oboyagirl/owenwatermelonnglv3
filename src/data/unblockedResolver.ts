@@ -422,6 +422,8 @@ export function resolveGameSource(
     currentSrc.includes('.pages.dev') ||
     currentSrc.includes('gamedistribution.com') ||
     currentSrc.includes('blobby-boi') ||
+    currentSrc.includes('stroongdog') ||
+    currentSrc.includes('strongdog') ||
     (currentSrc.startsWith('games/') && !PRESERVED_LOCAL_GAMES.has(currentSrc)) ||
     currentSrc === '';
 
