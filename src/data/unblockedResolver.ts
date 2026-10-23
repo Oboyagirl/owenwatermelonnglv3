@@ -21,9 +21,9 @@ const ACADEMICS_MAP: Record<string, string> = {
   "backrooms": "https://academics-study.github.io/backrooms/",
   "slicemaster": "https://academics-study.github.io/0-slice-master/",
   "shellshockers": "https://academics-study.github.io/shellshockers/",
-  "stickmanhook": "https://gameinclassroom.github.io/stickman-hook/",
-  "stickmanclimb": "https://gameinclassroom.github.io/stickman-climb-2/",
-  "stickmanclimb2": "https://gameinclassroom.github.io/stickman-climb-2/",
+  "stickmanhook": "https://7zeb.github.io/homework/index.html",
+  "stickmanclimb": "https://7zeb.github.io/homework/index.html",
+  "stickmanclimb2": "https://7zeb.github.io/homework/index.html",
   "peopleplayground": "https://7zeb.github.io/homework/melonplayground.html",
   "blockblast": "https://freeonlinewebtools.github.io/blockblastunblockedgames.github.io/",
   "ovo": "https://7zeb.github.io/homework/ovo2.html",
@@ -32,40 +32,40 @@ const ACADEMICS_MAP: Record<string, string> = {
   "minecraft": "https://7zeb.github.io/homework/mc1_8.html",
   "basketballlegends": "https://joe-the-chicken.github.io/basketball-stars/",
   "basketballlegends2020": "https://joe-the-chicken.github.io/basketball-stars/",
-  "vex": "https://gameinclassroom.github.io/vex-3/",
+  "vex": "https://7zeb.github.io/homework/index.html",
   "vex1": "https://ubghyper.github.io/GameList.github.io/Vex-1/",
   "vex2": "https://ubghyper.github.io/GameList.github.io/Vex-2/",
-  "vex3": "https://gameinclassroom.github.io/vex-3/",
-  "vex4": "https://gameinclassroom.github.io/vex-4/",
-  "vex5": "https://gameinclassroom.github.io/vex-5/",
-  "vex6": "https://gameinclassroom.github.io/vex-6/",
+  "vex3": "https://7zeb.github.io/homework/index.html",
+  "vex4": "https://7zeb.github.io/homework/index.html",
+  "vex5": "https://7zeb.github.io/homework/index.html",
+  "vex6": "https://7zeb.github.io/homework/index.html",
   "vex7": "https://7zeb.github.io/homework/vex7.html",
   "vex8": "https://7zeb.github.io/homework/vex8.html",
-  "worldshardestgame": "https://gameinclassroom.github.io/worlds-hardest-game-2/",
-  "worldshardestgame2": "https://gameinclassroom.github.io/worlds-hardest-game-2/",
-  "worldshardestgame3": "https://gameinclassroom.github.io/worlds-hardest-game-2/",
+  "worldshardestgame": "https://7zeb.github.io/homework/index.html",
+  "worldshardestgame2": "https://7zeb.github.io/homework/index.html",
+  "worldshardestgame3": "https://7zeb.github.io/homework/index.html",
   "fruitninja": "games/fruit-ninja.html",
   "mario": "https://7zeb.github.io/homework/mario-game/index.html",
   "supermario": "https://7zeb.github.io/homework/mario-game/index.html",
   "supermario63": "https://ubghyper.github.io/GameList.github.io/Super-Mario-63/",
-  "supermario64": "https://gameinclassroom.github.io/super-mario-64/",
+  "supermario64": "https://7zeb.github.io/homework/index.html",
   "supermariobros": "https://7zeb.github.io/homework/mario-game/index.html",
   "blackjack": "https://flyingsully.github.io/GameList.github.io/Blackjack/",
-  "happywheels": "https://gameinclassroom.github.io/happy-wheels/",
+  "happywheels": "https://7zeb.github.io/homework/index.html",
   "dumbwaystodie": "games/dumb-ways-to-die.html",
   "hooproyale": "https://ubghyper.github.io/GameList.github.io/Hoop-Royale/",
   "asmallworldcup": "games/sawyer-for-sawyer.html",
-  "stickmerge": "https://gameinclassroom.github.io/stick-merge/",
-  "stickmerge2": "https://gameinclassroom.github.io/stick-merge/",
-  "sausageflip": "https://gameinclassroom.github.io/sausage-flip/",
-  "sausagerun": "https://gameinclassroom.github.io/sausage-flip/",
+  "stickmerge": "https://7zeb.github.io/homework/index.html",
+  "stickmerge2": "https://7zeb.github.io/homework/index.html",
+  "sausageflip": "https://7zeb.github.io/homework/index.html",
+  "sausagerun": "https://7zeb.github.io/homework/index.html",
   "bindingofisaac": "https://flyingsully.github.io/GameList.github.io/Binding-Of-Isaac/",
   "ducklife4": "https://flyingsully.github.io/GameList.github.io/Duck-Life-4/",
-  "clusterrush": "https://gameinclassroom.github.io/cluster-rush/",
+  "clusterrush": "https://7zeb.github.io/homework/index.html",
   "cuphead": "https://freeonlinewebtools.github.io/gamelist2.github.io/Cuphead/",
   "badicecream": "https://freeonlinewebtools.github.io/gamelist8.github.io/Bad-Ice-Cream/",
-  "badicecream2": "https://gameinclassroom.github.io/bad-ice-cream-2/",
-  "badicecream3": "https://gameinclassroom.github.io/bad-ice-cream-3/",
+  "badicecream2": "https://7zeb.github.io/homework/index.html",
+  "badicecream3": "https://7zeb.github.io/homework/index.html",
   "candycrush": "https://freeonlinewebtools.github.io/gamelist3.github.io/Candy-Crush/",
   "deathrun3d": "https://freeonlinewebtools.github.io/gamelist3.github.io/Death-Run-3D/",
   "dadish": "https://freeonlinewebtools.github.io/gamelist3.github.io/Dadish/",
@@ -156,9 +156,9 @@ export function resolveGameSource(
 
   if (safeId.includes('paper-io') || safeTitle.toLowerCase().includes('paper io') || safeTitle.toLowerCase().includes('paper.io')) {
     return {
-      src: 'https://gameinclassroom.github.io/paper-io-2/',
+      src: 'https://7zeb.github.io/homework/index.html',
       mirrors: [
-        'https://gameinclassroom.github.io/paper-io-2/',
+        'https://7zeb.github.io/homework/index.html',
         'https://ubghyper.github.io/GameList.github.io/Paper-IO-2/'
       ]
     };
@@ -166,9 +166,9 @@ export function resolveGameSource(
 
   if (safeId.includes('getting-over-it') || safeTitle.toLowerCase().includes('getting over it')) {
     return {
-      src: 'https://gameinclassroom.github.io/getting-over-it/',
+      src: 'https://7zeb.github.io/homework/index.html',
       mirrors: [
-        'https://gameinclassroom.github.io/getting-over-it/',
+        'https://7zeb.github.io/homework/index.html',
         'games/getting-over-it.html',
         'https://freeonlinewebtools.github.io/gamelist6.github.io/Getting-Over-It/',
         'https://ubg98.github.io/GettingOverIt/'
@@ -178,9 +178,9 @@ export function resolveGameSource(
 
   if (safeId === 'achievement-unlocked' || safeTitle.toLowerCase() === 'achievement unlocked') {
     return {
-      src: 'https://gameinclassroom.github.io/achievement-unlocked/',
+      src: 'https://7zeb.github.io/homework/theimpossiblequiz.html',
       mirrors: [
-        'https://gameinclassroom.github.io/achievement-unlocked/',
+        'https://7zeb.github.io/homework/index.html',
         'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked/achievementunlocked.swf&title=Achievement+Unlocked',
         'https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked/'
       ]
@@ -296,9 +296,9 @@ export function resolveGameSource(
   // Fireboy & Watergirl series (Verified working HTML5 and Flash engines)
   if (safeId === 'fireboy-and-watergirl-3' || safeTitle.toLowerCase().includes('watergirl 3') || safeTitle.toLowerCase().includes('ice temple')) {
     return {
-      src: 'https://gameinclassroom.github.io/fireboy-watergirl-3-ice-temple/',
+      src: 'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-3/',
       mirrors: [
-        'https://gameinclassroom.github.io/fireboy-watergirl-3-ice-temple/',
+        'https://7zeb.github.io/homework/index.html',
         'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-3/fboy3.swf&title=Fireboy+and+Watergirl+3',
         'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-3/'
       ]
@@ -307,9 +307,9 @@ export function resolveGameSource(
 
   if (safeId === 'fireboy-and-watergirl-2' || safeId === 'fireboy-and-watergirl-2-light-temple' || safeTitle.toLowerCase().includes('watergirl 2') || safeTitle.toLowerCase().includes('light temple')) {
     return {
-      src: 'https://gameinclassroom.github.io/fireboy-and-watergirl-2-light-temple/',
+      src: 'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-2/',
       mirrors: [
-        'https://gameinclassroom.github.io/fireboy-and-watergirl-2-light-temple/',
+        'https://7zeb.github.io/homework/index.html',
         'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-2/'
       ]
     };
@@ -317,9 +317,9 @@ export function resolveGameSource(
 
   if (safeId === 'fireboy-and-watergirl-4' || safeTitle.toLowerCase().includes('watergirl 4') || safeTitle.toLowerCase().includes('crystal temple')) {
     return {
-      src: 'https://gameinclassroom.github.io/fireboy-and-watergirl-4-crystal-temple/',
+      src: 'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-4/',
       mirrors: [
-        'https://gameinclassroom.github.io/fireboy-and-watergirl-4-crystal-temple/',
+        'https://7zeb.github.io/homework/index.html',
         'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-4/'
       ]
     };
@@ -327,9 +327,9 @@ export function resolveGameSource(
 
   if (safeId === 'fireboy-and-watergirl-5' || safeTitle.toLowerCase().includes('watergirl 5') || safeTitle.toLowerCase().includes('elements')) {
     return {
-      src: 'https://gameinclassroom.github.io/fireboy-and-watergirl-5-elements/',
+      src: 'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-5/',
       mirrors: [
-        'https://gameinclassroom.github.io/fireboy-and-watergirl-5-elements/',
+        'https://7zeb.github.io/homework/index.html',
         'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-5/'
       ]
     };
@@ -337,9 +337,9 @@ export function resolveGameSource(
 
   if (safeId === 'fireboy-and-watergirl-6' || safeTitle.toLowerCase().includes('watergirl 6') || safeTitle.toLowerCase().includes('fairy tales')) {
     return {
-      src: 'https://gameinclassroom.github.io/fireboy-watergirl-6-fairy-tales/',
+      src: 'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-6/',
       mirrors: [
-        'https://gameinclassroom.github.io/fireboy-watergirl-6-fairy-tales/',
+        'https://7zeb.github.io/homework/index.html',
         'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-6/'
       ]
     };
@@ -347,9 +347,9 @@ export function resolveGameSource(
 
   if (safeId === 'fireboy-and-watergirl' || safeId === 'fireboy-and-watergirl-1' || safeTitle.toLowerCase().includes('watergirl')) {
     return {
-      src: 'https://gameinclassroom.github.io/fireboy-and-watergirl-forest-temple/',
+      src: 'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl/',
       mirrors: [
-        'https://gameinclassroom.github.io/fireboy-and-watergirl-forest-temple/',
+        'https://7zeb.github.io/homework/index.html',
         'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl/'
       ]
     };
@@ -371,7 +371,7 @@ export function resolveGameSource(
       src: 'games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papasfreezeria.swf&title=Papa%27s+Freezeria',
       mirrors: [
         'games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papasfreezeria.swf&title=Papa%27s+Freezeria',
-        'https://gameinclassroom.github.io/papas-freezeria/'
+        'https://7zeb.github.io/homework/papasfreezeria.html'
       ]
     };
   }
@@ -381,7 +381,7 @@ export function resolveGameSource(
       src: 'games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papasburgeria.swf&title=Papa%27s+Burgeria',
       mirrors: [
         'games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papasburgeria.swf&title=Papa%27s+Burgeria',
-        'https://gameinclassroom.github.io/papas-burgeria/'
+        'https://7zeb.github.io/homework/papasburgeria.html'
       ]
     };
   }
@@ -391,7 +391,7 @@ export function resolveGameSource(
       src: 'games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papassushiria.swf&title=Papa%27s+Sushiria',
       mirrors: [
         'games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papassushiria.swf&title=Papa%27s+Sushiria',
-        'https://gameinclassroom.github.io/papas-sushiria/'
+        'https://7zeb.github.io/homework/index.html'
       ]
     };
   }
@@ -418,6 +418,7 @@ export function resolveGameSource(
 
   // Check if primary is blocked by Securly (contains ubg keyword, pages.dev, gamedistribution, or broken games/)
   const isBlocked = 
+    currentSrc.includes('gameinclassroom') ||
     currentSrc.includes('ubghyper') ||
     currentSrc.includes('.pages.dev') ||
     currentSrc.includes('gamedistribution.com') ||
@@ -430,13 +431,13 @@ export function resolveGameSource(
   let resolvedSrc = currentSrc;
 
   if (isBlocked) {
-    // 2. Try Academics-Study verified endpoints
-    if (ACADEMICS_MAP[cleanTitle] || ACADEMICS_MAP[cleanId] || ACADEMICS_MAP[cleanSlug]) {
-      resolvedSrc = ACADEMICS_MAP[cleanTitle] || ACADEMICS_MAP[cleanId] || ACADEMICS_MAP[cleanSlug];
-    }
-    // 3. Try 7zeb verified endpoints (proven to work on school iPads)
-    else if (sMap[cleanTitle] || sMap[cleanId] || sMap[cleanSlug]) {
+    // 1. Try 7zeb verified endpoints FIRST (Confirmed working on school filters & iPads)
+    if (sMap[cleanTitle] || sMap[cleanId] || sMap[cleanSlug]) {
       resolvedSrc = sMap[cleanTitle] || sMap[cleanId] || sMap[cleanSlug];
+    }
+    // 2. Try Academics-Study verified endpoints
+    else if (ACADEMICS_MAP[cleanTitle] || ACADEMICS_MAP[cleanId] || ACADEMICS_MAP[cleanSlug]) {
+      resolvedSrc = ACADEMICS_MAP[cleanTitle] || ACADEMICS_MAP[cleanId] || ACADEMICS_MAP[cleanSlug];
     }
     // 4. Try gameinclassroom verified endpoints (580 repos)
     else if (gicMap[cleanTitle] || gicMap[cleanId] || gicMap[cleanSlug]) {
@@ -454,7 +455,7 @@ export function resolveGameSource(
     else {
       const cleanMirror = mirrors.find(m => 
         (m.includes('7zeb.github.io') || 
-         m.includes('gameinclassroom.github.io') ||
+         
          m.includes('academics-study.github.io') || 
          m.includes('javaspence.github.io') || 
          m.includes('henshmi.github.io') || 
@@ -474,6 +475,7 @@ export function resolveGameSource(
     ...mirrors.filter(m => m !== resolvedSrc && 
       !m.includes('blobby-boi') && 
       !m.includes('gamedistribution.com') &&
+      !m.includes('gameinclassroom') &&
       m !== 'games/paper-io-2/index.html' &&
       m !== 'games/retro-bowl/index.html'
     )
