@@ -211,7 +211,14 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setCurrentTrackIndex(foundIdx);
     }
 
-    const primaryUrl = resolveAssetUrl(target.audioSrc);
+    const isRemoteUrl = target.audioSrc.startsWith('http://') || target.audioSrc.startsWith('https://');
+    const isStaticHost = typeof window !== 'undefined' && 
+      (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:');
+
+    // 1. On fullstack server, route remote full MP3s through /api/music/proxy to bypass school filters and provide instant byte-range streaming
+    const preferredUrl = !isStaticHost && isRemoteUrl
+      ? `/api/music/proxy?url=${encodeURIComponent(target.audioSrc)}`
+      : resolveAssetUrl(target.audioSrc);
 
     const tryPlaySource = async (url: string): Promise<boolean> => {
       try {
@@ -235,18 +242,14 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
     };
 
-    // 1. Try target source directly (works for bundled MP3s and direct Apple preview CDN)
-    const okPrimary = await tryPlaySource(primaryUrl);
+    // 1. Try preferred same-origin proxy (exact full-length song, unblocked at school)
+    const okPrimary = await tryPlaySource(preferredUrl);
     if (okPrimary) return;
 
-    // 2. If running on fullstack Express backend (not static GitHub Pages), try /api/music/stream
-    const isStaticHost = typeof window !== "undefined" && 
-      (window.location.hostname.endsWith("github.io") || window.location.protocol === "file:");
-
-    if (!isStaticHost && target.artist && target.title) {
-      const serverStreamUrl = "/api/music/stream?artist=" + encodeURIComponent(target.artist) + "&title=" + encodeURIComponent(target.title);
-      const okServer = await tryPlaySource(serverStreamUrl);
-      if (okServer) return;
+    // 2. Direct fallback to original audioSrc (works on unfiltered connections)
+    if (preferredUrl !== target.audioSrc) {
+      const okDirect = await tryPlaySource(target.audioSrc);
+      if (okDirect) return;
     }
 
     // 3. Fallback to guaranteed bundled local artist MP3
@@ -448,6 +451,23 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             return; // Aborted by user
           }
           console.warn("Audio element error on:", audio.src, audio.error);
+
+          // If a proxied URL failed, try the direct remote URL before reverting to artist fallback
+          if (audio.src.includes('/api/music/proxy?url=')) {
+            try {
+              const urlParam = new URL(audio.src, window.location.origin).searchParams.get('url');
+              if (urlParam) {
+                console.log("Proxy retry with direct remote source:", urlParam);
+                audio.src = urlParam;
+                audio.load();
+                if (isPlaying) {
+                  audio.play().catch(() => {});
+                }
+                return;
+              }
+            } catch (e) {}
+          }
+
           const fallback = getSafeLocalFallback(currentTrack?.artist);
           if (audio.src !== fallback && !audio.src.endsWith(fallback)) {
             console.log("Automatically recovering playback using bundled local fallback:", fallback);

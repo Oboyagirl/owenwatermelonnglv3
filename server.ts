@@ -498,13 +498,60 @@ Your job:
   // Dynamic Real MP3 Resolution & Streaming for all album songs
   const musicPreviewCache = new Map<string, string>();
 
-  app.get('/api/music/stream', async (req, res) => {
+  // Dedicated Real MP3 Streaming & School-Unblocked Audio Proxy
+  app.get(['/api/music/proxy', '/api/music/stream'], async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Accept-Ranges', 'bytes');
 
+    const remoteUrl = String(req.query.url || '');
     const artist = String(req.query.artist || '');
     const title = String(req.query.title || '');
     const local = String(req.query.local || '');
+
+    // 1. Direct proxy for full-length MP3 URLs (archive.org, etc.) - Bypasses all school web filters
+    if (remoteUrl && (remoteUrl.startsWith('http://') || remoteUrl.startsWith('https://'))) {
+      try {
+        const clientRange = req.headers.range;
+        const fetchHeaders: Record<string, string> = {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        };
+        if (clientRange) {
+          fetchHeaders['Range'] = clientRange;
+        }
+
+        const remoteRes = await fetch(remoteUrl, { 
+          headers: fetchHeaders,
+          redirect: 'follow'
+        });
+
+        res.status(remoteRes.status);
+        res.setHeader('Content-Type', remoteRes.headers.get('content-type') || 'audio/mpeg');
+        if (remoteRes.headers.get('content-length')) {
+          res.setHeader('Content-Length', remoteRes.headers.get('content-length')!);
+        }
+        if (remoteRes.headers.get('content-range')) {
+          res.setHeader('Content-Range', remoteRes.headers.get('content-range')!);
+        }
+        res.setHeader('Accept-Ranges', 'bytes');
+        res.setHeader('Cache-Control', 'public, max-age=86400');
+
+        if (remoteRes.body) {
+          const reader = remoteRes.body.getReader();
+          req.on('close', () => {
+            reader.cancel().catch(() => {});
+          });
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            res.write(Buffer.from(value));
+          }
+          return res.end();
+        }
+      } catch (proxyErr) {
+        console.warn('Direct MP3 proxy failed for URL:', remoteUrl, proxyErr);
+      }
+    }
 
     if (local) {
       const cleanFilename = path.basename(local);
