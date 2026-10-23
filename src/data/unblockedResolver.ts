@@ -439,10 +439,6 @@ export function resolveGameSource(
     else if (ACADEMICS_MAP[cleanTitle] || ACADEMICS_MAP[cleanId] || ACADEMICS_MAP[cleanSlug]) {
       resolvedSrc = ACADEMICS_MAP[cleanTitle] || ACADEMICS_MAP[cleanId] || ACADEMICS_MAP[cleanSlug];
     }
-    // 4. Try gameinclassroom verified endpoints (580 repos)
-    else if (gicMap[cleanTitle] || gicMap[cleanId] || gicMap[cleanSlug]) {
-      resolvedSrc = gicMap[cleanTitle] || gicMap[cleanId] || gicMap[cleanSlug];
-    }
     // 5. Try freeonlinewebtools verified gamelist
     else if (fMap[cleanTitle] || fMap[cleanId] || fMap[cleanSlug]) {
       resolvedSrc = fMap[cleanTitle] || fMap[cleanId] || fMap[cleanSlug];

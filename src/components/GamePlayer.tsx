@@ -26,7 +26,8 @@ import {
   SkipForward,
   Disc3,
   Volume2,
-  VolumeX
+  VolumeX,
+  Shuffle
 } from 'lucide-react';
 import { Game } from '../types/game';
 import { openAboutBlankGame, resolveAssetUrl } from '../services/gamesStore';
@@ -325,29 +326,26 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
             </button>
           </div>
 
-          {/* 1-Click Quick Save */}
+          {/* Random Game Button */}
           <button
-            onClick={handleQuickSave}
-            disabled={isQuickSaving}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer border shadow-sm"
-            style={{
-              backgroundColor: quickSaved ? 'rgba(16, 185, 129, 0.25)' : activeTheme.accent,
-              borderColor: quickSaved ? '#10b981' : activeTheme.accent,
-              color: quickSaved ? '#34d399' : activeTheme.accentText
+            onClick={() => {
+              if (!allGames || allGames.length <= 1) return;
+              const others = allGames.filter(g => g && g.id && g.id !== game?.id);
+              if (others.length > 0) {
+                const pick = others[Math.floor(Math.random() * others.length)];
+                onSelectGame(pick);
+              }
             }}
-            title="1-Click Quick Save: Snapshot current progress to Slot 1 instantly"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer border shadow-sm hover:scale-105 active:scale-95"
+            style={{
+              backgroundColor: activeTheme.bgCard,
+              borderColor: activeTheme.accent,
+              color: activeTheme.accent
+            }}
+            title="Pick and play a random game"
           >
-            {quickSaved ? (
-              <>
-                <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>Quick Saved!</span>
-              </>
-            ) : (
-              <>
-                <Zap className="w-3.5 h-3.5 shrink-0" />
-                <span>{isQuickSaving ? 'Saving...' : 'Quick Save'}</span>
-              </>
-            )}
+            <Shuffle className="w-3.5 h-3.5" />
+            <span>Random Game</span>
           </button>
 
           <button
@@ -363,132 +361,8 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
             <Cloud className="w-3.5 h-3.5 text-emerald-400" />
             <span>Cloud Saves {gameSaves.length > 0 ? `(${gameSaves.length})` : ''}</span>
           </button>
-
-          <button
-            onClick={() => setShowIframeEditor(!showIframeEditor)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer border"
-            style={{
-              backgroundColor: showIframeEditor ? activeTheme.accent : activeTheme.bgCard,
-              borderColor: showIframeEditor ? activeTheme.accent : activeTheme.border,
-              color: showIframeEditor ? activeTheme.accentText : activeTheme.kicker
-            }}
-            title="Replace game with custom iframe HTML"
-          >
-            <Code className="w-3.5 h-3.5" />
-            <span>{showIframeEditor ? 'Close Iframe Editor' : 'Replace Iframe HTML'}</span>
-          </button>
-
-          <button
-            onClick={() => openAboutBlankGame({
-              ...game,
-              iframeSrc: activeIframeSrc,
-              customHtml: activeCustomHtml
-            })}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer border"
-            style={{
-              backgroundColor: activeTheme.accentBadge,
-              borderColor: activeTheme.border,
-              color: activeTheme.kicker
-            }}
-            title="Open in stealth about:blank window"
-          >
-            <ExternalLink className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
-            <span>Stealth Window</span>
-          </button>
         </div>
       </div>
-
-      {/* Slide-down Iframe HTML Editor / Replacer */}
-      {showIframeEditor && (
-        <div 
-          className="rounded-2xl p-5 shadow-2xl flex flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-200 border"
-          style={{
-            backgroundColor: activeTheme.bgSecondary,
-            borderColor: activeTheme.borderActive
-          }}
-        >
-          <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: activeTheme.border }}>
-            <div className="flex items-center gap-2">
-              <Code className="w-4 h-4" style={{ color: activeTheme.accent }} />
-              <h3 className="text-sm font-bold text-white">Replace Game Iframe HTML</h3>
-              <span className="text-xs text-slate-400">
-                (Paste any working <code>&lt;iframe&gt;</code> embed, raw HTML, or game link)
-              </span>
-            </div>
-            {savedSuccess && (
-              <span className="text-xs font-medium flex items-center gap-1" style={{ color: activeTheme.accent }}>
-                <Check className="w-3.5 h-3.5" /> Saved to your catalog!
-              </span>
-            )}
-          </div>
-
-          <textarea
-            value={iframeHtmlInput}
-            onChange={(e) => setIframeHtmlInput(e.target.value)}
-            rows={4}
-            className="w-full px-3 py-2.5 rounded-xl text-xs font-mono focus:outline-none resize-y border"
-            style={{
-              backgroundColor: activeTheme.bgPrimary,
-              borderColor: activeTheme.border,
-              color: activeTheme.kicker
-            }}
-            placeholder={`<iframe src="https://..." width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; gamepad; pointer-lock" allowfullscreen></iframe>`}
-          />
-
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => handleApplyIframeHtml(false)}
-                className="px-4 py-2 font-bold text-xs rounded-lg transition-colors cursor-pointer shadow-md"
-                style={{
-                  backgroundColor: activeTheme.accent,
-                  color: activeTheme.accentText
-                }}
-              >
-                Apply & Test Now
-              </button>
-              {onUpdateGame && (
-                <button
-                  onClick={() => handleApplyIframeHtml(true)}
-                  className="px-3.5 py-2 font-semibold text-xs rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 border"
-                  style={{
-                    backgroundColor: activeTheme.bgCard,
-                    borderColor: activeTheme.border,
-                    color: activeTheme.kicker
-                  }}
-                >
-                  <Save className="w-3.5 h-3.5" />
-                  <span>Save Permanently</span>
-                </button>
-              )}
-              <button
-                onClick={handleResetIframe}
-                className="px-3 py-2 hover:text-white text-xs rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 border"
-                style={{
-                  backgroundColor: activeTheme.bgCard,
-                  borderColor: activeTheme.border,
-                  color: '#94a3b8'
-                }}
-              >
-                <Undo2 className="w-3.5 h-3.5" />
-                <span>Reset Default</span>
-              </button>
-            </div>
-
-            <button
-              onClick={handleCopyEmbed}
-              className="flex items-center gap-1.5 px-3 py-2 text-slate-300 text-xs font-medium rounded-lg border transition-colors cursor-pointer"
-              style={{
-                backgroundColor: activeTheme.bgPrimary,
-                borderColor: activeTheme.border
-              }}
-            >
-              {copied ? <Check className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Copied HTML!' : 'Copy Current HTML'}</span>
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Main Game Player Frame Container */}
       <div 
@@ -522,26 +396,6 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
           </div>
 
           <div className="flex items-center gap-1 sm:gap-2">
-            {!isLocalGame && (
-              <button
-                onClick={() => {
-                  setUseSecurlyProxy(!useSecurlyProxy);
-                  setKeyCounter(prev => prev + 1);
-                }}
-                className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer border"
-                style={{
-                  backgroundColor: useSecurlyProxy ? activeTheme.accent : activeTheme.bgCard,
-                  borderColor: useSecurlyProxy ? activeTheme.accent : activeTheme.border,
-                  color: useSecurlyProxy ? activeTheme.accentText : activeTheme.kicker
-                }}
-                title="Toggle Securly Unblock Engine to route game same-origin"
-              >
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{useSecurlyProxy ? 'Securly Bypass: ON' : '⚡ Unblock Proxy'}</span>
-                <span className="sm:hidden">{useSecurlyProxy ? 'ON' : 'Unblock'}</span>
-              </button>
-            )}
-
             {mirrorsList.length > 1 && (
               <button
                 onClick={handleNextMirror}
@@ -558,17 +412,6 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
               </button>
             )}
 
-            <button
-              onClick={() => setShowIframeEditor(!showIframeEditor)}
-              className="p-2 rounded-lg transition-colors cursor-pointer"
-              style={{
-                color: showIframeEditor ? activeTheme.accent : '#94a3b8',
-                backgroundColor: showIframeEditor ? activeTheme.accentBadge : undefined
-              }}
-              title="Replace or Edit Iframe HTML"
-            >
-              <Code className="w-4 h-4" />
-            </button>
 
             {/* 1-Click Quick Save Button */}
             <button
