@@ -374,7 +374,13 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
                   className="group flex flex-col rounded-xl overflow-hidden bg-white/5 border border-white/5 hover:border-emerald-400/50 transition-all cursor-pointer p-2.5 gap-2 hover:-translate-y-1"
                 >
                   <div className="aspect-video rounded-lg overflow-hidden bg-slate-900 relative">
-                    <img src={g.thumbnail} alt={g.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                    <img 
+                      src={g.thumbnail} 
+                      alt={g.title} 
+                      loading="eager"
+                      decoding="async"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform" 
+                    />
                     <div className="absolute inset-0 bg-emerald-500/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <Play className="w-5 h-5 text-white fill-white" />
                     </div>

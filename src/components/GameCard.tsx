@@ -4,12 +4,37 @@ import { Game } from '../types/game';
 import { resolveAssetUrl } from '../services/gamesStore';
 import { ThemeConfig, THEMES } from '../services/themeStore';
 
+// In-memory session cache so loaded images render instantly with 0ms transition on filter/tab switch
+const LOADED_IMAGE_CACHE = new Set<string>();
+
+const CATEGORY_META: Record<string, { gradient: string; emoji: string }> = {
+  'sports': { gradient: 'from-emerald-950 via-teal-950 to-slate-950', emoji: '⚽' },
+  'arcade': { gradient: 'from-cyan-950 via-blue-950 to-slate-950', emoji: '🕹️' },
+  'action': { gradient: 'from-rose-950 via-red-950 to-slate-950', emoji: '💥' },
+  'racing': { gradient: 'from-amber-950 via-orange-950 to-slate-950', emoji: '🏎️' },
+  'puzzle': { gradient: 'from-purple-950 via-indigo-950 to-slate-950', emoji: '🧩' },
+  'multiplayer': { gradient: 'from-blue-950 via-indigo-950 to-slate-950', emoji: '👥' },
+  '2 player games': { gradient: 'from-sky-950 via-indigo-950 to-slate-950', emoji: '⚔️' },
+  'casual': { gradient: 'from-teal-950 via-slate-900 to-slate-950', emoji: '🎯' },
+  'horror': { gradient: 'from-neutral-950 via-red-950 to-slate-950', emoji: '👻' },
+  'retro': { gradient: 'from-fuchsia-950 via-purple-950 to-slate-950', emoji: '👾' },
+  'cooking sim': { gradient: 'from-amber-950 via-yellow-950 to-slate-950', emoji: '🍕' },
+  'strongdog xp': { gradient: 'from-amber-950 via-orange-950 to-slate-950', emoji: '🐕' },
+  'potato classics': { gradient: 'from-amber-950 via-yellow-950 to-slate-950', emoji: '🥔' }
+};
+
+function getGamePlaceholder(category?: string) {
+  const c = (category || '').toLowerCase();
+  return CATEGORY_META[c] || { gradient: 'from-slate-900 via-slate-950 to-black', emoji: '🎮' };
+}
+
 interface GameCardProps {
   game: Game;
   isFavorite: boolean;
   onToggleFavorite: (id: string) => void;
   onPlay: (game: Game) => void;
   activeTheme?: ThemeConfig;
+  priority?: boolean;
 }
 
 export const GameCard: React.FC<GameCardProps> = ({
@@ -17,16 +42,17 @@ export const GameCard: React.FC<GameCardProps> = ({
   isFavorite,
   onToggleFavorite,
   onPlay,
-  activeTheme = THEMES.original
+  activeTheme = THEMES.original,
+  priority = false
 }) => {
+  const resolvedThumb = game.thumbnail ? resolveAssetUrl(game.thumbnail) : '';
+  const isPrecached = Boolean(resolvedThumb && LOADED_IMAGE_CACHE.has(resolvedThumb));
+
   const [imgError, setImgError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(isPrecached);
   const [isHovered, setIsHovered] = useState(false);
 
-  const fallbackThumbnail = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240"><rect width="400" height="240" fill="%230c141f"/><circle cx="200" cy="120" r="45" fill="%231a2638"/><text x="200" y="130" font-size="34" font-family="sans-serif" text-anchor="middle" fill="%2338bdf8">🎮</text></svg>`;
-
-  const resolvedThumb = imgError || !game.thumbnail
-    ? fallbackThumbnail
-    : resolveAssetUrl(game.thumbnail);
+  const placeholder = getGamePlaceholder(game.category);
 
   return (
     <div
@@ -45,14 +71,49 @@ export const GameCard: React.FC<GameCardProps> = ({
         className="relative aspect-[16/10] w-full overflow-hidden"
         style={{ backgroundColor: activeTheme.bgPrimary }}
       >
-        <img
-          src={resolvedThumb}
-          alt={game.title}
-          onError={() => setImgError(true)}
-          referrerPolicy="no-referrer"
-          loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-        />
+        {/* Instant 0ms Visual Backdrop - Always visible immediately */}
+        <div 
+          className={`absolute inset-0 bg-gradient-to-br ${placeholder.gradient} flex flex-col items-center justify-center p-3 select-none transition-opacity duration-300 ${
+            isLoaded && !imgError ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          }`}
+        >
+          <div className="w-11 h-11 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl shadow-inner mb-1.5 backdrop-blur-xs">
+            {placeholder.emoji}
+          </div>
+          <span className="text-[11px] font-bold text-white/90 text-center line-clamp-1 max-w-[90%]">
+            {game.title}
+          </span>
+          {/* Subtle animated loading shimmer before network bytes land */}
+          {!imgError && !isLoaded && (
+            <div className="absolute inset-x-0 bottom-0 h-0.5 bg-white/10 overflow-hidden">
+              <div className="w-1/2 h-full bg-cyan-400/60 animate-pulse" />
+            </div>
+          )}
+        </div>
+
+        {/* Real Thumbnail Image with high-priority streaming & instant cache */}
+        {!imgError && resolvedThumb && (
+          <img
+            src={resolvedThumb}
+            alt={game.title}
+            onLoad={() => {
+              LOADED_IMAGE_CACHE.add(resolvedThumb);
+              setIsLoaded(true);
+            }}
+            onError={() => {
+              setImgError(true);
+              setIsLoaded(false);
+            }}
+            referrerPolicy="no-referrer"
+            loading={priority ? 'eager' : 'lazy'}
+            decoding="async"
+            // @ts-expect-error fetchPriority is a valid standard modern attribute
+            fetchpriority={priority ? 'high' : 'auto'}
+            className={`w-full h-full object-cover transition-all duration-300 group-hover:scale-105 ${
+              isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+            }`}
+          />
+        )}
 
         {/* Favorite Toggle Button */}
         <button
@@ -88,7 +149,7 @@ export const GameCard: React.FC<GameCardProps> = ({
       {/* Card Body */}
       <div className="p-3 flex flex-col flex-1 justify-between gap-2">
         <div className="flex flex-col gap-1">
-          {/* Quiet Category Kicker */}
+          {/* Category & Rating */}
           <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase tracking-wider">
             <span className="truncate">{game.category}</span>
             {game.rating && (
@@ -109,7 +170,7 @@ export const GameCard: React.FC<GameCardProps> = ({
             {game.title}
           </h3>
 
-          {/* Clean 1-Line Description */}
+          {/* Description */}
           {game.description && (
             <p className="text-[11px] text-slate-400 line-clamp-1 leading-normal">
               {game.description}

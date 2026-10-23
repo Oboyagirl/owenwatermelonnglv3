@@ -8,8 +8,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "category": "Racing",
     "secondaryCategory": "Potato Classics",
     "description": "Play Subway Surfers unblocked on Owen Watermelon V3! Fully playable, filter-free browser game directly from the TrippleThePotatoes collection.",
-    "thumbnail": "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Subway-Surfers/thumb.png",
-    "banner": "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Subway-Surfers/thumb.png",
+    "thumbnail": "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Subway-Surfers/Subway-Surfers.png",
+    "banner": "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Subway-Surfers/Subway-Surfers.png",
     "tags": [
       "Racing",
       "Potato Classics",

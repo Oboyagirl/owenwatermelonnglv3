@@ -706,7 +706,7 @@ export default function App() {
 
             {/* Games Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-5">
-              {filteredGames.slice(0, visibleCount).map(game => (
+              {filteredGames.slice(0, visibleCount).map((game, index) => (
                 <GameCard
                   key={game.id}
                   game={game}
@@ -714,6 +714,7 @@ export default function App() {
                   onToggleFavorite={toggleFavorite}
                   isFavorite={favorites.includes(game.id)}
                   activeTheme={activeTheme}
+                  priority={index < 24}
                 />
               ))}
             </div>

@@ -88,7 +88,7 @@ const CURATED_GAMES: Game[] = [
     title: "Soccer 2026",
     description: "Lead your national team onto the pitch, pass, tackle, and strike spectacular goals in this full 3D tournament soccer game.",
     category: "Sports",
-    thumbnail: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600&auto=format&fit=crop&q=80",
+    thumbnail: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&auto=format&fit=crop&q=80",
     banner: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&auto=format&fit=crop&q=80",
     mirrors: [
       "games/soccer-2026.html"
@@ -112,7 +112,7 @@ const CURATED_GAMES: Game[] = [
     title: "Soccer REAL",
     description: "Realistic 3D soccer simulation featuring agile dribbling, precision penalty kicks, and dynamic stadium action powered by Three.js.",
     category: "Sports",
-    thumbnail: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&auto=format&fit=crop&q=80",
+    thumbnail: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600&auto=format&fit=crop&q=80",
     banner: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=1200&auto=format&fit=crop&q=80",
     mirrors: [
       "games/soccer-real.html"
@@ -136,7 +136,7 @@ const CURATED_GAMES: Game[] = [
     title: "Classic 8-Ball Pool",
     description: "Line up your cue stick, control English spin, and sink solids or stripes in this authentic billiards simulator.",
     category: "Sports",
-    thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Pool-Ball/logo.png",
+    thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/8-Ball-Pool/8-ball-pool.png",
     mirrors: [
       "https://henshmi.github.io/Classic-8-Ball-Pool/dist/"
     ],
@@ -435,8 +435,8 @@ const CURATED_GAMES: Game[] = [
     title: "Cookie Clicker",
     description: "Bake billions of cookies! Hire grandmas, construct factories, open portals, and ascend to cookie godhood in the classic incremental clicker.",
     category: "Casual",
-    thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Cookie-Clicker/cookie.png",
-    banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Cookie-Clicker/cookie.png",
+    thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Cookie-Clicker/img/perfectCookie.png",
+    banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Cookie-Clicker/img/perfectCookie.png",
     mirrors: [
         "https://7zeb.github.io/homework/cookieclicker.html"
       ],
@@ -457,7 +457,7 @@ const CURATED_GAMES: Game[] = [
     title: "Subway Surfers",
     description: "Dash as fast as you can through subway tracks, dodge trains, jump over barriers, and surf on hoverboards in the world-famous endless runner!",
     category: "Racing",
-    thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Subway-Surfers/thumb.png",
+    thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Subway-Surfers/Subway-Surfers.png",
     mirrors: [
         "https://7zeb.github.io/homework/subway-surfers/index.html"
       ],
@@ -479,8 +479,8 @@ const CURATED_GAMES: Game[] = [
     title: "Monkey Mart",
     description: "Manage your very own supermarket! Plant bananas, stock shelves, serve monkey customers, hire staff, and grow your supermarket empire.",
     category: "Casual",
-    thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Monkey-Mart/logo.png",
-    banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Monkey-Mart/logo.png",
+    thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Monkey-Mart/assets/images/monkeymart.png",
+    banner: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Monkey-Mart/assets/images/monkeymart.png",
     mirrors: [
         "https://7zeb.github.io/homework/monkey-mart/index.html"
       ],
@@ -546,7 +546,7 @@ const CURATED_GAMES: Game[] = [
     title: "Basketball Stars",
     description: "Play 1v1 or 2v2 basketball tournaments with legendary bobblehead players. Perform epic dunks, steal the ball, and shoot three-pointers!",
     category: "Sports",
-    thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Basketball-Stars/assets/images/basketball-stars.png",
+    thumbnail: "https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Basketball-Stars/basketball-stars.png",
     mirrors: [
       "https://joe-the-chicken.github.io/basketball-stars/",
       "https://7zeb.github.io/homework/basketballstars.html"
