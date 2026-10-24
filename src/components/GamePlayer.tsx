@@ -27,7 +27,8 @@ import {
   Disc3,
   Volume2,
   VolumeX,
-  Shuffle
+  Shuffle,
+  Mic2
 } from 'lucide-react';
 import { Game } from '../types/game';
 import { openAboutBlankGame, resolveAssetUrl } from '../services/gamesStore';
@@ -36,6 +37,7 @@ import { CloudSaveModal } from './CloudSaveModal';
 import { useAuth } from '../context/AuthContext';
 import { useMusic } from '../context/MusicContext';
 import { captureUniversalGameState, captureBrowserGameState } from '../services/cloudSaveService';
+import { SyncedLyricsView } from './SyncedLyricsView';
 
 interface GamePlayerProps {
   game: Game;
@@ -95,6 +97,7 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
   const defaultIframeCode = game?.iframeCode || `<iframe class="game-iframe" id="game-area" title="${safeTitle}" src="${safeSrc}" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`;
   const [showIframeEditor, setShowIframeEditor] = useState(false);
   const [showCloudSaveModal, setShowCloudSaveModal] = useState(false);
+  const [showLyrics, setShowLyrics] = useState(false);
   const [isQuickSaving, setIsQuickSaving] = useState(false);
   const [quickSaved, setQuickSaved] = useState(false);
   const { user, profile, deviceLabel, saveCurrentGame, getSavesForGame } = useAuth();
@@ -465,6 +468,16 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
             >
               <Disc3 className={`w-3.5 h-3.5 ${isPlaying ? 'animate-spin' : ''}`} style={{ color: activeTheme.accent }} />
               <span className="hidden sm:inline">{isPlaying ? 'Music: ON' : '🎵 Music'}</span>
+            </button>
+
+            {/* In-Game Lyrics Button */}
+            <button
+              onClick={() => setShowLyrics(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer border bg-white/5 hover:bg-white/10 text-sky-400 border-sky-400/30"
+              title="Open Apple Music-style synchronized lyrics"
+            >
+              <Mic2 className="w-3.5 h-3.5 text-sky-400" />
+              <span className="hidden sm:inline">Lyrics</span>
             </button>
 
             <button
@@ -846,6 +859,14 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
         theme={activeTheme}
         contentWindow={iframeRef.current?.contentWindow || null}
       />
+
+      {/* Apple Music-Style Synced Lyrics Full-Screen Overlay */}
+      {showLyrics && (
+        <SyncedLyricsView 
+          onClose={() => setShowLyrics(false)} 
+          activeTheme={activeTheme} 
+        />
+      )}
     </div>
   );
 };

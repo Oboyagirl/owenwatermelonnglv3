@@ -14,11 +14,13 @@ import {
   Maximize2,
   ExternalLink,
   Shuffle,
-  Repeat
+  Repeat,
+  Mic2
 } from 'lucide-react';
 import { useMusic } from '../context/MusicContext';
 import { ThemeConfig } from '../services/themeStore';
 import { resolveAssetUrl } from '../utils/assetUrl';
+import { SyncedLyricsView } from './SyncedLyricsView';
 
 interface FloatingMusicPlayerProps {
   activeTheme?: ThemeConfig;
@@ -58,6 +60,7 @@ export const FloatingMusicPlayer: React.FC<FloatingMusicPlayerProps> = ({
   } = useMusic();
 
   const [position, setPosition] = useState<'right' | 'left'>('right');
+  const [showLyrics, setShowLyrics] = useState(false);
 
   // Hide floating player if user is actively in full Music Studio view
   if (activeSpace === 'music' || !isMiniPlayerOpen || !currentTrack) {
@@ -190,6 +193,15 @@ export const FloatingMusicPlayer: React.FC<FloatingMusicPlayerProps> = ({
                 title={`Move player to ${position === 'right' ? 'left' : 'right'}`}
               >
                 {position === 'right' ? '← Left' : 'Right →'}
+              </button>
+              {/* Synced Lyrics Button */}
+              <button
+                onClick={() => setShowLyrics(true)}
+                className="p-1.5 rounded-lg text-sky-400 hover:text-white hover:bg-sky-500/20 transition-colors flex items-center gap-1 cursor-pointer"
+                title="Open Apple Music-style kinetic synchronized lyrics"
+              >
+                <Mic2 className="w-3.5 h-3.5" />
+                <span className="text-[10px] font-bold hidden sm:inline">Lyrics</span>
               </button>
               {/* Open full studio */}
               <button
@@ -382,6 +394,14 @@ export const FloatingMusicPlayer: React.FC<FloatingMusicPlayerProps> = ({
             </button>
           </div>
         </div>
+      )}
+
+      {/* Full Apple Music-style Synced Lyrics Modal */}
+      {showLyrics && (
+        <SyncedLyricsView 
+          onClose={() => setShowLyrics(false)} 
+          activeTheme={activeTheme} 
+        />
       )}
     </div>
   );

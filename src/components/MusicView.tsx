@@ -20,12 +20,14 @@ import {
   Sparkles,
   Album as AlbumIcon,
   Layers,
-  ArrowRight
+  ArrowRight,
+  Mic2
 } from 'lucide-react';
 import { POPULAR_ARTISTS, POPULAR_ALBUMS, MusicTrack, MusicAlbum } from '../data/musicData';
 import { ThemeConfig } from '../services/themeStore';
 import { resolveAssetUrl } from '../utils/assetUrl';
 import { useMusic, CustomTrack } from '../context/MusicContext';
+import { SyncedLyricsView } from './SyncedLyricsView';
 
 interface MusicViewProps {
   activeTheme?: ThemeConfig;
@@ -67,6 +69,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
   const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
   const [playerMode, setPlayerMode] = useState<'stream' | 'spotify' | 'youtube'>('stream');
   const [showSpotifyAlbumEmbed, setShowSpotifyAlbumEmbed] = useState<boolean>(false);
+  const [showLyrics, setShowLyrics] = useState<boolean>(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -402,8 +405,16 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                 </div>
               </div>
 
-              {/* Mode Badges */}
+              {/* Mode Badges & Lyrics Toggle */}
               <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/5">
+                <button
+                  onClick={() => setShowLyrics(true)}
+                  className="px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 bg-gradient-to-r from-sky-500/20 to-indigo-500/20 hover:from-sky-500/30 hover:to-indigo-500/30 text-sky-300 border border-sky-400/30 shadow-sm hover:scale-105"
+                  title="Open Apple Music-style kinetic synchronized lyrics"
+                >
+                  <Mic2 className="w-3.5 h-3.5 text-sky-400 animate-pulse" />
+                  <span>Lyrics</span>
+                </button>
                 <button
                   onClick={() => setPlayerMode('stream')}
                   className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
@@ -552,6 +563,16 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                       title="Loop track"
                     >
                       <Repeat className="w-4 h-4" />
+                    </button>
+
+                    {/* Lyrics Button */}
+                    <button
+                      onClick={() => setShowLyrics(true)}
+                      className="px-3 py-2 rounded-xl border transition-all cursor-pointer bg-white/5 hover:bg-white/10 border-white/10 text-slate-300 hover:text-white flex items-center gap-1.5 shadow-sm"
+                      title="Open Apple Music-style kinetic synchronized lyrics"
+                    >
+                      <Mic2 className="w-3.5 h-3.5 text-sky-400" />
+                      <span className="text-xs font-bold">Lyrics</span>
                     </button>
                   </div>
 
@@ -1024,6 +1045,14 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
         )}
 
       </div>
+
+      {/* Apple Music-Style Synced Lyrics Full-Screen Overlay */}
+      {showLyrics && (
+        <SyncedLyricsView 
+          onClose={() => setShowLyrics(false)} 
+          activeTheme={activeTheme} 
+        />
+      )}
     </div>
   );
 };

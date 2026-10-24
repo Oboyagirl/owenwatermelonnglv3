@@ -4,6 +4,7 @@ import path from 'path';
 import https from 'https';
 import http from 'http';
 import fs from 'fs';
+import { Readable } from 'node:stream';
 import { GoogleGenAI } from '@google/genai';
 
 async function startServer() {
@@ -504,8 +505,6 @@ Your job:
     res.setHeader('Accept-Ranges', 'bytes');
 
     const remoteUrl = String(req.query.url || '');
-    const artist = String(req.query.artist || '');
-    const title = String(req.query.title || '');
     const local = String(req.query.local || '');
 
     // 1. Direct proxy for full-length MP3 URLs (archive.org, etc.) - Bypasses all school web filters
@@ -513,7 +512,8 @@ Your job:
       try {
         const clientRange = req.headers.range;
         const fetchHeaders: Record<string, string> = {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'Accept': '*/*'
         };
         if (clientRange) {
           fetchHeaders['Range'] = clientRange;
@@ -524,8 +524,22 @@ Your job:
           redirect: 'follow'
         });
 
+        if (!remoteRes.ok && remoteRes.status !== 206) {
+          return res.status(remoteRes.status).send('Remote audio not available: ' + remoteRes.statusText);
+        }
+
         res.status(remoteRes.status);
-        res.setHeader('Content-Type', remoteRes.headers.get('content-type') || 'audio/mpeg');
+        
+        let contentType = remoteRes.headers.get('content-type') || '';
+        if (!contentType || contentType.includes('text') || contentType.includes('html')) {
+          if (remoteUrl.endsWith('.m4a') || remoteUrl.endsWith('.mp4')) {
+            contentType = 'audio/mp4';
+          } else {
+            contentType = 'audio/mpeg';
+          }
+        }
+        res.setHeader('Content-Type', contentType);
+
         if (remoteRes.headers.get('content-length')) {
           res.setHeader('Content-Length', remoteRes.headers.get('content-length')!);
         }
@@ -534,22 +548,22 @@ Your job:
         }
         res.setHeader('Accept-Ranges', 'bytes');
         res.setHeader('Cache-Control', 'public, max-age=86400');
+        res.flushHeaders?.();
 
         if (remoteRes.body) {
-          const reader = remoteRes.body.getReader();
+          const nodeStream = Readable.fromWeb(remoteRes.body as any);
           req.on('close', () => {
-            reader.cancel().catch(() => {});
+            nodeStream.destroy();
           });
-
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            res.write(Buffer.from(value));
-          }
-          return res.end();
+          nodeStream.pipe(res);
+          return;
         }
       } catch (proxyErr) {
         console.warn('Direct MP3 proxy failed for URL:', remoteUrl, proxyErr);
+        if (!res.headersSent) {
+          return res.status(502).send('Proxy error streaming remote track');
+        }
+        return;
       }
     }
 
@@ -561,64 +575,7 @@ Your job:
       }
     }
 
-    // Try finding exact song match in local downloaded library
-    const titleClean = (title || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-    const artistClean = (artist || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-    if (fs.existsSync(primaryMusicDir) && titleClean.length >= 3) {
-      const files = fs.readdirSync(primaryMusicDir).filter(f => f.endsWith('.mp3'));
-      const directMatch = files.find(f => {
-        const fClean = f.toLowerCase().replace(/[^a-z0-9]/g, '');
-        return fClean.includes(titleClean) && (artistClean.length < 3 || fClean.includes(artistClean.slice(0, 4)));
-      });
-      if (directMatch) {
-        return streamAudioFile(directMatch, req, res);
-      }
-    }
-
-    if (!artist && !title) {
-      return streamAudioFile('tyler_see_you_again.mp3', req, res);
-    }
-
-    const cacheKey = `${artist}::${title}`.toLowerCase();
-    if (musicPreviewCache.has(cacheKey)) {
-      return res.redirect(musicPreviewCache.get(cacheKey)!);
-    }
-
-    try {
-      const cleanTitle = title.replace(/\([^)]*\)/g, '').replace(/feat\.[^)]+/gi, '').trim();
-      const q = encodeURIComponent(`${artist} ${cleanTitle}`);
-      const deezerRes = await fetch(`https://api.deezer.com/search?q=${q}&limit=5`);
-      const data = await deezerRes.json() as any;
-      const hit = data.data && data.data[0];
-      if (hit && hit.preview) {
-        musicPreviewCache.set(cacheKey, hit.preview);
-        return res.redirect(hit.preview);
-      }
-    } catch (e) {
-      console.warn('Real MP3 stream lookup failed for', artist, title, e);
-    }
-
-    // Dynamic distinct track selection for artist so songs in the same album never play the same song
-    const artistFiles = fs.existsSync(primaryMusicDir)
-      ? fs.readdirSync(primaryMusicDir).filter(f => {
-          const lower = f.toLowerCase();
-          const p = artistClean.slice(0, 4);
-          return p ? lower.includes(p) : false;
-        })
-      : [];
-
-    if (artistFiles.length > 0) {
-      // Hash title string to get deterministic distinct track for this song
-      let hash = 0;
-      for (let i = 0; i < title.length; i++) {
-        hash = (hash << 5) - hash + title.charCodeAt(i);
-        hash |= 0;
-      }
-      const pick = artistFiles[Math.abs(hash) % artistFiles.length];
-      return streamAudioFile(pick, req, res);
-    }
-
-    return streamAudioFile('tyler_see_you_again.mp3', req, res);
+    res.status(404).send('Audio track not found');
   });
 
   app.get('/music/:filename', (req, res) => {
@@ -627,6 +584,39 @@ Your job:
 
   app.get('/api/music/:filename', (req, res) => {
     streamAudioFile(req.params.filename, req, res);
+  });
+
+  // High-Accuracy LRCLIB Synced Lyrics Proxy (School-unblocked)
+  const lyricsCache = new Map<string, any>();
+  app.get('/api/music/lyrics', async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    const artist = String(req.query.artist || '').trim();
+    const title = String(req.query.title || '').trim();
+
+    if (!artist || !title) {
+      return res.status(400).json({ error: 'artist and title query parameters are required' });
+    }
+
+    const cacheKey = `${artist}::${title}`.toLowerCase();
+    if (lyricsCache.has(cacheKey)) {
+      return res.json(lyricsCache.get(cacheKey));
+    }
+
+    try {
+      const cleanTitle = title.replace(/\([^)]*\)/g, '').replace(/feat\.[^)]+/gi, '').trim();
+      const lrclibUrl = `https://lrclib.net/api/get?artist_name=${encodeURIComponent(artist)}&track_name=${encodeURIComponent(cleanTitle)}`;
+      const remoteRes = await fetch(lrclibUrl, {
+        headers: { 'User-Agent': 'OwenWatermelonV3/1.0 (https://ais-dev)' }
+      });
+      if (remoteRes.ok) {
+        const data = await remoteRes.json();
+        lyricsCache.set(cacheKey, data);
+        return res.json(data);
+      }
+      return res.status(404).json({ error: 'Lyrics not found' });
+    } catch (e: any) {
+      return res.status(500).json({ error: e.message });
+    }
   });
 
   app.use('/music', (req, res, next) => {
