@@ -133,43 +133,12 @@ export const ProxyView: React.FC<ProxyViewProps> = ({ initialUrl, onOpenInTab, a
   const containerRef = useRef<HTMLDivElement>(null);
   const omnibarRef = useRef<HTMLDivElement>(null);
 
-  // Background ping to check if local Node.js /api/proxy backend is reachable
+  // Ensure local Node.js /api/proxy backend is always active
   useEffect(() => {
-    let isMounted = true;
-    const testServer = async () => {
-      try {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 2000);
-        const res = await fetch('/api/proxy?url=https%3A%2F%2Fexample.com', {
-          method: 'HEAD',
-          signal: controller.signal
-        });
-        clearTimeout(timer);
-        if (isMounted) {
-          if (res.ok) {
-            setHasServerProxy(true);
-            setProxyEngine('server');
-          } else {
-            setHasServerProxy(false);
-            setProxyEngine('search');
-          }
-        }
-      } catch {
-        if (isMounted) {
-          setHasServerProxy(false);
-          setProxyEngine('search');
-        }
-      }
-    };
-
     if (!isGithubPages) {
-      testServer();
-    } else {
-      setHasServerProxy(false);
-      setProxyEngine('search');
+      setHasServerProxy(true);
+      setProxyEngine('server');
     }
-
-    return () => { isMounted = false; };
   }, [isGithubPages]);
 
   // Synchronize initialUrl if passed from outside
@@ -355,14 +324,11 @@ export const ProxyView: React.FC<ProxyViewProps> = ({ initialUrl, onOpenInTab, a
       if (customServerUrl) {
         return `${customServerUrl}/api/proxy?url=${encodeURIComponent(formatted)}`;
       }
-      if (hasServerProxy) {
-        return `/api/proxy?url=${encodeURIComponent(formatted)}`;
-      }
-      return formatted;
+      return `/api/proxy?url=${encodeURIComponent(formatted)}`;
     }
 
     // For 'unblocker' or 'search' fallback, return formatted
-    return formatted;
+    return `/api/proxy?url=${encodeURIComponent(formatted)}`;
   };
 
   const navigateTo = (url: string, engineOverride?: ProxyEngine) => {

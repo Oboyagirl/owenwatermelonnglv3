@@ -12,14 +12,13 @@ import {
   Star, 
   ChevronRight,
   Palette,
-  Cloud,
-  Film
+  Cloud
 } from 'lucide-react';
 import { Game } from '../types/game';
 import { ThemeConfig } from '../services/themeStore';
 
 interface HomeDashboardProps {
-  onNavigateTab: (tab: 'home' | 'games' | 'proxy' | 'movies' | 'apps' | 'music' | 'tools' | 'saved') => void;
+  onNavigateTab: (tab: 'home' | 'games' | 'proxy' | 'apps' | 'music' | 'tools' | 'saved') => void;
   onSelectGame: (game: Game) => void;
   featuredGames: Game[];
   trendingGames: Game[];
@@ -243,21 +242,6 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             </div>
             <span className="text-xs md:text-sm font-bold text-white group-hover:text-rose-300">Music</span>
             <span className="text-[10px] text-slate-400">Real MP3 Studio</span>
-          </button>
-
-          <button
-            onClick={() => onNavigateTab('movies')}
-            className="group p-4 md:p-5 rounded-2xl border transition-all duration-300 flex flex-col items-center text-center gap-2.5 cursor-pointer shadow-lg hover:-translate-y-1"
-            style={{
-              backgroundColor: cardBg,
-              borderColor: border
-            }}
-          >
-            <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-              🎬
-            </div>
-            <span className="text-xs md:text-sm font-bold text-white group-hover:text-cyan-300">Movies & TV</span>
-            <span className="text-[10px] text-slate-400">Movy.sx & 4K Stream</span>
           </button>
 
           <button

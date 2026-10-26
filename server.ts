@@ -4,6 +4,7 @@ import path from 'path';
 import https from 'https';
 import http from 'http';
 import fs from 'fs';
+import zlib from 'zlib';
 import { Readable } from 'node:stream';
 import { GoogleGenAI } from '@google/genai';
 
@@ -113,88 +114,6 @@ async function startServer() {
     });
   });
 
-  // Movy.sx Unblocked Streaming & Catalog Proxy - Strips X-Frame-Options: DENY and blocks ads
-  app.get('/api/movies/movy-stream', async (req, res) => {
-    const type = req.query.type === 'tv' ? 'tv' : 'movie';
-    const id = req.query.id as string;
-    const s = req.query.s || '1';
-    const e = req.query.e || '1';
-
-    if (!id) {
-      return res.status(400).send('Missing movie or show id');
-    }
-
-    const movyTarget = type === 'tv'
-      ? `https://www.movy.sx/tv/${id}/${s}/${e}`
-      : `https://www.movy.sx/movie/${id}`;
-
-    https.get(movyTarget, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Accept-Encoding': 'identity'
-      }
-    }, (upstreamRes) => {
-      res.status(upstreamRes.statusCode || 200);
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      res.setHeader('Access-Control-Allow-Origin', '*');
-      res.removeHeader('X-Frame-Options');
-      res.removeHeader('Frame-Options');
-      res.removeHeader('Content-Security-Policy');
-      res.setHeader('Content-Security-Policy', 'frame-ancestors *');
-
-      let html = '';
-      upstreamRes.setEncoding('utf-8');
-      upstreamRes.on('data', chunk => { html += chunk; });
-      upstreamRes.on('end', () => {
-        let cleaned = html.replace(/<meta[^>]*http-equiv=["']?X-Frame-Options["']?[^>]*>/gi, '');
-        cleaned = cleaned.replace(/<meta[^>]*http-equiv=["']?Content-Security-Policy["']?[^>]*>/gi, '');
-        cleaned = cleaned.replace(/window\.top/g, 'window.self');
-        cleaned = cleaned.replace(/top\.location/g, 'self.location');
-        
-        const antiAdShield = `
-<script>
-(function() {
-  window.open = function() { console.log('[AdShield] Blocked popup'); return null; };
-  window.alert = function() { return false; };
-  Object.defineProperty(window, 'top', { get: function() { return window.self; } });
-})();
-</script>`;
-        if (/<head[^>]*>/i.test(cleaned)) {
-          cleaned = cleaned.replace(/(<head[^>]*>)/i, `$1\n${antiAdShield}`);
-        } else {
-          cleaned = antiAdShield + cleaned;
-        }
-
-        res.send(cleaned);
-      });
-    }).on('error', (err) => {
-      res.status(502).send('Error loading Movy.sx stream: ' + err.message);
-    });
-  });
-
-  // Movy Next.js Asset Proxy for _next chunks
-  app.use('/_next', (req, res, next) => {
-    const targetUrl = 'https://www.movy.sx/_next' + req.url;
-    https.get(targetUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': '*/*'
-      }
-    }, (proxyRes) => {
-      res.status(proxyRes.statusCode || 200);
-      res.setHeader('Access-Control-Allow-Origin', '*');
-      res.removeHeader('X-Frame-Options');
-      res.removeHeader('Content-Security-Policy');
-      const ct = proxyRes.headers['content-type'];
-      if (ct) res.setHeader('Content-Type', ct);
-      proxyRes.pipe(res);
-    }).on('error', () => {
-      next();
-    });
-  });
-
   // Unblock Proxy Endpoint - Routes external websites and games through server so school filters (Securly, GoGuardian) cannot block them
   app.all('/api/proxy', (req, res) => {
     let targetUrl = (req.query.url as string) || (req.body && req.body.url);
@@ -221,7 +140,7 @@ async function startServer() {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
             'Accept-Language': 'en-US,en;q=0.9',
-            'Accept-Encoding': 'identity', // Prevent gzip/br compression so text rewriting works
+            'Accept-Encoding': 'gzip, deflate, br, identity',
           }
         }, (proxyRes) => {
           // Follow redirects internally on server so client iframe never sees redirect block
@@ -246,12 +165,29 @@ async function startServer() {
 
           if (contentType.includes('text/html')) {
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
+            res.removeHeader('Content-Encoding');
+            res.removeHeader('content-encoding');
+
+            // Handle decompression for gzipped or brotli upstream content
+            const encoding = (proxyRes.headers['content-encoding'] || '').toLowerCase();
+            let stream: any = proxyRes;
+            if (encoding === 'gzip') {
+              stream = proxyRes.pipe(zlib.createGunzip());
+            } else if (encoding === 'deflate') {
+              stream = proxyRes.pipe(zlib.createInflate());
+            } else if (encoding === 'br') {
+              stream = proxyRes.pipe(zlib.createBrotliDecompress());
+            }
+
             let body = '';
-            proxyRes.setEncoding('utf-8');
-            proxyRes.on('data', chunk => {
+            stream.setEncoding('utf-8');
+            stream.on('data', (chunk: string) => {
               body += chunk;
             });
-            proxyRes.on('end', () => {
+            stream.on('error', (streamErr: any) => {
+              console.warn('Decompression warning on proxy stream:', streamErr);
+            });
+            stream.on('end', () => {
               // Determine baseHref for subresources
               let baseHref = currentUrl;
               if (currentUrl.includes('ubghyper.github.io/GameList.github.io/')) {
