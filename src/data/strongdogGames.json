@@ -1391,9 +1391,10 @@
       "Unblocked",
       "Arcade"
     ],
-    "iframeSrc": "games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papaspizzeria.swf&title=Papa%27s+Pizzeria",
+    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Papas-Pizzeria/",
     "mirrors": [
-      "games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papaspizzeria.swf&title=Papa%27s+Pizzeria"
+      "https://ubghyper.github.io/GameList.github.io/Papas-Pizzeria/",
+      "/g/Papas-Pizzeria"
     ],
     "source": "strongdog.com",
     "rating": 4.7,
@@ -1431,9 +1432,10 @@
       "Unblocked",
       "Arcade"
     ],
-    "iframeSrc": "games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papassushiria.swf&title=Papa%27s+Sushiria",
+    "iframeSrc": "https://gameinclassroom.github.io/papas-sushiria/",
     "mirrors": [
-      "games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papassushiria.swf&title=Papa%27s+Sushiria"
+      "https://gameinclassroom.github.io/papas-sushiria/",
+      "https://ubghyper.github.io/GameList.github.io/Papas-Sushi/"
     ],
     "source": "strongdog.com",
     "rating": 4.6,

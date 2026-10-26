@@ -183,17 +183,43 @@ export async function fetchLyricsForTrack(artist: string, title: string, duratio
     const isStaticHost = typeof window !== 'undefined' && 
       (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:');
 
-    const fetchUrl = isStaticHost
-      ? `https://lrclib.net/api/get?artist_name=${encodeURIComponent(artist)}&track_name=${encodeURIComponent(cleanTitle)}`
-      : `/api/music/lyrics?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(cleanTitle)}`;
+    let data: any = null;
 
-    const res = await fetch(fetchUrl);
-    if (res.ok) {
-      const data = await res.json();
+    if (isStaticHost) {
+      try {
+        const getUrl = `https://lrclib.net/api/get?artist_name=${encodeURIComponent(artist)}&track_name=${encodeURIComponent(cleanTitle)}`;
+        const r = await fetch(getUrl);
+        if (r.ok) data = await r.json();
+      } catch (e) {}
+
+      if (!data || (!data.syncedLyrics && !data.plainLyrics)) {
+        try {
+          const sUrl = `https://lrclib.net/api/search?track_name=${encodeURIComponent(cleanTitle)}&artist_name=${encodeURIComponent(artist)}`;
+          const sr = await fetch(sUrl);
+          if (sr.ok) {
+            const list = await sr.json();
+            if (Array.isArray(list) && list.length > 0) {
+              data = list.find(item => item.syncedLyrics) || list[0];
+            }
+          }
+        } catch (e) {}
+      }
+    } else {
+      const fetchUrl = `/api/music/lyrics?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(cleanTitle)}&duration=${durationSec}`;
+      const res = await fetch(fetchUrl);
+      if (res.ok) {
+        data = await res.json();
+      } else {
+        const altRes = await fetch(`/api/lyrics?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(cleanTitle)}&duration=${durationSec}`);
+        if (altRes.ok) data = await altRes.json();
+      }
+    }
+
+    if (data) {
       if (data.syncedLyrics) {
         const lines = parseLrc(data.syncedLyrics);
         if (lines.length > 0) {
-          const result: SongLyrics = { synced: true, lines, source: 'lrclib-synced' };
+          const result: SongLyrics = { synced: true, lines, source: data.source || 'lrclib-synced' };
           LYRICS_CACHE.set(key, result);
           return result;
         }
@@ -206,7 +232,7 @@ export async function fetchLyricsForTrack(artist: string, title: string, duratio
           time: +(idx * interval).toFixed(2),
           text
         }));
-        const result: SongLyrics = { synced: false, lines, source: 'lrclib-plain' };
+        const result: SongLyrics = { synced: false, lines, source: 'plain-lyrics' };
         LYRICS_CACHE.set(key, result);
         return result;
       }
@@ -215,15 +241,14 @@ export async function fetchLyricsForTrack(artist: string, title: string, duratio
     console.warn('Online lyrics lookup failed for:', artist, title, err);
   }
 
-  // 4. Graceful melodic/ambient cues fallback so lyrics screen always looks polished
+  // 4. Graceful melodic presentation if no lyric text was found
   const fallbackLines: LyricLine[] = [
     { time: 0, text: `♪ ${title} ♪` },
     { time: 4, text: `${artist}` },
-    { time: Math.floor(durationSec * 0.15), text: '♪ Instrumental intro ♪' },
-    { time: Math.floor(durationSec * 0.35), text: '♪ Verse & Melody ♪' },
-    { time: Math.floor(durationSec * 0.50), text: '♪ Chorus & Harmony ♪' },
-    { time: Math.floor(durationSec * 0.70), text: '♪ Instrumental build ♪' },
-    { time: Math.floor(durationSec * 0.85), text: '♪ Outro ♪' },
+    { time: Math.floor(durationSec * 0.15), text: `♪ Playing ${title} ♪` },
+    { time: Math.floor(durationSec * 0.35), text: `♪ ${artist} — ${title} ♪` },
+    { time: Math.floor(durationSec * 0.60), text: `♪ High Fidelity Audio Playback ♪` },
+    { time: Math.floor(durationSec * 0.85), text: `♪ Outro ♪` },
   ];
 
   const result: SongLyrics = { synced: false, lines: fallbackLines, source: 'fallback' };

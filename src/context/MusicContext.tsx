@@ -71,6 +71,7 @@ export function getSafeLocalFallback(artist?: string): string {
 
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const currentTrackIdRef = useRef<string | null>(null);
 
   // Custom uploaded tracks
   const [customTracks, setCustomTracks] = useState<CustomTrack[]>(() => {
@@ -244,12 +245,18 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     // 1. Try preferred same-origin proxy (exact full-length song, unblocked at school)
     const okPrimary = await tryPlaySource(preferredUrl);
-    if (okPrimary) return;
+    if (okPrimary) {
+      currentTrackIdRef.current = target.id;
+      return;
+    }
 
     // 2. Direct fallback to original audioSrc (works on unfiltered connections)
     if (preferredUrl !== target.audioSrc) {
       const okDirect = await tryPlaySource(target.audioSrc);
-      if (okDirect) return;
+      if (okDirect) {
+        currentTrackIdRef.current = target.id;
+        return;
+      }
     }
 
     setAudioError(`Could not stream "${target.title}". Tap play to retry.`);
@@ -261,25 +268,36 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setAudioError(null);
     const audio = audioRef.current;
 
+    // Pausing: simply pause the audio element and keep currentTime intact!
     if (isPlaying) {
       audio.pause();
       setIsPlaying(false);
       return;
     }
 
-    // If audio element is already loaded, resume immediately!
-    if (audio.src && audio.src !== "about:blank" && !audio.error) {
+    // Unpausing / Resuming: If the track is already loaded on the audio element, resume directly!
+    if (
+      audio.src && 
+      audio.src !== "about:blank" && 
+      !audio.error && 
+      currentTrackIdRef.current === currentTrack.id
+    ) {
       try {
         await audio.play();
         setIsPlaying(true);
         setAudioError(null);
         updateMediaSession(currentTrack);
         return;
-      } catch (resumeErr) {
-        console.warn("Direct resume failed, reloading track:", resumeErr);
+      } catch (resumeErr: any) {
+        if (resumeErr && resumeErr.name === "NotAllowedError") {
+          setIsPlaying(false);
+          return;
+        }
+        console.warn("Direct resume hit error, will reload track:", resumeErr);
       }
     }
 
+    // Otherwise load and play the track
     await playTrack(currentTrack);
   }, [currentTrack, isPlaying, playTrack, updateMediaSession]);
   const nextTrack = useCallback(() => {
@@ -378,18 +396,25 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setCustomTracks(prev => prev.filter(t => t.id !== id));
   }, []);
 
-  // Sync initial audio src on mount or track change if not already playing
+  // Initialize initial audio src only on mount if empty (never reset when pausing)
   useEffect(() => {
     if (!audioRef.current || !currentTrack) return;
     const audio = audioRef.current;
-    const sourceUrl = resolveAssetUrl(currentTrack.audioSrc);
-    if (!sourceUrl) return;
+    if (!audio.src || audio.src === "about:blank" || audio.src === window.location.href) {
+      const isRemoteUrl = currentTrack.audioSrc.startsWith('http://') || currentTrack.audioSrc.startsWith('https://');
+      const isStaticHost = typeof window !== 'undefined' && 
+        (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:');
 
-    const isMatching = audio.src.endsWith(currentTrack.audioSrc) || audio.src.endsWith(sourceUrl) || audio.src === sourceUrl;
-    if (!isMatching && !isPlaying) {
-      audio.src = sourceUrl;
+      const initialUrl = !isStaticHost && isRemoteUrl
+        ? `/api/music/proxy?url=${encodeURIComponent(currentTrack.audioSrc)}`
+        : resolveAssetUrl(currentTrack.audioSrc);
+
+      if (initialUrl) {
+        audio.src = initialUrl;
+        currentTrackIdRef.current = currentTrack.id;
+      }
     }
-  }, [currentTrack, isPlaying]);
+  }, [currentTrack]);
 
   return (
     <MusicContext.Provider

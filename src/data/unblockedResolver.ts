@@ -355,44 +355,178 @@ export function resolveGameSource(
     };
   }
 
-  // Papa's Restaurant Management Series
-  if (safeId.includes('papas-scooperia') || safeId.includes('papa-scoop')) {
+  // Papa's Restaurant Management Series & Cooking Games (Direct Modern HTML5/WASM - Zero Flash)
+  const lowerId = safeId.toLowerCase();
+  const lowerTitle = safeTitle.toLowerCase();
+
+  if (lowerId.includes('pizzeria') || lowerTitle.includes('pizzeria')) {
     return {
-      src: 'games/papas-scooperia.html',
+      src: 'https://ubghyper.github.io/GameList.github.io/Papas-Pizzeria/',
       mirrors: [
-        'games/papas-scooperia.html',
-        'games/flash-player.html?swf=https://raw.githubusercontent.com/sz-games/Games9/main/papasscooperia.swf&title=Papa%27s+Scooperia'
+        'https://ubghyper.github.io/GameList.github.io/Papas-Pizzeria/',
+        '/g/Papas-Pizzeria'
       ]
     };
   }
 
-  if (safeId.includes('freezeria')) {
+  if (lowerId.includes('burgeria') || lowerId.includes('papa-burg') || lowerTitle.includes('burgeria')) {
     return {
-      src: 'games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papasfreezeria.swf&title=Papa%27s+Freezeria',
+      src: 'https://7zeb.github.io/homework/papasburgeria.html',
       mirrors: [
-        'games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papasfreezeria.swf&title=Papa%27s+Freezeria',
-        'https://7zeb.github.io/homework/papasfreezeria.html'
+        'https://7zeb.github.io/homework/papasburgeria.html',
+        'https://gameinclassroom.github.io/papas-burgeria/',
+        'https://ubghyper.github.io/GameList.github.io/Papa-Burg/'
       ]
     };
   }
 
-  if (safeId.includes('burgeria')) {
+  if (lowerId.includes('freezeria') || lowerTitle.includes('freezeria')) {
     return {
-      src: 'games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papasburgeria.swf&title=Papa%27s+Burgeria',
+      src: 'https://7zeb.github.io/homework/papasfreezeria.html',
       mirrors: [
-        'games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papasburgeria.swf&title=Papa%27s+Burgeria',
-        'https://7zeb.github.io/homework/papasburgeria.html'
+        'https://7zeb.github.io/homework/papasfreezeria.html',
+        'https://gameinclassroom.github.io/papas-freezeria/'
       ]
     };
   }
 
-  if (safeId.includes('sushiria')) {
+  if (lowerId.includes('bakeria') || lowerId.includes('papa-bakes') || lowerTitle.includes('bakeria')) {
     return {
-      src: 'games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papassushiria.swf&title=Papa%27s+Sushiria',
+      src: 'https://7zeb.github.io/homework/papasbakeria.html',
       mirrors: [
-        'games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/papassushiria.swf&title=Papa%27s+Sushiria',
-        'https://7zeb.github.io/homework/index.html'
+        'https://7zeb.github.io/homework/papasbakeria.html',
+        'https://ubghyper.github.io/GameList.github.io/Papa-Bakes/'
       ]
+    };
+  }
+
+  if (lowerId.includes('cheeseria') || lowerId.includes('papas-cheese') || lowerId.includes('toastelia') || lowerTitle.includes('cheeseria') || lowerTitle.includes('toastelia')) {
+    return {
+      src: 'https://7zeb.github.io/homework/papascheeseria.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/papascheeseria.html',
+        'https://ubghyper.github.io/GameList.github.io/Papas-Cheese/'
+      ]
+    };
+  }
+
+  if (lowerId.includes('cupcakeria') || lowerId.includes('papa-cpck') || lowerTitle.includes('cupcakeria')) {
+    return {
+      src: 'https://7zeb.github.io/homework/papascupcakeria.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/papascupcakeria.html',
+        'https://ubghyper.github.io/GameList.github.io/Papa-Cpck/'
+      ]
+    };
+  }
+
+  if (lowerId.includes('donuteria') || lowerId.includes('papas-donut') || lowerTitle.includes('donuteria')) {
+    return {
+      src: 'https://7zeb.github.io/homework/papasdonuteria.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/papasdonuteria.html',
+        'https://ubghyper.github.io/GameList.github.io/Papas-Donut/'
+      ]
+    };
+  }
+
+  if (lowerId.includes('hot-doggeria') || lowerId.includes('hotdoggeria') || lowerId.includes('papa-htdog') || lowerTitle.includes('hot doggeria')) {
+    return {
+      src: 'https://7zeb.github.io/homework/papashotdoggeria.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/papashotdoggeria.html',
+        'https://ubghyper.github.io/GameList.github.io/Papa-Htdog/'
+      ]
+    };
+  }
+
+  if (lowerId.includes('pancakeria') || lowerId.includes('papas-pnck') || lowerTitle.includes('pancakeria')) {
+    return {
+      src: 'https://7zeb.github.io/homework/papaspancakeria.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/papaspancakeria.html',
+        'https://ubghyper.github.io/GameList.github.io/Papas-PnCk/'
+      ]
+    };
+  }
+
+  if (lowerId.includes('pastaria') || lowerId.includes('pasteria') || lowerId.includes('papas-pasta') || lowerTitle.includes('pastaria')) {
+    return {
+      src: 'https://7zeb.github.io/homework/papaspastaria.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/papaspastaria.html',
+        'https://ubghyper.github.io/GameList.github.io/Papas-Pasta/'
+      ]
+    };
+  }
+
+  if (lowerId.includes('taco-mia') || lowerId.includes('tacomia') || lowerTitle.includes('taco mia')) {
+    return {
+      src: 'https://7zeb.github.io/homework/papastacomia.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/papastacomia.html'
+      ]
+    };
+  }
+
+  if (lowerId.includes('wingeria') || lowerId.includes('papas-wing') || lowerTitle.includes('wingeria')) {
+    return {
+      src: 'https://7zeb.github.io/homework/papaswingeria.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/papaswingeria.html',
+        'https://ubghyper.github.io/GameList.github.io/Papas-Wing/'
+      ]
+    };
+  }
+
+  if (lowerId.includes('sushiria') || lowerId.includes('papas-sushi') || lowerTitle.includes('sushiria')) {
+    return {
+      src: 'https://gameinclassroom.github.io/papas-sushiria/',
+      mirrors: [
+        'https://gameinclassroom.github.io/papas-sushiria/',
+        'https://ubghyper.github.io/GameList.github.io/Papas-Sushi/'
+      ]
+    };
+  }
+
+  if (lowerId.includes('scooperia') || lowerId.includes('papa-scoop') || lowerTitle.includes('scooperia')) {
+    return {
+      src: 'https://ubghyper.github.io/GameList.github.io/Papa-Scoop/',
+      mirrors: [
+        'https://ubghyper.github.io/GameList.github.io/Papa-Scoop/',
+        'games/papas-scooperia.html'
+      ]
+    };
+  }
+
+  if (lowerId.includes('cooking-mama') || lowerTitle.includes('cooking mama')) {
+    return {
+      src: 'https://ubghyper.github.io/GameList.github.io/Cooking-Mama/',
+      mirrors: [
+        'https://ubghyper.github.io/GameList.github.io/Cooking-Mama/',
+        '/g/Cooking-Mama'
+      ]
+    };
+  }
+
+  if (lowerId.includes('papalouie1') || lowerId.includes('papas-louie-1') || lowerTitle.includes('papa louie 1')) {
+    return {
+      src: 'https://ubghyper.github.io/GameList.github.io/Papas-Louie-1/',
+      mirrors: ['https://ubghyper.github.io/GameList.github.io/Papas-Louie-1/']
+    };
+  }
+
+  if (lowerId.includes('papalouie2') || lowerId.includes('papas-louie-2') || lowerTitle.includes('papa louie 2')) {
+    return {
+      src: 'https://ubghyper.github.io/GameList.github.io/Papas-Louie-2/',
+      mirrors: ['https://ubghyper.github.io/GameList.github.io/Papas-Louie-2/']
+    };
+  }
+
+  if (lowerId.includes('papalouie3') || lowerId.includes('papas-louie-3') || lowerTitle.includes('papa louie 3')) {
+    return {
+      src: 'https://ubghyper.github.io/GameList.github.io/Papas-Louie-3/',
+      mirrors: ['https://ubghyper.github.io/GameList.github.io/Papas-Louie-3/']
     };
   }
 

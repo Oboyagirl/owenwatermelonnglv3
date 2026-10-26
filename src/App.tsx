@@ -20,7 +20,7 @@ import { ProxyView } from './components/ProxyView';
 import { AppsView } from './components/AppsView';
 import { MusicView } from './components/MusicView';
 import { FloatingMusicPlayer } from './components/FloatingMusicPlayer';
-import { AIChatView } from './components/AIChatView';
+import { MoviesView } from './components/MoviesView';
 import { CloudSaveModal } from './components/CloudSaveModal';
 import { useGamesStore } from './services/gamesStore';
 import { useSiteSettingsStore } from './services/siteSettingsStore';
@@ -137,7 +137,7 @@ const APP_CATEGORIES = [
   'Casual'
 ];
 
-type SpaceType = 'home' | 'games' | 'proxy' | 'ai' | 'apps' | 'music' | 'tools' | 'saved';
+type SpaceType = 'home' | 'games' | 'proxy' | 'movies' | 'apps' | 'music' | 'tools' | 'saved';
 
 export default function App() {
   const {
@@ -284,7 +284,7 @@ export default function App() {
         home: '🏠',
         games: '🎮',
         proxy: '🌐',
-        ai: '🤖',
+        movies: '🎬',
         apps: '📱',
         music: '🎵',
         tools: '🛠️',
@@ -294,7 +294,7 @@ export default function App() {
         home: 'Home',
         games: 'Games',
         proxy: 'Web Proxy',
-        ai: 'AI Assistant',
+        movies: 'Movies & TV',
         apps: 'Apps',
         music: 'Music',
         tools: 'Tab Cloaker',
@@ -508,16 +508,8 @@ export default function App() {
       );
     }
 
-    if (space === 'ai') {
-      return (
-        <AIChatView
-          activeTheme={activeTheme}
-          onSelectGameTitle={(title) => {
-            setSearchTerm(title);
-            handleSelectSpace('games');
-          }}
-        />
-      );
+    if (space === 'movies') {
+      return <MoviesView activeTheme={activeTheme} />;
     }
 
     if (space === 'apps') {
