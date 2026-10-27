@@ -188,6 +188,17 @@ export const POPULAR_ALBUMS: MusicAlbum[] = [
     "spotifyAlbumId": "3RQQmkQEvNCY4prGKE6oc5"
   },
   {
+    "id": "album-more-life",
+    "title": "More Life",
+    "artist": "Drake",
+    "year": 2017,
+    "cover": "./music/covers/drake_more_life.jpg",
+    "genre": "Dancehall / R&B / Hip Hop",
+    "tracksCount": 22,
+    "description": "Multi-platinum playlist project featuring the global tropical house / dancehall anthem Passionfruit.",
+    "spotifyAlbumId": "1T5t5h1rG32M0a5a3a4b"
+  },
+  {
     "id": "album-damn",
     "title": "DAMN.",
     "artist": "Kendrick Lamar",
@@ -334,20 +345,36 @@ export const POPULAR_ALBUMS: MusicAlbum[] = [
 
 export const REAL_MUSIC_CATALOG: MusicTrack[] = [
   {
-    "id": "track-those-eyes",
-    "title": "Those Eyes",
-    "artist": "New West",
-    "album": "Those Eyes",
-    "year": 2019,
-    "duration": "3:40",
-    "durationSec": 220,
-    "cover": "./music/covers/new_west_those_eyes.jpg",
-    "genre": "Indie Pop / Dream Pop",
-    "audioSrc": "https://archive.org/download/new-west-those-eyes-chapter-1/New%20West%20%20Those%20Eyes%20(Chapter%201%20).mp4",
-    "spotifyId": "5V2qgB03dY31bQ6y0h3EwE",
-    "albumId": "album-those-eyes",
-    "trackNumber": 1,
-    "hasLocalAudio": false
+    "id": "track-tyler-see-you-again",
+    "title": "See You Again (feat. Kali Uchis)",
+    "artist": "Tyler, The Creator",
+    "album": "Flower Boy",
+    "year": 2017,
+    "duration": "3:00",
+    "durationSec": 180,
+    "cover": "./music/covers/tyler_flower_boy.jpg",
+    "genre": "Hip Hop / Neo Soul",
+    "audioSrc": "./music/tyler_see_you_again.mp3",
+    "spotifyId": "7KA4W4McWYRpgf0fWsTG9i",
+    "albumId": "album-flower-boy",
+    "trackNumber": 4,
+    "hasLocalAudio": true
+  },
+  {
+    "id": "track-drake-passionfruit",
+    "title": "Passionfruit",
+    "artist": "Drake",
+    "album": "More Life",
+    "year": 2017,
+    "duration": "4:58",
+    "durationSec": 298,
+    "cover": "./music/covers/drake_more_life.jpg",
+    "genre": "Dancehall / R&B",
+    "audioSrc": "./music/drake_passionfruit.mp3",
+    "spotifyId": "5mCPDffwhirusUrfd2v23G",
+    "albumId": "album-more-life",
+    "trackNumber": 3,
+    "hasLocalAudio": true
   },
   {
     "id": "album-flower-boy-track-1",
@@ -404,10 +431,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 180,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "https://archive.org/download/tyler-the-creator-flower-boy_22222/04%20See%20You%20Again%20(Featuring%20Kali%20Uch.mp3",
+    "audioSrc": "./music/tyler_see_you_again.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 4,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-flower-boy-track-5",
@@ -1154,10 +1181,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 194,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Trick/11%20-%20Mary.mp3",
+    "audioSrc": "./music/alex_g_mary.mp3",
     "albumId": "album-trick",
     "trackNumber": 12,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-trick-track-13",
@@ -1664,10 +1691,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 312,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/03%20Stronger.mp3",
+    "audioSrc": "./music/kanye_stronger.mp3",
     "albumId": "album-graduation",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-graduation-track-4",
@@ -2714,10 +2741,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 177,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "https://archive.org/download/12-fear_202604/08%20HUMBLE.m4a",
+    "audioSrc": "./music/kendrick_humble.mp3",
     "albumId": "album-damn",
     "trackNumber": 8,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-damn-track-9",
@@ -3044,10 +3071,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 312,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "https://archive.org/download/travis-astroworld/SICKO%20MODE.mp3",
+    "audioSrc": "./music/travis_sicko_mode.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-astroworld-track-4",
@@ -3584,10 +3611,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 184,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "https://archive.org/download/17FuturaFree_201703/03%20Pink%20%2B%20White.mp3",
+    "audioSrc": "./music/frank_pink_white.mp3",
     "albumId": "album-blonde",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-blonde-track-4",
@@ -4124,10 +4151,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 232,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "https://archive.org/download/03.-steve-lacy-mercury/05.%20Steve%20Lacy%20-%20Bad%20Habit.mp3",
+    "audioSrc": "./music/steve_lacy_bad_habit.mp3",
     "albumId": "album-gemini-rights",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-gemini-rights-track-6",
@@ -4424,10 +4451,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 200,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "https://archive.org/download/after-hours-the-weeknd_202609/09.%20Blinding%20Lights.mp3",
+    "audioSrc": "./music/weeknd_blinding_lights.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-after-hours-track-10",
@@ -4829,10 +4856,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 210,
     "cover": "./music/covers/billie_hit_me_hard.jpg",
     "genre": "Indie Pop / Alternative",
-    "audioSrc": "https://archive.org/download/hit-me-hard-and-soft1/04-BIRDS%20OF%20A%20FEATHER.mp3",
+    "audioSrc": "./music/billie_birds_of_a_feather.mp3",
     "albumId": "album-hit-me-hard",
     "trackNumber": 4,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-hit-me-hard-track-5",

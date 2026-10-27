@@ -1,7 +1,6 @@
 import React from 'react';
 import { 
   Gamepad2, 
-  Globe, 
   Film, 
   LayoutGrid, 
   Radio, 
@@ -24,13 +23,13 @@ export interface TabItem {
   id: string;
   title: string;
   icon?: string;
-  spaceType: 'home' | 'games' | 'proxy' | 'apps' | 'music' | 'tools' | 'saved';
+  spaceType: 'home' | 'games' | 'apps' | 'music' | 'tools' | 'saved';
   url?: string;
 }
 
 interface OwenSidebarProps {
-  activeSpace: 'home' | 'games' | 'proxy' | 'apps' | 'music' | 'tools' | 'saved';
-  onSelectSpace: (space: 'home' | 'games' | 'proxy' | 'apps' | 'music' | 'tools' | 'saved') => void;
+  activeSpace: 'home' | 'games' | 'apps' | 'music' | 'tools' | 'saved';
+  onSelectSpace: (space: 'home' | 'games' | 'apps' | 'music' | 'tools' | 'saved') => void;
   tabs: TabItem[];
   activeTabId: string;
   onSelectTab: (id: string) => void;
@@ -71,7 +70,6 @@ export const Sidebar: React.FC<OwenSidebarProps> = ({
   const NAV_ITEMS = [
     { id: 'home', label: 'Home', icon: Home, emoji: '🏠' },
     { id: 'games', label: 'Games', icon: Gamepad2, emoji: '🎮' },
-    { id: 'proxy', label: 'Proxy', icon: Globe, emoji: '🌐' },
     { id: 'apps', label: 'Apps', icon: LayoutGrid, emoji: '📱' },
     { id: 'music', label: 'Music', icon: Radio, emoji: '🎵' },
     { id: 'tools', label: 'Cloaker', icon: ShieldCheck, emoji: '🛠️' },

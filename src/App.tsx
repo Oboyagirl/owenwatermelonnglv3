@@ -16,7 +16,6 @@ import { Sidebar, TabItem } from './components/Sidebar';
 import { PasscodeGate, PASSCODE_STORAGE_KEY } from './components/PasscodeGate';
 import { WelcomeAnimation } from './components/WelcomeAnimation';
 import { HomeDashboard } from './components/HomeDashboard';
-import { ProxyView } from './components/ProxyView';
 import { AppsView } from './components/AppsView';
 import { MusicView } from './components/MusicView';
 import { FloatingMusicPlayer } from './components/FloatingMusicPlayer';
@@ -136,7 +135,7 @@ const APP_CATEGORIES = [
   'Casual'
 ];
 
-type SpaceType = 'home' | 'games' | 'proxy' | 'apps' | 'music' | 'tools' | 'saved';
+type SpaceType = 'home' | 'games' | 'apps' | 'music' | 'tools' | 'saved';
 
 export default function App() {
   const {
@@ -182,7 +181,8 @@ export default function App() {
   const [tabs, setTabs] = useState<TabItem[]>([
     { id: 'tab_home', title: 'Home', spaceType: 'home', icon: '🏠' },
     { id: 'tab_games', title: 'Games', spaceType: 'games', icon: '🎮' },
-    { id: 'tab_proxy', title: 'Web Proxy', spaceType: 'proxy', icon: '🌐' }
+    { id: 'tab_apps', title: 'Apps', spaceType: 'apps', icon: '📱' },
+    { id: 'tab_music', title: 'Music', spaceType: 'music', icon: '🎵' }
   ]);
   const [activeTabId, setActiveTabId] = useState<string>('tab_home');
   const [splitTabId, setSplitTabId] = useState<string | null>(null);
@@ -198,7 +198,6 @@ export default function App() {
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   const [isCloakerOpen, setIsCloakerOpen] = useState(false);
   const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(false);
-  const [proxyTargetUrl, setProxyTargetUrl] = useState<string>('about:home');
 
   // Passcode Gate (owenpan2244)
   const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
@@ -282,7 +281,6 @@ export default function App() {
       const spaceEmojiMap: Record<SpaceType, string> = {
         home: '🏠',
         games: '🎮',
-        proxy: '🌐',
         apps: '📱',
         music: '🎵',
         tools: '🛠️',
@@ -291,7 +289,6 @@ export default function App() {
       const spaceNameMap: Record<SpaceType, string> = {
         home: 'Home',
         games: 'Games',
-        proxy: 'Web Proxy',
         apps: 'Apps',
         music: 'Music',
         tools: 'Tab Cloaker',
@@ -358,26 +355,8 @@ export default function App() {
     const clean = query.trim();
     if (!clean) return;
 
-    // Detect if user typed a URL or domain
-    const isUrl = /^(https?:\/\/|[a-zA-Z0-9-]+\.[a-zA-Z]{2,})(\/.*)?$/.test(clean);
-    if (isUrl || clean.startsWith('http')) {
-      const url = clean.startsWith('http') ? clean : 'https://' + clean;
-      setProxyTargetUrl(url);
-      handleSelectSpace('proxy');
-      return;
-    }
-
-    // Check if query matches a game title
-    const gameMatch = games.find(g => g.title.toLowerCase().includes(clean.toLowerCase()));
-    if (gameMatch) {
-      setSearchTerm(clean);
-      handleSelectSpace('games');
-      return;
-    }
-
-    // Default to search proxy
-    setProxyTargetUrl(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(clean)}`);
-    handleSelectSpace('proxy');
+    setSearchTerm(clean);
+    handleSelectSpace('games');
   };
 
   const handleSelectGame = (game: Game) => {
@@ -485,25 +464,6 @@ export default function App() {
       );
     }
 
-    if (space === 'proxy') {
-      return (
-        <ProxyView
-          activeTheme={activeTheme}
-          initialUrl={currentTab.url || proxyTargetUrl}
-          onOpenInTab={(title, url, icon) => {
-            const newTab: TabItem = {
-              id: 'tab_' + Date.now(),
-              title,
-              spaceType: 'proxy',
-              icon: icon || '🌐',
-              url
-            };
-            setTabs(prev => [...prev, newTab]);
-            setActiveTabId(newTab.id);
-          }}
-        />
-      );
-    }
 
 
     if (space === 'apps') {

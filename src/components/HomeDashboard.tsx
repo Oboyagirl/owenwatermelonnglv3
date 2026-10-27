@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { 
   Search, 
   Gamepad2, 
-  Globe, 
   Sparkles, 
   LayoutGrid, 
   Radio, 
@@ -18,7 +17,7 @@ import { Game } from '../types/game';
 import { ThemeConfig } from '../services/themeStore';
 
 interface HomeDashboardProps {
-  onNavigateTab: (tab: 'home' | 'games' | 'proxy' | 'apps' | 'music' | 'tools' | 'saved') => void;
+  onNavigateTab: (tab: 'home' | 'games' | 'apps' | 'music' | 'tools' | 'saved') => void;
   onSelectGame: (game: Game) => void;
   featuredGames: Game[];
   trendingGames: Game[];
@@ -38,7 +37,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
 }) => {
   const [currentTime, setCurrentTime] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchCategory, setSearchCategory] = useState<'all' | 'games' | 'web'>('all');
+  const [searchCategory, setSearchCategory] = useState<'all' | 'games'>('all');
 
   useEffect(() => {
     const updateTime = () => {
@@ -55,12 +54,8 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
     const q = searchQuery.trim();
     if (!q) return;
 
-    if (searchCategory === 'web') {
-      onNavigateTab('proxy');
-    } else {
-      onSearchSubmit(q);
-      onNavigateTab('games');
-    }
+    onSearchSubmit(q);
+    onNavigateTab('games');
   };
 
   const spotlightGame = featuredGames[0] || trendingGames[0];
@@ -99,7 +94,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             {currentTime || '12:00'}
           </h1>
           <p className="text-sm md:text-base text-slate-300 font-medium max-w-lg">
-            Unblocked Games, Web Proxy, Music Studio & Cloud Saves. Optimized for school iPads, Chromebooks & desktop.
+            Unblocked Games, Music Studio & Cloud Saves. Optimized for school iPads, Chromebooks & desktop.
           </p>
 
           {/* Central Omnibar Search */}
@@ -120,7 +115,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search games, websites, music, or enter URL..."
+                placeholder="Search 800+ unblocked games, songs, or categories..."
                 className="w-full bg-transparent px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none"
               />
               
@@ -150,18 +145,6 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
                   Games
                 </button>
                 <button
-                  type="button"
-                  onClick={() => setSearchCategory('web')}
-                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all ${
-                    searchCategory === 'web' ? 'text-black' : 'text-slate-400 hover:text-white'
-                  }`}
-                  style={{
-                    backgroundColor: searchCategory === 'web' ? accent : undefined
-                  }}
-                >
-                  Proxy
-                </button>
-                <button
                   type="submit"
                   className="px-4 py-2 rounded-2xl text-black font-extrabold text-xs shadow-lg transition-all cursor-pointer ml-1"
                   style={{
@@ -176,7 +159,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
         </div>
 
         {/* Quick Spaces Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
           <button
             onClick={() => onNavigateTab('games')}
             className="group p-4 md:p-5 rounded-2xl border transition-all duration-300 flex flex-col items-center text-center gap-2.5 cursor-pointer shadow-lg hover:-translate-y-1"
@@ -212,21 +195,6 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             </div>
             <span className="text-xs md:text-sm font-bold text-white group-hover:text-amber-300">Plinko</span>
             <span className="text-[10px] text-slate-400">Pegboard Multipliers</span>
-          </button>
-
-          <button
-            onClick={() => onNavigateTab('proxy')}
-            className="group p-4 md:p-5 rounded-2xl border transition-all duration-300 flex flex-col items-center text-center gap-2.5 cursor-pointer shadow-lg hover:-translate-y-1"
-            style={{
-              backgroundColor: cardBg,
-              borderColor: border
-            }}
-          >
-            <div className="w-12 h-12 rounded-2xl bg-sky-500/20 text-sky-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-              🌐
-            </div>
-            <span className="text-xs md:text-sm font-bold text-white group-hover:text-sky-300">Web Proxy</span>
-            <span className="text-[10px] text-slate-400">Unblocked Browsing</span>
           </button>
 
           <button

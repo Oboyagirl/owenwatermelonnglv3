@@ -145,21 +145,10 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
     )
   );
 
-  // By default, games load directly for full speed and complete asset/WebGL compatibility.
-  // Securly unblock proxy can be toggled on-demand if a user is behind a strict filter.
-  const [useSecurlyProxy, setUseSecurlyProxy] = useState(false);
-
   const resolvedIframeSrc = (() => {
     if (activeCustomHtml) return undefined;
     if (isLocalGame) {
       return resolveAssetUrl(activeIframeSrc);
-    }
-    // Static GitHub Pages fallback
-    if (typeof window !== 'undefined' && (window.location.hostname.endsWith('github.io') || window.location.hostname.includes('github'))) {
-      return activeIframeSrc;
-    }
-    if (useSecurlyProxy) {
-      return `/api/proxy?url=${encodeURIComponent(activeIframeSrc)}`;
     }
     return activeIframeSrc;
   })();
@@ -175,7 +164,6 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
     setShowIframeEditor(false);
     setSavedSuccess(false);
     setCurrentMirrorIndex(0);
-    setUseSecurlyProxy(false);
   }, [game?.id, game?.iframeSrc, game?.iframeCode, game?.customHtml]);
 
   const handleNextMirror = () => {
@@ -540,7 +528,7 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
           style={{ backgroundColor: activeTheme.bgPrimary }}
         >
           <iframe
-            key={`${game.id}-${keyCounter}-${useSecurlyProxy ? 'proxied' : 'direct'}`}
+            key={`${game.id}-${keyCounter}`}
             ref={iframeRef}
             id="game-area"
             className={`border-0 block game-iframe transition-all duration-200 ${
@@ -603,29 +591,11 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
               }}
             >
               <ShieldCheck className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
-              <span>🛡️ Securly Bypass Engine: {useSecurlyProxy ? 'Active (Same-Origin)' : 'Direct'}</span>
+              <span>⚡ High-Speed Direct Mirror</span>
             </span>
           )}
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          {!isLocalGame && (
-            <button
-              onClick={() => {
-                setUseSecurlyProxy(!useSecurlyProxy);
-                setKeyCounter(prev => prev + 1);
-              }}
-              className="px-2.5 py-1 font-semibold rounded-lg border transition-colors cursor-pointer flex items-center gap-1.5"
-              style={{
-                backgroundColor: useSecurlyProxy ? activeTheme.accent : activeTheme.bgCard,
-                borderColor: useSecurlyProxy ? activeTheme.accent : activeTheme.border,
-                color: useSecurlyProxy ? activeTheme.accentText : activeTheme.kicker
-              }}
-              title="Toggle Securly unblock engine to route game same-origin"
-            >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>{useSecurlyProxy ? '🛡️ Securly Bypass: ON' : '🛡️ Direct Mirror'}</span>
-            </button>
-          )}
 
           {mirrorsList.length > 1 && (
             <button
