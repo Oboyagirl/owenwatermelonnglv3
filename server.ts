@@ -168,13 +168,13 @@ async function startServer() {
     next();
   }, express.static(path.resolve('public/games')));
 
-  // Serve album covers statically with long-term cache
+  // Serve album covers statically with no-cache / must-revalidate so updates reflect immediately
   const coversDir = fs.existsSync(path.resolve('public/music/covers'))
     ? path.resolve('public/music/covers')
     : path.resolve('dist/music/covers');
   app.use('/music/covers', (req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Cache-Control', 'public, max-age=604800');
+    res.setHeader('Cache-Control', 'no-cache, must-revalidate');
     next();
   }, express.static(coversDir));
 
@@ -246,6 +246,41 @@ async function startServer() {
   const musicPreviewCache = new Map<string, string>();
 
   // Dedicated Real MP3 Streaming & School-Unblocked Audio Proxy
+  const resolvedTargetCache = new Map<string, string>();
+
+  async function resolveTargetAudioUrl(originalUrl: string): Promise<string> {
+    const cached = resolvedTargetCache.get(originalUrl);
+    if (cached) return cached;
+
+    let target = originalUrl;
+    // Follow up to 5 redirects manually to avoid sending client headers (like Range) on redirect hops
+    for (let hop = 0; hop < 5; hop++) {
+      try {
+        const headRes = await fetch(target, {
+          method: 'HEAD',
+          redirect: 'manual',
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            'Accept': '*/*'
+          },
+          signal: AbortSignal.timeout(6000)
+        });
+        if ([301, 302, 303, 307, 308].includes(headRes.status)) {
+          const loc = headRes.headers.get('location');
+          if (loc) {
+            target = new URL(loc, target).href;
+            continue;
+          }
+        }
+        break;
+      } catch {
+        break;
+      }
+    }
+    resolvedTargetCache.set(originalUrl, target);
+    return target;
+  }
+
   app.get(['/api/music/proxy', '/api/music/stream'], async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Accept-Ranges', 'bytes');
@@ -256,6 +291,7 @@ async function startServer() {
     // 1. Direct proxy for full-length MP3 URLs (archive.org, etc.) - Bypasses all school web filters
     if (remoteUrl && (remoteUrl.startsWith('http://') || remoteUrl.startsWith('https://'))) {
       try {
+        const targetUrl = await resolveTargetAudioUrl(remoteUrl);
         const clientRange = req.headers.range;
         const fetchHeaders: Record<string, string> = {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
@@ -265,12 +301,14 @@ async function startServer() {
           fetchHeaders['Range'] = clientRange;
         }
 
-        const remoteRes = await fetch(remoteUrl, { 
+        const remoteRes = await fetch(targetUrl, { 
           headers: fetchHeaders,
-          redirect: 'follow'
+          redirect: 'follow',
+          signal: AbortSignal.timeout(15000)
         });
 
         if (!remoteRes.ok && remoteRes.status !== 206) {
+          resolvedTargetCache.delete(remoteUrl);
           return res.status(remoteRes.status).send('Remote audio not available: ' + remoteRes.statusText);
         }
 
@@ -278,7 +316,7 @@ async function startServer() {
         
         let contentType = remoteRes.headers.get('content-type') || '';
         if (!contentType || contentType.includes('text') || contentType.includes('html')) {
-          if (remoteUrl.endsWith('.m4a') || remoteUrl.endsWith('.mp4')) {
+          if (targetUrl.endsWith('.m4a') || targetUrl.endsWith('.mp4') || remoteUrl.endsWith('.m4a')) {
             contentType = 'audio/mp4';
           } else {
             contentType = 'audio/mpeg';
@@ -298,7 +336,7 @@ async function startServer() {
 
         if (remoteRes.body) {
           const nodeStream = Readable.fromWeb(remoteRes.body as any);
-          nodeStream.on('error', (err) => {
+          nodeStream.on('error', () => {
             if (!res.headersSent) {
               res.status(502).end();
             }
@@ -313,6 +351,7 @@ async function startServer() {
           return;
         }
       } catch (proxyErr) {
+        resolvedTargetCache.delete(remoteUrl);
         console.warn('Direct MP3 proxy failed for URL:', remoteUrl, proxyErr);
         if (!res.headersSent) {
           return res.status(502).send('Proxy error streaming remote track');

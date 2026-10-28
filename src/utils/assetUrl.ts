@@ -20,10 +20,18 @@ export function resolveAssetUrl(url: string | undefined | null): string {
     return trimmed;
   }
 
-  // Remove all leading slashes
-  const cleanPath = trimmed.replace(/^\/+/, '');
+  // Remove all leading slashes and relative prefixes like ./ or /
+  const cleanPath = trimmed.replace(/^(\.\/|\/)+/, '');
+
+  // Add cache buster for music covers to ensure browser cache is busted when artwork is updated
+  if (cleanPath.startsWith('music/covers/') || cleanPath.includes('covers/')) {
+    const version = 'v=20261028_takecare_v3';
+    const separator = cleanPath.includes('?') ? '&' : '?';
+    return `./${cleanPath}${separator}${version}`;
+  }
 
   // Using './' ensures that whether the app is hosted at domain root or a GitHub Pages subpath,
   // relative assets resolve against the current base URL.
   return `./${cleanPath}`;
 }
+

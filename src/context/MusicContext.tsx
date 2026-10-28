@@ -48,6 +48,7 @@ const MUSIC_VOL_KEY = 'owen_music_volume';
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentTrackIdRef = useRef<string | null>(null);
+  const activeTrackRef = useRef<CustomTrack | null>(null);
 
   // Custom uploaded tracks
   const [customTracks, setCustomTracks] = useState<CustomTrack[]>(() => {
@@ -176,11 +177,11 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, []);
 
-  // Play a specific track with robust streaming
   // Play a specific track with robust streaming (every song plays its own audio)
   const playTrack = useCallback(async (target: CustomTrack) => {
     if (!audioRef.current || !target || !target.audioSrc) return;
     setAudioError(null);
+    activeTrackRef.current = target;
     const audio = audioRef.current;
 
     // Update current index if found in catalog
@@ -218,10 +219,16 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
 
     // For remote tracks:
-    // Try direct remote audio first (fastest, unthrottled, native byte-ranges from archive.org CDN)
-    // If that fails, fallback to same-origin /api/music/proxy for strict school networks
+    // When running fullstack (dev/preview), use same-origin /api/music/proxy (unblocked, supports byte ranges)
+    // On static hosting (like GitHub Pages where /api/ doesn't exist), use direct archive.org CDN URL
+    const isStaticHost = typeof window !== 'undefined' && 
+      (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:');
+
     const directUrl = target.audioSrc;
     const proxiedUrl = `/api/music/proxy?url=${encodeURIComponent(directUrl)}`;
+
+    const primaryUrl = isStaticHost ? directUrl : proxiedUrl;
+    const secondaryUrl = isStaticHost ? proxiedUrl : directUrl;
 
     const trySource = async (url: string): Promise<boolean> => {
       try {
@@ -244,12 +251,12 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
     };
 
-    // 1. Try direct remote audio stream
-    const directOk = await trySource(directUrl);
+    // 1. Try primary stream
+    const directOk = await trySource(primaryUrl);
     if (directOk) return;
 
-    // 2. Try same-origin proxy of THIS EXACT TRACK (for school filter bypass)
-    const proxyOk = await trySource(proxiedUrl);
+    // 2. Try secondary stream fallback
+    const proxyOk = await trySource(secondaryUrl);
     if (proxyOk) return;
 
     // 3. If stream cannot be loaded, show error without playing a different song
@@ -449,7 +456,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       <audio
         ref={audioRef}
         loop={isLoop}
-        preload="metadata"
+        preload="none"
         onTimeUpdate={() => {
           if (audioRef.current) {
             setCurrentTime(audioRef.current.currentTime);
@@ -467,16 +474,34 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           }
           console.warn("Audio element error on:", audio.src, audio.error);
 
-          // If direct remote URL failed, retry via same-origin proxy of THIS EXACT TRACK
+          const activeTrack = activeTrackRef.current || currentTrack;
+          if (!activeTrack) return;
+
+          // If current stream failed and was using proxy, try direct URL
           if (
-            currentTrack && 
-            !audio.src.includes('/api/music/proxy') && 
-            (currentTrack.audioSrc.startsWith('http://') || currentTrack.audioSrc.startsWith('https://'))
+            audio.src.includes('/api/music/proxy') && 
+            (activeTrack.audioSrc.startsWith('http://') || activeTrack.audioSrc.startsWith('https://'))
           ) {
-            const proxyUrl = `/api/music/proxy?url=${encodeURIComponent(currentTrack.audioSrc)}`;
+            const directHref = new URL(activeTrack.audioSrc, window.location.origin).href;
+            if (audio.src !== directHref) {
+              console.log("Proxy stream failed, retrying direct URL for:", activeTrack.title);
+              audio.src = directHref;
+              if (isPlaying) {
+                audio.play().catch(() => {});
+              }
+              return;
+            }
+          }
+
+          // If direct remote failed, retry via same-origin proxy
+          if (
+            !audio.src.includes('/api/music/proxy') && 
+            (activeTrack.audioSrc.startsWith('http://') || activeTrack.audioSrc.startsWith('https://'))
+          ) {
+            const proxyUrl = `/api/music/proxy?url=${encodeURIComponent(activeTrack.audioSrc)}`;
             const proxyHref = new URL(proxyUrl, window.location.origin).href;
             if (audio.src !== proxyHref) {
-              console.log("Direct remote failed, retrying via same-origin proxy:", currentTrack.title);
+              console.log("Direct remote failed, retrying via same-origin proxy:", activeTrack.title);
               audio.src = proxyHref;
               if (isPlaying) {
                 audio.play().catch(() => {});
@@ -486,12 +511,12 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           }
 
           setIsPlaying(false);
-          setAudioError(`Audio connection error on "${currentTrack?.title}". Tap to retry.`);
+          setAudioError(`Audio connection error on "${activeTrack.title}". Tap to retry.`);
         }}
         onPlay={() => {
           setIsPlaying(true);
           setAudioError(null);
-          updateMediaSession(currentTrack);
+          updateMediaSession(activeTrackRef.current || currentTrack);
         }}
         onPause={() => setIsPlaying(false)}
       />

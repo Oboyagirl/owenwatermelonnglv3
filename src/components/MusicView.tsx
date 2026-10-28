@@ -448,10 +448,17 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
             </div>
 
             {audioError && (
-              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{audioError}</span>
-              </div>
+              <button
+                type="button"
+                onClick={() => togglePlay()}
+                className="w-full text-left p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center justify-between gap-2 hover:bg-amber-500/20 active:scale-[0.99] transition-all cursor-pointer"
+              >
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{audioError}</span>
+                </div>
+                <span className="font-semibold underline shrink-0 px-2 py-0.5 rounded bg-amber-500/20">Retry</span>
+              </button>
             )}
 
             {/* Mode-specific embed or audio scrubber */}

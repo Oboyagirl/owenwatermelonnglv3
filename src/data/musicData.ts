@@ -345,6 +345,22 @@ export const POPULAR_ALBUMS: MusicAlbum[] = [
 
 export const REAL_MUSIC_CATALOG: MusicTrack[] = [
   {
+    "id": "album-those-eyes-track-1",
+    "title": "Those Eyes",
+    "artist": "New West",
+    "album": "Those Eyes",
+    "year": 2019,
+    "duration": "3:40",
+    "durationSec": 220,
+    "cover": "./music/covers/new_west_those_eyes.jpg",
+    "genre": "Indie Pop / Dream Pop",
+    "audioSrc": "https://archive.org/download/new-west-those-eyes-mp-3.pm_202607/New_West_-_Those_Eyes_(mp3.pm).mp3",
+    "spotifyId": "5V2qgB03dY31bQ6y0h3EwE",
+    "albumId": "album-those-eyes",
+    "trackNumber": 1,
+    "hasLocalAudio": false
+  },
+  {
     "id": "track-tyler-see-you-again",
     "title": "See You Again (feat. Kali Uchis)",
     "artist": "Tyler, The Creator",
@@ -2043,15 +2059,15 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
   },
   {
     "id": "album-the-life-of-pablo-track-14",
-    "title": "Wolves",
+    "title": "Frank's Track (feat. Frank Ocean)",
     "artist": "Kanye West",
     "album": "The Life of Pablo",
     "year": 2016,
-    "duration": "5:01",
-    "durationSec": 301,
+    "duration": "0:38",
+    "durationSec": 38,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/13.%20Wolves%20(Feat.%20Sia%20%26%20Vic%20Mensa).mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/14.%20Frank%27s%20Track%20(Feat.%20Frank%20Ocean).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 14,
     "hasLocalAudio": false
@@ -3026,10 +3042,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 274,
     "cover": "./music/covers/kendrick_not_like_us.jpg",
     "genre": "West Coast Hip Hop",
-    "audioSrc": "https://archive.org/download/kendrick-lamar-not-like-us_202504/Kendrick%20Lamar%20-%20Not%20Like%20Us.mp4",
+    "audioSrc": "https://archive.org/download/kendrick-lamar-not-like-us_202606/Kendrick%20Lamar%20-%20Not%20Like%20Us.mp3",
     "albumId": "album-not-like-us",
     "trackNumber": 1,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-astroworld-track-1",
