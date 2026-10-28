@@ -298,8 +298,16 @@ async function startServer() {
 
         if (remoteRes.body) {
           const nodeStream = Readable.fromWeb(remoteRes.body as any);
+          nodeStream.on('error', (err) => {
+            if (!res.headersSent) {
+              res.status(502).end();
+            }
+          });
           req.on('close', () => {
-            nodeStream.destroy();
+            try { nodeStream.destroy(); } catch {}
+          });
+          res.on('error', () => {
+            try { nodeStream.destroy(); } catch {}
           });
           nodeStream.pipe(res);
           return;

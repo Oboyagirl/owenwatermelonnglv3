@@ -45,30 +45,6 @@ const CUSTOM_MUSIC_KEY = 'owen_custom_music_list';
 const LIKED_MUSIC_KEY = 'owen_liked_music';
 const MUSIC_VOL_KEY = 'owen_music_volume';
 
-
-const FALLBACK_TRACKS_BY_ARTIST: Record<string, string> = {
-  tyler: "./music/tyler_see_you_again.mp3",
-  frank: "./music/frank_pink_white.mp3",
-  kendrick: "./music/kendrick_humble.mp3",
-  billie: "./music/billie_birds_of_a_feather.mp3",
-  steve: "./music/steve_lacy_bad_habit.mp3",
-  kanye: "./music/kanye_stronger.mp3",
-  drake: "./music/drake_passionfruit.mp3",
-  alex: "./music/alex_g_mary.mp3",
-  weeknd: "./music/weeknd_blinding_lights.mp3",
-  travis: "./music/travis_sicko_mode.mp3"
-};
-
-export function getSafeLocalFallback(artist?: string): string {
-  const a = (artist || "").toLowerCase();
-  for (const [key, path] of Object.entries(FALLBACK_TRACKS_BY_ARTIST)) {
-    if (a.includes(key)) {
-      return resolveAssetUrl(path);
-    }
-  }
-  return resolveAssetUrl("./music/tyler_see_you_again.mp3");
-}
-
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentTrackIdRef = useRef<string | null>(null);
@@ -201,6 +177,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, []);
 
   // Play a specific track with robust streaming
+  // Play a specific track with robust streaming (every song plays its own audio)
   const playTrack = useCallback(async (target: CustomTrack) => {
     if (!audioRef.current || !target || !target.audioSrc) return;
     setAudioError(null);
@@ -218,68 +195,66 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       target.audioSrc.startsWith('blob:') ||
       target.audioSrc.startsWith('data:');
 
-    const isRemoteUrl = !isLocalAudio && (target.audioSrc.startsWith('http://') || target.audioSrc.startsWith('https://'));
-    const isStaticHost = typeof window !== 'undefined' && 
-      (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:');
-
-    // On fullstack server, route remote full MP3s through /api/music/proxy to bypass school filters
-    const preferredUrl = isLocalAudio
-      ? resolveAssetUrl(target.audioSrc)
-      : (!isStaticHost && isRemoteUrl
-          ? `/api/music/proxy?url=${encodeURIComponent(target.audioSrc)}`
-          : resolveAssetUrl(target.audioSrc));
-
-    const tryPlaySource = async (url: string): Promise<boolean> => {
+    // For local tracks, play direct relative asset URL
+    if (isLocalAudio) {
+      const localUrl = resolveAssetUrl(target.audioSrc);
+      const targetHref = new URL(localUrl, window.location.href).href;
+      if (audio.src !== targetHref) {
+        audio.src = targetHref;
+      }
       try {
-        if (!url) return false;
+        await audio.play();
+        setIsPlaying(true);
+        currentTrackIdRef.current = target.id;
+        updateMediaSession(target);
+      } catch (err: any) {
+        if (err && err.name === "NotAllowedError") {
+          setIsPlaying(false);
+        } else {
+          setAudioError(`Could not play "${target.title}". Tap to retry.`);
+        }
+      }
+      return;
+    }
+
+    // For remote tracks:
+    // Try direct remote audio first (fastest, unthrottled, native byte-ranges from archive.org CDN)
+    // If that fails, fallback to same-origin /api/music/proxy for strict school networks
+    const directUrl = target.audioSrc;
+    const proxiedUrl = `/api/music/proxy?url=${encodeURIComponent(directUrl)}`;
+
+    const trySource = async (url: string): Promise<boolean> => {
+      try {
         const targetHref = new URL(url, window.location.href).href;
         if (audio.src !== targetHref) {
           audio.src = targetHref;
-          audio.load();
         }
         await audio.play();
         setIsPlaying(true);
         setAudioError(null);
+        currentTrackIdRef.current = target.id;
         updateMediaSession(target);
         return true;
       } catch (err: any) {
         if (err && err.name === "NotAllowedError") {
           setIsPlaying(false);
-          setAudioError(null);
           return true;
         }
         return false;
       }
     };
 
-    // 1. Try preferred source (local MP3 directly, or school-unblocked server stream)
-    const okPrimary = await tryPlaySource(preferredUrl);
-    if (okPrimary) {
-      currentTrackIdRef.current = target.id;
-      return;
-    }
+    // 1. Try direct remote audio stream
+    const directOk = await trySource(directUrl);
+    if (directOk) return;
 
-    // 2. Direct fallback to original audioSrc (if remote and differs)
-    if (!isLocalAudio && preferredUrl !== target.audioSrc) {
-      const okDirect = await tryPlaySource(target.audioSrc);
-      if (okDirect) {
-        currentTrackIdRef.current = target.id;
-        return;
-      }
-    }
+    // 2. Try same-origin proxy of THIS EXACT TRACK (for school filter bypass)
+    const proxyOk = await trySource(proxiedUrl);
+    if (proxyOk) return;
 
-    // 3. Fallback to guaranteed local MP3 by artist
-    const localFallback = getSafeLocalFallback(target.artist);
-    if (localFallback && localFallback !== preferredUrl && localFallback !== target.audioSrc) {
-      const okFallback = await tryPlaySource(localFallback);
-      if (okFallback) {
-        currentTrackIdRef.current = target.id;
-        return;
-      }
-    }
-
-    setAudioError(`Could not stream "${target.title}". Tap play to retry.`);
+    // 3. If stream cannot be loaded, show error without playing a different song
     setIsPlaying(false);
+    setAudioError(`Could not stream "${target.title}". Tap play to retry.`);
   }, [allTracks, updateMediaSession]);
 
   const togglePlay = useCallback(async () => {
@@ -424,8 +399,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const isStaticHost = typeof window !== 'undefined' && 
         (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:');
 
-      const initialUrl = !isStaticHost && isRemoteUrl
-        ? `/api/music/proxy?url=${encodeURIComponent(currentTrack.audioSrc)}`
+      const initialUrl = isRemoteUrl
+        ? currentTrack.audioSrc
         : resolveAssetUrl(currentTrack.audioSrc);
 
       if (initialUrl) {
@@ -492,33 +467,22 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           }
           console.warn("Audio element error on:", audio.src, audio.error);
 
-          // If a proxied URL failed, try the direct remote URL
-          if (audio.src.includes('/api/music/proxy?url=')) {
-            try {
-              const urlParam = new URL(audio.src, window.location.origin).searchParams.get('url');
-              if (urlParam && audio.src !== urlParam) {
-                console.log("Proxy retry with direct remote source:", urlParam);
-                audio.src = urlParam;
-                audio.load();
-                if (isPlaying) {
-                  audio.play().catch(() => {});
-                }
-                return;
+          // If direct remote URL failed, retry via same-origin proxy of THIS EXACT TRACK
+          if (
+            currentTrack && 
+            !audio.src.includes('/api/music/proxy') && 
+            (currentTrack.audioSrc.startsWith('http://') || currentTrack.audioSrc.startsWith('https://'))
+          ) {
+            const proxyUrl = `/api/music/proxy?url=${encodeURIComponent(currentTrack.audioSrc)}`;
+            const proxyHref = new URL(proxyUrl, window.location.origin).href;
+            if (audio.src !== proxyHref) {
+              console.log("Direct remote failed, retrying via same-origin proxy:", currentTrack.title);
+              audio.src = proxyHref;
+              if (isPlaying) {
+                audio.play().catch(() => {});
               }
-            } catch (e) {}
-          }
-
-          // Fallback to guaranteed local MP3 for this artist so music never stops
-          const localFallback = getSafeLocalFallback(currentTrack?.artist);
-          const fallbackHref = new URL(localFallback, window.location.href).href;
-          if (audio.src !== fallbackHref) {
-            console.log("Audio switching to safe local fallback:", fallbackHref);
-            audio.src = fallbackHref;
-            audio.load();
-            if (isPlaying) {
-              audio.play().catch(() => {});
+              return;
             }
-            return;
           }
 
           setIsPlaying(false);
