@@ -354,11 +354,11 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 220,
     "cover": "./music/covers/new_west_those_eyes.jpg",
     "genre": "Indie Pop / Dream Pop",
-    "audioSrc": "https://archive.org/download/new-west-those-eyes-mp-3.pm_202607/New_West_-_Those_Eyes_(mp3.pm).mp3",
+    "audioSrc": "./music/drake_take_care_18_the_ride.mp3",
     "spotifyId": "5V2qgB03dY31bQ6y0h3EwE",
     "albumId": "album-those-eyes",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "track-tyler-see-you-again",
@@ -402,10 +402,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 194,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "https://archive.org/download/tyler-the-creator-flower-boy_22222/01%20Foreword%20(Featuring%20Rex%20Orange%20Co.mp3",
+    "audioSrc": "./music/tyler_flower_boy_01_foreword.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-flower-boy-track-2",
@@ -417,10 +417,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 194,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "https://archive.org/download/tyler-the-creator-flower-boy_22222/02%20Where%20This%20Flower%20Blooms%20(Featuri.mp3",
+    "audioSrc": "./music/tyler_flower_boy_02_where_this_flower_blooms.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 2,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-flower-boy-track-3",
@@ -432,10 +432,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 36,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "https://archive.org/download/tyler-the-creator-flower-boy_22222/03%20Sometimes....mp3",
+    "audioSrc": "./music/tyler_flower_boy_03_sometimes.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-flower-boy-track-4",
@@ -462,10 +462,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 205,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "https://archive.org/download/tyler-the-creator-flower-boy_22222/05%20Who%20Dat%20Boy%20(Featuring%20A%24Ap%20Rocky.mp3",
+    "audioSrc": "./music/tyler_flower_boy_05_who_dat_boy.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-flower-boy-track-6",
@@ -477,10 +477,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 237,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "https://archive.org/download/tyler-the-creator-flower-boy_22222/06%20Pothole%20(Featuring%20Jaden%20Smith).mp3",
+    "audioSrc": "./music/tyler_flower_boy_06_pothole.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-flower-boy-track-7",
@@ -492,10 +492,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 223,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "https://archive.org/download/tyler-the-creator-flower-boy_22222/07%20Garden%20Shed%20(Featuring%20Estelle).mp3",
+    "audioSrc": "./music/tyler_flower_boy_07_garden_shed.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 7,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-flower-boy-track-8",
@@ -507,10 +507,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 320,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "https://archive.org/download/tyler-the-creator-flower-boy_22222/08%20Boredom%20(Featuring%20Rex%20County%20Ora.mp3",
+    "audioSrc": "./music/tyler_flower_boy_08_boredom.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 8,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-flower-boy-track-9",
@@ -522,10 +522,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 206,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "https://archive.org/download/tyler-the-creator-flower-boy_22222/09%20I%20Ain't%20Got%20Time!.mp3",
+    "audioSrc": "./music/tyler_flower_boy_09_i_aint_got_time.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-flower-boy-track-10",
@@ -537,10 +537,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 255,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "https://archive.org/download/tyler-the-creator-flower-boy_22222/10%20911%20(Featuring%20Frank%20Ocean%20%26%20Stev.mp3",
+    "audioSrc": "./music/tyler_flower_boy_10_911_mr_lonely.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-flower-boy-track-11",
@@ -552,10 +552,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 60,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "https://archive.org/download/tyler-the-creator-flower-boy_22222/11%20Droppin'%20Seeds%20(Featuring%20Lil'%20Wa.mp3",
+    "audioSrc": "./music/tyler_flower_boy_11_droppin_seeds.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 11,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-flower-boy-track-12",
@@ -567,10 +567,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 225,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "https://archive.org/download/tyler-the-creator-flower-boy_22222/12%20November.mp3",
+    "audioSrc": "./music/tyler_flower_boy_12_november.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 12,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-flower-boy-track-13",
@@ -582,10 +582,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 224,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "https://archive.org/download/tyler-the-creator-flower-boy_22222/13%20Glitter.mp3",
+    "audioSrc": "./music/tyler_flower_boy_13_glitter.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 13,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-flower-boy-track-14",
@@ -597,10 +597,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 235,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "https://archive.org/download/tyler-the-creator-flower-boy_22222/14%20Enjoy%20Right%20Now%2C%20Today.mp3",
+    "audioSrc": "./music/tyler_flower_boy_14_enjoy_right_now_today.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 14,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-igor-track-1",
@@ -612,10 +612,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 200,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "https://archive.org/download/igor-tyler-the-creator_202608/01.%20IGOR'S%20THEME.mp3",
+    "audioSrc": "./music/tyler_igor_01_igors_theme.mp3",
     "albumId": "album-igor",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-igor-track-2",
@@ -627,10 +627,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 190,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "https://archive.org/download/igor-tyler-the-creator_202608/02.%20EARFQUAKE.mp3",
+    "audioSrc": "./music/tyler_igor_02_earfquake.mp3",
     "albumId": "album-igor",
     "trackNumber": 2,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-igor-track-3",
@@ -642,10 +642,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 212,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "https://archive.org/download/igor-tyler-the-creator_202608/03.%20I%20THINK.mp3",
+    "audioSrc": "./music/tyler_igor_03_i_think.mp3",
     "albumId": "album-igor",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-igor-track-4",
@@ -657,10 +657,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 14,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "https://archive.org/download/igor-tyler-the-creator_202608/04.%20EXACTLY%20WHAT%20YOU%20RUN%20FROM%20YOU%20END.mp3",
+    "audioSrc": "./music/tyler_igor_04_exactly_what_you_run_from.mp3",
     "albumId": "album-igor",
     "trackNumber": 4,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-igor-track-5",
@@ -672,10 +672,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 177,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "https://archive.org/download/igor-tyler-the-creator_202608/05.%20RUNNING%20OUT%20OF%20TIME.mp3",
+    "audioSrc": "./music/tyler_igor_05_running_out_of_time.mp3",
     "albumId": "album-igor",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-igor-track-6",
@@ -687,10 +687,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 195,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "https://archive.org/download/igor-tyler-the-creator_202608/06.%20NEW%20MAGIC%20WAND.mp3",
+    "audioSrc": "./music/tyler_igor_06_new_magic_wand.mp3",
     "albumId": "album-igor",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-igor-track-7",
@@ -702,10 +702,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 210,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "https://archive.org/download/igor-tyler-the-creator_202608/07.%20A%20BOY%20IS%20A%20GUN.mp3",
+    "audioSrc": "./music/tyler_igor_07_a_boy_is_a_gun.mp3",
     "albumId": "album-igor",
     "trackNumber": 7,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-igor-track-8",
@@ -717,10 +717,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 179,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "https://archive.org/download/igor-tyler-the-creator_202608/08.%20PUPPET.mp3",
+    "audioSrc": "./music/tyler_igor_08_puppet.mp3",
     "albumId": "album-igor",
     "trackNumber": 8,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-igor-track-9",
@@ -732,10 +732,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 205,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "https://archive.org/download/igor-tyler-the-creator_202608/09.%20WHAT'S%20GOOD.mp3",
+    "audioSrc": "./music/tyler_igor_09_whats_good.mp3",
     "albumId": "album-igor",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-igor-track-10",
@@ -747,10 +747,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 375,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "https://archive.org/download/igor-tyler-the-creator_202608/10.%20GONE%2C%20GONE%20THANK%20YOU.mp3",
+    "audioSrc": "./music/tyler_igor_10_gone_gone_thank_you.mp3",
     "albumId": "album-igor",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-igor-track-11",
@@ -762,10 +762,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 161,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "https://archive.org/download/igor-tyler-the-creator_202608/11.%20I%20DON'T%20LOVE%20YOU%20ANYMORE.mp3",
+    "audioSrc": "./music/tyler_igor_11_i_dont_love_you_anymore.mp3",
     "albumId": "album-igor",
     "trackNumber": 11,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-igor-track-12",
@@ -777,10 +777,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 265,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "https://archive.org/download/igor-tyler-the-creator_202608/12.%20ARE%20WE%20STILL%20FRIENDS.mp3",
+    "audioSrc": "./music/tyler_igor_12_are_we_still_friends.mp3",
     "albumId": "album-igor",
     "trackNumber": 12,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-cmiygl-track-1",
@@ -5187,10 +5187,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 272,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "https://archive.org/download/take-care-drake_202609/01.%20Over%20My%20Dead%20Body.mp3",
+    "audioSrc": "./music/drake_take_care_01_over_my_dead_body.mp3",
     "albumId": "album-take-care",
     "trackNumber": 1,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-2",
@@ -5202,10 +5202,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 224,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "https://archive.org/download/take-care-drake_202609/02.%20Shot%20For%20Me.mp3",
+    "audioSrc": "./music/drake_take_care_02_shot_for_me.mp3",
     "albumId": "album-take-care",
     "trackNumber": 2,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-3",
@@ -5217,10 +5217,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 236,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "https://archive.org/download/take-care-drake_202609/03.%20Headlines.mp3",
+    "audioSrc": "./music/drake_take_care_03_headlines.mp3",
     "albumId": "album-take-care",
     "trackNumber": 3,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-4",
@@ -5232,10 +5232,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 209,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "https://archive.org/download/take-care-drake_202609/04.%20Crew%20Love%20(Feat.%20The%20Weekend).mp3",
+    "audioSrc": "./music/drake_take_care_04_crew_love.mp3",
     "albumId": "album-take-care",
     "trackNumber": 4,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-5",
@@ -5247,10 +5247,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 277,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "https://archive.org/download/take-care-drake_202609/05.%20Take%20Care%20(Feat.%20Rihanna).mp3",
+    "audioSrc": "./music/drake_take_care_05_take_care.mp3",
     "albumId": "album-take-care",
     "trackNumber": 5,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-6",
@@ -5262,10 +5262,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 347,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "https://archive.org/download/take-care-drake_202609/06.%20Marvins%20Room%20-%20Buried%20Alive%20(Interlude)%20(Feat.%20Kendrick%20Lamar).mp3",
+    "audioSrc": "./music/drake_take_care_06_marvins_room.mp3",
     "albumId": "album-take-care",
     "trackNumber": 6,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-7",
@@ -5277,7 +5277,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 212,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "https://archive.org/download/take-care-drake_202609/07.%20Under%20Gound%20Kings.mp3",
+    "audioSrc": "./music/drake_take_care_07_buried_alive.mp3",
     "albumId": "album-take-care",
     "trackNumber": 7,
     "hasLocalAudio": true
@@ -5292,10 +5292,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 242,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "https://archive.org/download/take-care-drake_202609/08.%20Well%20Be%20Fine%20(Feat.%20Birdman).mp3",
+    "audioSrc": "./music/drake_take_care_08_under_ground_kings.mp3",
     "albumId": "album-take-care",
     "trackNumber": 8,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-9",
@@ -5307,10 +5307,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 216,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "https://archive.org/download/take-care-drake_202609/09.%20Make%20Me%20Proud%20(Feat.%20Nicki%20Minaj).mp3",
+    "audioSrc": "./music/drake_take_care_09_well_be_fine.mp3",
     "albumId": "album-take-care",
     "trackNumber": 9,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-10",
@@ -5322,10 +5322,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 307,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "https://archive.org/download/take-care-drake_202609/10.%20Lord%20Knows%20(Feat.%20Rick%20Ross).mp3",
+    "audioSrc": "./music/drake_take_care_10_make_me_proud.mp3",
     "albumId": "album-take-care",
     "trackNumber": 10,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-11",
@@ -5337,10 +5337,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 435,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "https://archive.org/download/take-care-drake_202609/11.%20Cameras%20-%20Good%20Ones%20Go%20(Interlude).mp3",
+    "audioSrc": "./music/drake_take_care_11_lord_knows.mp3",
     "albumId": "album-take-care",
     "trackNumber": 11,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-12",
@@ -5352,10 +5352,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 265,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "https://archive.org/download/take-care-drake_202609/12.%20Doing%20It%20Wrong.mp3",
+    "audioSrc": "./music/drake_take_care_12_cameras_good_ones_go.mp3",
     "albumId": "album-take-care",
     "trackNumber": 12,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-13",
@@ -5367,10 +5367,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 321,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "https://archive.org/download/take-care-drake_202609/13.%20The%20Real%20Her%20(Feat.%20Lil%20Wayne%20%26%20Andre%CC%81%203000).mp3",
+    "audioSrc": "./music/drake_take_care_13_doing_it_wrong.mp3",
     "albumId": "album-take-care",
     "trackNumber": 13,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-14",
@@ -5382,10 +5382,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 302,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "https://archive.org/download/take-care-drake_202609/14.%20Look%20What%20You%E2%80%99ve%20Done..mp3",
+    "audioSrc": "./music/drake_take_care_14_the_real_her.mp3",
     "albumId": "album-take-care",
     "trackNumber": 14,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-15",
@@ -5397,10 +5397,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 207,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "https://archive.org/download/take-care-drake_202609/15.%20HYFR%20(Hell%20Ya%20Fucking%20Right)%20(Feat.%20Lil%20Wayne).mp3",
+    "audioSrc": "./music/drake_take_care_15_look_what_youve_done.mp3",
     "albumId": "album-take-care",
     "trackNumber": 15,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-16",
@@ -5412,10 +5412,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 238,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "https://archive.org/download/take-care-drake_202609/16.%20Practice.mp3",
+    "audioSrc": "./music/drake_take_care_16_hyfr.mp3",
     "albumId": "album-take-care",
     "trackNumber": 16,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-take-care-track-17",
@@ -5427,10 +5427,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 351,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "https://archive.org/download/take-care-drake_202609/17.%20The%20Ride.mp3",
+    "audioSrc": "./music/drake_take_care_18_the_ride.mp3",
     "albumId": "album-take-care",
     "trackNumber": 17,
-    "hasLocalAudio": false
+    "hasLocalAudio": true
   },
   {
     "id": "album-clb-track-1",

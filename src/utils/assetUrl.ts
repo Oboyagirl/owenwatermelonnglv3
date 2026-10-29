@@ -25,7 +25,7 @@ export function resolveAssetUrl(url: string | undefined | null): string {
 
   // Add cache buster for music covers to ensure browser cache is busted when artwork is updated
   if (cleanPath.startsWith('music/covers/') || cleanPath.includes('covers/')) {
-    const version = 'v=20261028_takecare_v3';
+    const version = 'v=20261029_takecare_verified_v5';
     const separator = cleanPath.includes('?') ? '&' : '?';
     return `./${cleanPath}${separator}${version}`;
   }

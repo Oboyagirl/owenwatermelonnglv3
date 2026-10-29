@@ -5,8 +5,13 @@ import https from 'https';
 import http from 'http';
 import fs from 'fs';
 import zlib from 'zlib';
+import crypto from 'crypto';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 import { Readable } from 'node:stream';
 import { GoogleGenAI } from '@google/genai';
+
+const execFileAsync = promisify(execFile);
 
 async function startServer() {
   const app = express();
@@ -180,17 +185,30 @@ async function startServer() {
 
   const primaryMusicDir = path.resolve('public/music');
   const fallbackMusicDir = path.resolve('dist/music');
+  const cacheMusicDir = path.resolve('public/music/cache');
+  if (!fs.existsSync(cacheMusicDir)) {
+    fs.mkdirSync(cacheMusicDir, { recursive: true });
+  }
+
+  // Active transcode map to avoid duplicate simultaneous conversions
+  const activeTranscodes = new Map<string, Promise<string | null>>();
 
   // Serve static real MP3 music with byte-range streaming support (compatible with iOS iPad Safari & Chrome)
-  const streamAudioFile = (filename: string, req: express.Request, res: express.Response) => {
-    const cleanFilename = path.basename(filename);
-    let filePath = path.join(primaryMusicDir, cleanFilename);
-    if (!fs.existsSync(filePath)) {
-      filePath = path.join(fallbackMusicDir, cleanFilename);
+  const streamAudioFile = (filenameOrPath: string, req: express.Request, res: express.Response) => {
+    let filePath = filenameOrPath;
+    if (!path.isAbsolute(filePath)) {
+      const cleanFilename = path.basename(filenameOrPath);
+      filePath = path.join(primaryMusicDir, cleanFilename);
+      if (!fs.existsSync(filePath)) {
+        filePath = path.join(cacheMusicDir, cleanFilename);
+      }
+      if (!fs.existsSync(filePath)) {
+        filePath = path.join(fallbackMusicDir, cleanFilename);
+      }
     }
 
     if (!fs.existsSync(filePath)) {
-      return res.status(404).send('Audio file not found: ' + cleanFilename);
+      return res.status(404).send('Audio file not found: ' + filenameOrPath);
     }
 
     const stat = fs.statSync(filePath);
@@ -242,9 +260,6 @@ async function startServer() {
     }
   };
 
-  // Dynamic Real MP3 Resolution & Streaming for all album songs
-  const musicPreviewCache = new Map<string, string>();
-
   // Dedicated Real MP3 Streaming & School-Unblocked Audio Proxy
   const resolvedTargetCache = new Map<string, string>();
 
@@ -288,8 +303,95 @@ async function startServer() {
     const remoteUrl = String(req.query.url || '');
     const local = String(req.query.local || '');
 
-    // 1. Direct proxy for full-length MP3 URLs (archive.org, etc.) - Bypasses all school web filters
+    // Check direct local request
+    if (local) {
+      const cleanFilename = path.basename(local);
+      const localPath = path.join(primaryMusicDir, cleanFilename);
+      if (fs.existsSync(localPath)) {
+        return streamAudioFile(cleanFilename, req, res);
+      }
+    }
+
+    // 1. MP3 Streaming & Caching for remote URLs
+    // Encodes/Serves every track in the exact same format as See You Again (MPEG-1 Layer 3, 128 kbps, 44.1 kHz, stereo)
     if (remoteUrl && (remoteUrl.startsWith('http://') || remoteUrl.startsWith('https://'))) {
+      const urlHash = crypto.createHash('md5').update(remoteUrl).digest('hex');
+      const cachedFilePath = path.join(cacheMusicDir, `${urlHash}.mp3`);
+
+      // If already cached/transcoded, stream instantly with 206 Partial Content
+      if (fs.existsSync(cachedFilePath)) {
+        return streamAudioFile(cachedFilePath, req, res);
+      }
+
+      // Check if this URL corresponds to an existing local track in public/music/
+      try {
+        const decodedUrl = decodeURIComponent(remoteUrl);
+        const urlBasename = path.basename(decodedUrl).toLowerCase();
+        const primaryFiles = fs.readdirSync(primaryMusicDir);
+        const matched = primaryFiles.find(f => {
+          const lower = f.toLowerCase();
+          return lower === urlBasename || (urlBasename.length > 5 && lower.includes(urlBasename.slice(0, 15)));
+        });
+        if (matched) {
+          return streamAudioFile(path.join(primaryMusicDir, matched), req, res);
+        }
+      } catch {}
+
+      // Check if transcode is already in-flight
+      let transcodePromise = activeTranscodes.get(urlHash);
+      if (!transcodePromise) {
+        transcodePromise = (async () => {
+          const tempRaw = path.join('/tmp', `raw_${urlHash}_${Date.now()}.tmp`);
+          try {
+            const targetUrl = await resolveTargetAudioUrl(remoteUrl);
+            const remoteRes = await fetch(targetUrl, {
+              headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+                'Accept': '*/*'
+              },
+              redirect: 'follow',
+              signal: AbortSignal.timeout(30000)
+            });
+
+            if (!remoteRes.ok) {
+              return null;
+            }
+
+            const arrayBuffer = await remoteRes.arrayBuffer();
+            fs.writeFileSync(tempRaw, Buffer.from(arrayBuffer));
+
+            // Transcode with ffmpeg to standard 44.1kHz, 128kbps stereo MP3 (exact same as tyler_see_you_again.mp3)
+            await execFileAsync('ffmpeg', [
+              '-y', '-v', 'error',
+              '-i', tempRaw,
+              '-vn',
+              '-c:a', 'libmp3lame',
+              '-b:a', '128k',
+              '-ar', '44100',
+              '-ac', '2',
+              cachedFilePath
+            ]);
+
+            return cachedFilePath;
+          } catch (err) {
+            console.warn('On-demand transcode error for:', remoteUrl, err);
+            return null;
+          } finally {
+            try {
+              if (fs.existsSync(tempRaw)) fs.unlinkSync(tempRaw);
+            } catch {}
+            activeTranscodes.delete(urlHash);
+          }
+        })();
+        activeTranscodes.set(urlHash, transcodePromise);
+      }
+
+      const transcodedPath = await transcodePromise;
+      if (transcodedPath && fs.existsSync(transcodedPath)) {
+        return streamAudioFile(transcodedPath, req, res);
+      }
+
+      // Fallback: direct streaming proxy with audio/mpeg headers
       try {
         const targetUrl = await resolveTargetAudioUrl(remoteUrl);
         const clientRange = req.headers.range;
@@ -313,17 +415,7 @@ async function startServer() {
         }
 
         res.status(remoteRes.status);
-        
-        let contentType = remoteRes.headers.get('content-type') || '';
-        if (!contentType || contentType.includes('text') || contentType.includes('html')) {
-          if (targetUrl.endsWith('.m4a') || targetUrl.endsWith('.mp4') || remoteUrl.endsWith('.m4a')) {
-            contentType = 'audio/mp4';
-          } else {
-            contentType = 'audio/mpeg';
-          }
-        }
-        res.setHeader('Content-Type', contentType);
-
+        res.setHeader('Content-Type', 'audio/mpeg');
         if (remoteRes.headers.get('content-length')) {
           res.setHeader('Content-Length', remoteRes.headers.get('content-length')!);
         }
@@ -352,19 +444,11 @@ async function startServer() {
         }
       } catch (proxyErr) {
         resolvedTargetCache.delete(remoteUrl);
-        console.warn('Direct MP3 proxy failed for URL:', remoteUrl, proxyErr);
+        console.warn('Direct MP3 proxy fallback failed for URL:', remoteUrl, proxyErr);
         if (!res.headersSent) {
           return res.status(502).send('Proxy error streaming remote track');
         }
         return;
-      }
-    }
-
-    if (local) {
-      const cleanFilename = path.basename(local);
-      const localPath = path.join(primaryMusicDir, cleanFilename);
-      if (fs.existsSync(localPath)) {
-        return streamAudioFile(cleanFilename, req, res);
       }
     }
 
