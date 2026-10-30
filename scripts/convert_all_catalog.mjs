@@ -1,7 +1,9 @@
 import fs from 'fs';
 import path from 'path';
-import { execSync } from 'child_process';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 
+const execAsync = promisify(exec);
 const MUSIC_DIR = path.resolve('public/music');
 const MUSIC_DATA_PATH = path.resolve('src/data/musicData.ts');
 
@@ -9,11 +11,11 @@ if (!fs.existsSync(MUSIC_DIR)) {
   fs.mkdirSync(MUSIC_DIR, { recursive: true });
 }
 
-async function sleep(ms) {
+function sleep(ms) {
   return new Promise(r => setTimeout(r, ms));
 }
 
-// Download and convert single file using ffmpeg to 128k 44.1kHz stereo MP3
+// Download and convert single file using ffmpeg to standard 128k 44.1kHz stereo MP3
 async function downloadAndTranscode(url, filename) {
   const targetPath = path.join(MUSIC_DIR, filename);
   if (fs.existsSync(targetPath) && fs.statSync(targetPath).size > 100000) {
@@ -53,9 +55,8 @@ async function downloadAndTranscode(url, filename) {
     fs.writeFileSync(tempRaw, Buffer.from(arrayBuffer));
 
     console.log(`[TRANSCODING] ${filename} to 128k 44.1kHz stereo MP3...`);
-    execSync(`ffmpeg -y -v error -i "${tempRaw}" -vn -c:a libmp3lame -b:a 128k -ar 44100 -ac 2 "${targetPath}"`);
+    await execAsync(`ffmpeg -y -v error -i "${tempRaw}" -vn -c:a libmp3lame -b:a 128k -ar 44100 -ac 2 "${targetPath}"`);
     console.log(`[DONE] ${filename} (${fs.statSync(targetPath).size} bytes)`);
-    await sleep(200);
     return true;
   } catch (err) {
     console.warn(`[FAILED TRANSCODE] ${filename}: ${err.message}`);
@@ -65,27 +66,6 @@ async function downloadAndTranscode(url, filename) {
       if (fs.existsSync(tempRaw)) fs.unlinkSync(tempRaw);
     } catch {}
   }
-}
-
-// Function to update a track in src/data/musicData.ts
-function updateTrackInCatalog(trackId, localFile) {
-  let content = fs.readFileSync(MUSIC_DATA_PATH, 'utf8');
-  const reg = new RegExp(`(\\{[\\s\\S]*?"id":\\s*"${trackId}"[\\s\\S]*?\\})`);
-  const match = content.match(reg);
-  if (match) {
-    let block = match[1];
-    block = block.replace(/"audioSrc":\s*"[^"]+"/, `"audioSrc": "${localFile}"`);
-    if (block.includes('"hasLocalAudio"')) {
-      block = block.replace(/"hasLocalAudio":\s*(true|false)/, `"hasLocalAudio": true`);
-    } else {
-      block = block.replace(/\n\s*\},?$/, `,\n    "hasLocalAudio": true\n  }`);
-    }
-    content = content.replace(match[1], block);
-    fs.writeFileSync(MUSIC_DATA_PATH, content, 'utf8');
-    console.log(`[CATALOG UPDATED] ${trackId} -> ${localFile}`);
-    return true;
-  }
-  return false;
 }
 
 // Map each album to its Archive.org identifier and track resolution rule
@@ -525,37 +505,127 @@ const ALBUMS_PIPELINE = [
       { num: 14, file: 'Alex G/2012 - Trick/14 - Sarah.mp3' },
       { num: 15, file: 'Alex G/2012 - Trick/15 - 16 Mirrors.mp3' }
     ]
+  },
+  // 20. Alex G - House of Sugar
+  {
+    archiveId: 'full-discography-alex-g',
+    albumPrefix: 'alex_g_house_of_sugar',
+    tracksPrefix: 'album-house-of-sugar-track-',
+    mapping: [
+      { num: 1, file: 'Alex G/2019 - House Of Sugar/01 - Walk Away.mp3' },
+      { num: 2, file: 'Alex G/2019 - House Of Sugar/02 - Hope.mp3' },
+      { num: 3, file: 'Alex G/2019 - House Of Sugar/03 - Southern Sky.mp3' },
+      { num: 4, file: 'Alex G/2019 - House Of Sugar/04 - Gretel.mp3' },
+      { num: 5, file: 'Alex G/2019 - House Of Sugar/05 - Taking.mp3' },
+      { num: 6, file: 'Alex G/2019 - House Of Sugar/06 - Near.mp3' },
+      { num: 7, file: 'Alex G/2019 - House Of Sugar/07 - Project 2.mp3' },
+      { num: 8, file: 'Alex G/2019 - House Of Sugar/08 - Bad Man.mp3' },
+      { num: 9, file: 'Alex G/2019 - House Of Sugar/09 - Sugar.mp3' },
+      { num: 10, file: 'Alex G/2019 - House Of Sugar/10 - In My Arms.mp3' },
+      { num: 11, file: 'Alex G/2019 - House Of Sugar/11 - Cow.mp3' },
+      { num: 12, file: 'Alex G/2019 - House Of Sugar/12 - Crime.mp3' },
+      { num: 13, file: 'Alex G/2019 - House Of Sugar/13 - SugarHouse (Live).mp3' }
+    ]
+  },
+  // 21. Alex G - God Save the Animals
+  {
+    archiveId: 'full-discography-alex-g',
+    albumPrefix: 'alex_g_god_save',
+    tracksPrefix: 'album-god-save-the-animals-track-',
+    mapping: [
+      { num: 1, file: 'Alex G/2022 - God Save The Animals/01. After All.mp3' },
+      { num: 2, file: 'Alex G/2022 - God Save The Animals/02. Runner.mp3' },
+      { num: 3, file: 'Alex G/2022 - God Save The Animals/03. Mission.mp3' },
+      { num: 4, file: 'Alex G/2022 - God Save The Animals/04. S.D.O.S.mp3' },
+      { num: 5, file: 'Alex G/2022 - God Save The Animals/05. No Bitterness.mp3' },
+      { num: 6, file: "Alex G/2022 - God Save The Animals/06. Ain't It Easy.mp3" },
+      { num: 7, file: 'Alex G/2022 - God Save The Animals/07. Cross the Sea.mp3' },
+      { num: 8, file: 'Alex G/2022 - God Save The Animals/08. Blessing.mp3' },
+      { num: 9, file: 'Alex G/2022 - God Save The Animals/09. Early Morning Waiting.mp3' },
+      { num: 10, file: 'Alex G/2022 - God Save The Animals/10. Immunity.mp3' },
+      { num: 11, file: 'Alex G/2022 - God Save The Animals/11. Headroom Piano.mp3' },
+      { num: 12, file: 'Alex G/2022 - God Save The Animals/12. Miracles.mp3' },
+      { num: 13, file: 'Alex G/2022 - God Save The Animals/13. Forgive.mp3' }
+    ]
   }
 ];
 
+// Single serialized lock for updating musicData.ts
+let isUpdatingCatalog = false;
+async function updateCatalogBatch(updates) {
+  while (isUpdatingCatalog) {
+    await sleep(50);
+  }
+  isUpdatingCatalog = true;
+  try {
+    let content = fs.readFileSync(MUSIC_DATA_PATH, 'utf8');
+    for (const { trackId, localFile } of updates) {
+      const reg = new RegExp(`(\\{[\\s\\S]*?"id":\\s*"${trackId}"[\\s\\S]*?\\})`);
+      const match = content.match(reg);
+      if (match) {
+        let block = match[1];
+        block = block.replace(/"audioSrc":\s*"[^"]+"/, `"audioSrc": "${localFile}"`);
+        if (block.includes('"hasLocalAudio"')) {
+          block = block.replace(/"hasLocalAudio":\s*(true|false)/, `"hasLocalAudio": true`);
+        } else {
+          block = block.replace(/\n\s*\},?$/, `,\n    "hasLocalAudio": true\n  }`);
+        }
+        content = content.replace(match[1], block);
+      }
+    }
+    fs.writeFileSync(MUSIC_DATA_PATH, content, 'utf8');
+  } finally {
+    isUpdatingCatalog = false;
+  }
+}
+
+async function runWorker(tasksQueue, workerId) {
+  const localUpdates = [];
+  while (tasksQueue.length > 0) {
+    const task = tasksQueue.shift();
+    if (!task) break;
+    const ok = await downloadAndTranscode(task.url, task.filename);
+    if (ok) {
+      localUpdates.push({ trackId: task.trackId, localFile: `./music/${task.filename}` });
+      if (localUpdates.length >= 3) {
+        await updateCatalogBatch(localUpdates.splice(0, localUpdates.length));
+      }
+    }
+  }
+  if (localUpdates.length > 0) {
+    await updateCatalogBatch(localUpdates);
+  }
+}
+
 async function main() {
-  console.log(`Starting conversion pipeline for ${ALBUMS_PIPELINE.length} albums...`);
-  
-  // Link Kendrick Not Like Us first
-  updateTrackInCatalog('track-kendrick-not-like-us', './music/kendrick_not_like_us.mp3');
-  updateTrackInCatalog('album-not-like-us-track-1', './music/kendrick_not_like_us.mp3');
+  console.log(`Building task queue for ${ALBUMS_PIPELINE.length} albums...`);
+  const allTasks = [];
 
   for (const album of ALBUMS_PIPELINE) {
-    console.log(`\n========================================`);
-    console.log(`Processing ${album.albumPrefix} (${album.mapping.length} tracks)...`);
-    console.log(`========================================`);
-
     for (const item of album.mapping) {
       const localFilename = `${album.albumPrefix}_${String(item.num).padStart(2, '0')}.mp3`;
       const encodedFile = item.file.split('/').map(encodeURIComponent).join('/');
       const archiveUrl = `https://archive.org/download/${album.archiveId}/${encodedFile}`;
       const trackId = `${album.tracksPrefix}${item.num}`;
-
-      const ok = await downloadAndTranscode(archiveUrl, localFilename);
-      if (ok) {
-        updateTrackInCatalog(trackId, `./music/${localFilename}`);
-      }
+      allTasks.push({
+        url: archiveUrl,
+        filename: localFilename,
+        trackId: trackId
+      });
     }
   }
 
+  console.log(`Total tasks to process: ${allTasks.length}`);
+  const CONCURRENCY = 4;
+  const workers = [];
+  for (let i = 0; i < CONCURRENCY; i++) {
+    workers.push(runWorker(allTasks, i + 1));
+  }
+
+  await Promise.all(workers);
   console.log('\n========================================');
   console.log('ALL ALBUMS CONVERSION PIPELINE FINISHED!');
   console.log('========================================');
 }
 
-main();
+main().catch(console.error);
