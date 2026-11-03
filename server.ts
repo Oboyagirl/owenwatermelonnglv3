@@ -193,8 +193,20 @@ async function startServer() {
   // Active transcode map to avoid duplicate simultaneous conversions
   const activeTranscodes = new Map<string, Promise<string | null>>();
 
+  // Cache of known archive.org URLs for each catalog filename
+  let albumSourceUrlsMap: Record<string, string> = {};
+  const loadSourceUrls = () => {
+    try {
+      const urlsPath = path.resolve('src/data/albumSourceUrls.json');
+      if (fs.existsSync(urlsPath)) {
+        albumSourceUrlsMap = JSON.parse(fs.readFileSync(urlsPath, 'utf8'));
+      }
+    } catch {}
+  };
+  loadSourceUrls();
+
   // Serve static real MP3 music with byte-range streaming support (compatible with iOS iPad Safari & Chrome)
-  const streamAudioFile = (filenameOrPath: string, req: express.Request, res: express.Response) => {
+  const streamAudioFile = async (filenameOrPath: string, req: express.Request, res: express.Response) => {
     let filePath = filenameOrPath;
     if (!path.isAbsolute(filePath)) {
       const cleanFilename = path.basename(filenameOrPath);
@@ -208,6 +220,70 @@ async function startServer() {
     }
 
     if (!fs.existsSync(filePath)) {
+      const cleanFilename = path.basename(filenameOrPath);
+      let sourceUrl = albumSourceUrlsMap[cleanFilename];
+      if (!sourceUrl) {
+        loadSourceUrls();
+        sourceUrl = albumSourceUrlsMap[cleanFilename];
+      }
+
+      if (sourceUrl) {
+        const targetDiskPath = path.join(primaryMusicDir, cleanFilename);
+        try {
+          const targetUrl = await resolveTargetAudioUrl(sourceUrl);
+          const clientRange = req.headers.range;
+          const fetchHeaders: Record<string, string> = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            'Accept': '*/*'
+          };
+          if (clientRange) fetchHeaders['Range'] = clientRange;
+
+          const remoteRes = await fetch(targetUrl, {
+            headers: fetchHeaders,
+            redirect: 'follow',
+            signal: AbortSignal.timeout(20000)
+          });
+
+          if (remoteRes.ok || remoteRes.status === 206) {
+            res.status(remoteRes.status);
+            res.setHeader('Content-Type', 'audio/mpeg');
+            res.setHeader('Accept-Ranges', 'bytes');
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            res.setHeader('Cache-Control', 'public, max-age=86400');
+            if (remoteRes.headers.get('content-length')) {
+              res.setHeader('Content-Length', remoteRes.headers.get('content-length')!);
+            }
+            if (remoteRes.headers.get('content-range')) {
+              res.setHeader('Content-Range', remoteRes.headers.get('content-range')!);
+            }
+            res.flushHeaders?.();
+
+            if (remoteRes.body) {
+              const nodeStream = Readable.fromWeb(remoteRes.body as any);
+              nodeStream.pipe(res);
+
+              // Asynchronously save to local disk if not already present
+              if (!fs.existsSync(targetDiskPath)) {
+                fetch(targetUrl, {
+                  headers: { 'User-Agent': 'Mozilla/5.0' },
+                  redirect: 'follow'
+                })
+                  .then(r => r.arrayBuffer())
+                  .then(buf => {
+                    if (buf.byteLength > 100000) {
+                      fs.writeFileSync(targetDiskPath, Buffer.from(buf));
+                    }
+                  })
+                  .catch(() => {});
+              }
+              return;
+            }
+          }
+        } catch (err: any) {
+          console.warn(`[STREAM FALLBACK ERROR] for ${cleanFilename}:`, err.message);
+        }
+      }
+
       return res.status(404).send('Audio file not found: ' + filenameOrPath);
     }
 

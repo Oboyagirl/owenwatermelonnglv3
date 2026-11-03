@@ -354,7 +354,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 220,
     "cover": "./music/covers/new_west_those_eyes.jpg",
     "genre": "Indie Pop / Dream Pop",
-    "audioSrc": "./music/alex_g_god_save_13.mp3",
+    "audioSrc": "./music/new_west_those_eyes.mp3",
     "spotifyId": "5V2qgB03dY31bQ6y0h3EwE",
     "albumId": "album-those-eyes",
     "trackNumber": 1,

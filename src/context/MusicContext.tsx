@@ -202,6 +202,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const targetHref = new URL(localUrl, window.location.href).href;
       if (audio.src !== targetHref) {
         audio.src = targetHref;
+        try { audio.load(); } catch {}
       }
       try {
         await audio.play();
@@ -211,7 +212,26 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       } catch (err: any) {
         if (err && err.name === "NotAllowedError") {
           setIsPlaying(false);
+        } else if (err && err.name === "AbortError") {
+          try {
+            await audio.play();
+            setIsPlaying(true);
+            currentTrackIdRef.current = target.id;
+            updateMediaSession(target);
+          } catch {}
         } else {
+          const cleanName = target.audioSrc.replace(/^(\.\/|\/)+/, '').replace(/^music\//, '');
+          const fallbackHref = new URL(`./music/${cleanName}`, window.location.href).href;
+          if (audio.src !== fallbackHref) {
+            audio.src = fallbackHref;
+            try {
+              await audio.play();
+              setIsPlaying(true);
+              currentTrackIdRef.current = target.id;
+              updateMediaSession(target);
+              return;
+            } catch {}
+          }
           setAudioError(`Could not play "${target.title}". Tap to retry.`);
         }
       }
