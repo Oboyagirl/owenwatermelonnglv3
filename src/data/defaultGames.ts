@@ -1069,6 +1069,62 @@ const CURATED_GAMES: Game[] = [
       { key: "Arrow Keys / WASD", action: "Move & Jump" },
       { key: "Space", action: "Activate Gadget" }
     ]
+  },
+  {
+    id: "diep-io",
+    source: "unblocked",
+    title: "Diep.io (Tank Arena)",
+    description: "Survive and dominate the tank arena! Shoot shapes to earn XP, upgrade your health, speed, and cannon power, and evolve into specialized battle tanks.",
+    category: "Action",
+    secondaryCategory: "Potato Classics",
+    thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&auto=format&fit=crop&q=80",
+    mirrors: [
+      "games/diep-io.html",
+      "https://diep.io/",
+      "https://arras.io/"
+    ],
+    tags: ["Diep.io", "Deip.io", "Diep", "Tank", "Arena", "IO Games", "Multiplayer", "Shooter", "Action", "Unblocked"],
+    rating: 4.9,
+    plays: 350000,
+    author: "Matheus Valadares",
+    featured: true,
+    iframeSrc: "games/diep-io.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Diep.io (Tank Arena)" src="games/diep-io.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "WASD / Arrows", action: "Drive Tank" },
+      { key: "Mouse Aim & Click", action: "Aim & Fire Cannon" },
+      { key: "1 - 8 Keys", action: "Upgrade Stats" },
+      { key: "E", action: "Auto-Fire Toggle" },
+      { key: "C", action: "Auto-Spin Toggle" }
+    ]
+  },
+  {
+    id: "spaceflight-simulator",
+    source: "unblocked",
+    title: "Spaceflight Simulator",
+    description: "Build your own custom rockets from realistic parts, calculate orbital mechanics, launch into space, and land on the Moon, Mars, and beyond in this physics-based space sim.",
+    category: "Simulation",
+    secondaryCategory: "Potato Classics",
+    thumbnail: "https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?w=1200&auto=format&fit=crop&q=80",
+    mirrors: [
+      "games/spaceflight-simulator.html",
+      "https://ubghyper.github.io/GameList.github.io/Spaceflight-Simulator/"
+    ],
+    tags: ["Spaceflight Simulator", "Space Flight Sim", "Rocket", "Space", "Physics", "Simulation", "Orbit", "Stef Morojna", "Unblocked"],
+    rating: 5.0,
+    plays: 420000,
+    author: "Stef Morojna",
+    featured: true,
+    iframeSrc: "games/spaceflight-simulator.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Spaceflight Simulator" src="games/spaceflight-simulator.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Mouse Drag & Click", action: "Build Rocket / Place Modules" },
+      { key: "Throttle Slider / Space", action: "Adjust Engine Thrust" },
+      { key: "A / D or Left / Right", action: "RCS / Rotate Rocket" },
+      { key: "Staging Buttons", action: "Ignite / Detach Stages" }
+    ]
   }
 ];
 
@@ -1112,10 +1168,15 @@ export const URL_OVERRIDES: Record<string, string> = {
   "pokemonred": "games/pokemon-red.html",
   "pokemon-red": "games/pokemon-red.html",
 
-  // Flight Simulators & Gunblood
+  // Spaceflight Simulator & Flight Games
+  "spaceflight-simulator": "games/spaceflight-simulator.html",
+  "spaceflightsimulator": "games/spaceflight-simulator.html",
+  "space-flight-simulator": "games/spaceflight-simulator.html",
+  "spaceflightsim": "games/spaceflight-simulator.html",
+  "space-flight-sim": "games/spaceflight-simulator.html",
+  "potatoes-spaceflight-simulator": "games/spaceflight-simulator.html",
   "flash-flight-simulator-1": "games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Flash-Flight-Simulator-1/flashflightsimulator.swf&title=Flash+Flight+Simulator",
   "flash-flight-simulator": "games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Flash-Flight-Simulator-1/flashflightsimulator.swf&title=Flash+Flight+Simulator",
-  "spaceflight-simulator": "games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Flash-Flight-Simulator-1/flashflightsimulator.swf&title=Flash+Flight+Simulator",
   "gunblood": "games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Gunblood/gunblood.swf&title=Gunblood",
 
   // Fireboy and Watergirl Series (Native HTML5 Engines)
@@ -1132,6 +1193,12 @@ export const URL_OVERRIDES: Record<string, string> = {
   "serenitrove": "games/serenitrove.html",
 
   // .io Games (Direct Working Clones without ad/argix redirects)
+  "diep-io": "games/diep-io.html",
+  "diep": "games/diep-io.html",
+  "diepio": "games/diep-io.html",
+  "deip-io": "games/diep-io.html",
+  "deipio": "games/diep-io.html",
+  "potatoes-diep-io": "games/diep-io.html",
   "agar-io": "https://7zeb.github.io/homework/agariolite.html",
   "potatoes-agar-io": "https://7zeb.github.io/homework/agariolite.html",
   "agariolite": "https://7zeb.github.io/homework/agariolite.html",

@@ -138,7 +138,9 @@ const PRESERVED_LOCAL_GAMES = new Set([
   "games/soccer-random/index.html",
   "games/volley-random.html",
   "games/basket-random.html",
-  "games/boxing-random.html"
+  "games/boxing-random.html",
+  "games/diep-io.html",
+  "games/spaceflight-simulator.html"
 ]);
 
 function cleanText(str: string): string {
@@ -163,6 +165,33 @@ export function resolveGameSource(
   const safeMirrors = Array.isArray(mirrors) ? mirrors : [];
 
   // Specialized top-priority handlers for requested games
+  if (
+    safeId.includes('diep') || safeId.includes('deip') ||
+    safeTitle.toLowerCase().includes('diep') || safeTitle.toLowerCase().includes('deip')
+  ) {
+    return {
+      src: 'games/diep-io.html',
+      mirrors: [
+        'games/diep-io.html',
+        'https://diep.io/',
+        'https://arras.io/'
+      ]
+    };
+  }
+
+  if (
+    safeId.includes('spaceflight') || safeId.includes('space-flight') ||
+    safeTitle.toLowerCase().includes('spaceflight') || safeTitle.toLowerCase().includes('space flight')
+  ) {
+    return {
+      src: 'games/spaceflight-simulator.html',
+      mirrors: [
+        'games/spaceflight-simulator.html',
+        'https://ubghyper.github.io/GameList.github.io/Spaceflight-Simulator/'
+      ]
+    };
+  }
+
   if (safeId === 'retro-bowl' || safeId === 'potatoes-retro-bowl') {
     return {
       src: 'https://retro--bowl.pages.dev/',
