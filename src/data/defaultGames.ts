@@ -833,8 +833,7 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/btd1.jpg",
     mirrors: [
-      "games/bloons-td-1.html",
-      "https://7zeb.github.io/homework/bloonsTD.html",
+      "https://gameinclassroom.github.io/bloons-tower-defense-1/",
       "https://ubghyper.github.io/GameList.github.io/Bloons-Tower-Defense/"
     ],
     tags: ["Bloons", "BTD", "Bloons TD", "Tower Defense", "Strategy", "Classic", "Owen OG", "Unblocked"],
@@ -842,8 +841,8 @@ const CURATED_GAMES: Game[] = [
     plays: 198000,
     author: "Ninja Kiwi",
     featured: true,
-    iframeSrc: "games/bloons-td-1.html",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Bloons Tower Defence" src="games/bloons-td-1.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://gameinclassroom.github.io/bloons-tower-defense-1/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Bloons Tower Defence" src="https://gameinclassroom.github.io/bloons-tower-defense-1/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Left Click", action: "Select & Place Towers" },
       { key: "Click Tower", action: "Upgrade & Target Strategy" }
@@ -858,7 +857,6 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/btd2.jpg",
     mirrors: [
-      "games/bloons-td-2.html",
       "https://7zeb.github.io/homework/bloonsTD2.html",
       "https://ubghyper.github.io/GameList.github.io/Bloonstd-2/"
     ],
@@ -867,8 +865,8 @@ const CURATED_GAMES: Game[] = [
     plays: 231000,
     author: "Ninja Kiwi",
     featured: true,
-    iframeSrc: "games/bloons-td-2.html",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Bloons Tower Defence 2" src="games/bloons-td-2.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://7zeb.github.io/homework/bloonsTD2.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Bloons Tower Defence 2" src="https://7zeb.github.io/homework/bloonsTD2.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Left Click", action: "Select & Place Towers" },
       { key: "Click Tower", action: "Upgrade / Sell" }
@@ -883,7 +881,6 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/btd3.jpg",
     mirrors: [
-      "games/bloons-td-3.html",
       "https://7zeb.github.io/homework/bloonsTD3.html",
       "https://ubghyper.github.io/GameList.github.io/Bloonstd-3/"
     ],
@@ -892,8 +889,8 @@ const CURATED_GAMES: Game[] = [
     plays: 265000,
     author: "Ninja Kiwi",
     featured: true,
-    iframeSrc: "games/bloons-td-3.html",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Bloons Tower Defence 3" src="games/bloons-td-3.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://7zeb.github.io/homework/bloonsTD3.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Bloons Tower Defence 3" src="https://7zeb.github.io/homework/bloonsTD3.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Left Click", action: "Select & Place Towers" },
       { key: "Click Tower", action: "Upgrade / Sell" }
@@ -908,7 +905,6 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/btd4.jpg",
     mirrors: [
-      "games/bloons-td-4.html",
       "https://7zeb.github.io/homework/bloonsTD4.html",
       "https://ubghyper.github.io/GameList.github.io/Bloonstd-4/"
     ],
@@ -917,8 +913,8 @@ const CURATED_GAMES: Game[] = [
     plays: 312000,
     author: "Ninja Kiwi",
     featured: true,
-    iframeSrc: "games/bloons-td-4.html",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Bloons TD 4" src="games/bloons-td-4.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://7zeb.github.io/homework/bloonsTD4.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Bloons TD 4" src="https://7zeb.github.io/homework/bloonsTD4.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Left Click", action: "Select & Place Towers" },
       { key: "Click Tower", action: "Upgrade / Target Mode" }
@@ -933,7 +929,6 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/btd5.png",
     mirrors: [
-      "games/bloons-td-5.html",
       "https://7zeb.github.io/homework/bloonsTD5.html",
       "https://ubghyper.github.io/GameList.github.io/Bloonstd-5/"
     ],
@@ -942,8 +937,8 @@ const CURATED_GAMES: Game[] = [
     plays: 450000,
     author: "Ninja Kiwi",
     featured: true,
-    iframeSrc: "games/bloons-td-5.html",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Bloons TD 5" src="games/bloons-td-5.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://7zeb.github.io/homework/bloonsTD5.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Bloons TD 5" src="https://7zeb.github.io/homework/bloonsTD5.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Left Click", action: "Select & Place Towers" },
       { key: "Click Tower", action: "Upgrade Ability / Target" },
@@ -959,7 +954,7 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/ducklife1.jpg",
     mirrors: [
-      "games/duck-life-1.html",
+      "https://gameinclassroom.github.io/duck-life/",
       "https://ubghyper.github.io/GameList.github.io/Duck-Life/"
     ],
     tags: ["Duck Life", "Duck", "Racing", "Training", "Animal", "Casual", "Owen OG", "Unblocked"],
@@ -967,8 +962,8 @@ const CURATED_GAMES: Game[] = [
     plays: 280000,
     author: "Wix Games",
     featured: true,
-    iframeSrc: "games/duck-life-1.html",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life" src="games/duck-life-1.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://gameinclassroom.github.io/duck-life/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life" src="https://gameinclassroom.github.io/duck-life/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "↑ / W", action: "Jump (Running Mode)" },
       { key: "← / → / A / D", action: "Move Left & Right (Swimming / Flying)" }
@@ -983,7 +978,7 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/ducklife2.jpg",
     mirrors: [
-      "games/duck-life-2.html",
+      "https://gameinclassroom.github.io/duck-life-2-world-champion/",
       "https://ubghyper.github.io/GameList.github.io/Duck-Life-2/"
     ],
     tags: ["Duck Life", "Duck Life 2", "Duck", "Racing", "Training", "Animal", "Owen OG", "Unblocked"],
@@ -991,8 +986,8 @@ const CURATED_GAMES: Game[] = [
     plays: 295000,
     author: "Wix Games",
     featured: true,
-    iframeSrc: "games/duck-life-2.html",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 2: World Champion" src="games/duck-life-2.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://gameinclassroom.github.io/duck-life-2-world-champion/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 2: World Champion" src="https://gameinclassroom.github.io/duck-life-2-world-champion/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "↑ / W", action: "Jump / Climb" },
       { key: "← / → / A / D", action: "Steer Duck" }
@@ -1007,7 +1002,7 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/ducklife3.jpg",
     mirrors: [
-      "games/duck-life-3.html",
+      "https://gameinclassroom.github.io/duck-life-3-evolution/",
       "https://ubghyper.github.io/GameList.github.io/Duck-Life-3/"
     ],
     tags: ["Duck Life", "Duck Life 3", "Duck", "Evolution", "Racing", "Training", "Owen OG", "Unblocked"],
@@ -1015,8 +1010,8 @@ const CURATED_GAMES: Game[] = [
     plays: 310000,
     author: "Wix Games",
     featured: true,
-    iframeSrc: "games/duck-life-3.html",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 3: Evolution" src="games/duck-life-3.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://gameinclassroom.github.io/duck-life-3-evolution/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 3: Evolution" src="https://gameinclassroom.github.io/duck-life-3-evolution/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Arrow Keys / WASD", action: "Control Duck in Training & Races" },
       { key: "Space", action: "Action / Jump" }
@@ -1031,7 +1026,7 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/ducklife4.jpg",
     mirrors: [
-      "games/duck-life-4.html",
+      "https://gameinclassroom.github.io/duck-life-4/",
       "https://ubghyper.github.io/GameList.github.io/Duck-Life-4/"
     ],
     tags: ["Duck Life", "Duck Life 4", "Duck", "Adventure", "Racing", "Training", "Owen OG", "Unblocked"],
@@ -1039,8 +1034,8 @@ const CURATED_GAMES: Game[] = [
     plays: 350000,
     author: "Wix Games",
     featured: true,
-    iframeSrc: "games/duck-life-4.html",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 4" src="games/duck-life-4.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://gameinclassroom.github.io/duck-life-4/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 4" src="https://gameinclassroom.github.io/duck-life-4/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Arrow Keys / WASD", action: "Move Duck / Navigate World" },
       { key: "Space / Mouse", action: "Jump / Interact" }
@@ -1055,7 +1050,6 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/ducklife5.png",
     mirrors: [
-      "games/duck-life-5.html",
       "https://ubghyper.github.io/GameList.github.io/Duck-Life-5/"
     ],
     tags: ["Duck Life", "Duck Life 5", "Treasure Hunt", "Duck", "Platformer", "Casual", "Owen OG", "Unblocked"],
@@ -1063,67 +1057,11 @@ const CURATED_GAMES: Game[] = [
     plays: 180000,
     author: "Wix Games",
     featured: true,
-    iframeSrc: "games/duck-life-5.html",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 5: Treasure Hunt" src="games/duck-life-5.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Duck-Life-5/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 5: Treasure Hunt" src="https://ubghyper.github.io/GameList.github.io/Duck-Life-5/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Arrow Keys / WASD", action: "Move & Jump" },
       { key: "Space", action: "Activate Gadget" }
-    ]
-  },
-  {
-    id: "diep-io",
-    source: "unblocked",
-    title: "Diep.io (Tank Arena)",
-    description: "Survive and dominate the tank arena! Shoot shapes to earn XP, upgrade your health, speed, and cannon power, and evolve into specialized battle tanks.",
-    category: "Action",
-    secondaryCategory: "Potato Classics",
-    thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80",
-    banner: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&auto=format&fit=crop&q=80",
-    mirrors: [
-      "games/diep-io.html",
-      "https://diep.io/",
-      "https://arras.io/"
-    ],
-    tags: ["Diep.io", "Deip.io", "Diep", "Tank", "Arena", "IO Games", "Multiplayer", "Shooter", "Action", "Unblocked"],
-    rating: 4.9,
-    plays: 350000,
-    author: "Matheus Valadares",
-    featured: true,
-    iframeSrc: "games/diep-io.html",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Diep.io (Tank Arena)" src="games/diep-io.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
-    controls: [
-      { key: "WASD / Arrows", action: "Drive Tank" },
-      { key: "Mouse Aim & Click", action: "Aim & Fire Cannon" },
-      { key: "1 - 8 Keys", action: "Upgrade Stats" },
-      { key: "E", action: "Auto-Fire Toggle" },
-      { key: "C", action: "Auto-Spin Toggle" }
-    ]
-  },
-  {
-    id: "spaceflight-simulator",
-    source: "unblocked",
-    title: "Spaceflight Simulator",
-    description: "Build your own custom rockets from realistic parts, calculate orbital mechanics, launch into space, and land on the Moon, Mars, and beyond in this physics-based space sim.",
-    category: "Simulation",
-    secondaryCategory: "Potato Classics",
-    thumbnail: "https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?w=600&auto=format&fit=crop&q=80",
-    banner: "https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?w=1200&auto=format&fit=crop&q=80",
-    mirrors: [
-      "games/spaceflight-simulator.html",
-      "https://ubghyper.github.io/GameList.github.io/Spaceflight-Simulator/"
-    ],
-    tags: ["Spaceflight Simulator", "Space Flight Sim", "Rocket", "Space", "Physics", "Simulation", "Orbit", "Stef Morojna", "Unblocked"],
-    rating: 5.0,
-    plays: 420000,
-    author: "Stef Morojna",
-    featured: true,
-    iframeSrc: "games/spaceflight-simulator.html",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Spaceflight Simulator" src="games/spaceflight-simulator.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
-    controls: [
-      { key: "Mouse Drag & Click", action: "Build Rocket / Place Modules" },
-      { key: "Throttle Slider / Space", action: "Adjust Engine Thrust" },
-      { key: "A / D or Left / Right", action: "RCS / Rotate Rocket" },
-      { key: "Staging Buttons", action: "Ignite / Detach Stages" }
     ]
   }
 ];
@@ -1168,15 +1106,10 @@ export const URL_OVERRIDES: Record<string, string> = {
   "pokemonred": "games/pokemon-red.html",
   "pokemon-red": "games/pokemon-red.html",
 
-  // Spaceflight Simulator & Flight Games
-  "spaceflight-simulator": "games/spaceflight-simulator.html",
-  "spaceflightsimulator": "games/spaceflight-simulator.html",
-  "space-flight-simulator": "games/spaceflight-simulator.html",
-  "spaceflightsim": "games/spaceflight-simulator.html",
-  "space-flight-sim": "games/spaceflight-simulator.html",
-  "potatoes-spaceflight-simulator": "games/spaceflight-simulator.html",
+  // Flight Simulators & Gunblood
   "flash-flight-simulator-1": "games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Flash-Flight-Simulator-1/flashflightsimulator.swf&title=Flash+Flight+Simulator",
   "flash-flight-simulator": "games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Flash-Flight-Simulator-1/flashflightsimulator.swf&title=Flash+Flight+Simulator",
+  "spaceflight-simulator": "games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Flash-Flight-Simulator-1/flashflightsimulator.swf&title=Flash+Flight+Simulator",
   "gunblood": "games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Gunblood/gunblood.swf&title=Gunblood",
 
   // Fireboy and Watergirl Series (Native HTML5 Engines)
@@ -1193,12 +1126,6 @@ export const URL_OVERRIDES: Record<string, string> = {
   "serenitrove": "games/serenitrove.html",
 
   // .io Games (Direct Working Clones without ad/argix redirects)
-  "diep-io": "games/diep-io.html",
-  "diep": "games/diep-io.html",
-  "diepio": "games/diep-io.html",
-  "deip-io": "games/diep-io.html",
-  "deipio": "games/diep-io.html",
-  "potatoes-diep-io": "games/diep-io.html",
   "agar-io": "https://7zeb.github.io/homework/agariolite.html",
   "potatoes-agar-io": "https://7zeb.github.io/homework/agariolite.html",
   "agariolite": "https://7zeb.github.io/homework/agariolite.html",
@@ -1260,23 +1187,23 @@ export const URL_OVERRIDES: Record<string, string> = {
   "fruit-ninja": "games/fruit-ninja.html",
   "fruitninja": "games/fruit-ninja.html",
 
-  // Bloons Tower Defence Series (Local High-Speed HTML5 + 7zeb Verified Mirrors)
-  "bloons-tower-defence": "games/bloons-td-1.html",
-  "bloonstd": "games/bloons-td-1.html",
-  "bloonstowerdefence": "games/bloons-td-1.html",
-  "bloonstowerdefense": "games/bloons-td-1.html",
-  "bloons-tower-defence-2": "games/bloons-td-2.html",
-  "bloonstd2": "games/bloons-td-2.html",
-  "bloons-tower-defence-3": "games/bloons-td-3.html",
-  "bloonstd3": "games/bloons-td-3.html",
-  "btd3": "games/bloons-td-3.html",
-  "bloons-td-4": "games/bloons-td-4.html",
-  "btd-4": "games/bloons-td-4.html",
-  "btd4": "games/bloons-td-4.html",
-  "bloonstd4": "games/bloons-td-4.html",
-  "bloons-td-5": "games/bloons-td-5.html",
-  "bloonstd5": "games/bloons-td-5.html",
-  "btd5": "games/bloons-td-5.html",
+  // Bloons Tower Defence Series (Clean HTML5 WebAssembly / Canvas Engines)
+  "bloons-tower-defence": "https://gameinclassroom.github.io/bloons-tower-defense-1/",
+  "bloonstd": "https://gameinclassroom.github.io/bloons-tower-defense-1/",
+  "bloonstowerdefence": "https://gameinclassroom.github.io/bloons-tower-defense-1/",
+  "bloonstowerdefense": "https://gameinclassroom.github.io/bloons-tower-defense-1/",
+  "bloons-tower-defence-2": "https://7zeb.github.io/homework/bloonsTD2.html",
+  "bloonstd2": "https://7zeb.github.io/homework/bloonsTD2.html",
+  "bloons-tower-defence-3": "https://7zeb.github.io/homework/bloonsTD3.html",
+  "bloonstd3": "https://7zeb.github.io/homework/bloonsTD3.html",
+  "btd3": "https://7zeb.github.io/homework/bloonsTD3.html",
+  "bloons-td-4": "https://7zeb.github.io/homework/bloonsTD4.html",
+  "btd-4": "https://7zeb.github.io/homework/bloonsTD4.html",
+  "btd4": "https://7zeb.github.io/homework/bloonsTD4.html",
+  "bloonstd4": "https://7zeb.github.io/homework/bloonsTD4.html",
+  "bloons-td-5": "https://7zeb.github.io/homework/bloonsTD5.html",
+  "bloonstd5": "https://7zeb.github.io/homework/bloonsTD5.html",
+  "btd5": "https://7zeb.github.io/homework/bloonsTD5.html",
 
   // Papa's Cooking Series (Modern Native HTML5 / WebAssembly Ports - Zero Flash)
   "papas-pizzeria": "https://ubghyper.github.io/GameList.github.io/Papas-Pizzeria/",
@@ -1397,17 +1324,17 @@ export const URL_OVERRIDES: Record<string, string> = {
   "case-opener": "games/case-opener.html",
   "minecraft-case-simulator": "games/case-opener.html",
 
-  // Duck Life Series (Local High-Speed HTML5 + ubghyper Verified Mirrors)
-  "duck-life": "games/duck-life-1.html",
-  "duck-life-2": "games/duck-life-2.html",
-  "duck-life-3": "games/duck-life-3.html",
-  "duck-life-4": "games/duck-life-4.html",
-  "duck-life-5": "games/duck-life-5.html",
-  "ducklife": "games/duck-life-1.html",
-  "ducklife2": "games/duck-life-2.html",
-  "ducklife3": "games/duck-life-3.html",
-  "ducklife4": "games/duck-life-4.html",
-  "ducklife5": "games/duck-life-5.html",
+  // Other essential games
+  "duck-life": "https://gameinclassroom.github.io/duck-life/",
+  "duck-life-2": "https://gameinclassroom.github.io/duck-life-2-world-champion/",
+  "duck-life-3": "https://gameinclassroom.github.io/duck-life-3-evolution/",
+  "duck-life-4": "https://gameinclassroom.github.io/duck-life-4/",
+  "duck-life-5": "https://ubghyper.github.io/GameList.github.io/Duck-Life-5/",
+  "ducklife": "https://gameinclassroom.github.io/duck-life/",
+  "ducklife2": "https://gameinclassroom.github.io/duck-life-2-world-champion/",
+  "ducklife3": "https://gameinclassroom.github.io/duck-life-3-evolution/",
+  "ducklife4": "https://gameinclassroom.github.io/duck-life-4/",
+  "ducklife5": "https://ubghyper.github.io/GameList.github.io/Duck-Life-5/",
   "jacksmith": "https://ubghyper.github.io/GameList.github.io/Jacksmith/",
   "learntofly": "https://gameinclassroom.github.io/learn-to-fly/",
   "learntofly2": "https://ubghyper.github.io/GameList.github.io/Learn-To-Fly-2/",

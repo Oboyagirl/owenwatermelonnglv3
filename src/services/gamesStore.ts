@@ -111,17 +111,8 @@ export function useGamesStore() {
         const parsed = JSON.parse(cached);
         if (parsed && typeof parsed === 'object') {
           for (const key of Object.keys(parsed)) {
-            const src = parsed[key]?.iframeSrc || '';
-            if (
-              key.includes('bloon') || 
-              key.includes('btd') || 
-              key.includes('duck') ||
-              src.includes('gameinclassroom') ||
-              src.includes('freeonlinewebtools') ||
-              src.includes('.swf') ||
-              src.includes('flash-player') ||
-              src.includes('homework/index.html')
-            ) {
+            if ((key.includes('bloon') || key.includes('btd') || key.includes('duck')) &&
+                (parsed[key]?.iframeSrc?.includes('flash-player') || parsed[key]?.iframeSrc?.includes('.swf'))) {
               delete parsed[key];
             }
           }

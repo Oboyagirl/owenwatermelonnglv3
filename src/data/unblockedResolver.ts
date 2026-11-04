@@ -18,75 +18,65 @@ const ACADEMICS_MAP: Record<string, string> = {
   "retrobowlcollege": "https://academics-study.github.io/retro-bowl-college/",
   "drifthunters": "https://7zeb.github.io/homework/drift-hunters/index.html",
   "drifthunter": "https://7zeb.github.io/homework/drift-hunters/index.html",
-  "backrooms": "https://7zeb.github.io/homework/backrooms.html",
+  "backrooms": "https://academics-study.github.io/backrooms/",
   "slicemaster": "https://academics-study.github.io/0-slice-master/",
   "shellshockers": "https://academics-study.github.io/shellshockers/",
-  "stickmanhook": "https://ubghyper.github.io/GameList.github.io/Stickman-Hook/",
-  "stickmanclimb": "https://ubghyper.github.io/GameList.github.io/Stickman-Climb/",
-  "stickmanclimb2": "https://ubghyper.github.io/GameList.github.io/Stickman-Climb-2/",
+  "stickmanhook": "https://7zeb.github.io/homework/index.html",
+  "stickmanclimb": "https://7zeb.github.io/homework/index.html",
+  "stickmanclimb2": "https://7zeb.github.io/homework/index.html",
   "peopleplayground": "https://7zeb.github.io/homework/melonplayground.html",
-  "blockblast": "https://ubghyper.github.io/GameList.github.io/Block-Blast/",
+  "blockblast": "https://freeonlinewebtools.github.io/blockblastunblockedgames.github.io/",
   "ovo": "https://7zeb.github.io/homework/ovo2.html",
   "eaglercraft": "https://7zeb.github.io/homework/mc1_8.html",
   "eaglercraft188": "https://7zeb.github.io/homework/mc1_8.html",
   "minecraft": "https://7zeb.github.io/homework/mc1_8.html",
   "basketballlegends": "https://joe-the-chicken.github.io/basketball-stars/",
   "basketballlegends2020": "https://joe-the-chicken.github.io/basketball-stars/",
-  "vex": "https://7zeb.github.io/homework/vex7.html",
+  "vex": "https://7zeb.github.io/homework/index.html",
   "vex1": "https://ubghyper.github.io/GameList.github.io/Vex-1/",
   "vex2": "https://ubghyper.github.io/GameList.github.io/Vex-2/",
-  "vex3": "https://ubghyper.github.io/GameList.github.io/Vex-3/",
-  "vex4": "https://ubghyper.github.io/GameList.github.io/Vex-4/",
-  "vex5": "https://ubghyper.github.io/GameList.github.io/Vex-5/",
-  "vex6": "https://ubghyper.github.io/GameList.github.io/Vex-6/",
+  "vex3": "https://7zeb.github.io/homework/index.html",
+  "vex4": "https://7zeb.github.io/homework/index.html",
+  "vex5": "https://7zeb.github.io/homework/index.html",
+  "vex6": "https://7zeb.github.io/homework/index.html",
   "vex7": "https://7zeb.github.io/homework/vex7.html",
   "vex8": "https://7zeb.github.io/homework/vex8.html",
-  "worldshardestgame": "https://ubghyper.github.io/GameList.github.io/Worlds-Hardest-Game/",
-  "worldshardestgame2": "https://ubghyper.github.io/GameList.github.io/Worlds-Hardest-Game-2/",
-  "worldshardestgame3": "https://ubghyper.github.io/GameList.github.io/Worlds-Hardest-Game-3/",
+  "worldshardestgame": "https://7zeb.github.io/homework/index.html",
+  "worldshardestgame2": "https://7zeb.github.io/homework/index.html",
+  "worldshardestgame3": "https://7zeb.github.io/homework/index.html",
   "fruitninja": "games/fruit-ninja.html",
   "mario": "https://7zeb.github.io/homework/mario-game/index.html",
   "supermario": "https://7zeb.github.io/homework/mario-game/index.html",
   "supermario63": "https://ubghyper.github.io/GameList.github.io/Super-Mario-63/",
-  "supermario64": "https://7zeb.github.io/homework/sm64/index.html",
+  "supermario64": "https://7zeb.github.io/homework/index.html",
   "supermariobros": "https://7zeb.github.io/homework/mario-game/index.html",
-  "blackjack": "https://ubghyper.github.io/GameList.github.io/Blackjack/",
-  "happywheels": "games/happy-wheels.html",
+  "blackjack": "https://flyingsully.github.io/GameList.github.io/Blackjack/",
+  "happywheels": "https://7zeb.github.io/homework/index.html",
   "dumbwaystodie": "games/dumb-ways-to-die.html",
   "hooproyale": "https://ubghyper.github.io/GameList.github.io/Hoop-Royale/",
   "asmallworldcup": "games/sawyer-for-sawyer.html",
-  "stickmerge": "https://ubghyper.github.io/GameList.github.io/Stick-Merge/",
-  "stickmerge2": "https://ubghyper.github.io/GameList.github.io/Stick-Merge/",
-  "sausageflip": "https://ubghyper.github.io/GameList.github.io/Sausage-Flip/",
-  "sausagerun": "https://ubghyper.github.io/GameList.github.io/Sausage-Run/",
-  "bindingofisaac": "https://ubghyper.github.io/GameList.github.io/Binding-Of-Isaac/",
-  "ducklife": "games/duck-life-1.html",
-  "ducklife1": "games/duck-life-1.html",
-  "ducklife2": "games/duck-life-2.html",
-  "ducklife3": "games/duck-life-3.html",
-  "ducklife4": "games/duck-life-4.html",
-  "ducklife5": "games/duck-life-5.html",
-  "bloonstd": "games/bloons-td-1.html",
-  "bloonstd2": "games/bloons-td-2.html",
-  "bloonstd3": "games/bloons-td-3.html",
-  "bloonstd4": "games/bloons-td-4.html",
-  "bloonstd5": "games/bloons-td-5.html",
-  "clusterrush": "https://ubghyper.github.io/GameList.github.io/Cluster-Rush/",
-  "cuphead": "https://ubghyper.github.io/GameList.github.io/Cuphead/",
-  "badicecream": "https://ubghyper.github.io/GameList.github.io/Bad-Ice-Cream/",
-  "badicecream2": "https://ubghyper.github.io/GameList.github.io/Bad-Ice-Cream-2/",
-  "badicecream3": "https://ubghyper.github.io/GameList.github.io/Bad-Ice-Cream-3/",
-  "candycrush": "https://ubghyper.github.io/GameList.github.io/Candy-Crush/",
-  "deathrun3d": "https://ubghyper.github.io/GameList.github.io/Death-Run-3D/",
-  "dadish": "https://ubghyper.github.io/GameList.github.io/Dadish/",
-  "dadish2": "https://ubghyper.github.io/GameList.github.io/Dadish-2/",
-  "dadish3": "https://ubghyper.github.io/GameList.github.io/Dadish-3/",
-  "bladeball": "https://ubghyper.github.io/GameList.github.io/Blade-Ball/",
-  "blockpost": "https://ubghyper.github.io/GameList.github.io/Blockpost/",
+  "stickmerge": "https://7zeb.github.io/homework/index.html",
+  "stickmerge2": "https://7zeb.github.io/homework/index.html",
+  "sausageflip": "https://7zeb.github.io/homework/index.html",
+  "sausagerun": "https://7zeb.github.io/homework/index.html",
+  "bindingofisaac": "https://flyingsully.github.io/GameList.github.io/Binding-Of-Isaac/",
+  "ducklife4": "https://flyingsully.github.io/GameList.github.io/Duck-Life-4/",
+  "clusterrush": "https://7zeb.github.io/homework/index.html",
+  "cuphead": "https://freeonlinewebtools.github.io/gamelist2.github.io/Cuphead/",
+  "badicecream": "https://freeonlinewebtools.github.io/gamelist8.github.io/Bad-Ice-Cream/",
+  "badicecream2": "https://7zeb.github.io/homework/index.html",
+  "badicecream3": "https://7zeb.github.io/homework/index.html",
+  "candycrush": "https://freeonlinewebtools.github.io/gamelist3.github.io/Candy-Crush/",
+  "deathrun3d": "https://freeonlinewebtools.github.io/gamelist3.github.io/Death-Run-3D/",
+  "dadish": "https://freeonlinewebtools.github.io/gamelist3.github.io/Dadish/",
+  "dadish2": "https://freeonlinewebtools.github.io/gamelist2.github.io/Dadish-2/",
+  "dadish3": "https://freeonlinewebtools.github.io/gamelist2.github.io/Dadish-3/",
+  "bladeball": "https://freeonlinewebtools.github.io/gamelist3.github.io/Blade-Ball/",
+  "blockpost": "https://freeonlinewebtools.github.io/gamelist3.github.io/Blockpost/",
   "boxingrandom": "https://7zeb.github.io/homework/boxingrandom.html",
-  "clash": "https://ubghyper.github.io/GameList.github.io/Clash-Of-Vikings/",
-  "clashofvikings": "https://ubghyper.github.io/GameList.github.io/Clash-Of-Vikings/",
-  "clashoftanks": "https://ubghyper.github.io/GameList.github.io/Clash-Of-Tanks/"
+  "clash": "https://freeonlinewebtools.github.io/gamelist3.github.io/Clash-Of-Vikings/",
+  "clashofvikings": "https://freeonlinewebtools.github.io/gamelist3.github.io/Clash-Of-Vikings/",
+  "clashoftanks": "https://freeonlinewebtools.github.io/gamelist3.github.io/Clash-Of-Vikings/"
 };
 
 const FLYINGSULLY_GAMES = new Set([
@@ -97,16 +87,6 @@ const FLYINGSULLY_GAMES = new Set([
 
 // Retain local client-side offline game canvas implementations
 const PRESERVED_LOCAL_GAMES = new Set([
-  "games/bloons-td-1.html",
-  "games/bloons-td-2.html",
-  "games/bloons-td-3.html",
-  "games/bloons-td-4.html",
-  "games/bloons-td-5.html",
-  "games/duck-life-1.html",
-  "games/duck-life-2.html",
-  "games/duck-life-3.html",
-  "games/duck-life-4.html",
-  "games/duck-life-5.html",
   "games/watermelon-merge.html",
   "games/snake.html",
   "games/tetris.html",
@@ -138,12 +118,7 @@ const PRESERVED_LOCAL_GAMES = new Set([
   "games/soccer-random/index.html",
   "games/volley-random.html",
   "games/basket-random.html",
-  "games/boxing-random.html",
-  "games/diep-io.html",
-  "games/spaceflight-simulator.html",
-  "games/geometry-dash.html",
-  "games/google-baseball.html",
-  "games/slither-io.html"
+  "games/boxing-random.html"
 ]);
 
 function cleanText(str: string): string {
@@ -168,221 +143,6 @@ export function resolveGameSource(
   const safeMirrors = Array.isArray(mirrors) ? mirrors : [];
 
   // Specialized top-priority handlers for requested games
-
-  // Sniper Assassin 1 - 5 (Verified SWFs with local modern Flash Player runner)
-  if (
-    safeId.includes('sniper-assassin') || safeId.includes('sniperassassin') ||
-    safeTitle.toLowerCase().includes('sniper assassin')
-  ) {
-    const combined = (safeId + ' ' + safeTitle).toLowerCase();
-    if (combined.includes('5')) {
-      const u = 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Sniper-assassin-5/sniper-assassin-5.swf&title=Sniper+Assassin+5';
-      return { src: u, mirrors: [u] };
-    }
-    if (combined.includes('4')) {
-      const u = 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Sniper-assassin-4/sniperassassin4.swf&title=Sniper+Assassin+4';
-      return { src: u, mirrors: [u] };
-    }
-    if (combined.includes('3')) {
-      const u = 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Sniper-assassin-3/sniper-assassin-3.swf&title=Sniper+Assassin+3';
-      return { src: u, mirrors: [u] };
-    }
-    if (combined.includes('2')) {
-      const u = 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Sniper-assassin-2/sniper-assassin-2.swf&title=Sniper+Assassin+2';
-      return { src: u, mirrors: [u] };
-    }
-    const u = 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Sniper-Assassin/sniperassassin.swf&title=Sniper+Assassin';
-    return { src: u, mirrors: [u] };
-  }
-
-  // Wheely 1 - 8 (Verified SWFs with local modern Flash Player runner)
-  if (safeId.includes('wheely') || safeTitle.toLowerCase().includes('wheely')) {
-    const combined = (safeId + ' ' + safeTitle).toLowerCase();
-    for (let num = 8; num >= 2; num--) {
-      if (combined.includes(String(num))) {
-        const u = `games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Wheely-${num}/Wheely-${num}.swf&title=Wheely+${num}`;
-        return { src: u, mirrors: [u] };
-      }
-    }
-    const u = 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Wheely/Wheely.swf&title=Wheely';
-    return { src: u, mirrors: [u] };
-  }
-
-  // Happy Wheels (Local unblocked runner + happy-wheels.pages.dev + ubghyper)
-  if (
-    safeId.includes('happy-wheel') || safeId.includes('happywheel') ||
-    safeTitle.toLowerCase().includes('happy wheel')
-  ) {
-    return {
-      src: 'games/happy-wheels.html',
-      mirrors: [
-        'games/happy-wheels.html',
-        'https://happy-wheels.pages.dev/',
-        'https://ubghyper.github.io/GameList.github.io/Happy-Wheels/'
-      ]
-    };
-  }
-
-  // Google Baseball (Doodle Baseball)
-  if (
-    safeId.includes('baseball') && (safeId.includes('google') || safeTitle.toLowerCase().includes('google'))
-  ) {
-    return {
-      src: 'games/google-baseball.html',
-      mirrors: [
-        'games/google-baseball.html',
-        'https://7zeb.github.io/homework/googlebaseball.html'
-      ]
-    };
-  }
-
-  // Geometry Dash (All editions: Classic, Remastered, Meltdown, Sub-Zero, Lite)
-  if (
-    safeId.includes('geometry-dash') || safeId.includes('geometrydash') ||
-    safeTitle.toLowerCase().includes('geometry dash')
-  ) {
-    return {
-      src: 'games/geometry-dash.html',
-      mirrors: [
-        'games/geometry-dash.html',
-        'https://geometry-dash.pages.dev/',
-        'https://7zeb.github.io/homework/geometry-dash-remastered/index.html',
-        'https://7zeb.github.io/homework/geometryvibes.html',
-        'https://ubghyper.github.io/GameList.github.io/Geometry-Dash-Lite/'
-      ]
-    };
-  }
-
-  // Slither.io (60 FPS local canvas arena + online servers)
-  if (safeId.includes('slither') || safeTitle.toLowerCase().includes('slither')) {
-    return {
-      src: 'games/slither-io.html',
-      mirrors: [
-        'games/slither-io.html',
-        'https://slither.com/io'
-      ]
-    };
-  }
-
-  // Paper.io & Paper.io 2
-  if (
-    safeId.includes('paper-io') || safeId.includes('paperio') ||
-    safeTitle.toLowerCase().includes('paper io') || safeTitle.toLowerCase().includes('paper.io')
-  ) {
-    return {
-      src: 'https://7zeb.github.io/homework/paperio2.html',
-      mirrors: [
-        'https://7zeb.github.io/homework/paperio2.html',
-        'https://ubghyper.github.io/GameList.github.io/Paper-IO-2/'
-      ]
-    };
-  }
-
-  // Hole.io
-  if (
-    safeId.includes('hole-io') || safeId.includes('holeio') ||
-    safeTitle.toLowerCase().includes('hole.io') || safeTitle.toLowerCase().includes('hole io')
-  ) {
-    return {
-      src: 'https://7zeb.github.io/homework/holeio.html',
-      mirrors: [
-        'https://7zeb.github.io/homework/holeio.html'
-      ]
-    };
-  }
-
-  // Agar.io
-  if (
-    safeId.includes('agar-io') || safeId.includes('agario') ||
-    safeTitle.toLowerCase().includes('agar.io') || safeTitle.toLowerCase().includes('agar io') ||
-    safeTitle.toLowerCase() === 'agar'
-  ) {
-    return {
-      src: 'https://7zeb.github.io/homework/agariolite.html',
-      mirrors: [
-        'https://7zeb.github.io/homework/agariolite.html'
-      ]
-    };
-  }
-
-  // Smash Karts (Direct live unblocked domain without dead freeonlinewebtools wrappers)
-  if (
-    safeId.includes('smash-kart') || safeId.includes('smashkart') ||
-    safeTitle.toLowerCase().includes('smash kart')
-  ) {
-    return {
-      src: 'https://smashkarts.io/',
-      mirrors: [
-        'https://smashkarts.io/'
-      ]
-    };
-  }
-
-  // 1v1.lol (Full unity build assets on ubghyper)
-  if (
-    safeId.includes('1v1-lol') || safeId.includes('1v1lol') ||
-    safeTitle.toLowerCase().includes('1v1.lol') || safeTitle.toLowerCase().includes('1v1 lol')
-  ) {
-    return {
-      src: 'https://ubghyper.github.io/GameList.github.io/1v1-LOL/',
-      mirrors: [
-        'https://ubghyper.github.io/GameList.github.io/1v1-LOL/'
-      ]
-    };
-  }
-
-  // EvoWars.io (Direct live server without dead freeonlinewebtools wrapper)
-  if (
-    safeId.includes('evowars') || safeTitle.toLowerCase().includes('evowars')
-  ) {
-    return {
-      src: 'https://evowars.io/',
-      mirrors: [
-        'https://evowars.io/'
-      ]
-    };
-  }
-
-  // Zombs Royale
-  if (
-    safeId.includes('zombs') || safeTitle.toLowerCase().includes('zombs')
-  ) {
-    return {
-      src: 'https://zombsroyale.io/',
-      mirrors: [
-        'https://zombsroyale.io/'
-      ]
-    };
-  }
-
-  // Diep.io / Deip.io Tank Arena (Offline local canvas arena + official live unblocked mirrors)
-  if (
-    safeId.includes('diep') || safeId.includes('deip') ||
-    safeTitle.toLowerCase().includes('diep') || safeTitle.toLowerCase().includes('deip')
-  ) {
-    return {
-      src: 'games/diep-io.html',
-      mirrors: [
-        'games/diep-io.html',
-        'https://diep.io/',
-        'https://arras.io/'
-      ]
-    };
-  }
-
-  if (
-    safeId.includes('spaceflight') || safeId.includes('space-flight') ||
-    safeTitle.toLowerCase().includes('spaceflight') || safeTitle.toLowerCase().includes('space flight')
-  ) {
-    return {
-      src: 'games/spaceflight-simulator.html',
-      mirrors: [
-        'games/spaceflight-simulator.html',
-        'https://ubghyper.github.io/GameList.github.io/Spaceflight-Simulator/'
-      ]
-    };
-  }
-
   if (safeId === 'retro-bowl' || safeId === 'potatoes-retro-bowl') {
     return {
       src: 'https://retro--bowl.pages.dev/',
@@ -394,111 +154,24 @@ export function resolveGameSource(
     };
   }
 
+  if (safeId.includes('paper-io') || safeTitle.toLowerCase().includes('paper io') || safeTitle.toLowerCase().includes('paper.io')) {
+    return {
+      src: 'https://7zeb.github.io/homework/index.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/index.html',
+        'https://ubghyper.github.io/GameList.github.io/Paper-IO-2/'
+      ]
+    };
+  }
+
   if (safeId.includes('getting-over-it') || safeTitle.toLowerCase().includes('getting over it')) {
     return {
-      src: 'games/getting-over-it.html',
+      src: 'https://7zeb.github.io/homework/index.html',
       mirrors: [
+        'https://7zeb.github.io/homework/index.html',
         'games/getting-over-it.html',
-        'https://ubghyper.github.io/GameList.github.io/Getting-Over-It/',
-        'https://7zeb.github.io/homework/getting-over-it/'
-      ]
-    };
-  }
-
-  // Bloons Tower Defense Series (Local High-Speed HTML5 + 7zeb Verified Mirrors)
-  if (safeId.includes('bloon') || safeId.includes('btd') || safeTitle.toLowerCase().includes('bloon')) {
-    const lower = (safeId + ' ' + safeTitle).toLowerCase();
-    if (lower.includes('5') || lower.includes('btd5')) {
-      return {
-        src: 'games/bloons-td-5.html',
-        mirrors: [
-          'games/bloons-td-5.html',
-          'https://7zeb.github.io/homework/bloonsTD5.html'
-        ]
-      };
-    }
-    if (lower.includes('4') || lower.includes('btd4')) {
-      return {
-        src: 'games/bloons-td-4.html',
-        mirrors: [
-          'games/bloons-td-4.html',
-          'https://7zeb.github.io/homework/bloonsTD4.html'
-        ]
-      };
-    }
-    if (lower.includes('3') || lower.includes('btd3')) {
-      return {
-        src: 'games/bloons-td-3.html',
-        mirrors: [
-          'games/bloons-td-3.html',
-          'https://7zeb.github.io/homework/bloonsTD3.html'
-        ]
-      };
-    }
-    if (lower.includes('2') || lower.includes('btd2')) {
-      return {
-        src: 'games/bloons-td-2.html',
-        mirrors: [
-          'games/bloons-td-2.html',
-          'https://7zeb.github.io/homework/bloonsTD2.html'
-        ]
-      };
-    }
-    // Default to BTD 1
-    return {
-      src: 'games/bloons-td-1.html',
-      mirrors: [
-        'games/bloons-td-1.html',
-        'https://7zeb.github.io/homework/bloonsTD.html'
-      ]
-    };
-  }
-
-  // Duck Life Series (Local High-Speed Ruffle Runner + ubghyper Verified Mirrors)
-  if (safeId.includes('duck-life') || safeId.includes('ducklife') || safeTitle.toLowerCase().includes('duck life')) {
-    const lower = (safeId + ' ' + safeTitle).toLowerCase();
-    if (lower.includes('5') || lower.includes('treasure')) {
-      return {
-        src: 'games/duck-life-5.html',
-        mirrors: [
-          'games/duck-life-5.html',
-          'https://ubghyper.github.io/GameList.github.io/Duck-Life-5/'
-        ]
-      };
-    }
-    if (lower.includes('4')) {
-      return {
-        src: 'games/duck-life-4.html',
-        mirrors: [
-          'games/duck-life-4.html',
-          'https://ubghyper.github.io/GameList.github.io/Duck-Life-4/'
-        ]
-      };
-    }
-    if (lower.includes('3') || lower.includes('evolution')) {
-      return {
-        src: 'games/duck-life-3.html',
-        mirrors: [
-          'games/duck-life-3.html',
-          'https://ubghyper.github.io/GameList.github.io/Duck-Life-3/'
-        ]
-      };
-    }
-    if (lower.includes('2') || lower.includes('champion')) {
-      return {
-        src: 'games/duck-life-2.html',
-        mirrors: [
-          'games/duck-life-2.html',
-          'https://ubghyper.github.io/GameList.github.io/Duck-Life-2/'
-        ]
-      };
-    }
-    // Default to Duck Life 1
-    return {
-      src: 'games/duck-life-1.html',
-      mirrors: [
-        'games/duck-life-1.html',
-        'https://ubghyper.github.io/GameList.github.io/Duck-Life/'
+        'https://freeonlinewebtools.github.io/gamelist6.github.io/Getting-Over-It/',
+        'https://ubg98.github.io/GettingOverIt/'
       ]
     };
   }
@@ -808,8 +481,9 @@ export function resolveGameSource(
 
   if (lowerId.includes('sushiria') || lowerId.includes('papas-sushi') || lowerTitle.includes('sushiria')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Papas-Sushi/',
+      src: 'https://gameinclassroom.github.io/papas-sushiria/',
       mirrors: [
+        'https://gameinclassroom.github.io/papas-sushiria/',
         'https://ubghyper.github.io/GameList.github.io/Papas-Sushi/'
       ]
     };
@@ -876,35 +550,15 @@ export function resolveGameSource(
     return { src: fixedUrl, mirrors: [fixedUrl, ...mirrors.filter(m => m !== fixedUrl)] };
   }
 
-  // Convert any legacy freeonlinewebtools.github.io URLs to working ubghyper or 7zeb endpoints
-  if (safeSrc.includes('freeonlinewebtools.github.io')) {
-    const slugMatch = safeSrc.match(/freeonlinewebtools\.github\.io\/[^\/]+\/([^\/]+)/);
-    const slug = slugMatch ? slugMatch[1] : '';
-    const normSlug = cleanText(slug);
-
-    if (sMap[normSlug] || sMap[cleanTitle] || sMap[cleanId]) {
-      const fixedUrl = sMap[normSlug] || sMap[cleanTitle] || sMap[cleanId];
-      return {
-        src: fixedUrl,
-        mirrors: [fixedUrl, `https://ubghyper.github.io/GameList.github.io/${slug}/`]
-      };
-    }
-    const fixedUrl = `https://ubghyper.github.io/GameList.github.io/${slug}/`;
-    return {
-      src: fixedUrl,
-      mirrors: [fixedUrl]
-    };
-  }
-
-  // Check if primary needs fallback resolution
+  // Check if primary is blocked by Securly (contains ubg keyword, pages.dev, gamedistribution, or broken games/)
   const isBlocked = 
     currentSrc.includes('gameinclassroom') ||
+    currentSrc.includes('ubghyper') ||
     currentSrc.includes('.pages.dev') ||
     currentSrc.includes('gamedistribution.com') ||
     currentSrc.includes('blobby-boi') ||
     currentSrc.includes('stroongdog') ||
     currentSrc.includes('strongdog') ||
-    currentSrc.endsWith('/index.html') && currentSrc.includes('7zeb.github.io/homework/index.html') ||
     (currentSrc.startsWith('games/') && !PRESERVED_LOCAL_GAMES.has(currentSrc)) ||
     currentSrc === '';
 
@@ -919,35 +573,30 @@ export function resolveGameSource(
     else if (ACADEMICS_MAP[cleanTitle] || ACADEMICS_MAP[cleanId] || ACADEMICS_MAP[cleanSlug]) {
       resolvedSrc = ACADEMICS_MAP[cleanTitle] || ACADEMICS_MAP[cleanId] || ACADEMICS_MAP[cleanSlug];
     }
-    // 3. Try ubghyper verified endpoints
-    else if (cleanSlug && !cleanSlug.includes('http')) {
-      resolvedSrc = `https://ubghyper.github.io/GameList.github.io/${cleanSlug}/`;
+    // 5. Try freeonlinewebtools verified gamelist
+    else if (fMap[cleanTitle] || fMap[cleanId] || fMap[cleanSlug]) {
+      resolvedSrc = fMap[cleanTitle] || fMap[cleanId] || fMap[cleanSlug];
     }
-    // 4. Try FlyingSully mirrors
+    // 6. Try FlyingSully mirrors
     else if (FLYINGSULLY_GAMES.has(cleanTitle) || FLYINGSULLY_GAMES.has(cleanId) || FLYINGSULLY_GAMES.has(cleanSlug)) {
       resolvedSrc = `https://flyingsully.github.io/GameList.github.io/${title.replace(/ /g, '-')}/`;
     }
-    // 5. Look for clean mirrors already in mirrors array
+    // 7. Look for clean mirrors already in mirrors array
     else {
       const cleanMirror = mirrors.find(m => 
         (m.includes('7zeb.github.io') || 
-         m.includes('ubghyper.github.io') ||
+         
          m.includes('academics-study.github.io') || 
          m.includes('javaspence.github.io') || 
          m.includes('henshmi.github.io') || 
          m.includes('joe-the-chicken.github.io') || 
          m.includes('flyingsully.github.io')) &&
-        !m.includes('homework/index.html')
+        !m.includes('ubghyper')
       );
       if (cleanMirror) {
         resolvedSrc = cleanMirror;
       }
     }
-  }
-
-  // Prevent directory index page from ever being loaded as game iframe
-  if (resolvedSrc === 'https://7zeb.github.io/homework/index.html') {
-    resolvedSrc = `https://ubghyper.github.io/GameList.github.io/${safeTitle.replace(/\s+/g, '-')}/`;
   }
 
   // Construct clean prioritized mirrors list
@@ -957,8 +606,8 @@ export function resolveGameSource(
       !m.includes('blobby-boi') && 
       !m.includes('gamedistribution.com') &&
       !m.includes('gameinclassroom') &&
-      !m.includes('freeonlinewebtools') &&
-      m !== 'games/paper-io-2/index.html'
+      m !== 'games/paper-io-2/index.html' &&
+      m !== 'games/retro-bowl/index.html'
     )
   ];
 
