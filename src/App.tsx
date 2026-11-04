@@ -45,6 +45,7 @@ export function isOwenWatermelonOG(game: Game): boolean {
   if (id.includes('basket-random') || title.includes('basket random')) return true;
   if (id.startsWith('ovo') || title.startsWith('ovo')) return true;
   if (id.includes('duck-life') || title.includes('duck life') || title.includes('ducklife')) return true;
+  if (id.includes('bloons') || id.includes('btd') || title.includes('bloons') || title.includes('balloon')) return true;
   if (id.includes('cut-the-rope') || title.includes('cut the rope')) return true;
 
   const ogList = [

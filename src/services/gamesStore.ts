@@ -110,6 +110,12 @@ export function useGamesStore() {
       if (cached) {
         const parsed = JSON.parse(cached);
         if (parsed && typeof parsed === 'object') {
+          for (const key of Object.keys(parsed)) {
+            if ((key.includes('bloon') || key.includes('btd') || key.includes('duck')) &&
+                (parsed[key]?.iframeSrc?.includes('flash-player') || parsed[key]?.iframeSrc?.includes('.swf'))) {
+              delete parsed[key];
+            }
+          }
           return parsed;
         }
       }

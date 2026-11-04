@@ -823,6 +823,246 @@ const CURATED_GAMES: Game[] = [
       { key: "W / S or Mouse", action: "Player 1 Paddle" },
       { key: "↑ / ↓", action: "Player 2 Paddle" }
     ]
+  },
+  {
+    id: "bloons-tower-defence",
+    source: "unblocked",
+    title: "Bloons Tower Defence",
+    description: "The legendary original monkey tower defense game! Place dart monkeys, tack shooters, bomb towers, and ice towers along the winding path to pop all balloons before they reach the end.",
+    category: "Strategy",
+    secondaryCategory: "Potato Classics",
+    thumbnail: "thumbnails/btd1.jpg",
+    mirrors: [
+      "https://gameinclassroom.github.io/bloons-tower-defense-1/",
+      "https://ubghyper.github.io/GameList.github.io/Bloons-Tower-Defense/"
+    ],
+    tags: ["Bloons", "BTD", "Bloons TD", "Tower Defense", "Strategy", "Classic", "Owen OG", "Unblocked"],
+    rating: 4.9,
+    plays: 198000,
+    author: "Ninja Kiwi",
+    featured: true,
+    iframeSrc: "https://gameinclassroom.github.io/bloons-tower-defense-1/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Bloons Tower Defence" src="https://gameinclassroom.github.io/bloons-tower-defense-1/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Left Click", action: "Select & Place Towers" },
+      { key: "Click Tower", action: "Upgrade & Target Strategy" }
+    ]
+  },
+  {
+    id: "bloons-tower-defence-2",
+    source: "unblocked",
+    title: "Bloons Tower Defence 2",
+    description: "Bloons TD 2 introduces brand new tracks, boomerang throwers, road spikes, monkey glue, and treacherous lead balloons!",
+    category: "Strategy",
+    secondaryCategory: "Potato Classics",
+    thumbnail: "thumbnails/btd2.jpg",
+    mirrors: [
+      "https://7zeb.github.io/homework/bloonsTD2.html",
+      "https://ubghyper.github.io/GameList.github.io/Bloonstd-2/"
+    ],
+    tags: ["Bloons", "BTD", "Bloons TD 2", "Tower Defense", "Strategy", "Classic", "Owen OG", "Unblocked"],
+    rating: 4.9,
+    plays: 231000,
+    author: "Ninja Kiwi",
+    featured: true,
+    iframeSrc: "https://7zeb.github.io/homework/bloonsTD2.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Bloons Tower Defence 2" src="https://7zeb.github.io/homework/bloonsTD2.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Left Click", action: "Select & Place Towers" },
+      { key: "Click Tower", action: "Upgrade / Sell" }
+    ]
+  },
+  {
+    id: "bloons-tower-defence-3",
+    source: "unblocked",
+    title: "Bloons Tower Defence 3",
+    description: "Bloons TD 3 brings 8 challenging tracks, spiked ball factories, super monkeys, pineapple bombs, and the menacing MOAB airship!",
+    category: "Strategy",
+    secondaryCategory: "Potato Classics",
+    thumbnail: "thumbnails/btd3.jpg",
+    mirrors: [
+      "https://7zeb.github.io/homework/bloonsTD3.html",
+      "https://ubghyper.github.io/GameList.github.io/Bloonstd-3/"
+    ],
+    tags: ["Bloons", "BTD", "Bloons TD 3", "Tower Defense", "Strategy", "Classic", "Owen OG", "Unblocked"],
+    rating: 4.9,
+    plays: 265000,
+    author: "Ninja Kiwi",
+    featured: true,
+    iframeSrc: "https://7zeb.github.io/homework/bloonsTD3.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Bloons Tower Defence 3" src="https://7zeb.github.io/homework/bloonsTD3.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Left Click", action: "Select & Place Towers" },
+      { key: "Click Tower", action: "Upgrade / Sell" }
+    ]
+  },
+  {
+    id: "btd-4",
+    source: "unblocked",
+    title: "Bloons TD 4",
+    description: "Bloons TD 4 delivers crisp graphics, monkey aces, mortar towers, monkey apprentices, career ranks, and multiple difficulty modes.",
+    category: "Strategy",
+    secondaryCategory: "Potato Classics",
+    thumbnail: "thumbnails/btd4.jpg",
+    mirrors: [
+      "https://7zeb.github.io/homework/bloonsTD4.html",
+      "https://ubghyper.github.io/GameList.github.io/Bloonstd-4/"
+    ],
+    tags: ["Bloons", "BTD", "Bloons TD 4", "Tower Defense", "Strategy", "Classic", "Owen OG", "Unblocked"],
+    rating: 4.9,
+    plays: 312000,
+    author: "Ninja Kiwi",
+    featured: true,
+    iframeSrc: "https://7zeb.github.io/homework/bloonsTD4.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Bloons TD 4" src="https://7zeb.github.io/homework/bloonsTD4.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Left Click", action: "Select & Place Towers" },
+      { key: "Click Tower", action: "Upgrade / Target Mode" }
+    ]
+  },
+  {
+    id: "bloons-td-5",
+    source: "unblocked",
+    title: "Bloons TD 5",
+    description: "Bloons TD 5 features 21 powerful towers with activated abilities, two upgrade paths, special missions, and daily challenges in glorious 60 FPS HTML5!",
+    category: "Strategy",
+    secondaryCategory: "Potato Classics",
+    thumbnail: "thumbnails/btd5.png",
+    mirrors: [
+      "https://7zeb.github.io/homework/bloonsTD5.html",
+      "https://ubghyper.github.io/GameList.github.io/Bloonstd-5/"
+    ],
+    tags: ["Bloons", "BTD", "Bloons TD 5", "Tower Defense", "Strategy", "Classic", "Owen OG", "Unblocked"],
+    rating: 5.0,
+    plays: 450000,
+    author: "Ninja Kiwi",
+    featured: true,
+    iframeSrc: "https://7zeb.github.io/homework/bloonsTD5.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Bloons TD 5" src="https://7zeb.github.io/homework/bloonsTD5.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Left Click", action: "Select & Place Towers" },
+      { key: "Click Tower", action: "Upgrade Ability / Target" },
+      { key: "Space", action: "Start / Fast Forward Round" }
+    ]
+  },
+  {
+    id: "duck-life",
+    source: "unblocked",
+    title: "Duck Life",
+    description: "Train your baby duckling in running, swimming, and flying to win races and save your farm! Eat seed to boost energy and level up your duck skills.",
+    category: "Casual",
+    secondaryCategory: "Potato Classics",
+    thumbnail: "thumbnails/ducklife1.jpg",
+    mirrors: [
+      "https://gameinclassroom.github.io/duck-life/",
+      "https://ubghyper.github.io/GameList.github.io/Duck-Life/"
+    ],
+    tags: ["Duck Life", "Duck", "Racing", "Training", "Animal", "Casual", "Owen OG", "Unblocked"],
+    rating: 4.9,
+    plays: 280000,
+    author: "Wix Games",
+    featured: true,
+    iframeSrc: "https://gameinclassroom.github.io/duck-life/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life" src="https://gameinclassroom.github.io/duck-life/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "↑ / W", action: "Jump (Running Mode)" },
+      { key: "← / → / A / D", action: "Move Left & Right (Swimming / Flying)" }
+    ]
+  },
+  {
+    id: "duck-life-2",
+    source: "unblocked",
+    title: "Duck Life 2: World Champion",
+    description: "The championship expands worldwide! Train running, flying, swimming, and climbing to compete against elite ducks in England, Egypt, Hawaii, and Japan.",
+    category: "Casual",
+    secondaryCategory: "Potato Classics",
+    thumbnail: "thumbnails/ducklife2.jpg",
+    mirrors: [
+      "https://gameinclassroom.github.io/duck-life-2-world-champion/",
+      "https://ubghyper.github.io/GameList.github.io/Duck-Life-2/"
+    ],
+    tags: ["Duck Life", "Duck Life 2", "Duck", "Racing", "Training", "Animal", "Owen OG", "Unblocked"],
+    rating: 4.9,
+    plays: 295000,
+    author: "Wix Games",
+    featured: true,
+    iframeSrc: "https://gameinclassroom.github.io/duck-life-2-world-champion/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 2: World Champion" src="https://gameinclassroom.github.io/duck-life-2-world-champion/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "↑ / W", action: "Jump / Climb" },
+      { key: "← / → / A / D", action: "Steer Duck" }
+    ]
+  },
+  {
+    id: "duck-life-3",
+    source: "unblocked",
+    title: "Duck Life 3: Evolution",
+    description: "Genetically evolve your duck into distinct breeds! Choose between strength, agility, speed, or flying specializations and race through the Amateur, Advanced, and Professional leagues.",
+    category: "Casual",
+    secondaryCategory: "Potato Classics",
+    thumbnail: "thumbnails/ducklife3.jpg",
+    mirrors: [
+      "https://gameinclassroom.github.io/duck-life-3-evolution/",
+      "https://ubghyper.github.io/GameList.github.io/Duck-Life-3/"
+    ],
+    tags: ["Duck Life", "Duck Life 3", "Duck", "Evolution", "Racing", "Training", "Owen OG", "Unblocked"],
+    rating: 4.9,
+    plays: 310000,
+    author: "Wix Games",
+    featured: true,
+    iframeSrc: "https://gameinclassroom.github.io/duck-life-3-evolution/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 3: Evolution" src="https://gameinclassroom.github.io/duck-life-3-evolution/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Arrow Keys / WASD", action: "Control Duck in Training & Races" },
+      { key: "Space", action: "Action / Jump" }
+    ]
+  },
+  {
+    id: "duck-life-4",
+    source: "unblocked",
+    title: "Duck Life 4",
+    description: "Embark on an open-world adventure across 6 vibrant worlds! Buy new ducks, challenge boss ducks, train stamina, jump, flying, and swimming, and conquer the volcano.",
+    category: "Casual",
+    secondaryCategory: "Potato Classics",
+    thumbnail: "thumbnails/ducklife4.jpg",
+    mirrors: [
+      "https://gameinclassroom.github.io/duck-life-4/",
+      "https://ubghyper.github.io/GameList.github.io/Duck-Life-4/"
+    ],
+    tags: ["Duck Life", "Duck Life 4", "Duck", "Adventure", "Racing", "Training", "Owen OG", "Unblocked"],
+    rating: 4.9,
+    plays: 350000,
+    author: "Wix Games",
+    featured: true,
+    iframeSrc: "https://gameinclassroom.github.io/duck-life-4/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 4" src="https://gameinclassroom.github.io/duck-life-4/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Arrow Keys / WASD", action: "Move Duck / Navigate World" },
+      { key: "Space / Mouse", action: "Jump / Interact" }
+    ]
+  },
+  {
+    id: "duck-life-5",
+    source: "unblocked",
+    title: "Duck Life 5: Treasure Hunt",
+    description: "Explore the mysterious underground volcano cave! Dash, bounce, fly with jetpacks, collect rare coins, and discover ancient treasures.",
+    category: "Casual",
+    secondaryCategory: "Potato Classics",
+    thumbnail: "thumbnails/ducklife5.png",
+    mirrors: [
+      "https://ubghyper.github.io/GameList.github.io/Duck-Life-5/"
+    ],
+    tags: ["Duck Life", "Duck Life 5", "Treasure Hunt", "Duck", "Platformer", "Casual", "Owen OG", "Unblocked"],
+    rating: 4.8,
+    plays: 180000,
+    author: "Wix Games",
+    featured: true,
+    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Duck-Life-5/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 5: Treasure Hunt" src="https://ubghyper.github.io/GameList.github.io/Duck-Life-5/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Arrow Keys / WASD", action: "Move & Jump" },
+      { key: "Space", action: "Activate Gadget" }
+    ]
   }
 ];
 
@@ -947,18 +1187,23 @@ export const URL_OVERRIDES: Record<string, string> = {
   "fruit-ninja": "games/fruit-ninja.html",
   "fruitninja": "games/fruit-ninja.html",
 
-  // Bloons Tower Defence Series (Flash Player Runner with 200 OK SWF Endpoints)
-  "bloons-tower-defence": "games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/bloonstd.swf&title=Bloons+Tower+Defence",
-  "bloonstd": "games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/bloonstd.swf&title=Bloons+Tower+Defence",
-  "bloons-tower-defence-2": "games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/bloonstd2.swf&title=Bloons+Tower+Defence+2",
-  "bloonstd2": "games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/bloonstd2.swf&title=Bloons+Tower+Defence+2",
-  "bloons-tower-defence-3": "games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/bloonstd3.swf&title=Bloons+Tower+Defence+3",
-  "bloonstd3": "games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/bloonstd3.swf&title=Bloons+Tower+Defence+3",
-  "bloons-td-4": "games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/bloonstd4.swf&title=Bloons+TD+4",
-  "btd-4": "games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/bloonstd4.swf&title=Bloons+TD+4",
-  "bloonstd4": "games/flash-player.html?swf=https://raw.githubusercontent.com/maxplayzreal/Flash-Games-SWF/main/bloonstd4.swf&title=Bloons+TD+4",
-  "bloons-td-5": "games/flash-player.html?swf=https://raw.githubusercontent.com/sz-games/Games7/main/btd5.swf&title=Bloons+TD+5",
-  "bloonstd5": "games/flash-player.html?swf=https://raw.githubusercontent.com/sz-games/Games7/main/btd5.swf&title=Bloons+TD+5",
+  // Bloons Tower Defence Series (Clean HTML5 WebAssembly / Canvas Engines)
+  "bloons-tower-defence": "https://gameinclassroom.github.io/bloons-tower-defense-1/",
+  "bloonstd": "https://gameinclassroom.github.io/bloons-tower-defense-1/",
+  "bloonstowerdefence": "https://gameinclassroom.github.io/bloons-tower-defense-1/",
+  "bloonstowerdefense": "https://gameinclassroom.github.io/bloons-tower-defense-1/",
+  "bloons-tower-defence-2": "https://7zeb.github.io/homework/bloonsTD2.html",
+  "bloonstd2": "https://7zeb.github.io/homework/bloonsTD2.html",
+  "bloons-tower-defence-3": "https://7zeb.github.io/homework/bloonsTD3.html",
+  "bloonstd3": "https://7zeb.github.io/homework/bloonsTD3.html",
+  "btd3": "https://7zeb.github.io/homework/bloonsTD3.html",
+  "bloons-td-4": "https://7zeb.github.io/homework/bloonsTD4.html",
+  "btd-4": "https://7zeb.github.io/homework/bloonsTD4.html",
+  "btd4": "https://7zeb.github.io/homework/bloonsTD4.html",
+  "bloonstd4": "https://7zeb.github.io/homework/bloonsTD4.html",
+  "bloons-td-5": "https://7zeb.github.io/homework/bloonsTD5.html",
+  "bloonstd5": "https://7zeb.github.io/homework/bloonsTD5.html",
+  "btd5": "https://7zeb.github.io/homework/bloonsTD5.html",
 
   // Papa's Cooking Series (Modern Native HTML5 / WebAssembly Ports - Zero Flash)
   "papas-pizzeria": "https://ubghyper.github.io/GameList.github.io/Papas-Pizzeria/",
@@ -1084,6 +1329,12 @@ export const URL_OVERRIDES: Record<string, string> = {
   "duck-life-2": "https://gameinclassroom.github.io/duck-life-2-world-champion/",
   "duck-life-3": "https://gameinclassroom.github.io/duck-life-3-evolution/",
   "duck-life-4": "https://gameinclassroom.github.io/duck-life-4/",
+  "duck-life-5": "https://ubghyper.github.io/GameList.github.io/Duck-Life-5/",
+  "ducklife": "https://gameinclassroom.github.io/duck-life/",
+  "ducklife2": "https://gameinclassroom.github.io/duck-life-2-world-champion/",
+  "ducklife3": "https://gameinclassroom.github.io/duck-life-3-evolution/",
+  "ducklife4": "https://gameinclassroom.github.io/duck-life-4/",
+  "ducklife5": "https://ubghyper.github.io/GameList.github.io/Duck-Life-5/",
   "jacksmith": "https://ubghyper.github.io/GameList.github.io/Jacksmith/",
   "learntofly": "https://gameinclassroom.github.io/learn-to-fly/",
   "learntofly2": "https://ubghyper.github.io/GameList.github.io/Learn-To-Fly-2/",
