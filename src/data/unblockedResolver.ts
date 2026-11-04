@@ -140,7 +140,10 @@ const PRESERVED_LOCAL_GAMES = new Set([
   "games/basket-random.html",
   "games/boxing-random.html",
   "games/diep-io.html",
-  "games/spaceflight-simulator.html"
+  "games/spaceflight-simulator.html",
+  "games/geometry-dash.html",
+  "games/google-baseball.html",
+  "games/slither-io.html"
 ]);
 
 function cleanText(str: string): string {
@@ -165,6 +168,194 @@ export function resolveGameSource(
   const safeMirrors = Array.isArray(mirrors) ? mirrors : [];
 
   // Specialized top-priority handlers for requested games
+
+  // Sniper Assassin 1 - 5 (Verified SWFs with local modern Flash Player runner)
+  if (
+    safeId.includes('sniper-assassin') || safeId.includes('sniperassassin') ||
+    safeTitle.toLowerCase().includes('sniper assassin')
+  ) {
+    const combined = (safeId + ' ' + safeTitle).toLowerCase();
+    if (combined.includes('5')) {
+      const u = 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Sniper-assassin-5/sniper-assassin-5.swf&title=Sniper+Assassin+5';
+      return { src: u, mirrors: [u] };
+    }
+    if (combined.includes('4')) {
+      const u = 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Sniper-assassin-4/sniperassassin4.swf&title=Sniper+Assassin+4';
+      return { src: u, mirrors: [u] };
+    }
+    if (combined.includes('3')) {
+      const u = 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Sniper-assassin-3/sniper-assassin-3.swf&title=Sniper+Assassin+3';
+      return { src: u, mirrors: [u] };
+    }
+    if (combined.includes('2')) {
+      const u = 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Sniper-assassin-2/sniper-assassin-2.swf&title=Sniper+Assassin+2';
+      return { src: u, mirrors: [u] };
+    }
+    const u = 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Sniper-Assassin/sniperassassin.swf&title=Sniper+Assassin';
+    return { src: u, mirrors: [u] };
+  }
+
+  // Wheely 1 - 8 (Verified SWFs with local modern Flash Player runner)
+  if (safeId.includes('wheely') || safeTitle.toLowerCase().includes('wheely')) {
+    const combined = (safeId + ' ' + safeTitle).toLowerCase();
+    for (let num = 8; num >= 2; num--) {
+      if (combined.includes(String(num))) {
+        const u = `games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Wheely-${num}/Wheely-${num}.swf&title=Wheely+${num}`;
+        return { src: u, mirrors: [u] };
+      }
+    }
+    const u = 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Wheely/Wheely.swf&title=Wheely';
+    return { src: u, mirrors: [u] };
+  }
+
+  // Happy Wheels (Local unblocked runner + happy-wheels.pages.dev + ubghyper)
+  if (
+    safeId.includes('happy-wheel') || safeId.includes('happywheel') ||
+    safeTitle.toLowerCase().includes('happy wheel')
+  ) {
+    return {
+      src: 'games/happy-wheels.html',
+      mirrors: [
+        'games/happy-wheels.html',
+        'https://happy-wheels.pages.dev/',
+        'https://ubghyper.github.io/GameList.github.io/Happy-Wheels/'
+      ]
+    };
+  }
+
+  // Google Baseball (Doodle Baseball)
+  if (
+    safeId.includes('baseball') && (safeId.includes('google') || safeTitle.toLowerCase().includes('google'))
+  ) {
+    return {
+      src: 'games/google-baseball.html',
+      mirrors: [
+        'games/google-baseball.html',
+        'https://7zeb.github.io/homework/googlebaseball.html'
+      ]
+    };
+  }
+
+  // Geometry Dash (All editions: Classic, Remastered, Meltdown, Sub-Zero, Lite)
+  if (
+    safeId.includes('geometry-dash') || safeId.includes('geometrydash') ||
+    safeTitle.toLowerCase().includes('geometry dash')
+  ) {
+    return {
+      src: 'games/geometry-dash.html',
+      mirrors: [
+        'games/geometry-dash.html',
+        'https://geometry-dash.pages.dev/',
+        'https://7zeb.github.io/homework/geometry-dash-remastered/index.html',
+        'https://7zeb.github.io/homework/geometryvibes.html',
+        'https://ubghyper.github.io/GameList.github.io/Geometry-Dash-Lite/'
+      ]
+    };
+  }
+
+  // Slither.io (60 FPS local canvas arena + online servers)
+  if (safeId.includes('slither') || safeTitle.toLowerCase().includes('slither')) {
+    return {
+      src: 'games/slither-io.html',
+      mirrors: [
+        'games/slither-io.html',
+        'https://slither.com/io'
+      ]
+    };
+  }
+
+  // Paper.io & Paper.io 2
+  if (
+    safeId.includes('paper-io') || safeId.includes('paperio') ||
+    safeTitle.toLowerCase().includes('paper io') || safeTitle.toLowerCase().includes('paper.io')
+  ) {
+    return {
+      src: 'https://7zeb.github.io/homework/paperio2.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/paperio2.html',
+        'https://ubghyper.github.io/GameList.github.io/Paper-IO-2/'
+      ]
+    };
+  }
+
+  // Hole.io
+  if (
+    safeId.includes('hole-io') || safeId.includes('holeio') ||
+    safeTitle.toLowerCase().includes('hole.io') || safeTitle.toLowerCase().includes('hole io')
+  ) {
+    return {
+      src: 'https://7zeb.github.io/homework/holeio.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/holeio.html'
+      ]
+    };
+  }
+
+  // Agar.io
+  if (
+    safeId.includes('agar-io') || safeId.includes('agario') ||
+    safeTitle.toLowerCase().includes('agar.io') || safeTitle.toLowerCase().includes('agar io') ||
+    safeTitle.toLowerCase() === 'agar'
+  ) {
+    return {
+      src: 'https://7zeb.github.io/homework/agariolite.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/agariolite.html'
+      ]
+    };
+  }
+
+  // Smash Karts (Direct live unblocked domain without dead freeonlinewebtools wrappers)
+  if (
+    safeId.includes('smash-kart') || safeId.includes('smashkart') ||
+    safeTitle.toLowerCase().includes('smash kart')
+  ) {
+    return {
+      src: 'https://smashkarts.io/',
+      mirrors: [
+        'https://smashkarts.io/'
+      ]
+    };
+  }
+
+  // 1v1.lol (Full unity build assets on ubghyper)
+  if (
+    safeId.includes('1v1-lol') || safeId.includes('1v1lol') ||
+    safeTitle.toLowerCase().includes('1v1.lol') || safeTitle.toLowerCase().includes('1v1 lol')
+  ) {
+    return {
+      src: 'https://ubghyper.github.io/GameList.github.io/1v1-LOL/',
+      mirrors: [
+        'https://ubghyper.github.io/GameList.github.io/1v1-LOL/'
+      ]
+    };
+  }
+
+  // EvoWars.io (Direct live server without dead freeonlinewebtools wrapper)
+  if (
+    safeId.includes('evowars') || safeTitle.toLowerCase().includes('evowars')
+  ) {
+    return {
+      src: 'https://evowars.io/',
+      mirrors: [
+        'https://evowars.io/'
+      ]
+    };
+  }
+
+  // Zombs Royale
+  if (
+    safeId.includes('zombs') || safeTitle.toLowerCase().includes('zombs')
+  ) {
+    return {
+      src: 'https://zombsroyale.io/',
+      mirrors: [
+        'https://zombsroyale.io/'
+      ]
+    };
+  }
+
+  // Diep.io / Deip.io Tank Arena (Offline local canvas arena + official live unblocked mirrors)
   if (
     safeId.includes('diep') || safeId.includes('deip') ||
     safeTitle.toLowerCase().includes('diep') || safeTitle.toLowerCase().includes('deip')
@@ -199,16 +390,6 @@ export function resolveGameSource(
         'https://retro--bowl.pages.dev/',
         'https://javaspence.github.io/retrobowl/',
         'https://ubghyper.github.io/GameList.github.io/retro-bowl/'
-      ]
-    };
-  }
-
-  if (safeId.includes('paper-io') || safeTitle.toLowerCase().includes('paper io') || safeTitle.toLowerCase().includes('paper.io')) {
-    return {
-      src: 'https://7zeb.github.io/homework/paperio2.html',
-      mirrors: [
-        'https://7zeb.github.io/homework/paperio2.html',
-        'https://ubghyper.github.io/GameList.github.io/Paper-IO-2/'
       ]
     };
   }

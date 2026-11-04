@@ -96,12 +96,13 @@
 
   <iframe
     id="game-frame"
-    src="https://gameinclassroom.github.io/happy-wheels/"
+    src="https://happy-wheels.pages.dev/"
     allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope"
     allowfullscreen
   ></iframe>
 
   <div id="controls-bar">
+    <button class="hw-btn" onclick="switchMirror()">⇄ Mirror</button>
     <button class="hw-btn" onclick="reloadHappyWheels()">↺ Reload</button>
     <button class="hw-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
   </div>
@@ -109,6 +110,11 @@
   <script>
     const frame = document.getElementById('game-frame');
     const loader = document.getElementById('loading-container');
+    const mirrors = [
+      "https://happy-wheels.pages.dev/",
+      "https://ubghyper.github.io/GameList.github.io/Happy-Wheels/"
+    ];
+    let mirrorIdx = 0;
 
     frame.onload = function() {
       setTimeout(function() {
@@ -132,7 +138,12 @@
         loader.style.display = 'flex';
         loader.style.opacity = '1';
       }
-      frame.src = frame.src;
+      frame.src = mirrors[mirrorIdx];
+    }
+
+    function switchMirror() {
+      mirrorIdx = (mirrorIdx + 1) % mirrors.length;
+      reloadHappyWheels();
     }
 
     function toggleFullscreen() {
