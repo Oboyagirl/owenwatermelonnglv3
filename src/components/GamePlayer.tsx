@@ -36,7 +36,12 @@ import { ThemeConfig, THEMES } from '../services/themeStore';
 import { CloudSaveModal } from './CloudSaveModal';
 import { useAuth } from '../context/AuthContext';
 import { useMusic } from '../context/MusicContext';
-import { captureUniversalGameState, captureBrowserGameState } from '../services/cloudSaveService';
+import { 
+  captureUniversalGameState, 
+  restoreUniversalGameState, 
+  formatExactTimestamp, 
+  formatTimeAgo 
+} from '../services/cloudSaveService';
 import { SyncedLyricsView } from './SyncedLyricsView';
 
 interface GamePlayerProps {
@@ -100,8 +105,12 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
   const [showLyrics, setShowLyrics] = useState(false);
   const [isQuickSaving, setIsQuickSaving] = useState(false);
   const [quickSaved, setQuickSaved] = useState(false);
+  const [quickSavedTime, setQuickSavedTime] = useState<string | null>(null);
+  const [isRestoringLatest, setIsRestoringLatest] = useState(false);
+  const [restoreNotification, setRestoreNotification] = useState<string | null>(null);
   const { user, profile, deviceLabel, saveCurrentGame, getSavesForGame } = useAuth();
   const gameSaves = (typeof getSavesForGame === 'function' && game?.id ? getSavesForGame(game.id) : []) || [];
+  const latestSave = gameSaves.length > 0 ? gameSaves[0] : null;
 
   const handleQuickSave = async () => {
     if (typeof saveCurrentGame !== 'function' || !game?.id) return;
@@ -109,18 +118,41 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
     try {
       const contentWindow = iframeRef.current?.contentWindow || null;
       const dataToSave = await captureUniversalGameState(game.id, contentWindow);
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
+      
       await saveCurrentGame(game.id, 'slot1', {
-        title: safeTitle,
+        title: `Quick Save at ${timeStr}`,
         saveData: dataToSave,
         saveType: 'universal',
         deviceLabel
       });
       setQuickSaved(true);
-      setTimeout(() => setQuickSaved(false), 3000);
+      setQuickSavedTime(timeStr);
+      setTimeout(() => setQuickSaved(false), 4000);
     } catch (e) {
       console.error("Quick save error:", e);
     } finally {
       setIsQuickSaving(false);
+    }
+  };
+
+  const handleRestoreLatest = async () => {
+    if (!latestSave || isRestoringLatest) return;
+    setIsRestoringLatest(true);
+    try {
+      const contentWindow = iframeRef.current?.contentWindow || null;
+      await restoreUniversalGameState(game.id, latestSave.saveData, contentWindow);
+      const exactTime = formatExactTimestamp(latestSave.updatedAt || latestSave.createdAt);
+      setRestoreNotification(`Restored checkpoint from ${exactTime}! Reloading game...`);
+      setTimeout(() => {
+        handleReload();
+        setIsRestoringLatest(false);
+        setTimeout(() => setRestoreNotification(null), 3500);
+      }, 400);
+    } catch (e) {
+      console.error("Restore latest checkpoint error:", e);
+      setIsRestoringLatest(false);
     }
   };
   const [iframeHtmlInput, setIframeHtmlInput] = useState(defaultIframeCode);
@@ -408,18 +440,18 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
             <button
               onClick={handleQuickSave}
               disabled={isQuickSaving}
-              className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer border"
+              className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer border shadow-sm active:scale-95"
               style={{
                 backgroundColor: quickSaved ? 'rgba(16, 185, 129, 0.25)' : activeTheme.bgCard,
                 borderColor: quickSaved ? '#10b981' : activeTheme.border,
                 color: quickSaved ? '#34d399' : activeTheme.kicker
               }}
-              title="1-Click Quick Save: Snapshot progress to Slot 1 instantly"
+              title="1-Click Quick Save: Snapshot progress to Slot 1 with exact time"
             >
               {quickSaved ? (
                 <>
                   <Check className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Saved!</span>
+                  <span>Saved ({quickSavedTime})</span>
                 </>
               ) : (
                 <>
@@ -429,6 +461,33 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
               )}
             </button>
 
+            {/* 1-Click Go Back to Latest Checkpoint */}
+            {latestSave && (
+              <button
+                onClick={handleRestoreLatest}
+                disabled={isRestoringLatest}
+                className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer border shadow-sm active:scale-95"
+                style={{
+                  backgroundColor: isRestoringLatest ? 'rgba(56, 189, 248, 0.25)' : 'rgba(56, 189, 248, 0.1)',
+                  borderColor: isRestoringLatest ? '#38bdf8' : 'rgba(56, 189, 248, 0.3)',
+                  color: '#38bdf8'
+                }}
+                title={`Go back to checkpoint saved at ${formatExactTimestamp(latestSave.updatedAt || latestSave.createdAt)}`}
+              >
+                {isRestoringLatest ? (
+                  <>
+                    <RotateCcw className="w-3.5 h-3.5 animate-spin text-sky-400" />
+                    <span>Restoring...</span>
+                  </>
+                ) : (
+                  <>
+                    <Undo2 className="w-3.5 h-3.5 text-sky-400" />
+                    <span className="hidden sm:inline">Go Back</span>
+                  </>
+                )}
+              </button>
+            )}
+
             <button
               onClick={() => setShowCloudSaveModal(true)}
               className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer border"
@@ -437,10 +496,15 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
                 borderColor: gameSaves.length > 0 ? '#10b981' : activeTheme.border,
                 color: gameSaves.length > 0 ? '#34d399' : activeTheme.kicker
               }}
-              title="Cross-Device Cloud Saves: Save progress across school Chromebooks and home computers"
+              title="Open Exact Time Checkpoints & Cloud Saves manager"
             >
               <Cloud className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="hidden sm:inline">Cloud Save</span>
+              <span className="hidden sm:inline">Checkpoints</span>
+              {gameSaves.length > 0 && (
+                <span className="text-[10px] font-mono px-1 rounded bg-emerald-500/20 text-emerald-300">
+                  {gameSaves.length}
+                </span>
+              )}
             </button>
 
             {/* In-Player Real MP3 Music Toggle */}
@@ -527,6 +591,20 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
           className="relative flex-1 w-full h-full overflow-hidden flex items-center justify-center"
           style={{ backgroundColor: activeTheme.bgPrimary }}
         >
+          {/* Floating In-Game Toast Notifications for Exact Time Save & Restore */}
+          {restoreNotification && (
+            <div className="absolute top-4 z-30 px-4 py-2 rounded-xl bg-sky-950/90 border border-sky-400 text-sky-200 text-xs font-bold shadow-2xl backdrop-blur-md flex items-center gap-2 animate-fadeIn">
+              <Sparkles className="w-4 h-4 text-sky-400 animate-spin" />
+              <span>{restoreNotification}</span>
+            </div>
+          )}
+          {quickSaved && (
+            <div className="absolute top-4 z-30 px-4 py-2 rounded-xl bg-emerald-950/90 border border-emerald-400 text-emerald-200 text-xs font-bold shadow-2xl backdrop-blur-md flex items-center gap-2 animate-fadeIn">
+              <Check className="w-4 h-4 text-emerald-400" />
+              <span>Checkpoint saved at {quickSavedTime}! Easy to go back anytime.</span>
+            </div>
+          )}
+
           <iframe
             key={`${game.id}-${keyCounter}`}
             ref={iframeRef}

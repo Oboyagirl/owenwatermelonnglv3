@@ -1,7 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, onAuthStateChanged, signInAnonymously, signOut } from 'firebase/auth';
 import { auth } from '../services/firebase';
-import { UserProfile, GameSave } from '../services/cloudSaveService';
+import { 
+  UserProfile, 
+  GameSave, 
+  saveGameSlot, 
+  deleteGameSlot, 
+  subscribeToUserGameSaves,
+  getLocalBackups,
+  getOrCreateLocalGuest,
+  detectDeviceLabel
+} from '../services/cloudSaveService';
 
 interface AuthContextType {
   user: User | null;
@@ -15,7 +24,7 @@ interface AuthContextType {
   updateGamerProfile: (updates: Partial<UserProfile>) => Promise<void>;
   deleteSave: (gameIdOrId: string, slot?: string) => Promise<void>;
   getSavesForGame: (gameId: string) => GameSave[];
-  saveCurrentGame: (gameId: string, slot: string, data: { title?: string; saveData: string; saveType?: string; deviceLabel?: string; score?: number; level?: string }) => Promise<void>;
+  saveCurrentGame: (gameId: string, slot: string, data: { title?: string; saveData: string; saveType?: string; deviceLabel?: string; score?: number; level?: string }) => Promise<GameSave>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,42 +39,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return null;
     }
   });
+
+  const [deviceLabel] = useState<string>(() => detectDeviceLabel());
+
+  const currentUserId = user?.uid || profile?.userId || getOrCreateLocalGuest().uid;
+
   const [saves, setSaves] = useState<GameSave[]>(() => {
-    try {
-      const saved = localStorage.getItem('owen_cloud_saves');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
+    return getLocalBackups(currentUserId);
   });
 
-  const [deviceLabel] = useState<string>(() => {
-    if (typeof window === 'undefined') return 'Browser Device';
-    const ua = navigator.userAgent;
-    if (/iPad|iPhone/i.test(ua)) return 'School iPad';
-    if (/CrOS/i.test(ua)) return 'School Chromebook';
-    if (/Mac/i.test(ua)) return 'MacBook';
-    if (/Windows/i.test(ua)) return 'Windows PC';
-    return 'Web Device';
-  });
-
+  // Track Firebase Auth State
   useEffect(() => {
     try {
       const unsubscribe = onAuthStateChanged(auth, (u) => {
         setUser(u);
-        if (u && !profile) {
-          setProfile({
-            userId: u.uid,
-            displayName: u.displayName || 'Melon Gamer',
-            avatarId: 'melon_classic'
+        if (u) {
+          setProfile(prev => {
+            const nextProf: UserProfile = {
+              userId: u.uid,
+              displayName: u.displayName || prev?.displayName || 'Melon Gamer',
+              photoURL: u.photoURL || prev?.photoURL || undefined,
+              avatarId: prev?.avatarId || 'melon_classic'
+            };
+            try {
+              localStorage.setItem('owen_gamer_profile', JSON.stringify(nextProf));
+            } catch {}
+            return nextProf;
           });
         }
       });
       return () => unsubscribe();
-    } catch {
-      // Firebase auth listener fallback
+    } catch (e) {
+      console.warn("Auth state listener warning:", e);
     }
-  }, [profile]);
+  }, []);
+
+  // Subscribe to real-time Cloud Saves from Firestore and local mirror
+  useEffect(() => {
+    const activeUid = user?.uid || profile?.userId || getOrCreateLocalGuest().uid;
+    const unsub = subscribeToUserGameSaves(activeUid, (updatedSaves) => {
+      setSaves(updatedSaves);
+    });
+    return () => unsub();
+  }, [user?.uid, profile?.userId]);
 
   const loginGoogle = async () => {
     try {
@@ -99,13 +115,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setProfile(guestProf);
       localStorage.setItem('owen_gamer_profile', JSON.stringify(guestProf));
     } catch {
-      const localGuest: UserProfile = {
-        userId: 'guest-' + Date.now(),
+      const localGuest = getOrCreateLocalGuest(name);
+      const guestProf: UserProfile = {
+        userId: localGuest.uid,
         displayName: name,
         avatarId: 'melon_classic'
       };
-      setProfile(localGuest);
-      localStorage.setItem('owen_gamer_profile', JSON.stringify(localGuest));
+      setProfile(guestProf);
+      localStorage.setItem('owen_gamer_profile', JSON.stringify(guestProf));
     }
   };
 
@@ -120,7 +137,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateGamerProfile = async (updates: Partial<UserProfile>) => {
     setProfile(prev => {
-      const next = prev ? { ...prev, ...updates } : { userId: 'local', displayName: 'Player', ...updates };
+      const next = prev ? { ...prev, ...updates } : { userId: currentUserId, displayName: 'Player', ...updates };
       try {
         localStorage.setItem('owen_gamer_profile', JSON.stringify(next));
       } catch {}
@@ -130,50 +147,55 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const getSavesForGame = (gameId: string): GameSave[] => {
     if (!gameId) return [];
-    return saves.filter(s => s.gameId === gameId);
+    const cleanGameId = gameId.replace(/[^a-zA-Z0-9_\-]/g, '_');
+    return saves
+      .filter(s => s.gameId === gameId || s.gameId === cleanGameId || s.id.startsWith(`${cleanGameId}_`))
+      .sort((a, b) => {
+        const timeA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+        const timeB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+        return timeB - timeA;
+      });
   };
 
   const saveCurrentGame = async (
     gameId: string, 
     slot: string, 
     data: { title?: string; saveData: string; saveType?: string; deviceLabel?: string; score?: number; level?: string }
-  ) => {
-    const saveId = `${gameId}_${slot}`;
-    const newSave: GameSave = {
-      id: saveId,
-      userId: profile?.userId || user?.uid || 'guest',
-      gameId,
-      slot,
-      title: data.title || gameId,
-      saveData: data.saveData,
-      saveType: data.saveType || 'universal',
-      score: data.score,
-      level: data.level,
-      deviceLabel: data.deviceLabel || deviceLabel,
-      updatedAt: new Date().toISOString()
-    };
-    setSaves(prev => {
-      const filtered = prev.filter(s => s.id !== saveId);
-      const updated = [newSave, ...filtered];
-      try {
-        localStorage.setItem('owen_cloud_saves', JSON.stringify(updated));
-      } catch {}
-      return updated;
+  ): Promise<GameSave> => {
+    const activeUid = user?.uid || profile?.userId || getOrCreateLocalGuest().uid;
+    const savedDoc = await saveGameSlot(activeUid, gameId, slot, {
+      ...data,
+      deviceLabel: data.deviceLabel || deviceLabel
     });
+
+    setSaves(prev => {
+      const filtered = prev.filter(s => s.id !== savedDoc.id);
+      return [savedDoc, ...filtered];
+    });
+
+    return savedDoc;
   };
 
   const deleteSave = async (gameIdOrId: string, slot?: string) => {
+    const activeUid = user?.uid || profile?.userId || getOrCreateLocalGuest().uid;
+    let targetGameId = gameIdOrId;
+    let targetSlot = slot || 'slot1';
+
+    if (gameIdOrId.includes('_') && !slot) {
+      const parts = gameIdOrId.split('_');
+      targetSlot = parts.pop() || 'slot1';
+      targetGameId = parts.join('_');
+    }
+
+    await deleteGameSlot(activeUid, targetGameId, targetSlot);
+
     setSaves(prev => {
-      const next = prev.filter(s => {
+      return prev.filter(s => {
         if (slot) {
-          return !(s.gameId === gameIdOrId && s.slot === slot);
+          return !(s.gameId === targetGameId && s.slot === targetSlot);
         }
         return s.id !== gameIdOrId && s.gameId !== gameIdOrId;
       });
-      try {
-        localStorage.setItem('owen_cloud_saves', JSON.stringify(next));
-      } catch {}
-      return next;
     });
   };
 

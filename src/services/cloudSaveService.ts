@@ -411,6 +411,56 @@ export function subscribeToUserGameSaves(userId: string, callback: (saves: GameS
   );
 }
 
+export function formatExactTimestamp(isoString?: string): string {
+  if (!isoString) return 'Just now';
+  try {
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return 'Recently';
+    return d.toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+  } catch {
+    return 'Recently';
+  }
+}
+
+export function formatTimeAgo(isoString?: string): string {
+  if (!isoString) return 'Just now';
+  try {
+    const d = new Date(isoString);
+    const now = Date.now();
+    const diffMs = now - d.getTime();
+    if (diffMs < 0 || isNaN(diffMs)) return 'Just now';
+    const diffSec = Math.floor(diffMs / 1000);
+    if (diffSec < 15) return 'Just now';
+    if (diffSec < 60) return `${diffSec}s ago`;
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) return `${diffMin}m ago`;
+    const diffHr = Math.floor(diffMin / 60);
+    if (diffHr < 24) return `${diffHr}h ago`;
+    const diffDays = Math.floor(diffHr / 24);
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  } catch {
+    return 'Recently';
+  }
+}
+
+export function formatSaveBytes(bytesOrChars: number): string {
+  if (!bytesOrChars || bytesOrChars <= 0) return '0 B';
+  if (bytesOrChars < 1024) return `${bytesOrChars} B`;
+  const kb = bytesOrChars / 1024;
+  if (kb < 1024) return `${kb.toFixed(1)} KB`;
+  return `${(kb / 1024).toFixed(1)} MB`;
+}
+
 export async function saveGameSlot(
   userId: string,
   gameId: string,
@@ -422,11 +472,13 @@ export async function saveGameSlot(
     score?: number;
     level?: string;
     deviceLabel?: string;
+    createdAt?: string;
+    updatedAt?: string;
   }
 ): Promise<GameSave> {
-  // Sanitize saveId to conform strictly to isValidId regex ^[a-zA-Z0-9_\-]+$
+  // Sanitize saveId to conform strictly to isValidId regex ^[a-zA-Z0-9_\-]+$ and max 32 chars for slot
   const cleanGameId = (gameId.replace(/[^a-zA-Z0-9_\-]/g, '_').slice(0, 60)) || 'game';
-  const cleanSlot = (slot.replace(/[^a-zA-Z0-9_\-]/g, '_').slice(0, 20)) || 'slot1';
+  const cleanSlot = (slot.replace(/[^a-zA-Z0-9_\-]/g, '_').slice(0, 32)) || 'slot1';
   const saveId = `${cleanGameId}_${cleanSlot}`;
   const path = `users/${userId}/saves/${saveId}`;
 
@@ -436,18 +488,28 @@ export async function saveGameSlot(
     : (payload.saveData || '');
 
   const now = new Date().toISOString();
+  const exactTimeStr = formatExactTimestamp(now);
   
+  // Find if previous version existed to preserve initial createdAt
+  const existingBackups = getLocalBackups(userId);
+  const existing = existingBackups.find(s => s.id === saveId);
+
+  // Default title includes the exact moment saved
+  const finalTitle = payload.title && payload.title.trim().length > 0 && payload.title !== gameId
+    ? payload.title.trim()
+    : `Checkpoint (${exactTimeStr})`;
+
   // Construct clean document without any undefined or null properties
   const saveDoc: GameSave = {
     id: saveId,
     userId,
     gameId,
-    slot,
-    title: (payload.title || gameId).slice(0, 120),
+    slot: cleanSlot,
+    title: finalTitle.slice(0, 120),
     saveData: truncatedData,
-    saveType: payload.saveType || 'state',
+    saveType: payload.saveType || 'universal',
     deviceLabel: payload.deviceLabel || detectDeviceLabel(),
-    createdAt: now,
+    createdAt: payload.createdAt || existing?.createdAt || now,
     updatedAt: now
   };
 
@@ -474,7 +536,7 @@ export async function saveGameSlot(
 
 export async function deleteGameSlot(userId: string, gameId: string, slot: string): Promise<void> {
   const cleanGameId = (gameId.replace(/[^a-zA-Z0-9_\-]/g, '_').slice(0, 60)) || 'game';
-  const cleanSlot = (slot.replace(/[^a-zA-Z0-9_\-]/g, '_').slice(0, 20)) || 'slot1';
+  const cleanSlot = (slot.replace(/[^a-zA-Z0-9_\-]/g, '_').slice(0, 32)) || 'slot1';
   const saveId = `${cleanGameId}_${cleanSlot}`;
   const path = `users/${userId}/saves/${saveId}`;
 

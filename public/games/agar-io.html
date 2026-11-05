@@ -665,6 +665,55 @@
       `).join('');
     }
 
+    // State Persistence for Exact Time Checkpoint Cloud Saves
+    function saveAgarState() {
+      if (!player) return;
+      try {
+        const state = {
+          player: {
+            name: player.name,
+            color: player.color,
+            isAlive: player.isAlive,
+            cells: player.cells.map(c => ({
+              x: c.x, y: c.y, vx: c.vx, vy: c.vy, mass: c.mass, mergeTimer: c.mergeTimer
+            }))
+          },
+          savedAt: Date.now()
+        };
+        localStorage.setItem('agario_save_state', JSON.stringify(state));
+      } catch(e) {}
+    }
+
+    function loadAgarState() {
+      try {
+        const raw = localStorage.getItem('agario_save_state');
+        if (!raw) return;
+        const state = JSON.parse(raw);
+        if (state && state.player && Array.isArray(state.player.cells)) {
+          player.name = state.player.name || player.name;
+          player.color = state.player.color || player.color;
+          player.isAlive = state.player.isAlive !== false;
+          player.cells = state.player.cells;
+          if (player.isAlive) {
+            document.getElementById('start-overlay').style.display = 'none';
+          }
+        }
+      } catch(e) {}
+    }
+
+    // Auto-save every 2 seconds
+    setInterval(saveAgarState, 2000);
+    window.addEventListener('beforeunload', saveAgarState);
+
+    // Listen for Cloud Save instant restore events
+    window.addEventListener('message', (e) => {
+      if (e.data && e.data.type === 'UNIVERSAL_GAME_RESTORE') {
+        setTimeout(loadAgarState, 50);
+      }
+    });
+
+    loadAgarState();
+
     function loop(now) {
       const dt = Math.min(0.1, (now - lastTime) / 1000);
       lastTime = now;

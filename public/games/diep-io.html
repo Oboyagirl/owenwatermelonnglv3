@@ -809,6 +809,65 @@
       `).join('');
     }
 
+    // State Persistence for Exact Time Checkpoint Cloud Saves
+    function saveDiepState() {
+      if (!player) return;
+      try {
+        const state = {
+          player: {
+            name: player.name,
+            x: player.x,
+            y: player.y,
+            score: player.score,
+            level: player.level,
+            tankClass: player.tankClass,
+            health: player.health,
+            maxHealth: player.maxHealth,
+            isAlive: player.isAlive
+          },
+          statUpgrades,
+          statPoints,
+          savedAt: Date.now()
+        };
+        localStorage.setItem('diepio_save_state', JSON.stringify(state));
+      } catch(e) {}
+    }
+
+    function loadDiepState() {
+      try {
+        const raw = localStorage.getItem('diepio_save_state');
+        if (!raw) return;
+        const state = JSON.parse(raw);
+        if (state && state.player) {
+          Object.assign(player, state.player);
+          if (Array.isArray(state.statUpgrades)) {
+            state.statUpgrades.forEach((u, i) => {
+              if (statUpgrades[i] && typeof u.level === 'number') {
+                statUpgrades[i].level = u.level;
+              }
+            });
+          }
+          if (typeof state.statPoints === 'number') statPoints = state.statPoints;
+          recalculateStats();
+          renderStatsUI();
+          updateLevelUI();
+        }
+      } catch(e) {}
+    }
+
+    // Auto-save every 2 seconds
+    setInterval(saveDiepState, 2000);
+    window.addEventListener('beforeunload', saveDiepState);
+
+    // Listen for Cloud Save instant restore events
+    window.addEventListener('message', (e) => {
+      if (e.data && e.data.type === 'UNIVERSAL_GAME_RESTORE') {
+        setTimeout(loadDiepState, 50);
+      }
+    });
+
+    loadDiepState();
+
     function loop(now) {
       const dt = Math.min(0.1, (now - lastTime) / 1000);
       lastTime = now;

@@ -775,6 +775,56 @@
       ctx.restore();
     }
 
+    // State Persistence for Exact Time Checkpoint Cloud Saves
+    function saveFlightState() {
+      try {
+        const state = {
+          ship: {
+            x: ship.x, y: ship.y, vx: ship.vx, vy: ship.vy,
+            angle: ship.angle, angularVelocity: ship.angularVelocity,
+            mass: ship.mass, fuel: ship.fuel, maxFuel: ship.maxFuel,
+            thrust: ship.thrust, stage: ship.stage, maxStages: ship.maxStages,
+            crashed: ship.crashed, landed: ship.landed
+          },
+          throttle, sasEnabled, chuteDeployed, isMapMode,
+          savedAt: Date.now()
+        };
+        localStorage.setItem('sfs_flight_state', JSON.stringify(state));
+      } catch(e) {}
+    }
+
+    function loadFlightState() {
+      try {
+        const raw = localStorage.getItem('sfs_flight_state');
+        if (!raw) return;
+        const state = JSON.parse(raw);
+        if (state && state.ship) {
+          Object.assign(ship, state.ship);
+          if (typeof state.throttle === 'number') throttle = state.throttle;
+          if (typeof state.sasEnabled === 'boolean') sasEnabled = state.sasEnabled;
+          if (typeof state.chuteDeployed === 'boolean') chuteDeployed = state.chuteDeployed;
+          if (typeof state.isMapMode === 'boolean') isMapMode = state.isMapMode;
+          // Sync UI
+          document.getElementById('throttle-slider').value = Math.round(throttle * 100);
+          document.getElementById('throttle-num').textContent = `${Math.round(throttle * 100)}%`;
+        }
+      } catch(e) {}
+    }
+
+    // Auto-save flight state every 1.5 seconds
+    setInterval(saveFlightState, 1500);
+    window.addEventListener('beforeunload', saveFlightState);
+
+    // Listen for Cloud Save instant restore events
+    window.addEventListener('message', (e) => {
+      if (e.data && e.data.type === 'UNIVERSAL_GAME_RESTORE') {
+        setTimeout(loadFlightState, 50);
+      }
+    });
+
+    // Load initial state if one was saved
+    loadFlightState();
+
     function gameLoop(now) {
       const dt = Math.min(0.1, (now - lastTime) / 1000);
       lastTime = now;
