@@ -3,8 +3,94 @@ import ubgGamesList from './ubgFilteredGames.json';
 import strongdogGamesList from './strongdogGames.json';
 import { TRIPPLE_POTATOES_GAMES } from './tripplePotatoesGames';
 import { resolveGameSource } from './unblockedResolver';
+import sevenZebMap from './sevenZebGamesMap.json';
 
 const CURATED_GAMES: Game[] = [
+  {
+    id: "spaceflight-simulator",
+    source: "unblocked",
+    title: "Spaceflight Simulator",
+    description: "Build multi-stage rockets, manage staging and throttle, escape Earth's atmosphere, and navigate orbital trajectories to reach the Moon in this realistic physics space simulator!",
+    category: "Simulation",
+    secondaryCategory: "Owen Watermelon OG’s",
+    thumbnail: "https://images.unsplash.com/photo-1517976487507-5b3b4b45f942?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1517976487507-5b3b4b45f942?w=1200&auto=format&fit=crop&q=80",
+    mirrors: [
+      "games/spaceflight-simulator.html",
+      "https://astronautag.github.io/spaceflight-simulator/",
+      "https://7zeb.github.io/homework/3Dflightsimulator.html",
+      "games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Flash-Flight-Simulator-1/flashflightsimulator.swf&title=Flash+Flight+Simulator"
+    ],
+    tags: ["Space", "Rocket", "Simulation", "Spaceflight Simulator", "SFS", "Physics", "Orbit", "Trending", "Unblocked"],
+    rating: 5.0,
+    plays: 342000,
+    author: "Stefo Mai Morojna",
+    featured: true,
+    iframeSrc: "games/spaceflight-simulator.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Spaceflight Simulator" src="games/spaceflight-simulator.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Space", action: "Stage Rocket / Ignite Boosters" },
+      { key: "A / D or ← / →", action: "Steer Rocket / Gimbal" },
+      { key: "Shift / Ctrl or Slider", action: "Throttle Up / Down" },
+      { key: "M", action: "Toggle Orbit Map / Cockpit View" }
+    ]
+  },
+  {
+    id: "diep-io",
+    source: "unblocked",
+    title: "Diep.io",
+    description: "Pilot your custom tank, destroy polygonal shapes to earn XP, upgrade 8 vital stats, and evolve through 45 levels of twin, sniper, destroyer, and machine gun classes!",
+    category: "Action",
+    secondaryCategory: "Owen Watermelon OG’s",
+    thumbnail: "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?w=1200&auto=format&fit=crop&q=80",
+    mirrors: [
+      "games/diep-io.html",
+      "https://ilancosman.github.io/diepio-clone/",
+      "https://priswall.github.io/diepio-clone/",
+      "/api/proxy/game?url=https://ilancosman.github.io/diepio-clone/"
+    ],
+    tags: ["Diep.io", "Tank", "Multiplayer", "Shooter", "IO Games", "Action", "Trending", "Unblocked"],
+    rating: 5.0,
+    plays: 489000,
+    author: "Matheus Valadares",
+    featured: true,
+    iframeSrc: "games/diep-io.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Diep.io" src="games/diep-io.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "WASD / Arrow Keys", action: "Move Tank" },
+      { key: "Mouse Move & Left Click", action: "Aim & Shoot" },
+      { key: "1 - 8 Keys", action: "Upgrade Stats" },
+      { key: "E / C", action: "Toggle Auto-Fire / Auto-Spin" }
+    ]
+  },
+  {
+    id: "agar-io",
+    source: "unblocked",
+    title: "Agar.io",
+    description: "The world-famous mass-eating battle royale! Control your cell, consume pellets, split to hunt other players, avoid spiky green viruses, and dominate the leaderboard!",
+    category: "Action",
+    secondaryCategory: "Owen Watermelon OG’s",
+    thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80",
+    banner: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&auto=format&fit=crop&q=80",
+    mirrors: [
+      "games/agar-io.html",
+      "https://7zeb.github.io/homework/agariolite.html",
+      "/api/proxy/game?url=https://7zeb.github.io/homework/agariolite.html"
+    ],
+    tags: ["Agar.io", "Blob", "Multiplayer", "IO Games", "Action", "Survival", "Trending", "Unblocked"],
+    rating: 5.0,
+    plays: 520000,
+    author: "Matheus Valadares",
+    featured: true,
+    iframeSrc: "games/agar-io.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Agar.io" src="games/agar-io.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Mouse Move", action: "Glide Cell Direction" },
+      { key: "Space", action: "Split Cell in Half (Launch Attack)" },
+      { key: "W", action: "Eject Mass (Feed Teammate / Virus)" }
+    ]
+  },
   {
     id: "free-plinko-game-online",
     source: "unblocked",
@@ -833,7 +919,9 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/btd1.jpg",
     mirrors: [
+      "https://7zeb.github.io/homework/bloonsTD.html",
       "https://gameinclassroom.github.io/bloons-tower-defense-1/",
+      "/api/proxy/game?url=https://gameinclassroom.github.io/bloons-tower-defense-1/",
       "https://ubghyper.github.io/GameList.github.io/Bloons-Tower-Defense/"
     ],
     tags: ["Bloons", "BTD", "Bloons TD", "Tower Defense", "Strategy", "Classic", "Owen OG", "Unblocked"],
@@ -841,8 +929,8 @@ const CURATED_GAMES: Game[] = [
     plays: 198000,
     author: "Ninja Kiwi",
     featured: true,
-    iframeSrc: "https://gameinclassroom.github.io/bloons-tower-defense-1/",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Bloons Tower Defence" src="https://gameinclassroom.github.io/bloons-tower-defense-1/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://7zeb.github.io/homework/bloonsTD.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Bloons Tower Defence" src="https://7zeb.github.io/homework/bloonsTD.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Left Click", action: "Select & Place Towers" },
       { key: "Click Tower", action: "Upgrade & Target Strategy" }
@@ -858,6 +946,7 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "thumbnails/btd2.jpg",
     mirrors: [
       "https://7zeb.github.io/homework/bloonsTD2.html",
+      "/api/proxy/game?url=https://7zeb.github.io/homework/bloonsTD2.html",
       "https://ubghyper.github.io/GameList.github.io/Bloonstd-2/"
     ],
     tags: ["Bloons", "BTD", "Bloons TD 2", "Tower Defense", "Strategy", "Classic", "Owen OG", "Unblocked"],
@@ -882,6 +971,7 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "thumbnails/btd3.jpg",
     mirrors: [
       "https://7zeb.github.io/homework/bloonsTD3.html",
+      "/api/proxy/game?url=https://7zeb.github.io/homework/bloonsTD3.html",
       "https://ubghyper.github.io/GameList.github.io/Bloonstd-3/"
     ],
     tags: ["Bloons", "BTD", "Bloons TD 3", "Tower Defense", "Strategy", "Classic", "Owen OG", "Unblocked"],
@@ -906,6 +996,7 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "thumbnails/btd4.jpg",
     mirrors: [
       "https://7zeb.github.io/homework/bloonsTD4.html",
+      "/api/proxy/game?url=https://7zeb.github.io/homework/bloonsTD4.html",
       "https://ubghyper.github.io/GameList.github.io/Bloonstd-4/"
     ],
     tags: ["Bloons", "BTD", "Bloons TD 4", "Tower Defense", "Strategy", "Classic", "Owen OG", "Unblocked"],
@@ -930,6 +1021,7 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "thumbnails/btd5.png",
     mirrors: [
       "https://7zeb.github.io/homework/bloonsTD5.html",
+      "/api/proxy/game?url=https://7zeb.github.io/homework/bloonsTD5.html",
       "https://ubghyper.github.io/GameList.github.io/Bloonstd-5/"
     ],
     tags: ["Bloons", "BTD", "Bloons TD 5", "Tower Defense", "Strategy", "Classic", "Owen OG", "Unblocked"],
@@ -955,6 +1047,7 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "thumbnails/ducklife1.jpg",
     mirrors: [
       "https://gameinclassroom.github.io/duck-life/",
+      "/api/proxy/game?url=https://gameinclassroom.github.io/duck-life/",
       "https://ubghyper.github.io/GameList.github.io/Duck-Life/"
     ],
     tags: ["Duck Life", "Duck", "Racing", "Training", "Animal", "Casual", "Owen OG", "Unblocked"],
@@ -979,6 +1072,7 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "thumbnails/ducklife2.jpg",
     mirrors: [
       "https://gameinclassroom.github.io/duck-life-2-world-champion/",
+      "/api/proxy/game?url=https://gameinclassroom.github.io/duck-life-2-world-champion/",
       "https://ubghyper.github.io/GameList.github.io/Duck-Life-2/"
     ],
     tags: ["Duck Life", "Duck Life 2", "Duck", "Racing", "Training", "Animal", "Owen OG", "Unblocked"],
@@ -1003,6 +1097,7 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "thumbnails/ducklife3.jpg",
     mirrors: [
       "https://gameinclassroom.github.io/duck-life-3-evolution/",
+      "/api/proxy/game?url=https://gameinclassroom.github.io/duck-life-3-evolution/",
       "https://ubghyper.github.io/GameList.github.io/Duck-Life-3/"
     ],
     tags: ["Duck Life", "Duck Life 3", "Duck", "Evolution", "Racing", "Training", "Owen OG", "Unblocked"],
@@ -1027,6 +1122,7 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "thumbnails/ducklife4.jpg",
     mirrors: [
       "https://gameinclassroom.github.io/duck-life-4/",
+      "/api/proxy/game?url=https://gameinclassroom.github.io/duck-life-4/",
       "https://ubghyper.github.io/GameList.github.io/Duck-Life-4/"
     ],
     tags: ["Duck Life", "Duck Life 4", "Duck", "Adventure", "Racing", "Training", "Owen OG", "Unblocked"],
@@ -1050,7 +1146,8 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/ducklife5.png",
     mirrors: [
-      "https://ubghyper.github.io/GameList.github.io/Duck-Life-5/"
+      "https://ubghyper.github.io/GameList.github.io/Duck-Life-5/",
+      "/api/proxy/game?url=https://ubghyper.github.io/GameList.github.io/Duck-Life-5/"
     ],
     tags: ["Duck Life", "Duck Life 5", "Treasure Hunt", "Duck", "Platformer", "Casual", "Owen OG", "Unblocked"],
     rating: 4.8,
@@ -1062,6 +1159,56 @@ const CURATED_GAMES: Game[] = [
     controls: [
       { key: "Arrow Keys / WASD", action: "Move & Jump" },
       { key: "Space", action: "Activate Gadget" }
+    ]
+  },
+  {
+    id: "duck-life-space",
+    source: "unblocked",
+    title: "Duck Life: Space",
+    description: "Launch your champion duck into outer space! Travel across planets, master zero-G gravity races, and upgrade your duck skills across the galaxy.",
+    category: "Casual",
+    secondaryCategory: "Potato Classics",
+    thumbnail: "thumbnails/ducklife4.jpg",
+    mirrors: [
+      "https://gameinclassroom.github.io/duck-life-4/",
+      "/api/proxy/game?url=https://gameinclassroom.github.io/duck-life-4/",
+      "https://ubghyper.github.io/GameList.github.io/Duck-Life-4/"
+    ],
+    tags: ["Duck Life", "Space", "Duck", "Racing", "Training", "Animal", "Owen OG", "Unblocked"],
+    rating: 4.9,
+    plays: 210000,
+    author: "Wix Games",
+    featured: true,
+    iframeSrc: "https://gameinclassroom.github.io/duck-life-4/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life: Space" src="https://gameinclassroom.github.io/duck-life-4/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Arrow Keys / WASD", action: "Control Duck" },
+      { key: "Space", action: "Jump / Boost" }
+    ]
+  },
+  {
+    id: "duck-life-battle",
+    source: "unblocked",
+    title: "Duck Life: Battle",
+    description: "The ultimate duck showdown! Train strength, defense, speed, and health, equip special weapons and hats, and battle rogue ducks in arena tournaments.",
+    category: "Casual",
+    secondaryCategory: "Potato Classics",
+    thumbnail: "thumbnails/ducklife3.jpg",
+    mirrors: [
+      "https://gameinclassroom.github.io/duck-life-3-evolution/",
+      "/api/proxy/game?url=https://gameinclassroom.github.io/duck-life-3-evolution/",
+      "https://ubghyper.github.io/GameList.github.io/Duck-Life-3/"
+    ],
+    tags: ["Duck Life", "Battle", "Duck", "Combat", "Training", "Animal", "Owen OG", "Unblocked"],
+    rating: 4.9,
+    plays: 240000,
+    author: "Wix Games",
+    featured: true,
+    iframeSrc: "https://gameinclassroom.github.io/duck-life-3-evolution/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life: Battle" src="https://gameinclassroom.github.io/duck-life-3-evolution/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    controls: [
+      { key: "Arrow Keys / WASD", action: "Move Duck / Navigate Arena" },
+      { key: "Mouse Click", action: "Select Attacks & Items" }
     ]
   }
 ];
@@ -1188,10 +1335,10 @@ export const URL_OVERRIDES: Record<string, string> = {
   "fruitninja": "games/fruit-ninja.html",
 
   // Bloons Tower Defence Series (Clean HTML5 WebAssembly / Canvas Engines)
-  "bloons-tower-defence": "https://gameinclassroom.github.io/bloons-tower-defense-1/",
-  "bloonstd": "https://gameinclassroom.github.io/bloons-tower-defense-1/",
-  "bloonstowerdefence": "https://gameinclassroom.github.io/bloons-tower-defense-1/",
-  "bloonstowerdefense": "https://gameinclassroom.github.io/bloons-tower-defense-1/",
+  "bloons-tower-defence": "https://7zeb.github.io/homework/bloonsTD.html",
+  "bloonstd": "https://7zeb.github.io/homework/bloonsTD.html",
+  "bloonstowerdefence": "https://7zeb.github.io/homework/bloonsTD.html",
+  "bloonstowerdefense": "https://7zeb.github.io/homework/bloonsTD.html",
   "bloons-tower-defence-2": "https://7zeb.github.io/homework/bloonsTD2.html",
   "bloonstd2": "https://7zeb.github.io/homework/bloonsTD2.html",
   "bloons-tower-defence-3": "https://7zeb.github.io/homework/bloonsTD3.html",
@@ -1464,10 +1611,115 @@ export function getCanonicalGameKey(g: { id?: string; title?: string }): string 
   const cleanId = id
     .replace(/^potatoes-/, '')
     .replace(/-alt$/, '')
+    .replace(/^7zeb-/, '')
     .replace(/[^a-z0-9]/g, '');
+
+  // Bloons TD canonical keys
+  if (cleanId === 'bloonstd' || cleanId === 'bloonstowerdefence' || cleanTitle === 'bloonstowerdefence' || cleanTitle === 'bloonstd' || cleanTitle === 'bloonstowerdefence1') return 'bloonstd1';
+  if (cleanId === 'bloonstd2' || cleanId === 'bloonstowerdefence2' || cleanTitle === 'bloonstowerdefence2' || cleanTitle === 'bloonstd2') return 'bloonstd2';
+  if (cleanId === 'bloonstd3' || cleanId === 'bloonstowerdefence3' || cleanTitle === 'bloonstowerdefence3' || cleanTitle === 'bloonstd3') return 'bloonstd3';
+  if (cleanId === 'bloonstd4' || cleanTitle === 'bloonstd4') return 'bloonstd4';
+  if (cleanId === 'bloonstd5' || cleanTitle === 'bloonstd5' || cleanTitle === 'bloonstd5') return 'bloonstd5';
+
+  // Duck Life canonical keys
+  if (cleanId === 'ducklife' || cleanTitle === 'ducklife') return 'ducklife1';
+  if (cleanId === 'ducklife2' || cleanTitle === 'ducklife2' || cleanTitle === 'ducklife2worldchampion') return 'ducklife2';
+  if (cleanId === 'ducklife3' || cleanTitle === 'ducklife3' || cleanTitle === 'ducklife3evolution') return 'ducklife3';
+  if (cleanId === 'ducklife4' || cleanTitle === 'ducklife4') return 'ducklife4';
+  if (cleanId === 'ducklife5' || cleanTitle === 'ducklife5' || cleanTitle === 'ducklife5treasurehunt') return 'ducklife5';
+  if (cleanId === 'ducklifespace' || cleanTitle === 'ducklifespace') return 'ducklifespace';
+  if (cleanId === 'ducklifebattle' || cleanTitle === 'ducklifebattle') return 'ducklifebattle';
+
+  // Spaceflight, Diep, Agar canonical keys
+  if (cleanId.includes('spaceflightsimulator') || cleanTitle.includes('spaceflightsimulator')) return 'spaceflightsimulator';
+  if (cleanId === 'diepio' || cleanTitle === 'diepio') return 'diepio';
+  if (cleanId === 'agario' || cleanTitle === 'agario') return 'agario';
 
   return cleanTitle || cleanId;
 }
+
+const SEVEN_ZEB_METADATA: Record<string, { title: string; category: string; description: string; author?: string; thumbnail?: string }> = {
+  "112": { title: "Minecraft 1.12", category: "Adventure", description: "Experience classic Minecraft Java Edition version 1.12 with world generation, crafting, and survival.", thumbnail: "https://images.unsplash.com/photo-1627856013091-fed6e4e30025?w=600&auto=format&fit=crop&q=80" },
+  "1v1lol1": { title: "1v1.LOL", category: "Action", description: "Battle Royale building and shooting simulator. Out-build and out-gun your opponent in fast-paced 1v1 combat.", thumbnail: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80" },
+  "2048cupcakes": { title: "2048 Cupcakes", category: "Puzzle", description: "Delicious cupcake-themed edition of 2048. Slide sweet pastries to combine them into the ultimate cupcake confection!", thumbnail: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&auto=format&fit=crop&q=80" },
+  "3dflightsimulator": { title: "3D Flight Simulator", category: "Simulation", description: "Take controls of realistic aircraft, cruise through clear skies, navigate airport runways, and master authentic flight physics.", thumbnail: "https://images.unsplash.com/photo-1517976487507-5b3b4b45f942?w=600&auto=format&fit=crop&q=80" },
+  "alpha126": { title: "Minecraft Alpha 1.2.6", category: "Adventure", description: "Step back into the historic Halloween update of Minecraft Alpha 1.2.6 with early biomes, Nether portals, and nostalgic mechanics.", thumbnail: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop&q=80" },
+  "beta13": { title: "Minecraft Beta 1.3", category: "Adventure", description: "Relive Minecraft Beta 1.3 featuring smooth lighting, beds, repeaters, redstone logic, and classic terrain generation.", thumbnail: "https://images.unsplash.com/photo-1627856013091-fed6e4e30025?w=600&auto=format&fit=crop&q=80" },
+  "gtaa": { title: "Grand Theft Auto Advance", category: "Action", description: "Top-down retro open-world crime thriller set in Liberty City with vehicles, missions, and action.", thumbnail: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80" },
+  "hhbrowse": { title: "H&H Browse", category: "Arcade", description: "Explore the H&H interactive browser portal and web arcade showcase.", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "hhcrossy": { title: "H&H Crossy Road", category: "Arcade", description: "Hop, dodge, and cross endless busy highways, raging rivers, and railroad tracks without getting hit!", thumbnail: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&auto=format&fit=crop&q=80" },
+  "hopterroyale": { title: "Hopter Royale", category: "Action", description: "Multiplayer aerial helicopter battle arena. Shoot rival choppers, collect powerups, and rule the skies.", thumbnail: "https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=600&auto=format&fit=crop&q=80" },
+  "indev": { title: "Minecraft Indev", category: "Adventure", description: "Explore Minecraft Indev 0.31, the pioneering development phase with floating islands and custom world types.", thumbnail: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop&q=80" },
+  "agariolite": { title: "Agar.io Lite", category: "Action", description: "Smooth lightweight edition of Agar.io. Eat nutrient orbs, split strategically, and grow to dominate the cell arena.", thumbnail: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=600&auto=format&fit=crop&q=80" },
+  "angrybirds": { title: "Angry Birds", category: "Arcade", description: "Launch the flock with precision trajectory! Demolish piggy structures and reclaim stolen eggs across dozens of levels.", thumbnail: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&auto=format&fit=crop&q=80" },
+  "angrybirdsshowdown": { title: "Angry Birds Showdown", category: "Arcade", description: "Competitive high-speed slingshot duels against rival bird masters in intense physics destruction challenges.", thumbnail: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&auto=format&fit=crop&q=80" },
+  "angrybirdsspace": { title: "Angry Birds Space", category: "Arcade", description: "Catapult the birds through cosmic gravitational fields, planetary orbits, and zero-G space environments!", thumbnail: "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=600&auto=format&fit=crop&q=80" },
+  "brawlstarsprojectlaser": { title: "Brawl Stars: Project Laser", category: "Action", description: "The original retro Project Laser 8-bit space shooter prototype from Supercell's universe.", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "cardrawing": { title: "Draw Climber / Car Drawing", category: "Casual", description: "Draw custom wheels and legs to guide your vehicle over hills, ramps, and obstacle-filled tracks.", thumbnail: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&auto=format&fit=crop&q=80" },
+  "carkingarena": { title: "Car King Arena", category: "Action", description: "Smash, ram, and outmaneuver enemy cars in a demolition derby battle royale to claim the crown!", thumbnail: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=600&auto=format&fit=crop&q=80" },
+  "chess": { title: "Master Chess", category: "Strategy", description: "Play the timeless game of strategy against challenging chess engines with multi-level AI.", thumbnail: "https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=600&auto=format&fit=crop&q=80" },
+  "chinesefortnite": { title: "Chinese Fortnite (Mini Battle)", category: "Action", description: "Fast-paced top-down mini battle royale shooter featuring loot chests, storm circles, and multiplayer action.", thumbnail: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80" },
+  "cleanupio": { title: "Clean Up IO", category: "Action", description: "Vacuum up trash, furniture, vehicles, and entire city blocks to expand your cleaning vacuum.", thumbnail: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=80" },
+  "crazycrashlanding": { title: "Crash Landing 3D", category: "Simulation", description: "Pilot damaged aircraft under extreme emergency conditions and perform emergency crash landings safely.", thumbnail: "https://images.unsplash.com/photo-1517976487507-5b3b4b45f942?w=600&auto=format&fit=crop&q=80" },
+  "crazymotorcycle": { title: "Crazy Motorcycle", category: "Sports", description: "Perform heart-stopping stunts, backflips, and 360 air-spins across dangerous stunt courses on a motorcycle.", thumbnail: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=600&auto=format&fit=crop&q=80" },
+  "dkcountry": { title: "Donkey Kong Country", category: "Adventure", description: "The groundbreaking SNES platformer starring Donkey Kong and Diddy Kong collecting bananas across DK Island.", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "dkcountry2": { title: "Donkey Kong Country 2: Diddy's Kong Quest", category: "Adventure", description: "Embark on Crocodile Isle to rescue DK with Diddy and Dixie Kong's helicopter hair spin.", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "dkcountry3": { title: "Donkey Kong Country 3: Dixie Kong's Double Trouble", category: "Adventure", description: "Join Dixie Kong and baby Kiddy Kong exploring the Northern Kremisphere in classic 16-bit beauty.", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "eagleride": { title: "Eagle Ride", category: "Arcade", description: "Soar through a dense pine forest at extreme speeds as a majestic eagle avoiding trees and rocks.", thumbnail: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&auto=format&fit=crop&q=80" },
+  "fifa7": { title: "FIFA 07", category: "Sports", description: "Classic EA Sports FIFA 07 soccer. Pick your world football club and score unforgettable goals.", thumbnail: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&auto=format&fit=crop&q=80" },
+  "fnaf": { title: "Five Nights at Freddy's", category: "Action", description: "Survive your night shift at Freddy Fazbear's Pizza while monitoring security cameras and preserving power.", thumbnail: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80" },
+  "footballbros": { title: "Football Bros", category: "Sports", description: "Multiplayer arcade American football with quick passing, fierce tackles, and touchdown celebrations.", thumbnail: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=600&auto=format&fit=crop&q=80" },
+  "footballlegends": { title: "Football Legends 2021", category: "Sports", description: "Play 1v1 and 2v2 big-head soccer matches with special super shots, headers, and tournament cups.", thumbnail: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&auto=format&fit=crop&q=80" },
+  "gameoflife": { title: "Conway's Game of Life", category: "Simulation", description: "Explore cellular automaton patterns, gliders, oscillators, and emergent behavior in this interactive simulator.", thumbnail: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=80" },
+  "geometrydashremastered": { title: "Geometry Dash Remastered", category: "Arcade", description: "Jump and fly your way through danger in this rhythm-based platformer synced to pulsing techno soundtracks.", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "geometryvibes": { title: "Geometry Vibes", category: "Arcade", description: "A chill rhythmic geometric runner packed with neon aesthetics, obstacle timings, and smooth beats.", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "googledino": { title: "Chrome Dino Game", category: "Arcade", description: "The beloved offline T-Rex runner! Leap over cacti and duck beneath pterodactyls in high-speed infinite desert runs.", thumbnail: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=600&auto=format&fit=crop&q=80" },
+  "gta1": { title: "Grand Theft Auto (Classic)", category: "Action", description: "The iconic original top-down 1997 crime epic that started the Grand Theft Auto revolution.", thumbnail: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80" },
+  "hanger2": { title: "Hanger 2", category: "Action", description: "Swing through treacherous obstacle courses using your grappling rope without losing limbs!", thumbnail: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&auto=format&fit=crop&q=80" },
+  "highwaytraffic": { title: "Highway Traffic Racer", category: "Racing", description: "Weave through bumper-to-bumper city highway traffic at breakneck speeds without crashing.", thumbnail: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=600&auto=format&fit=crop&q=80" },
+  "jumpingshell": { title: "Jumping Shell", category: "Puzzle", description: "A clever thinking platformer where you shed layers of shells to squeeze through narrow passageways.", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "kartbros": { title: "Kart Bros", category: "Racing", description: "Hilarious multiplayer go-kart racing packed with banana peels, turbo boosts, and drift corners.", thumbnail: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=600&auto=format&fit=crop&q=80" },
+  "mariogame": { title: "Super Mario Bros.", category: "Adventure", description: "The legendary NES platformer by Nintendo! Stomp Goombas, enter warp pipes, and rescue Princess Peach.", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "mc18": { title: "Minecraft 1.8.8 (Eaglercraft)", category: "Adventure", description: "Full browser-playable Minecraft 1.8.8 with multiplayer server support, survival, creative mode, and custom skins.", thumbnail: "https://images.unsplash.com/photo-1627856013091-fed6e4e30025?w=600&auto=format&fit=crop&q=80" },
+  "minesweeper": { title: "Minesweeper Classic", category: "Puzzle", description: "Clear the minefield using logic deduction, flags, and number clues without detonating a bomb.", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "motox3mspookyland": { title: "Moto X3M 6: Spooky Land", category: "Sports", description: "Ride through terrifying haunted trials, bone tracks, witch cauldrons, and fiery pumpkin hazards!", thumbnail: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=600&auto=format&fit=crop&q=80" },
+  "noobminer": { title: "Noob Miner: Jailbreak", category: "Adventure", description: "Dig, mine ores, trade with merchants, and upgrade pickaxes to orchestrate your great escape from prison.", thumbnail: "https://images.unsplash.com/photo-1627856013091-fed6e4e30025?w=600&auto=format&fit=crop&q=80" },
+  "oppositeday": { title: "Opposite Day Game", category: "Puzzle", description: "Nothing is as it seems! Think backwards and break conventional game logic to solve bizarre puzzles.", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "parkingfury": { title: "Parking Fury", category: "Casual", description: "Maneuver sports cars and trucks into tight parking spots without scratching the paintwork.", thumbnail: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=600&auto=format&fit=crop&q=80" },
+  "parkingfury2": { title: "Parking Fury 2", category: "Casual", description: "Navigate crowded nighttime parking lots under rainy city lights with precision steering.", thumbnail: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=600&auto=format&fit=crop&q=80" },
+  "parkingfury3": { title: "Parking Fury 3", category: "Casual", description: "Steer luxury sedans and heavy rigs into challenging target bays in bustling multi-level garages.", thumbnail: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=600&auto=format&fit=crop&q=80" },
+  "pixelspeedrun": { title: "Pixel Speedrun", category: "Arcade", description: "Test your twitch reflexes in micro-second platforming sprints filled with spikes and springs.", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "plantsvszombies": { title: "Plants vs Zombies", category: "Strategy", description: "Defend your suburban lawn from hilarious zombies using pea shooters, wall-nuts, cherry bombs, and sunflowers!", thumbnail: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80" },
+  "ragdollhit": { title: "Ragdoll Hit", category: "Action", description: "Kick, punch, and smash floppy ragdoll enemies across physics-based combat arenas.", thumbnail: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80" },
+  "ragdollsoccer": { title: "Ragdoll Soccer 2 Player", category: "Sports", description: "Hilarious floppy ragdoll soccer physics with bouncy balls, overhead kicks, and unpredictable goals.", thumbnail: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&auto=format&fit=crop&q=80" },
+  "redball4vol1": { title: "Red Ball 4: Vol 1", category: "Adventure", description: "Roll and bounce through verdant hills to stop the evil gray squares from turning the round world square!", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "rocketleague2d": { title: "Rocket League 2D", category: "Sports", description: "High-flying rocket cars meet soccer in this awesome side-scrolling aerial aerial-goal arena.", thumbnail: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=600&auto=format&fit=crop&q=80" },
+  "rocketsoccerderby": { title: "Rocket Soccer Derby", category: "Sports", description: "3D vehicular soccer championship! Boost into supersonic speeds, launch off walls, and slam the ball into the net.", thumbnail: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&auto=format&fit=crop&q=80" },
+  "sandgame": { title: "Falling Sand Game", category: "Simulation", description: "Experiment with physics sand, water, fire, plant life, gun powder, acid, and oil in a relaxing sandbox.", thumbnail: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=80" },
+  "shortlife": { title: "Short Life", category: "Action", description: "Guide your clumsy hero past razor-sharp spikes, swinging pendulum blades, and explosive mines.", thumbnail: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80" },
+  "slope3": { title: "Slope 3", category: "Arcade", description: "Roll a high-velocity neon sphere down infinite 3D downhill ramps, navigating twists, jumps, and tunnels.", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "sm64": { title: "Super Mario 64 (HTML5)", category: "Adventure", description: "The revolutionary 3D platforming masterpiece! Triple jump, ground pound, and collect Power Stars inside Princess Peach's castle.", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "snowballio": { title: "Snowball.io", category: "Action", description: "Roll massive snowballs and blast rival players off the icy floating iceberg to become the ultimate snow champion.", thumbnail: "https://images.unsplash.com/photo-1517867065801-e20f409696b0?w=600&auto=format&fit=crop&q=80" },
+  "snowrider": { title: "Snow Rider 3D", category: "Sports", description: "Slide down snowy mountain peaks on a toboggan sled, collecting gifts and avoiding boulders and trees.", thumbnail: "https://images.unsplash.com/photo-1517867065801-e20f409696b0?w=600&auto=format&fit=crop&q=80" },
+  "snowroad": { title: "Snow Road", category: "Sports", description: "Speed through winter wonderlands on a fast snowmobile with jumps, ramps, and obstacles.", thumbnail: "https://images.unsplash.com/photo-1517867065801-e20f409696b0?w=600&auto=format&fit=crop&q=80" },
+  "sonicoriginal": { title: "Sonic The Hedgehog (Original)", category: "Adventure", description: "Spin-dash through Green Hill Zone at supersonic speed with Sega's legendary blue blur Sonic!", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "source1v1lolreloadedcom": { title: "1v1.LOL Reloaded", category: "Action", description: "Community edition of 1v1.LOL featuring custom weapon loadouts, build practice, and snappy aim trainers.", thumbnail: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80" },
+  "stack": { title: "Stack Tower 3D", category: "Arcade", description: "Timing is everything! Stack colored geometric blocks as high as possible without shaving off edges.", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "stateio": { title: "State.io - Conquer the World", category: "Strategy", description: "Dispatch troop armies across borders, capture neutral territories, and conquer enemy nations in real-time tactical war.", thumbnail: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=80" },
+  "stealabrainrot": { title: "Steal a Brainrot", category: "Casual", description: "Collect quirky brainrot memes, trade rare icons, and laugh through funny viral internet mini-games.", thumbnail: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=600&auto=format&fit=crop&q=80" },
+  "subwaysurfersny": { title: "Subway Surfers: New York", category: "Arcade", description: "Dash through the iconic New York City subway tunnels, grind gleaming train tracks, and dodge the grumpy inspector!", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "subwaysurfersbeijing": { title: "Subway Surfers: Beijing", category: "Arcade", description: "Sprint through Beijing's scenic subway tracks adorned with dragon lanterns and bustling neon stations.", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "subwaysurferssanfrancisco": { title: "Subway Surfers: San Francisco", category: "Arcade", description: "Surf along the hilly tracks and cable-car rails under the golden arches of San Francisco.", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "taproad": { title: "Tap Road", category: "Arcade", description: "Switch lanes with instantaneous precision to survive high-speed neon cyber raceways.", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "theescape": { title: "The Escape", category: "Puzzle", description: "Search for hidden clues, decipher cryptic riddles, and escape complex locked containment facilities.", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "trapthecat": { title: "Trap The Cat (Chat Noir)", category: "Puzzle", description: "Block hexagons on a grid to encircle the sly black cat before it escapes off the edges.", thumbnail: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=600&auto=format&fit=crop&q=80" },
+  "triviacrack": { title: "Trivia Crack", category: "Casual", description: "Spin the wheel and test your intellect across science, entertainment, history, geography, sports, and art!", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "unicyclehero": { title: "Unicycle Hero", category: "Sports", description: "Balance precariously on a unicycle while hurling javelins, throwing shot puts, and jumping hurdles.", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "wartheknights": { title: "War of the Knights", category: "Action", description: "Clash in epic medieval sword duels, parry heavy swings, and conquer ancient castle fortifications.", thumbnail: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80" },
+  "wheeliebike": { title: "Wheelie Bike", category: "Sports", description: "Maintain the wheelie angle for as long as possible without letting your front wheel touch the ground.", thumbnail: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=600&auto=format&fit=crop&q=80" },
+  "wordleunlimited": { title: "Wordle Unlimited", category: "Puzzle", description: "Guess the hidden 5-letter word in six tries with color-coded tile feedback. Play unlimited words daily!", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80" },
+  "zombierush": { title: "Zombie Rush", category: "Action", description: "Fend off relentless waves of bloodthirsty zombies with shotguns, assault rifles, and barricades.", thumbnail: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80" }
+};
 
 function buildDefaultGames(): Game[] {
   const seenIds = new Set<string>();
@@ -1552,6 +1804,41 @@ function buildDefaultGames(): Game[] {
   // Add all StrongDog XP games (deduplicated against all above with tag & mirror merge)
   for (const g of (strongdogGamesList as unknown as Game[])) {
     addGameCandidate(g, 'StrongDog XP');
+  }
+
+  // Add all unblocked 7zeb games
+  for (const [key, url] of Object.entries(sevenZebMap as Record<string, string>)) {
+    if (key === 'crazytaxi' || url.includes('crazy-taxi')) continue;
+
+    const meta = SEVEN_ZEB_METADATA[key] || {
+      title: key.charAt(0).toUpperCase() + key.slice(1),
+      category: 'Arcade',
+      description: `Play unblocked ${key} with smooth 60 FPS performance, verified unblocked school mirrors, and full audio support.`,
+      thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80"
+    };
+
+    const newGame: Game = {
+      id: `7zeb-${key}`,
+      source: 'unblocked',
+      title: meta.title,
+      description: meta.description,
+      category: meta.category,
+      secondaryCategory: "Owen Watermelon OG’s",
+      thumbnail: meta.thumbnail || "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80",
+      mirrors: [
+        url,
+        `/api/proxy/game?url=${encodeURIComponent(url)}`
+      ],
+      tags: [meta.title, '7zeb', 'Unblocked', 'Owen OG', meta.category],
+      rating: 4.9,
+      plays: Math.floor(150000 + (key.length * 12345) % 150000),
+      author: meta.author || 'Owen OG',
+      featured: false,
+      iframeSrc: url,
+      iframeCode: `<iframe class="game-iframe" id="game-area" title="${meta.title}" src="${url}" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`
+    };
+
+    addGameCandidate(newGame, "Owen Watermelon OG’s");
   }
 
   return games;

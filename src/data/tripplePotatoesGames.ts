@@ -174,8 +174,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Moto-X3M/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Moto-X3M/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Moto-X3M/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Moto-X3M/"
+      "https://ubghyper.github.io/GameList.github.io/Moto-X3M/",
+      "https://ubghyper.github.io/GameList.github.io/Moto-X3M/"
     ],
     "controls": [
       {
@@ -398,8 +398,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Clash/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Clash/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Clash/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Clash/"
+      "https://ubghyper.github.io/GameList.github.io/Clash/",
+      "https://ubghyper.github.io/GameList.github.io/Clash/"
     ],
     "controls": [
       {
@@ -436,8 +436,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Flappy-Bird/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Flappy-Bird/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Flappy-Bird/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Flappy-Bird/"
+      "https://ubghyper.github.io/GameList.github.io/Flappy-Bird/",
+      "https://ubghyper.github.io/GameList.github.io/Flappy-Bird/"
     ],
     "controls": [
       {
@@ -474,8 +474,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Super-Mario-Run/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Super-Mario-Run/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Super-Mario-Run/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Super-Mario-Run/"
+      "https://ubghyper.github.io/GameList.github.io/Super-Mario-Run/",
+      "https://ubghyper.github.io/GameList.github.io/Super-Mario-Run/"
     ],
     "controls": [
       {
@@ -512,8 +512,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Stumble-Guys/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Stumble-Guys/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Stumble-Guys/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Stumble-Guys/"
+      "https://ubghyper.github.io/GameList.github.io/Stumble-Guys/",
+      "https://ubghyper.github.io/GameList.github.io/Stumble-Guys/"
     ],
     "controls": [
       {
@@ -550,8 +550,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Tower-Builder/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Tower-Builder/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Tower-Builder/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Tower-Builder/"
+      "https://ubghyper.github.io/GameList.github.io/Tower-Builder/",
+      "https://ubghyper.github.io/GameList.github.io/Tower-Builder/"
     ],
     "controls": [
       {
@@ -588,8 +588,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Idle-Miners-Tycoon/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Idle-Miners-Tycoon/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Idle-Miners-Tycoon/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Idle-Miners-Tycoon/"
+      "https://ubghyper.github.io/GameList.github.io/Idle-Miners-Tycoon/",
+      "https://ubghyper.github.io/GameList.github.io/Idle-Miners-Tycoon/"
     ],
     "controls": [
       {
@@ -626,8 +626,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/The-Impossible-Quiz/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/The-Impossible-Quiz/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/The-Impossible-Quiz/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/The-Impossible-Quiz/"
+      "https://ubghyper.github.io/GameList.github.io/The-Impossible-Quiz/",
+      "https://ubghyper.github.io/GameList.github.io/The-Impossible-Quiz/"
     ],
     "controls": [
       {
@@ -664,8 +664,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Dune-/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Dune-/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Dune-/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Dune-/"
+      "https://ubghyper.github.io/GameList.github.io/Dune-/",
+      "https://ubghyper.github.io/GameList.github.io/Dune-/"
     ],
     "controls": [
       {
@@ -702,8 +702,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Do-Not-Open-horror-game-/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Do-Not-Open-horror-game-/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Do-Not-Open-horror-game-/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Do-Not-Open-horror-game-/"
+      "https://ubghyper.github.io/GameList.github.io/Do-Not-Open-horror-game-/",
+      "https://ubghyper.github.io/GameList.github.io/Do-Not-Open-horror-game-/"
     ],
     "controls": [
       {
@@ -740,8 +740,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Poppy-Playtime/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Poppy-Playtime/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Poppy-Playtime/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Poppy-Playtime/"
+      "https://ubghyper.github.io/GameList.github.io/Poppy-Playtime/",
+      "https://ubghyper.github.io/GameList.github.io/Poppy-Playtime/"
     ],
     "controls": [
       {
@@ -778,8 +778,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Backrooms/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Backrooms/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Backrooms/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Backrooms/"
+      "https://ubghyper.github.io/GameList.github.io/Backrooms/",
+      "https://ubghyper.github.io/GameList.github.io/Backrooms/"
     ],
     "controls": [
       {
@@ -816,8 +816,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Five-Nights-at-Winstons/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Five-Nights-at-Winstons/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Five-Nights-at-Winstons/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Five-Nights-at-Winstons/"
+      "https://ubghyper.github.io/GameList.github.io/Five-Nights-at-Winstons/",
+      "https://ubghyper.github.io/GameList.github.io/Five-Nights-at-Winstons/"
     ],
     "controls": [
       {
@@ -854,8 +854,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/FNAF-Browser/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/FNAF-Browser/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/FNAF-Browser/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/FNAF-Browser/"
+      "https://ubghyper.github.io/GameList.github.io/FNAF-Browser/",
+      "https://ubghyper.github.io/GameList.github.io/FNAF-Browser/"
     ],
     "controls": [
       {
@@ -892,8 +892,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Behind-The-Scenes-Backrooms-/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Behind-The-Scenes-Backrooms-/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Behind-The-Scenes-Backrooms-/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Behind-The-Scenes-Backrooms-/"
+      "https://ubghyper.github.io/GameList.github.io/Behind-The-Scenes-Backrooms-/",
+      "https://ubghyper.github.io/GameList.github.io/Behind-The-Scenes-Backrooms-/"
     ],
     "controls": [
       {
@@ -930,8 +930,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Huggy-Wuggy-Horror/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Huggy-Wuggy-Horror/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Huggy-Wuggy-Horror/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Huggy-Wuggy-Horror/"
+      "https://ubghyper.github.io/GameList.github.io/Huggy-Wuggy-Horror/",
+      "https://ubghyper.github.io/GameList.github.io/Huggy-Wuggy-Horror/"
     ],
     "controls": [
       {
@@ -968,8 +968,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/IO-games/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/IO-games/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/IO-games/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/IO-games/"
+      "https://ubghyper.github.io/GameList.github.io/IO-games/",
+      "https://ubghyper.github.io/GameList.github.io/IO-games/"
     ],
     "controls": [
       {
@@ -1006,8 +1006,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Agar-io/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Agar-io/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Agar-io/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Agar-io/"
+      "https://ubghyper.github.io/GameList.github.io/Agar-io/",
+      "https://ubghyper.github.io/GameList.github.io/Agar-io/"
     ],
     "controls": [
       {
@@ -1044,8 +1044,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Tanks-io/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Tanks-io/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Tanks-io/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Tanks-io/"
+      "https://ubghyper.github.io/GameList.github.io/Tanks-io/",
+      "https://ubghyper.github.io/GameList.github.io/Tanks-io/"
     ],
     "controls": [
       {
@@ -1082,8 +1082,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/slither-io/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/slither-io/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/slither-io/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/slither-io/"
+      "https://ubghyper.github.io/GameList.github.io/slither-io/",
+      "https://ubghyper.github.io/GameList.github.io/slither-io/"
     ],
     "controls": [
       {
@@ -1157,8 +1157,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Shell-Shockers-io/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Shell-Shockers-io/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Shell-Shockers-io/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Shell-Shockers-io/"
+      "https://ubghyper.github.io/GameList.github.io/Shell-Shockers-io/",
+      "https://ubghyper.github.io/GameList.github.io/Shell-Shockers-io/"
     ],
     "controls": [
       {
@@ -1195,8 +1195,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Gartic-io/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Gartic-io/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Gartic-io/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Gartic-io/"
+      "https://ubghyper.github.io/GameList.github.io/Gartic-io/",
+      "https://ubghyper.github.io/GameList.github.io/Gartic-io/"
     ],
     "controls": [
       {
@@ -1233,8 +1233,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Hole-io/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Hole-io/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Hole-io/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Hole-io/"
+      "https://ubghyper.github.io/GameList.github.io/Hole-io/",
+      "https://ubghyper.github.io/GameList.github.io/Hole-io/"
     ],
     "controls": [
       {
@@ -1308,8 +1308,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/FlipHero-io/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/FlipHero-io/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/FlipHero-io/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/FlipHero-io/"
+      "https://ubghyper.github.io/GameList.github.io/FlipHero-io/",
+      "https://ubghyper.github.io/GameList.github.io/FlipHero-io/"
     ],
     "controls": [
       {
@@ -1346,8 +1346,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Eat-io/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Eat-io/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Eat-io/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Eat-io/"
+      "https://ubghyper.github.io/GameList.github.io/Eat-io/",
+      "https://ubghyper.github.io/GameList.github.io/Eat-io/"
     ],
     "controls": [
       {
@@ -1384,8 +1384,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Aquapark-io/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Aquapark-io/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Aquapark-io/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Aquapark-io/"
+      "https://ubghyper.github.io/GameList.github.io/Aquapark-io/",
+      "https://ubghyper.github.io/GameList.github.io/Aquapark-io/"
     ],
     "controls": [
       {
@@ -1422,8 +1422,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Biters-io/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Biters-io/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Biters-io/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Biters-io/"
+      "https://ubghyper.github.io/GameList.github.io/Biters-io/",
+      "https://ubghyper.github.io/GameList.github.io/Biters-io/"
     ],
     "controls": [
       {
@@ -1460,8 +1460,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Just-fall-lol/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Just-fall-lol/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Just-fall-lol/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Just-fall-lol/"
+      "https://ubghyper.github.io/GameList.github.io/Just-fall-lol/",
+      "https://ubghyper.github.io/GameList.github.io/Just-fall-lol/"
     ],
     "controls": [
       {
@@ -1535,8 +1535,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Fall-Boys/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Fall-Boys/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Fall-Boys/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Fall-Boys/"
+      "https://ubghyper.github.io/GameList.github.io/Fall-Boys/",
+      "https://ubghyper.github.io/GameList.github.io/Fall-Boys/"
     ],
     "controls": [
       {
@@ -1610,8 +1610,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Rag-Doll-Games-Boxing-/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Rag-Doll-Games-Boxing-/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Rag-Doll-Games-Boxing-/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Rag-Doll-Games-Boxing-/"
+      "https://ubghyper.github.io/GameList.github.io/Rag-Doll-Games-Boxing-/",
+      "https://ubghyper.github.io/GameList.github.io/Rag-Doll-Games-Boxing-/"
     ],
     "controls": [
       {
@@ -1648,8 +1648,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Squid-Game-2/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Squid-Game-2/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Squid-Game-2/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Squid-Game-2/"
+      "https://ubghyper.github.io/GameList.github.io/Squid-Game-2/",
+      "https://ubghyper.github.io/GameList.github.io/Squid-Game-2/"
     ],
     "controls": [
       {
@@ -1686,8 +1686,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Stick-Slashers/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Stick-Slashers/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Stick-Slashers/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Stick-Slashers/"
+      "https://ubghyper.github.io/GameList.github.io/Stick-Slashers/",
+      "https://ubghyper.github.io/GameList.github.io/Stick-Slashers/"
     ],
     "controls": [
       {
@@ -1724,8 +1724,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Zombs-Royale/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Zombs-Royale/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Zombs-Royale/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Zombs-Royale/"
+      "https://ubghyper.github.io/GameList.github.io/Zombs-Royale/",
+      "https://ubghyper.github.io/GameList.github.io/Zombs-Royale/"
     ],
     "controls": [
       {
@@ -1762,8 +1762,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Basket-Bros-/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Basket-Bros-/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Basket-Bros-/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Basket-Bros-/"
+      "https://ubghyper.github.io/GameList.github.io/Basket-Bros-/",
+      "https://ubghyper.github.io/GameList.github.io/Basket-Bros-/"
     ],
     "controls": [
       {
@@ -1800,8 +1800,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Tiny-Castle/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Tiny-Castle/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Tiny-Castle/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Tiny-Castle/"
+      "https://ubghyper.github.io/GameList.github.io/Tiny-Castle/",
+      "https://ubghyper.github.io/GameList.github.io/Tiny-Castle/"
     ],
     "controls": [
       {
@@ -1986,8 +1986,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Bob-against-the-WORLD-/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Bob-against-the-WORLD-/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Bob-against-the-WORLD-/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Bob-against-the-WORLD-/"
+      "https://ubghyper.github.io/GameList.github.io/Bob-against-the-WORLD-/",
+      "https://ubghyper.github.io/GameList.github.io/Bob-against-the-WORLD-/"
     ],
     "controls": [
       {
@@ -2024,8 +2024,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Tanks-VS-Zombies/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Tanks-VS-Zombies/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Tanks-VS-Zombies/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Tanks-VS-Zombies/"
+      "https://ubghyper.github.io/GameList.github.io/Tanks-VS-Zombies/",
+      "https://ubghyper.github.io/GameList.github.io/Tanks-VS-Zombies/"
     ],
     "controls": [
       {
@@ -2062,8 +2062,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/3-Little-Heroes/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/3-Little-Heroes/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/3-Little-Heroes/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/3-Little-Heroes/"
+      "https://ubghyper.github.io/GameList.github.io/3-Little-Heroes/",
+      "https://ubghyper.github.io/GameList.github.io/3-Little-Heroes/"
     ],
     "controls": [
       {
@@ -2138,7 +2138,7 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "mirrors": [
       "https://gameinclassroom.github.io/getting-over-it/",
       "games/getting-over-it.html",
-      "https://freeonlinewebtools.github.io/gamelist6.github.io/Getting-Over-It/",
+      "https://ubghyper.github.io/GameList.github.io/Getting-Over-It/",
       "https://ubg98.github.io/GettingOverIt/"
     ],
     "controls": [
@@ -2213,8 +2213,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Space-bar-clicker/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Space-bar-clicker/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Space-bar-clicker/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Space-bar-clicker/"
+      "https://ubghyper.github.io/GameList.github.io/Space-bar-clicker/",
+      "https://ubghyper.github.io/GameList.github.io/Space-bar-clicker/"
     ],
     "controls": [
       {
@@ -2325,8 +2325,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Stickman-Climb-2/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Stickman-Climb-2/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Stickman-Climb-2/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Stickman-Climb-2/"
+      "https://ubghyper.github.io/GameList.github.io/Stickman-Climb-2/",
+      "https://ubghyper.github.io/GameList.github.io/Stickman-Climb-2/"
     ],
     "controls": [
       {
@@ -2511,8 +2511,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Burning-Rubber-5-XS/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Burning-Rubber-5-XS/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Burning-Rubber-5-XS/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Burning-Rubber-5-XS/"
+      "https://ubghyper.github.io/GameList.github.io/Burning-Rubber-5-XS/",
+      "https://ubghyper.github.io/GameList.github.io/Burning-Rubber-5-XS/"
     ],
     "controls": [
       {
@@ -2549,8 +2549,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/CraftMine/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/CraftMine/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/CraftMine/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/CraftMine/"
+      "https://ubghyper.github.io/GameList.github.io/CraftMine/",
+      "https://ubghyper.github.io/GameList.github.io/CraftMine/"
     ],
     "controls": [
       {
@@ -2587,8 +2587,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Death-Run/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Death-Run/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Death-Run/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Death-Run/"
+      "https://ubghyper.github.io/GameList.github.io/Death-Run/",
+      "https://ubghyper.github.io/GameList.github.io/Death-Run/"
     ],
     "controls": [
       {
@@ -2625,8 +2625,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Baldi-39-s-Basics/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Baldi-39-s-Basics/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Baldi-39-s-Basics/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Baldi-39-s-Basics/"
+      "https://ubghyper.github.io/GameList.github.io/Baldi-39-s-Basics/",
+      "https://ubghyper.github.io/GameList.github.io/Baldi-39-s-Basics/"
     ],
     "controls": [
       {
@@ -2663,8 +2663,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Pixel-Craft/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Pixel-Craft/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Pixel-Craft/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Pixel-Craft/"
+      "https://ubghyper.github.io/GameList.github.io/Pixel-Craft/",
+      "https://ubghyper.github.io/GameList.github.io/Pixel-Craft/"
     ],
     "controls": [
       {
@@ -2701,8 +2701,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Fifa-2002-/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Fifa-2002-/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Fifa-2002-/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Fifa-2002-/"
+      "https://ubghyper.github.io/GameList.github.io/Fifa-2002-/",
+      "https://ubghyper.github.io/GameList.github.io/Fifa-2002-/"
     ],
     "controls": [
       {
@@ -2739,8 +2739,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/GTA-for-Browser/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/GTA-for-Browser/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/GTA-for-Browser/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/GTA-for-Browser/"
+      "https://ubghyper.github.io/GameList.github.io/GTA-for-Browser/",
+      "https://ubghyper.github.io/GameList.github.io/GTA-for-Browser/"
     ],
     "controls": [
       {
@@ -2777,8 +2777,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Brawl-Stars/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Brawl-Stars/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Brawl-Stars/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Brawl-Stars/"
+      "https://ubghyper.github.io/GameList.github.io/Brawl-Stars/",
+      "https://ubghyper.github.io/GameList.github.io/Brawl-Stars/"
     ],
     "controls": [
       {
@@ -2852,8 +2852,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Dino-Run-3/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Dino-Run-3/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Dino-Run-3/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Dino-Run-3/"
+      "https://ubghyper.github.io/GameList.github.io/Dino-Run-3/",
+      "https://ubghyper.github.io/GameList.github.io/Dino-Run-3/"
     ],
     "controls": [
       {
@@ -2890,8 +2890,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Browser-Doom/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Browser-Doom/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Browser-Doom/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Browser-Doom/"
+      "https://ubghyper.github.io/GameList.github.io/Browser-Doom/",
+      "https://ubghyper.github.io/GameList.github.io/Browser-Doom/"
     ],
     "controls": [
       {
@@ -2928,8 +2928,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Marble-Run/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Marble-Run/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Marble-Run/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Marble-Run/"
+      "https://ubghyper.github.io/GameList.github.io/Marble-Run/",
+      "https://ubghyper.github.io/GameList.github.io/Marble-Run/"
     ],
     "controls": [
       {
@@ -2966,8 +2966,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Cube-Craft-Survival/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Cube-Craft-Survival/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Cube-Craft-Survival/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Cube-Craft-Survival/"
+      "https://ubghyper.github.io/GameList.github.io/Cube-Craft-Survival/",
+      "https://ubghyper.github.io/GameList.github.io/Cube-Craft-Survival/"
     ],
     "controls": [
       {
@@ -3004,8 +3004,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Elastic-Morty/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Elastic-Morty/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Elastic-Morty/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Elastic-Morty/"
+      "https://ubghyper.github.io/GameList.github.io/Elastic-Morty/",
+      "https://ubghyper.github.io/GameList.github.io/Elastic-Morty/"
     ],
     "controls": [
       {
@@ -3079,8 +3079,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Shards/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Shards/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Shards/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Shards/"
+      "https://ubghyper.github.io/GameList.github.io/Shards/",
+      "https://ubghyper.github.io/GameList.github.io/Shards/"
     ],
     "controls": [
       {
@@ -3154,8 +3154,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Color-Road/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Color-Road/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Color-Road/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Color-Road/"
+      "https://ubghyper.github.io/GameList.github.io/Color-Road/",
+      "https://ubghyper.github.io/GameList.github.io/Color-Road/"
     ],
     "controls": [
       {
@@ -3192,8 +3192,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Hover-Racer-Drive/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Hover-Racer-Drive/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Hover-Racer-Drive/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Hover-Racer-Drive/"
+      "https://ubghyper.github.io/GameList.github.io/Hover-Racer-Drive/",
+      "https://ubghyper.github.io/GameList.github.io/Hover-Racer-Drive/"
     ],
     "controls": [
       {
@@ -3230,8 +3230,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Draw-Climber/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Draw-Climber/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Draw-Climber/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Draw-Climber/"
+      "https://ubghyper.github.io/GameList.github.io/Draw-Climber/",
+      "https://ubghyper.github.io/GameList.github.io/Draw-Climber/"
     ],
     "controls": [
       {
@@ -3268,8 +3268,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Spiral-Roll/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Spiral-Roll/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Spiral-Roll/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Spiral-Roll/"
+      "https://ubghyper.github.io/GameList.github.io/Spiral-Roll/",
+      "https://ubghyper.github.io/GameList.github.io/Spiral-Roll/"
     ],
     "controls": [
       {
@@ -3306,8 +3306,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Gangsters/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Gangsters/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Gangsters/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Gangsters/"
+      "https://ubghyper.github.io/GameList.github.io/Gangsters/",
+      "https://ubghyper.github.io/GameList.github.io/Gangsters/"
     ],
     "controls": [
       {
@@ -3344,8 +3344,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Mine-Shooter/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Mine-Shooter/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Mine-Shooter/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Mine-Shooter/"
+      "https://ubghyper.github.io/GameList.github.io/Mine-Shooter/",
+      "https://ubghyper.github.io/GameList.github.io/Mine-Shooter/"
     ],
     "controls": [
       {
@@ -3382,8 +3382,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/HTML5-2D-games/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/HTML5-2D-games/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/HTML5-2D-games/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/HTML5-2D-games/"
+      "https://ubghyper.github.io/GameList.github.io/HTML5-2D-games/",
+      "https://ubghyper.github.io/GameList.github.io/HTML5-2D-games/"
     ],
     "controls": [
       {
@@ -3420,8 +3420,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Dumb-Ways-To-Die/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Dumb-Ways-To-Die/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Dumb-Ways-To-Die/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Dumb-Ways-To-Die/"
+      "https://ubghyper.github.io/GameList.github.io/Dumb-Ways-To-Die/",
+      "https://ubghyper.github.io/GameList.github.io/Dumb-Ways-To-Die/"
     ],
     "controls": [
       {
@@ -3458,8 +3458,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Bakeria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Bakeria/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Papa-39-s-Bakeria/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Papa-39-s-Bakeria/"
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Bakeria/",
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Bakeria/"
     ],
     "controls": [
       {
@@ -3496,8 +3496,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Burgeria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Burgeria/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Papa-39-s-Burgeria/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Papa-39-s-Burgeria/"
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Burgeria/",
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Burgeria/"
     ],
     "controls": [
       {
@@ -3534,8 +3534,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Cheeseria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Cheeseria/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Papa-39-s-Cheeseria/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Papa-39-s-Cheeseria/"
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Cheeseria/",
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Cheeseria/"
     ],
     "controls": [
       {
@@ -3572,8 +3572,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Cupcakeria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Cupcakeria/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Papa-39-s-Cupcakeria/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Papa-39-s-Cupcakeria/"
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Cupcakeria/",
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Cupcakeria/"
     ],
     "controls": [
       {
@@ -3610,8 +3610,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Donuteria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Donuteria/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Papa-39-s-Donuteria/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Papa-39-s-Donuteria/"
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Donuteria/",
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Donuteria/"
     ],
     "controls": [
       {
@@ -3648,8 +3648,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Freezeria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Freezeria/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Papa-39-s-Freezeria/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Papa-39-s-Freezeria/"
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Freezeria/",
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Freezeria/"
     ],
     "controls": [
       {
@@ -3686,8 +3686,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Hot-Doggeria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Hot-Doggeria/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Papa-39-s-Hot-Doggeria/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Papa-39-s-Hot-Doggeria/"
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Hot-Doggeria/",
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Hot-Doggeria/"
     ],
     "controls": [
       {
@@ -3724,8 +3724,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pancakeria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pancakeria/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Papa-39-s-Pancakeria/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Papa-39-s-Pancakeria/"
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pancakeria/",
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pancakeria/"
     ],
     "controls": [
       {
@@ -3762,8 +3762,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pastaria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pastaria/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Papa-39-s-Pastaria/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Papa-39-s-Pastaria/"
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pastaria/",
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pastaria/"
     ],
     "controls": [
       {
@@ -3800,8 +3800,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pizzeria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pizzeria/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Papa-39-s-Pizzeria/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Papa-39-s-Pizzeria/"
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pizzeria/",
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Pizzeria/"
     ],
     "controls": [
       {
@@ -3838,8 +3838,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Scooperia/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Scooperia/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Papa-39-s-Scooperia/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Papa-39-s-Scooperia/"
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Scooperia/",
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Scooperia/"
     ],
     "controls": [
       {
@@ -3876,8 +3876,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Sushiria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Sushiria/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Papa-39-s-Sushiria/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Papa-39-s-Sushiria/"
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Sushiria/",
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Sushiria/"
     ],
     "controls": [
       {
@@ -3914,8 +3914,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-39-s-Taco-Mia/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Taco-Mia/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Papa-39-s-Taco-Mia/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Papa-39-s-Taco-Mia/"
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Taco-Mia/",
+      "https://ubghyper.github.io/GameList.github.io/Papa-39-s-Taco-Mia/"
     ],
     "controls": [
       {
@@ -3952,8 +3952,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Papa-s-Bakeria/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Papa-s-Bakeria/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Papa-s-Bakeria/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Papa-s-Bakeria/"
+      "https://ubghyper.github.io/GameList.github.io/Papa-s-Bakeria/",
+      "https://ubghyper.github.io/GameList.github.io/Papa-s-Bakeria/"
     ],
     "controls": [
       {
@@ -4175,8 +4175,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Soccer-Skils/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Soccer-Skils/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Soccer-Skils/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Soccer-Skils/"
+      "https://ubghyper.github.io/GameList.github.io/Soccer-Skils/",
+      "https://ubghyper.github.io/GameList.github.io/Soccer-Skils/"
     ],
     "controls": [
       {
@@ -4250,8 +4250,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Apple-shooter/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Apple-shooter/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Apple-shooter/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Apple-shooter/"
+      "https://ubghyper.github.io/GameList.github.io/Apple-shooter/",
+      "https://ubghyper.github.io/GameList.github.io/Apple-shooter/"
     ],
     "controls": [
       {
@@ -4288,8 +4288,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Cycle-Extreme/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Cycle-Extreme/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Cycle-Extreme/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Cycle-Extreme/"
+      "https://ubghyper.github.io/GameList.github.io/Cycle-Extreme/",
+      "https://ubghyper.github.io/GameList.github.io/Cycle-Extreme/"
     ],
     "controls": [
       {
@@ -4326,8 +4326,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/knife-hit/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/knife-hit/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/knife-hit/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/knife-hit/"
+      "https://ubghyper.github.io/GameList.github.io/knife-hit/",
+      "https://ubghyper.github.io/GameList.github.io/knife-hit/"
     ],
     "controls": [
       {
@@ -4364,8 +4364,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Mr-Fight/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Mr-Fight/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Mr-Fight/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Mr-Fight/"
+      "https://ubghyper.github.io/GameList.github.io/Mr-Fight/",
+      "https://ubghyper.github.io/GameList.github.io/Mr-Fight/"
     ],
     "controls": [
       {
@@ -4402,8 +4402,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Zombie-Killer/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Zombie-Killer/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Zombie-Killer/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Zombie-Killer/"
+      "https://ubghyper.github.io/GameList.github.io/Zombie-Killer/",
+      "https://ubghyper.github.io/GameList.github.io/Zombie-Killer/"
     ],
     "controls": [
       {
@@ -4440,8 +4440,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Room-Clicker/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Room-Clicker/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Room-Clicker/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Room-Clicker/"
+      "https://ubghyper.github.io/GameList.github.io/Room-Clicker/",
+      "https://ubghyper.github.io/GameList.github.io/Room-Clicker/"
     ],
     "controls": [
       {
@@ -4515,8 +4515,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Mario/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Mario/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Mario/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Mario/"
+      "https://ubghyper.github.io/GameList.github.io/Mario/",
+      "https://ubghyper.github.io/GameList.github.io/Mario/"
     ],
     "controls": [
       {
@@ -4553,8 +4553,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Pool-Ball/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Pool-Ball/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Pool-Ball/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Pool-Ball/"
+      "https://ubghyper.github.io/GameList.github.io/Pool-Ball/",
+      "https://ubghyper.github.io/GameList.github.io/Pool-Ball/"
     ],
     "controls": [
       {
@@ -4591,8 +4591,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Ultimate-Bro-Workout/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Ultimate-Bro-Workout/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Ultimate-Bro-Workout/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Ultimate-Bro-Workout/"
+      "https://ubghyper.github.io/GameList.github.io/Ultimate-Bro-Workout/",
+      "https://ubghyper.github.io/GameList.github.io/Ultimate-Bro-Workout/"
     ],
     "controls": [
       {
@@ -4775,8 +4775,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/sausage-run/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/sausage-run/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/sausage-run/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/sausage-run/"
+      "https://ubghyper.github.io/GameList.github.io/sausage-run/",
+      "https://ubghyper.github.io/GameList.github.io/sausage-run/"
     ],
     "controls": [
       {
@@ -4813,8 +4813,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Donkey-Kong/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Donkey-Kong/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Donkey-Kong/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Donkey-Kong/"
+      "https://ubghyper.github.io/GameList.github.io/Donkey-Kong/",
+      "https://ubghyper.github.io/GameList.github.io/Donkey-Kong/"
     ],
     "controls": [
       {
@@ -4851,8 +4851,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Google-Baseball/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Google-Baseball/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Google-Baseball/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Google-Baseball/"
+      "https://ubghyper.github.io/GameList.github.io/Google-Baseball/",
+      "https://ubghyper.github.io/GameList.github.io/Google-Baseball/"
     ],
     "controls": [
       {
@@ -4889,8 +4889,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/EXTREME-air-hockey/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/EXTREME-air-hockey/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/EXTREME-air-hockey/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/EXTREME-air-hockey/"
+      "https://ubghyper.github.io/GameList.github.io/EXTREME-air-hockey/",
+      "https://ubghyper.github.io/GameList.github.io/EXTREME-air-hockey/"
     ],
     "controls": [
       {
@@ -4927,8 +4927,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Acid-Bunny/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Acid-Bunny/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Acid-Bunny/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Acid-Bunny/"
+      "https://ubghyper.github.io/GameList.github.io/Acid-Bunny/",
+      "https://ubghyper.github.io/GameList.github.io/Acid-Bunny/"
     ],
     "controls": [
       {
@@ -4965,8 +4965,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Acid-Bunny-2/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Acid-Bunny-2/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Acid-Bunny-2/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Acid-Bunny-2/"
+      "https://ubghyper.github.io/GameList.github.io/Acid-Bunny-2/",
+      "https://ubghyper.github.io/GameList.github.io/Acid-Bunny-2/"
     ],
     "controls": [
       {
@@ -5003,8 +5003,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Paper-Plane/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Paper-Plane/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Paper-Plane/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Paper-Plane/"
+      "https://ubghyper.github.io/GameList.github.io/Paper-Plane/",
+      "https://ubghyper.github.io/GameList.github.io/Paper-Plane/"
     ],
     "controls": [
       {
@@ -5078,8 +5078,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/How-to-get-FORTNITE-/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/How-to-get-FORTNITE-/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/How-to-get-FORTNITE-/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/How-to-get-FORTNITE-/"
+      "https://ubghyper.github.io/GameList.github.io/How-to-get-FORTNITE-/",
+      "https://ubghyper.github.io/GameList.github.io/How-to-get-FORTNITE-/"
     ],
     "controls": [
       {
@@ -5116,8 +5116,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Roblox/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Roblox/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Roblox/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Roblox/"
+      "https://ubghyper.github.io/GameList.github.io/Roblox/",
+      "https://ubghyper.github.io/GameList.github.io/Roblox/"
     ],
     "controls": [
       {
@@ -5154,8 +5154,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/Random-Stuff/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/Random-Stuff/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/Random-Stuff/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/Random-Stuff/"
+      "https://ubghyper.github.io/GameList.github.io/Random-Stuff/",
+      "https://ubghyper.github.io/GameList.github.io/Random-Stuff/"
     ],
     "controls": [
       {
@@ -5192,8 +5192,8 @@ export const TRIPPLE_POTATOES_GAMES: Game[] = [
     "iframeCode": "<iframe src=\"https://ubghyper.github.io/GameList.github.io/SUS/\" width=\"100%\" height=\"100%\" frameborder=\"0\" allow=\"autoplay; fullscreen; gamepad; pointer-lock\" allowfullscreen></iframe>",
     "mirrors": [
       "https://ubghyper.github.io/GameList.github.io/SUS/",
-      "https://freeonlinewebtools.github.io/gamelist4.github.io/SUS/",
-      "https://freeonlinewebtools.github.io/gamelist8.github.io/SUS/"
+      "https://ubghyper.github.io/GameList.github.io/SUS/",
+      "https://ubghyper.github.io/GameList.github.io/SUS/"
     ],
     "controls": [
       {

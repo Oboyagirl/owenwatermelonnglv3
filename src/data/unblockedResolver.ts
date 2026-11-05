@@ -118,7 +118,10 @@ const PRESERVED_LOCAL_GAMES = new Set([
   "games/soccer-random/index.html",
   "games/volley-random.html",
   "games/basket-random.html",
-  "games/boxing-random.html"
+  "games/boxing-random.html",
+  "games/spaceflight-simulator.html",
+  "games/diep-io.html",
+  "games/agar-io.html"
 ]);
 
 function cleanText(str: string): string {
@@ -243,8 +246,184 @@ export function resolveGameSource(
     };
   }
 
-  // Flash Flight Simulator & Spaceflight Simulator
-  if (safeId.includes('flash-flight') || safeId.includes('spaceflight-simulator') || safeTitle.toLowerCase().includes('flight simulator')) {
+  // Space Flight Simulator (HTML5 local physics + multi-tier mirrors)
+  if (safeId.includes('spaceflight-simulator') || safeId.includes('space-flight-simulator') || safeId === 'spaceflightsim' || safeTitle.toLowerCase().includes('spaceflight simulator') || safeTitle.toLowerCase().includes('space flight sim')) {
+    return {
+      src: 'games/spaceflight-simulator.html',
+      mirrors: [
+        'games/spaceflight-simulator.html',
+        'https://astronautag.github.io/spaceflight-simulator/',
+        'https://7zeb.github.io/homework/3Dflightsimulator.html',
+        'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Flash-Flight-Simulator-1/flashflightsimulator.swf&title=Flash+Flight+Simulator'
+      ]
+    };
+  }
+
+  // Diep.io (HTML5 local client + online clones & proxies)
+  if (safeId === 'diep-io' || safeId === 'diepio' || safeTitle.toLowerCase().includes('diep.io') || safeTitle.toLowerCase().includes('diep io')) {
+    return {
+      src: 'games/diep-io.html',
+      mirrors: [
+        'games/diep-io.html',
+        'https://ilancosman.github.io/diepio-clone/',
+        'https://priswall.github.io/diepio-clone/',
+        '/api/proxy/game?url=https://ilancosman.github.io/diepio-clone/'
+      ]
+    };
+  }
+
+  // Agar.io (HTML5 local client + 7zeb agariolite + proxy)
+  if (safeId === 'agar-io' || safeId === 'agario' || safeTitle.toLowerCase().includes('agar.io') || safeTitle.toLowerCase().includes('agar io')) {
+    return {
+      src: 'games/agar-io.html',
+      mirrors: [
+        'games/agar-io.html',
+        'https://7zeb.github.io/homework/agariolite.html',
+        '/api/proxy/game?url=https://7zeb.github.io/homework/agariolite.html'
+      ]
+    };
+  }
+
+  // Bloons TD Series (100% Guaranteed 7zeb Unblocked HTML5/WASM)
+  if (safeId === 'bloons-tower-defence' || safeId === 'bloonstd' || safeId === 'btd-1' || safeTitle.toLowerCase() === 'bloons tower defence' || safeTitle.toLowerCase() === 'bloons td') {
+    return {
+      src: 'https://7zeb.github.io/homework/bloonsTD.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/bloonsTD.html',
+        'https://gameinclassroom.github.io/bloons-tower-defense-1/',
+        '/api/proxy/game?url=https://gameinclassroom.github.io/bloons-tower-defense-1/',
+        'https://ubghyper.github.io/GameList.github.io/Bloons-Tower-Defense/'
+      ]
+    };
+  }
+
+  if (safeId === 'bloons-tower-defence-2' || safeId === 'bloonstd2' || safeId === 'btd-2' || safeTitle.toLowerCase().includes('bloons tower defence 2') || safeTitle.toLowerCase().includes('bloons td 2')) {
+    return {
+      src: 'https://7zeb.github.io/homework/bloonsTD2.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/bloonsTD2.html',
+        'https://ubghyper.github.io/GameList.github.io/Bloonstd-2/',
+        '/api/proxy/game?url=https://ubghyper.github.io/GameList.github.io/Bloonstd-2/'
+      ]
+    };
+  }
+
+  if (safeId === 'bloons-tower-defence-3' || safeId === 'bloonstd3' || safeId === 'btd-3' || safeTitle.toLowerCase().includes('bloons tower defence 3') || safeTitle.toLowerCase().includes('bloons td 3')) {
+    return {
+      src: 'https://7zeb.github.io/homework/bloonsTD3.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/bloonsTD3.html',
+        'https://ubghyper.github.io/GameList.github.io/Bloonstd-3/',
+        '/api/proxy/game?url=https://ubghyper.github.io/GameList.github.io/Bloonstd-3/'
+      ]
+    };
+  }
+
+  if (safeId === 'btd-4' || safeId === 'bloons-td-4' || safeId === 'bloonstd4' || safeTitle.toLowerCase().includes('bloons td 4')) {
+    return {
+      src: 'https://7zeb.github.io/homework/bloonsTD4.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/bloonsTD4.html',
+        'https://ubghyper.github.io/GameList.github.io/Bloonstd-4/',
+        '/api/proxy/game?url=https://ubghyper.github.io/GameList.github.io/Bloonstd-4/'
+      ]
+    };
+  }
+
+  if (safeId === 'bloons-td-5' || safeId === 'bloonstd5' || safeId === 'btd-5' || safeTitle.toLowerCase().includes('bloons td 5')) {
+    return {
+      src: 'https://7zeb.github.io/homework/bloonsTD5.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/bloonsTD5.html',
+        'https://ubghyper.github.io/GameList.github.io/Bloonstd-5/',
+        '/api/proxy/game?url=https://ubghyper.github.io/GameList.github.io/Bloonstd-5/'
+      ]
+    };
+  }
+
+  // Duck Life Series (100% Working WebGL & HTML5 Builds)
+  if (safeId === 'duck-life' || safeId === 'ducklife' || safeId === 'duck-life-1' || safeTitle.toLowerCase() === 'duck life') {
+    return {
+      src: 'https://gameinclassroom.github.io/duck-life/',
+      mirrors: [
+        'https://gameinclassroom.github.io/duck-life/',
+        'https://ubghyper.github.io/GameList.github.io/Duck-Life/',
+        '/api/proxy/game?url=https://gameinclassroom.github.io/duck-life/',
+        '/g/Duck-Life'
+      ]
+    };
+  }
+
+  if (safeId === 'duck-life-2' || safeId === 'ducklife2' || safeTitle.toLowerCase().includes('duck life 2') || safeTitle.toLowerCase().includes('ducklife 2')) {
+    return {
+      src: 'https://gameinclassroom.github.io/duck-life-2-world-champion/',
+      mirrors: [
+        'https://gameinclassroom.github.io/duck-life-2-world-champion/',
+        'https://ubghyper.github.io/GameList.github.io/Duck-Life-2/',
+        '/api/proxy/game?url=https://gameinclassroom.github.io/duck-life-2-world-champion/',
+        '/g/Duck-Life-2'
+      ]
+    };
+  }
+
+  if (safeId === 'duck-life-3' || safeId === 'ducklife3' || safeTitle.toLowerCase().includes('duck life 3') || safeTitle.toLowerCase().includes('ducklife 3')) {
+    return {
+      src: 'https://gameinclassroom.github.io/duck-life-3-evolution/',
+      mirrors: [
+        'https://gameinclassroom.github.io/duck-life-3-evolution/',
+        'https://ubghyper.github.io/GameList.github.io/Duck-Life-3/',
+        '/api/proxy/game?url=https://gameinclassroom.github.io/duck-life-3-evolution/',
+        '/g/Duck-Life-3'
+      ]
+    };
+  }
+
+  if (safeId === 'duck-life-4' || safeId === 'ducklife4' || safeTitle.toLowerCase().includes('duck life 4') || safeTitle.toLowerCase().includes('ducklife 4')) {
+    return {
+      src: 'https://gameinclassroom.github.io/duck-life-4/',
+      mirrors: [
+        'https://gameinclassroom.github.io/duck-life-4/',
+        'https://ubghyper.github.io/GameList.github.io/Duck-Life-4/',
+        'https://flyingsully.github.io/GameList.github.io/Duck-Life-4/',
+        '/api/proxy/game?url=https://gameinclassroom.github.io/duck-life-4/',
+        '/g/Duck-Life-4'
+      ]
+    };
+  }
+
+  if (safeId === 'duck-life-5' || safeId === 'ducklife5' || safeTitle.toLowerCase().includes('duck life 5') || safeTitle.toLowerCase().includes('treasure hunt')) {
+    return {
+      src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life-5/',
+      mirrors: [
+        'https://ubghyper.github.io/GameList.github.io/Duck-Life-5/',
+        '/api/proxy/game?url=https://ubghyper.github.io/GameList.github.io/Duck-Life-5/',
+        '/g/Duck-Life-5'
+      ]
+    };
+  }
+
+  if (safeId.includes('duck-life-space') || safeTitle.toLowerCase().includes('duck life space')) {
+    return {
+      src: 'https://gameinclassroom.github.io/duck-life-4/',
+      mirrors: [
+        'https://gameinclassroom.github.io/duck-life-4/',
+        'https://ubghyper.github.io/GameList.github.io/Duck-Life-4/'
+      ]
+    };
+  }
+
+  if (safeId.includes('duck-life-battle') || safeTitle.toLowerCase().includes('duck life battle')) {
+    return {
+      src: 'https://gameinclassroom.github.io/duck-life-3-evolution/',
+      mirrors: [
+        'https://gameinclassroom.github.io/duck-life-3-evolution/',
+        'https://ubghyper.github.io/GameList.github.io/Duck-Life-3/'
+      ]
+    };
+  }
+
+  // Flash Flight Simulator
+  if (safeId.includes('flash-flight') || safeTitle.toLowerCase().includes('flash flight simulator')) {
     const swf = 'https://ubghyper.github.io/GameList.github.io/Flash-Flight-Simulator-1/flashflightsimulator.swf';
     return {
       src: `games/flash-player.html?swf=${swf}&title=Flash+Flight+Simulator`,
@@ -564,28 +743,19 @@ export function resolveGameSource(
 
   let resolvedSrc = currentSrc;
 
-  if (isBlocked) {
-    // 1. Try 7zeb verified endpoints FIRST (Confirmed working on school filters & iPads)
-    if (sMap[cleanTitle] || sMap[cleanId] || sMap[cleanSlug]) {
-      resolvedSrc = sMap[cleanTitle] || sMap[cleanId] || sMap[cleanSlug];
-    }
-    // 2. Try Academics-Study verified endpoints
-    else if (ACADEMICS_MAP[cleanTitle] || ACADEMICS_MAP[cleanId] || ACADEMICS_MAP[cleanSlug]) {
+  // 1. Prioritize verified 7zeb unblocked endpoints FIRST if matched
+  if (sMap[cleanTitle] || sMap[cleanId] || sMap[cleanSlug]) {
+    resolvedSrc = sMap[cleanTitle] || sMap[cleanId] || sMap[cleanSlug];
+  } else if (isBlocked) {
+    if (ACADEMICS_MAP[cleanTitle] || ACADEMICS_MAP[cleanId] || ACADEMICS_MAP[cleanSlug]) {
       resolvedSrc = ACADEMICS_MAP[cleanTitle] || ACADEMICS_MAP[cleanId] || ACADEMICS_MAP[cleanSlug];
-    }
-    // 5. Try freeonlinewebtools verified gamelist
-    else if (fMap[cleanTitle] || fMap[cleanId] || fMap[cleanSlug]) {
+    } else if (fMap[cleanTitle] || fMap[cleanId] || fMap[cleanSlug]) {
       resolvedSrc = fMap[cleanTitle] || fMap[cleanId] || fMap[cleanSlug];
-    }
-    // 6. Try FlyingSully mirrors
-    else if (FLYINGSULLY_GAMES.has(cleanTitle) || FLYINGSULLY_GAMES.has(cleanId) || FLYINGSULLY_GAMES.has(cleanSlug)) {
+    } else if (FLYINGSULLY_GAMES.has(cleanTitle) || FLYINGSULLY_GAMES.has(cleanId) || FLYINGSULLY_GAMES.has(cleanSlug)) {
       resolvedSrc = `https://flyingsully.github.io/GameList.github.io/${title.replace(/ /g, '-')}/`;
-    }
-    // 7. Look for clean mirrors already in mirrors array
-    else {
+    } else {
       const cleanMirror = mirrors.find(m => 
         (m.includes('7zeb.github.io') || 
-         
          m.includes('academics-study.github.io') || 
          m.includes('javaspence.github.io') || 
          m.includes('henshmi.github.io') || 
@@ -599,20 +769,27 @@ export function resolveGameSource(
     }
   }
 
-  // Construct clean prioritized mirrors list
-  const cleanMirrorsList = [
+  // Construct clean prioritized mirrors list (with automatic unblocked server proxy fallback)
+  const validMirrors = [
     resolvedSrc,
     ...mirrors.filter(m => m !== resolvedSrc && 
       !m.includes('blobby-boi') && 
       !m.includes('gamedistribution.com') &&
-      !m.includes('gameinclassroom') &&
       m !== 'games/paper-io-2/index.html' &&
       m !== 'games/retro-bowl/index.html'
     )
   ];
 
+  // If the primary source is an external HTTP(S) URL, add the universal school-filter proxy mirror
+  if (resolvedSrc.startsWith('http://') || resolvedSrc.startsWith('https://')) {
+    const proxyMirror = `/api/proxy/game?url=${encodeURIComponent(resolvedSrc)}`;
+    if (!validMirrors.includes(proxyMirror)) {
+      validMirrors.push(proxyMirror);
+    }
+  }
+
   return {
     src: resolvedSrc,
-    mirrors: cleanMirrorsList
+    mirrors: validMirrors
   };
 }

@@ -54,6 +54,54 @@ async function startServer() {
 
 
 
+  // Universal School-Unblocked Game Proxy - Proxies any external game (Duck Life, Bloons TD, etc.)
+  // Bypasses Securly / GoGuardian / firewall blocks by serving through Google Cloud Run with rewritten base headers
+  app.get('/api/proxy/game', async (req, res) => {
+    let targetUrl = req.query.url as string;
+    if (!targetUrl) return res.status(400).send('Missing url parameter');
+    if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+      targetUrl = 'https://' + targetUrl;
+    }
+
+    try {
+      const upstreamRes = await fetch(targetUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'Accept': '*/*'
+        },
+        redirect: 'follow',
+        signal: AbortSignal.timeout(15000)
+      });
+
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+      res.removeHeader('X-Frame-Options');
+      res.removeHeader('Content-Security-Policy');
+
+      const contentType = upstreamRes.headers.get('content-type') || '';
+      res.setHeader('Content-Type', contentType || 'text/html; charset=utf-8');
+
+      if (contentType.includes('text/html')) {
+        let html = await upstreamRes.text();
+        const baseHref = targetUrl.endsWith('/') ? targetUrl : targetUrl.substring(0, targetUrl.lastIndexOf('/') + 1);
+        const baseTag = `<base href="${baseHref}">`;
+        html = html.replace(/<meta[^>]*http-equiv=["']?Content-Security-Policy["']?[^>]*>/gi, '');
+        if (/<head[^>]*>/i.test(html)) {
+          html = html.replace(/(<head[^>]*>)/i, `$1\n${baseTag}`);
+        } else {
+          html = baseTag + html;
+        }
+        return res.send(html);
+      } else {
+        const arrayBuf = await upstreamRes.arrayBuffer();
+        return res.send(Buffer.from(arrayBuf));
+      }
+    } catch (err: any) {
+      console.warn('Game proxy error:', targetUrl, err.message);
+      return res.status(502).send('Error loading unblocked game mirror: ' + err.message);
+    }
+  });
+
   // Direct Game Play-Shell Runner - Unblocks games for school iPads by piping play-shells and resolving assets via jsDelivr CDN
   app.get('/g/:slug', (req, res) => {
     const slug = req.params.slug;

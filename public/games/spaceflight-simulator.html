@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Spaceflight Simulator</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      background: #050811; color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    #game-container {
+      position: relative; width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+    }
+    canvas {
+      display: block; width: 100%; height: 100%;
+      background: #030712;
+    }
+    /* Top HUD */
+    #hud-top {
+      position: absolute; top: 12px; left: 16px; right: 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      pointer-events: none; z-index: 10;
+    }
+    .hud-card {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 10px; padding: 8px 14px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+      pointer-events: auto;
+    }
+    .hud-title {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+      color: #94a3b8; margin-bottom: 2px;
+    }
+    .hud-value {
+      font-size: 18px; font-weight: 700; font-family: monospace;
+      color: #38bdf8;
+    }
+    .hud-accent { color: #f43f5e; }
+    .hud-green { color: #10b981; }
+
+    /* Flight Controls Overlay */
+    #flight-controls {
+      position: absolute; bottom: 20px; left: 20px; right: 20px;
+      display: flex; justify-content: space-between; align-items: flex-end;
+      pointer-events: none; z-index: 10;
+    }
+    .interactive { pointer-events: auto; }
+    .btn {
+      background: #1e293b; border: 1px solid #475569;
+      color: #fff; font-weight: 600; font-size: 13px;
+      padding: 10px 18px; border-radius: 8px; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn:hover { background: #334155; border-color: #38bdf8; }
+    .btn-primary {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      border-color: #38bdf8;
+    }
+    .btn-primary:hover { background: linear-gradient(135deg, #0ea5e9, #0284c7); }
+    .btn-danger {
+      background: linear-gradient(135deg, #e11d48, #be123c);
+      border-color: #fb7185;
+    }
+    .btn-danger:hover { background: linear-gradient(135deg, #f43f5e, #e11d48); }
+
+    /* Throttle bar */
+    .throttle-container {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .throttle-slider-wrap {
+      height: 140px; width: 36px; background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 8px;
+      position: relative; overflow: hidden; display: flex; align-items: flex-end;
+      cursor: ns-resize;
+    }
+    .throttle-level {
+      width: 100%; background: linear-gradient(to top, #0284c7, #38bdf8, #f43f5e);
+      transition: height 0.05s ease;
+    }
+    .throttle-text {
+      position: absolute; width: 100%; top: 50%; transform: translateY(-50%);
+      text-align: center; font-size: 11px; font-weight: 700; font-family: monospace;
+      color: #fff; text-shadow: 0 1px 3px #000; pointer-events: none;
+    }
+
+    /* Build Mode Sidebar */
+    #build-menu {
+      position: absolute; top: 60px; right: 16px; bottom: 80px; width: 220px;
+      background: rgba(15, 23, 42, 0.92); border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 12px; padding: 14px; backdrop-filter: blur(10px);
+      display: flex; flex-direction: column; gap: 10px; z-index: 20;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+    .build-title {
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: #38bdf8; border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 8px;
+    }
+    .build-list {
+      flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
+    }
+    .part-card {
+      background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(71, 85, 105, 0.6);
+      border-radius: 8px; padding: 8px 10px; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      transition: all 0.15s ease;
+    }
+    .part-card:hover {
+      border-color: #38bdf8; background: rgba(51, 65, 85, 0.9);
+      transform: translateX(-2px);
+    }
+    .part-card.active { border-color: #38bdf8; background: rgba(14, 165, 233, 0.2); }
+    .part-name { font-size: 12px; font-weight: 600; color: #f1f5f9; }
+    .part-stat { font-size: 10px; color: #94a3b8; font-family: monospace; }
+
+    /* Map view indicator */
+    #map-tag {
+      position: absolute; top: 70px; left: 16px;
+      padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold;
+      background: rgba(244, 63, 94, 0.2); border: 1px solid rgba(244, 63, 94, 0.6);
+      color: #fb7185; text-transform: uppercase; letter-spacing: 1px;
+      display: none; z-index: 10;
+    }
+
+    /* Message banner */
+    #banner-msg {
+      position: absolute; top: 18%; left: 50%; transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95); border: 1px solid #38bdf8;
+      border-radius: 10px; padding: 12px 24px; font-size: 15px; font-weight: 600;
+      color: #38bdf8; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+      transition: opacity 0.4s ease; opacity: 0; pointer-events: none; z-index: 30;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="space-canvas"></canvas>
+
+    <div id="hud-top">
+      <div class="hud-card">
+        <div class="hud-title">Altitude</div>
+        <div class="hud-value" id="val-alt">0 m</div>
+      </div>
+      <div class="hud-card">
+        <div class="hud-title">Speed</div>
+        <div class="hud-value" id="val-spd">0 m/s</div>
+      </div>
+      <div class="hud-card">
+        <div class="hud-title">Apoapsis / Periapsis</div>
+        <div class="hud-value" id="val-orbit">-- / --</div>
+      </div>
+      <div class="hud-card">
+        <div class="hud-title">Fuel Remaining</div>
+        <div class="hud-value hud-green" id="val-fuel">100%</div>
+      </div>
+    </div>
+
+    <div id="map-tag">ORBITAL MAP VIEW</div>
+    <div id="banner-msg">LIFTOFF!</div>
+
+    <!-- Flight Bottom Controls -->
+    <div id="flight-controls">
+      <!-- Left side: Steer & SAS -->
+      <div class="interactive" style="display: flex; gap: 8px;">
+        <button class="btn" id="btn-left" title="Turn Left (A / Left Arrow)">◀ Left</button>
+        <button class="btn" id="btn-right" title="Turn Right (D / Right Arrow)">Right ▶</button>
+        <button class="btn btn-primary" id="btn-sas" title="Toggle SAS Auto-Stabilizer">SAS: ON</button>
+        <button class="btn" id="btn-map" title="Toggle Map / Cockpit View (M)">Map (M)</button>
+      </div>
+
+      <!-- Center: Stage & Reset -->
+      <div class="interactive" style="display: flex; gap: 10px;">
+        <button class="btn btn-danger" id="btn-stage" style="font-size: 14px; padding: 12px 24px;">🚀 STAGE (Space)</button>
+        <button class="btn" id="btn-chute" title="Deploy Emergency Parachute">🪂 Chute</button>
+        <button class="btn" id="btn-reset">↺ Build / Reset</button>
+      </div>
+
+      <!-- Right side: Throttle -->
+      <div class="interactive throttle-container">
+        <div class="throttle-slider-wrap" id="throttle-wrap">
+          <div class="throttle-level" id="throttle-fill" style="height: 0%;"></div>
+          <div class="throttle-text" id="throttle-pct">0%</div>
+        </div>
+        <span style="font-size: 11px; font-weight: 700; color: #94a3b8;">THROTTLE</span>
+      </div>
+    </div>
+
+    <!-- Build Mode Overlay Menu -->
+    <div id="build-menu" style="display: none;">
+      <div class="build-title">Rocket Builder</div>
+      <div style="font-size: 11px; color: #cbd5e1;">Select preset rocket or launch custom stages:</div>
+      <div class="build-list">
+        <div class="part-card active" data-preset="saturn">
+          <div>
+            <div class="part-name">Saturn V Lunar</div>
+            <div class="part-stat">3 Stages · Deep Space</div>
+          </div>
+        </div>
+        <div class="part-card" data-preset="falcon">
+          <div>
+            <div class="part-name">Falcon Booster</div>
+            <div class="part-stat">Dual Booster · Orbital</div>
+          </div>
+        </div>
+        <div class="part-card" data-preset="titan">
+          <div>
+            <div class="part-name">Titan Orbit Core</div>
+            <div class="part-stat">Single Heavy Stage</div>
+          </div>
+        </div>
+        <div class="part-card" data-preset="sputnik">
+          <div>
+            <div class="part-name">Scout Sounder</div>
+            <div class="part-stat">Lightweight · Suborbital</div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btn-launch-preset" style="width: 100%;">LAUNCH ROCKET 🚀</button>
+    </div>
+  </div>
+
+  <script>
+    // --- Spaceflight Simulator Physics & Rendering Engine ---
+    const canvas = document.getElementById('space-canvas');
+    const ctx = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Sound effects via Web Audio API
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+    function playRocketRumble(throttle) {
+      if (!audioCtx || throttle <= 0) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(45 + throttle * 40, audioCtx.currentTime);
+        gain.gain.setValueAtTime(throttle * 0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.1);
+      } catch(e) {}
+    }
+
+    // World & Orbit Constants
+    const G = 6.674e-11;
+    const EARTH_RADIUS = 300000; // 300 km scaled planet
+    const EARTH_MASS = 5.972e22; // scaled mass
+    const MOON_RADIUS = 75000;
+    const MOON_DIST = 1600000;
+    const MOON_MASS = 7.342e20;
+    const ATMOSPHERE_HEIGHT = 80000; // 80 km atmosphere
+
+    // Game State
+    let isMapMode = false;
+    let isBuildMode = false;
+    let sasEnabled = true;
+    let chuteDeployed = false;
+    let throttle = 0; // 0 to 1
+    let camera = { x: 0, y: 0, zoom: 1 };
+    let stars = [];
+
+    // Generate background galaxy stars
+    for (let i = 0; i < 400; i++) {
+      stars.push({
+        x: (Math.random() - 0.5) * 8000000,
+        y: (Math.random() - 0.5) * 8000000,
+        size: Math.random() * 2 + 0.5,
+        alpha: Math.random() * 0.8 + 0.2
+      });
+    }
+
+    // Rocket State
+    let ship = {
+      x: 0,
+      y: -(EARTH_RADIUS + 15),
+      vx: 0,
+      vy: 0,
+      angle: -Math.PI / 2, // pointing up
+      angularVelocity: 0,
+      mass: 8000, // dry mass
+      fuel: 16000, // fuel mass
+      maxFuel: 16000,
+      thrust: 380000, // Newtons
+      stage: 1,
+      maxStages: 3,
+      exhaustParticles: [],
+      debris: [],
+      crashed: false,
+      landed: true
+    };
+
+    function resetShip(preset = 'saturn') {
+      ship.x = 0;
+      ship.y = -(EARTH_RADIUS + 15);
+      ship.vx = 0;
+      ship.vy = 0;
+      ship.angle = -Math.PI / 2;
+      ship.angularVelocity = 0;
+      ship.crashed = false;
+      ship.landed = true;
+      chuteDeployed = false;
+      throttle = 0;
+      ship.debris = [];
+      ship.exhaustParticles = [];
+
+      if (preset === 'falcon') {
+        ship.mass = 6000; ship.maxFuel = 14000; ship.fuel = 14000; ship.thrust = 420000; ship.maxStages = 2;
+      } else if (preset === 'titan') {
+        ship.mass = 9000; ship.maxFuel = 20000; ship.fuel = 20000; ship.thrust = 480000; ship.maxStages = 1;
+      } else if (preset === 'sputnik') {
+        ship.mass = 2500; ship.maxFuel = 6000; ship.fuel = 6000; ship.thrust = 180000; ship.maxStages = 1;
+      } else {
+        // Saturn V
+        ship.mass = 8000; ship.maxFuel = 18000; ship.fuel = 18000; ship.thrust = 460000; ship.maxStages = 3;
+      }
+      ship.stage = 1;
+      updateThrottleUI();
+      showBanner("ROCKET ON LAUNCH PAD - THROTTLE UP & IGNITE!");
+    }
+
+    resetShip('saturn');
+
+    // Controls Handling
+    const keys = {};
+    window.addEventListener('keydown', e => {
+      initAudio();
+      keys[e.key.toLowerCase()] = true;
+      if (e.key === ' ' || e.code === 'Space') {
+        e.preventDefault();
+        triggerStage();
+      }
+      if (e.key.toLowerCase() === 'm') toggleMapMode();
+      if (e.key === 'Shift') setThrottle(Math.min(1, throttle + 0.1));
+      if (e.key === 'Control') setThrottle(Math.max(0, throttle - 0.1));
+    });
+    window.addEventListener('keyup', e => {
+      keys[e.key.toLowerCase()] = false;
+    });
+
+    // Touch & Button listeners
+    document.getElementById('btn-left').addEventListener('mousedown', () => keys['a'] = true);
+    document.getElementById('btn-left').addEventListener('mouseup', () => keys['a'] = false);
+    document.getElementById('btn-right').addEventListener('mousedown', () => keys['d'] = true);
+    document.getElementById('btn-right').addEventListener('mouseup', () => keys['d'] = false);
+
+    document.getElementById('btn-left').addEventListener('touchstart', e => { e.preventDefault(); keys['a'] = true; });
+    document.getElementById('btn-left').addEventListener('touchend', e => { e.preventDefault(); keys['a'] = false; });
+    document.getElementById('btn-right').addEventListener('touchstart', e => { e.preventDefault(); keys['d'] = true; });
+    document.getElementById('btn-right').addEventListener('touchend', e => { e.preventDefault(); keys['d'] = false; });
+
+    document.getElementById('btn-stage').addEventListener('click', () => { initAudio(); triggerStage(); });
+    document.getElementById('btn-chute').addEventListener('click', () => { chuteDeployed = !chuteDeployed; showBanner(chuteDeployed ? "PARACHUTE DEPLOYED!" : "PARACHUTE CUT!"); });
+    document.getElementById('btn-sas').addEventListener('click', () => {
+      sasEnabled = !sasEnabled;
+      document.getElementById('btn-sas').textContent = `SAS: ${sasEnabled ? 'ON' : 'OFF'}`;
+      document.getElementById('btn-sas').className = sasEnabled ? 'btn btn-primary' : 'btn';
+    });
+    document.getElementById('btn-map').addEventListener('click', toggleMapMode);
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      const menu = document.getElementById('build-menu');
+      menu.style.display = menu.style.display === 'none' ? 'flex' : 'none';
+    });
+
+    // Presets selector
+    document.querySelectorAll('.part-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.part-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+      });
+    });
+    document.getElementById('btn-launch-preset').addEventListener('click', () => {
+      const active = document.querySelector('.part-card.active');
+      const preset = active ? active.getAttribute('data-preset') : 'saturn';
+      resetShip(preset);
+      document.getElementById('build-menu').style.display = 'none';
+    });
+
+    // Throttle click/drag
+    const throttleWrap = document.getElementById('throttle-wrap');
+    let isDraggingThrottle = false;
+    function handleThrottleEvent(e) {
+      const rect = throttleWrap.getBoundingClientRect();
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const pct = 1 - Math.min(1, Math.max(0, (clientY - rect.top) / rect.height));
+      setThrottle(pct);
+    }
+    throttleWrap.addEventListener('mousedown', e => { isDraggingThrottle = true; handleThrottleEvent(e); });
+    window.addEventListener('mousemove', e => { if (isDraggingThrottle) handleThrottleEvent(e); });
+    window.addEventListener('mouseup', () => { isDraggingThrottle = false; });
+    throttleWrap.addEventListener('touchstart', e => { isDraggingThrottle = true; handleThrottleEvent(e); }, { passive: false });
+    window.addEventListener('touchmove', e => { if (isDraggingThrottle) handleThrottleEvent(e); }, { passive: false });
+    window.addEventListener('touchend', () => { isDraggingThrottle = false; });
+
+    function setThrottle(val) {
+      throttle = Math.min(1, Math.max(0, val));
+      updateThrottleUI();
+    }
+    function updateThrottleUI() {
+      const fill = document.getElementById('throttle-fill');
+      const text = document.getElementById('throttle-pct');
+      const pct = Math.round(throttle * 100);
+      fill.style.height = `${pct}%`;
+      text.textContent = `${pct}%`;
+    }
+
+    function toggleMapMode() {
+      isMapMode = !isMapMode;
+      document.getElementById('map-tag').style.display = isMapMode ? 'block' : 'none';
+      document.getElementById('btn-map').textContent = isMapMode ? 'Ship (M)' : 'Map (M)';
+    }
+
+    function showBanner(text) {
+      const b = document.getElementById('banner-msg');
+      b.textContent = text;
+      b.style.opacity = '1';
+      setTimeout(() => { b.style.opacity = '0'; }, 3200);
+    }
+
+    function triggerStage() {
+      if (ship.crashed) return;
+      if (ship.stage < ship.maxStages) {
+        // Eject booster stage debris
+        ship.debris.push({
+          x: ship.x,
+          y: ship.y + 10,
+          vx: ship.vx + (Math.random() - 0.5) * 5,
+          vy: ship.vy + 8,
+          angle: ship.angle,
+          angularVelocity: (Math.random() - 0.5) * 0.1,
+          life: 400
+        });
+        ship.stage++;
+        ship.fuel = ship.maxFuel * 0.6; // New stage fuel
+        ship.mass *= 0.7; // jettison dry booster weight
+        showBanner(`STAGE ${ship.stage} SEPARATION - ENGINE IGNITED!`);
+      } else {
+        showBanner("FINAL STAGE ACTIVE - ALL BOOSTERS SEPARATED");
+      }
+    }
+
+    // --- Physics Step ---
+    let lastTime = performance.now();
+    function updatePhysics(dt) {
+      if (ship.crashed) return;
+
+      // Distance from Earth center
+      const rEarth = Math.hypot(ship.x, ship.y);
+      const alt = rEarth - EARTH_RADIUS;
+
+      // Handle Steering
+      if (keys['a'] || keys['arrowleft']) {
+        ship.angularVelocity -= 0.04 * dt;
+      }
+      if (keys['d'] || keys['arrowright']) {
+        ship.angularVelocity += 0.04 * dt;
+      }
+      if (sasEnabled && !keys['a'] && !keys['d'] && !keys['arrowleft'] && !keys['arrowright']) {
+        ship.angularVelocity *= Math.pow(0.1, dt); // Active damping
+      }
+      ship.angle += ship.angularVelocity * dt;
+
+      // Gravity from Earth
+      const gAccel = (G * EARTH_MASS) / (rEarth * rEarth);
+      const gX = -gAccel * (ship.x / rEarth);
+      const gY = -gAccel * (ship.y / rEarth);
+
+      // Atmospheric Drag
+      let dragX = 0, dragY = 0;
+      if (alt < ATMOSPHERE_HEIGHT) {
+        const airDensity = Math.exp(-alt / 9000); // barometric formula
+        const speed = Math.hypot(ship.vx, ship.vy);
+        const dragMagnitude = 0.5 * airDensity * (speed * speed) * (chuteDeployed ? 4.5 : 0.08);
+        if (speed > 0.01) {
+          dragX = -dragMagnitude * (ship.vx / speed) / (ship.mass + ship.fuel);
+          dragY = -dragMagnitude * (ship.vy / speed) / (ship.mass + ship.fuel);
+        }
+      }
+
+      // Engine Thrust
+      let thrustX = 0, thrustY = 0;
+      if (throttle > 0 && ship.fuel > 0) {
+        const fuelConsumption = 220 * throttle * dt;
+        ship.fuel = Math.max(0, ship.fuel - fuelConsumption);
+        const effectiveThrust = ship.thrust * throttle;
+        const totalMass = ship.mass + ship.fuel;
+        const accel = effectiveThrust / totalMass;
+
+        thrustX = Math.cos(ship.angle) * accel;
+        thrustY = Math.sin(ship.angle) * accel;
+
+        ship.landed = false;
+        playRocketRumble(throttle);
+
+        // Emit engine flame particles
+        for (let i = 0; i < 3; i++) {
+          const spread = (Math.random() - 0.5) * 0.3;
+          const pAngle = ship.angle + Math.PI + spread;
+          const pSpeed = 150 + Math.random() * 100;
+          ship.exhaustParticles.push({
+            x: ship.x - Math.cos(ship.angle) * 16,
+            y: ship.y - Math.sin(ship.angle) * 16,
+            vx: ship.vx + Math.cos(pAngle) * pSpeed,
+            vy: ship.vy + Math.sin(pAngle) * pSpeed,
+            life: 1.0,
+            decay: 2.5 + Math.random() * 1.5,
+            size: 4 + Math.random() * 6
+          });
+        }
+      }
+
+      // Update Velocity & Position
+      ship.vx += (gX + dragX + thrustX) * dt;
+      ship.vy += (gY + dragY + thrustY) * dt;
+      ship.x += ship.vx * dt;
+      ship.y += ship.vy * dt;
+
+      // Update Particles
+      for (let i = ship.exhaustParticles.length - 1; i >= 0; i--) {
+        const p = ship.exhaustParticles[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.life -= p.decay * dt;
+        if (p.life <= 0) ship.exhaustParticles.splice(i, 1);
+      }
+
+      // Update Debris
+      for (let i = ship.debris.length - 1; i >= 0; i--) {
+        const d = ship.debris[i];
+        d.x += d.vx * dt;
+        d.y += d.vy * dt;
+        d.angle += d.angularVelocity;
+        d.life--;
+        if (d.life <= 0) ship.debris.splice(i, 1);
+      }
+
+      // Surface Collision / Landing Check
+      if (alt <= 0) {
+        const speed = Math.hypot(ship.vx, ship.vy);
+        if (speed > 16) {
+          ship.crashed = true;
+          showBanner("CRITICAL IMPACT - ROCKET DESTROYED! PRESS RESET.");
+        } else {
+          ship.y = -(EARTH_RADIUS + 15);
+          ship.vx = 0;
+          ship.vy = 0;
+          ship.angularVelocity = 0;
+          ship.angle = -Math.PI / 2;
+          ship.landed = true;
+        }
+      }
+
+      // Telemetry Calculations
+      const speed = Math.hypot(ship.vx, ship.vy);
+      document.getElementById('val-alt').textContent = alt >= 1000 ? `${(alt / 1000).toFixed(1)} km` : `${Math.round(alt)} m`;
+      document.getElementById('val-spd').textContent = `${Math.round(speed)} m/s`;
+      const fuelPct = Math.round((ship.fuel / ship.maxFuel) * 100);
+      const fuelEl = document.getElementById('val-fuel');
+      fuelEl.textContent = `${fuelPct}%`;
+      fuelEl.className = fuelPct > 30 ? 'hud-value hud-green' : 'hud-value hud-accent';
+
+      // Apoapsis approximation
+      if (alt > 2000 && speed > 200) {
+        const specificEnergy = (speed * speed) / 2 - (G * EARTH_MASS) / rEarth;
+        const apo = specificEnergy < 0 ? (- (G * EARTH_MASS) / (2 * specificEnergy)) - EARTH_RADIUS : 999999;
+        document.getElementById('val-orbit').textContent = `${Math.round(apo / 1000)} km / ${Math.round(alt / 1000)} km`;
+      } else {
+        document.getElementById('val-orbit').textContent = `-- / --`;
+      }
+    }
+
+    // --- Render Loop ---
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.save();
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+
+      // Adjust camera zoom based on view mode and altitude
+      let targetZoom = 1.8;
+      if (isMapMode) {
+        targetZoom = 0.0012; // Far orbital map
+      } else {
+        const alt = Math.hypot(ship.x, ship.y) - EARTH_RADIUS;
+        targetZoom = Math.max(0.08, 2.0 / (1 + alt * 0.00008));
+      }
+      camera.zoom += (targetZoom - camera.zoom) * 0.1;
+      camera.x += (ship.x - camera.x) * 0.1;
+      camera.y += (ship.y - camera.y) * 0.1;
+
+      ctx.translate(centerX, centerY);
+      ctx.scale(camera.zoom, camera.zoom);
+      ctx.translate(-camera.x, -camera.y);
+
+      // 1. Draw Starfield
+      ctx.fillStyle = '#ffffff';
+      for (const s of stars) {
+        ctx.globalAlpha = s.alpha;
+        ctx.fillRect(s.x, s.y, s.size / camera.zoom, s.size / camera.zoom);
+      }
+      ctx.globalAlpha = 1.0;
+
+      // 2. Draw Earth Atmosphere Glow
+      const atmGrad = ctx.createRadialGradient(0, 0, EARTH_RADIUS, 0, 0, EARTH_RADIUS + ATMOSPHERE_HEIGHT);
+      atmGrad.addColorStop(0, 'rgba(56, 189, 248, 0.4)');
+      atmGrad.addColorStop(0.6, 'rgba(14, 165, 233, 0.15)');
+      atmGrad.addColorStop(1, 'rgba(2, 132, 199, 0)');
+      ctx.fillStyle = atmGrad;
+      ctx.beginPath();
+      ctx.arc(0, 0, EARTH_RADIUS + ATMOSPHERE_HEIGHT, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 3. Draw Earth Planet Surface
+      const earthGrad = ctx.createRadialGradient(0, -EARTH_RADIUS * 0.8, 10000, 0, 0, EARTH_RADIUS);
+      earthGrad.addColorStop(0, '#15803d'); // Continents
+      earthGrad.addColorStop(0.3, '#0369a1'); // Ocean
+      earthGrad.addColorStop(0.9, '#082f49');
+      earthGrad.addColorStop(1, '#0f172a');
+      ctx.fillStyle = earthGrad;
+      ctx.beginPath();
+      ctx.arc(0, 0, EARTH_RADIUS, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 4. Draw Moon
+      const moonX = Math.cos(0.7) * MOON_DIST;
+      const moonY = Math.sin(0.7) * MOON_DIST;
+      ctx.fillStyle = '#94a3b8';
+      ctx.beginPath();
+      ctx.arc(moonX, moonY, MOON_RADIUS, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Draw Orbit Trajectory Line in Map View
+      if (isMapMode) {
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2 / camera.zoom;
+        ctx.beginPath();
+        ctx.arc(0, 0, Math.hypot(ship.x, ship.y), 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Ship marker on map
+        ctx.fillStyle = '#f43f5e';
+        ctx.beginPath();
+        ctx.arc(ship.x, ship.y, 14 / camera.zoom, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 5. Draw Rocket Exhaust Particles
+      for (const p of ship.exhaustParticles) {
+        ctx.fillStyle = `rgba(251, 146, 60, ${p.life})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 6. Draw Jettisoned Debris
+      for (const d of ship.debris) {
+        ctx.save();
+        ctx.translate(d.x, d.y);
+        ctx.rotate(d.angle);
+        ctx.fillStyle = '#64748b';
+        ctx.fillRect(-4, -12, 8, 24);
+        ctx.restore();
+      }
+
+      // 7. Draw The Rocket Ship
+      if (!ship.crashed) {
+        ctx.save();
+        ctx.translate(ship.x, ship.y);
+        ctx.rotate(ship.angle + Math.PI / 2); // standard canvas rotation
+
+        // Parachute if deployed
+        if (chuteDeployed) {
+          ctx.strokeStyle = '#f8fafc';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(-10, -28); ctx.lineTo(-24, -60);
+          ctx.moveTo(10, -28); ctx.lineTo(24, -60);
+          ctx.stroke();
+          // Chute canopy
+          ctx.fillStyle = '#e11d48';
+          ctx.beginPath();
+          ctx.arc(0, -60, 30, Math.PI, 0);
+          ctx.fill();
+        }
+
+        // Rocket Core Body
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(-7, -24, 14, 48);
+
+        // Nose Cone (Capsule)
+        ctx.fillStyle = '#0284c7';
+        ctx.beginPath();
+        ctx.moveTo(-7, -24);
+        ctx.lineTo(0, -36);
+        ctx.lineTo(7, -24);
+        ctx.closePath();
+        ctx.fill();
+
+        // Staging lines
+        ctx.fillStyle = '#334155';
+        ctx.fillRect(-7, -4, 14, 3);
+        ctx.fillRect(-7, 12, 14, 3);
+
+        // Side Boosters if Stage 1
+        if (ship.stage === 1) {
+          ctx.fillStyle = '#e2e8f0';
+          ctx.fillRect(-13, 0, 5, 26);
+          ctx.fillRect(8, 0, 5, 26);
+          // Booster cones
+          ctx.fillStyle = '#f43f5e';
+          ctx.beginPath();
+          ctx.moveTo(-13, 0); ctx.lineTo(-10.5, -6); ctx.lineTo(-8, 0); ctx.fill();
+          ctx.beginPath();
+          ctx.moveTo(8, 0); ctx.lineTo(10.5, -6); ctx.lineTo(13, 0); ctx.fill();
+        }
+
+        // Engine Bell Nozzle
+        ctx.fillStyle = '#475569';
+        ctx.beginPath();
+        ctx.moveTo(-5, 24);
+        ctx.lineTo(-7, 30);
+        ctx.lineTo(7, 30);
+        ctx.lineTo(5, 24);
+        ctx.closePath();
+        ctx.fill();
+
+        // Main Engine Flame if firing
+        if (throttle > 0 && ship.fuel > 0) {
+          ctx.fillStyle = '#f59e0b';
+          ctx.beginPath();
+          ctx.moveTo(-5, 30);
+          ctx.lineTo(0, 30 + 28 * throttle + (Math.random() * 8));
+          ctx.lineTo(5, 30);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.fillStyle = '#38bdf8'; // Blue hot core
+          ctx.beginPath();
+          ctx.moveTo(-2, 30);
+          ctx.lineTo(0, 30 + 14 * throttle);
+          ctx.lineTo(2, 30);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        ctx.restore();
+      } else {
+        // Crash explosion remnants
+        ctx.fillStyle = '#f43f5e';
+        ctx.beginPath();
+        ctx.arc(ship.x, ship.y, 25, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
+    function gameLoop(now) {
+      const dt = Math.min(0.1, (now - lastTime) / 1000);
+      lastTime = now;
+      updatePhysics(dt);
+      render();
+      requestAnimationFrame(gameLoop);
+    }
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>
