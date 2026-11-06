@@ -771,9 +771,10 @@
       "Unblocked",
       "Arcade"
     ],
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Agar-io/",
+    "iframeSrc": "https://7zeb.github.io/homework/agariolite.html",
     "mirrors": [
-      "https://ubghyper.github.io/GameList.github.io/Agar-io/"
+      "https://7zeb.github.io/homework/agariolite.html",
+      "/api/proxy/game?url=https://7zeb.github.io/homework/agariolite.html"
     ],
     "source": "strongdog.com",
     "rating": 4.4,
@@ -1673,15 +1674,15 @@
       "Unblocked",
       "Arcade"
     ],
-    "iframeSrc": "games/duck-life-2.html",
+    "iframeSrc": "https://gameinclassroom.github.io/duck-life-2-world-champion/",
     "mirrors": [
-      "games/duck-life-2.html",
-      "https://ubghyper.github.io/GameList.github.io/Duck-Life-2/"
+      "https://gameinclassroom.github.io/duck-life-2-world-champion/",
+      "games/duck-life-2.html"
     ],
     "source": "strongdog.com",
     "rating": 4.7,
     "plays": 51490,
-    "iframeCode": "<iframe class=\"game-iframe\" id=\"game-area\" title=\"Duck Life 2\" src=\"games/duck-life-2.html\" allow=\"autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope\" allowfullscreen=\"\"></iframe>"
+    "iframeCode": "<iframe class=\"game-iframe\" id=\"game-area\" title=\"Duck Life 2\" src=\"https://gameinclassroom.github.io/duck-life-2-world-champion/\" allow=\"autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope\" allowfullscreen=\"\"></iframe>"
   },
   {
     "id": "strongdog-ducklife3",
@@ -1695,15 +1696,15 @@
       "Unblocked",
       "Arcade"
     ],
-    "iframeSrc": "games/duck-life-3.html",
+    "iframeSrc": "https://gameinclassroom.github.io/duck-life-3-evolution/",
     "mirrors": [
-      "games/duck-life-3.html",
-      "https://ubghyper.github.io/GameList.github.io/Duck-Life-3/"
+      "https://gameinclassroom.github.io/duck-life-3-evolution/",
+      "games/duck-life-3.html"
     ],
     "source": "strongdog.com",
     "rating": 4.7,
     "plays": 69867,
-    "iframeCode": "<iframe class=\"game-iframe\" id=\"game-area\" title=\"Duck Life 3\" src=\"games/duck-life-3.html\" allow=\"autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope\" allowfullscreen=\"\"></iframe>"
+    "iframeCode": "<iframe class=\"game-iframe\" id=\"game-area\" title=\"Duck Life 3\" src=\"https://gameinclassroom.github.io/duck-life-3-evolution/\" allow=\"autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope\" allowfullscreen=\"\"></iframe>"
   },
   {
     "id": "strongdog-factoryballs2",
@@ -2217,9 +2218,10 @@
       "Unblocked",
       "Arcade"
     ],
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/slither-io/",
+    "iframeSrc": "https://freeonlinewebtools.github.io/gamelist3.github.io/slitherio/",
     "mirrors": [
-      "https://ubghyper.github.io/GameList.github.io/slither-io/"
+      "https://freeonlinewebtools.github.io/gamelist3.github.io/slitherio/",
+      "/api/proxy/game?url=https://freeonlinewebtools.github.io/gamelist3.github.io/slitherio/"
     ],
     "source": "strongdog.com",
     "rating": 4.5,
@@ -2639,9 +2641,9 @@
       "Unblocked",
       "Arcade"
     ],
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Eat-io/",
+    "iframeSrc": "https://7zeb.github.io/homework/holeio.html",
     "mirrors": [
-      "https://ubghyper.github.io/GameList.github.io/Eat-io/"
+      "https://7zeb.github.io/homework/holeio.html"
     ],
     "source": "strongdog.com",
     "rating": 4.8,
@@ -3159,9 +3161,9 @@
       "Unblocked",
       "Arcade"
     ],
-    "iframeSrc": "https://ubghyper.github.io/GameList.github.io/Zombs-Royale/",
+    "iframeSrc": "https://gameinclassroom.github.io/zombs-royale-io/",
     "mirrors": [
-      "https://ubghyper.github.io/GameList.github.io/Zombs-Royale/"
+      "https://gameinclassroom.github.io/zombs-royale-io/"
     ],
     "source": "strongdog.com",
     "rating": 4.7,

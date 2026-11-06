@@ -21,9 +21,9 @@ const ACADEMICS_MAP: Record<string, string> = {
   "backrooms": "https://academics-study.github.io/backrooms/",
   "slicemaster": "https://academics-study.github.io/0-slice-master/",
   "shellshockers": "https://academics-study.github.io/shellshockers/",
-  "stickmanhook": "https://7zeb.github.io/homework/index.html",
-  "stickmanclimb": "https://7zeb.github.io/homework/index.html",
-  "stickmanclimb2": "https://7zeb.github.io/homework/index.html",
+  "stickmanhook": "https://freeonlinewebtools.github.io/gamelist3.github.io/Stickman-Hook/",
+  "stickmanclimb": "https://gameinclassroom.github.io/stickman-climb-2/",
+  "stickmanclimb2": "https://gameinclassroom.github.io/stickman-climb-2/",
   "peopleplayground": "https://7zeb.github.io/homework/melonplayground.html",
   "blockblast": "https://freeonlinewebtools.github.io/blockblastunblockedgames.github.io/",
   "ovo": "https://7zeb.github.io/homework/ovo2.html",
@@ -32,40 +32,40 @@ const ACADEMICS_MAP: Record<string, string> = {
   "minecraft": "https://7zeb.github.io/homework/mc1_8.html",
   "basketballlegends": "https://joe-the-chicken.github.io/basketball-stars/",
   "basketballlegends2020": "https://joe-the-chicken.github.io/basketball-stars/",
-  "vex": "https://7zeb.github.io/homework/index.html",
+  "vex": "https://gameinclassroom.github.io/vex-3/",
   "vex1": "https://ubghyper.github.io/GameList.github.io/Vex-1/",
   "vex2": "https://ubghyper.github.io/GameList.github.io/Vex-2/",
-  "vex3": "https://7zeb.github.io/homework/index.html",
-  "vex4": "https://7zeb.github.io/homework/index.html",
-  "vex5": "https://7zeb.github.io/homework/index.html",
-  "vex6": "https://7zeb.github.io/homework/index.html",
+  "vex3": "https://gameinclassroom.github.io/vex-3/",
+  "vex4": "https://gameinclassroom.github.io/vex-4/",
+  "vex5": "https://gameinclassroom.github.io/vex-5/",
+  "vex6": "https://gameinclassroom.github.io/vex-6/",
   "vex7": "https://7zeb.github.io/homework/vex7.html",
   "vex8": "https://7zeb.github.io/homework/vex8.html",
-  "worldshardestgame": "https://7zeb.github.io/homework/index.html",
-  "worldshardestgame2": "https://7zeb.github.io/homework/index.html",
-  "worldshardestgame3": "https://7zeb.github.io/homework/index.html",
+  "worldshardestgame": "https://freeonlinewebtools.github.io/gamelist3.github.io/Worlds-Hardest-Game/",
+  "worldshardestgame2": "https://freeonlinewebtools.github.io/gamelist3.github.io/Worlds-Hardest-Game-2/",
+  "worldshardestgame3": "https://freeonlinewebtools.github.io/gamelist3.github.io/Worlds-Hardest-Game-3/",
   "fruitninja": "games/fruit-ninja.html",
   "mario": "https://7zeb.github.io/homework/mario-game/index.html",
   "supermario": "https://7zeb.github.io/homework/mario-game/index.html",
   "supermario63": "https://ubghyper.github.io/GameList.github.io/Super-Mario-63/",
-  "supermario64": "https://7zeb.github.io/homework/index.html",
+  "supermario64": "https://7zeb.github.io/homework/sm64/",
   "supermariobros": "https://7zeb.github.io/homework/mario-game/index.html",
   "blackjack": "https://flyingsully.github.io/GameList.github.io/Blackjack/",
-  "happywheels": "https://7zeb.github.io/homework/index.html",
+  "happywheels": "https://gameinclassroom.github.io/happy-wheels/",
   "dumbwaystodie": "games/dumb-ways-to-die.html",
   "hooproyale": "https://ubghyper.github.io/GameList.github.io/Hoop-Royale/",
   "asmallworldcup": "games/sawyer-for-sawyer.html",
-  "stickmerge": "https://7zeb.github.io/homework/index.html",
-  "stickmerge2": "https://7zeb.github.io/homework/index.html",
-  "sausageflip": "https://7zeb.github.io/homework/index.html",
-  "sausagerun": "https://7zeb.github.io/homework/index.html",
+  "stickmerge": "https://gameinclassroom.github.io/stick-merge/",
+  "stickmerge2": "https://gameinclassroom.github.io/stick-merge/",
+  "sausageflip": "https://7zeb.github.io/homework/steal-a-brainrot/go/sausage-flip.html",
+  "sausagerun": "https://7zeb.github.io/homework/steal-a-brainrot/go/sausage-flip.html",
   "bindingofisaac": "https://flyingsully.github.io/GameList.github.io/Binding-Of-Isaac/",
-  "ducklife4": "https://flyingsully.github.io/GameList.github.io/Duck-Life-4/",
-  "clusterrush": "https://7zeb.github.io/homework/index.html",
+  "ducklife4": "https://gameinclassroom.github.io/duck-life-4/",
+  "clusterrush": "https://gameinclassroom.github.io/cluster-rush/",
   "cuphead": "https://freeonlinewebtools.github.io/gamelist2.github.io/Cuphead/",
   "badicecream": "https://freeonlinewebtools.github.io/gamelist8.github.io/Bad-Ice-Cream/",
-  "badicecream2": "https://7zeb.github.io/homework/index.html",
-  "badicecream3": "https://7zeb.github.io/homework/index.html",
+  "badicecream2": "https://freeonlinewebtools.github.io/gamelist8.github.io/Bad-Ice-Cream-2/",
+  "badicecream3": "https://freeonlinewebtools.github.io/gamelist8.github.io/Bad-Ice-Cream-3/",
   "candycrush": "https://freeonlinewebtools.github.io/gamelist3.github.io/Candy-Crush/",
   "deathrun3d": "https://freeonlinewebtools.github.io/gamelist3.github.io/Death-Run-3D/",
   "dadish": "https://freeonlinewebtools.github.io/gamelist3.github.io/Dadish/",
@@ -120,8 +120,7 @@ const PRESERVED_LOCAL_GAMES = new Set([
   "games/basket-random.html",
   "games/boxing-random.html",
   "games/spaceflight-simulator.html",
-  "games/diep-io.html",
-  "games/agar-io.html"
+  "games/duck-life-5.html"
 ]);
 
 function cleanText(str: string): string {
@@ -159,33 +158,30 @@ export function resolveGameSource(
 
   if (safeId.includes('paper-io') || safeTitle.toLowerCase().includes('paper io') || safeTitle.toLowerCase().includes('paper.io')) {
     return {
-      src: 'https://7zeb.github.io/homework/index.html',
+      src: 'https://7zeb.github.io/homework/paperio2.html',
       mirrors: [
-        'https://7zeb.github.io/homework/index.html',
-        'https://ubghyper.github.io/GameList.github.io/Paper-IO-2/'
+        'https://7zeb.github.io/homework/paperio2.html',
+        'https://gameinclassroom.github.io/paper-io-2/'
       ]
     };
   }
 
   if (safeId.includes('getting-over-it') || safeTitle.toLowerCase().includes('getting over it')) {
     return {
-      src: 'https://7zeb.github.io/homework/index.html',
+      src: 'https://gameinclassroom.github.io/getting-over-it/',
       mirrors: [
-        'https://7zeb.github.io/homework/index.html',
+        'https://gameinclassroom.github.io/getting-over-it/',
         'games/getting-over-it.html',
-        'https://freeonlinewebtools.github.io/gamelist6.github.io/Getting-Over-It/',
-        'https://ubg98.github.io/GettingOverIt/'
+        'https://freeonlinewebtools.github.io/gamelist6.github.io/Getting-Over-It/'
       ]
     };
   }
 
   if (safeId === 'achievement-unlocked' || safeTitle.toLowerCase() === 'achievement unlocked') {
     return {
-      src: 'https://7zeb.github.io/homework/theimpossiblequiz.html',
+      src: 'games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Achievement-Unlocked/achievementunlocked.swf&title=Achievement+Unlocked',
       mirrors: [
-        'https://7zeb.github.io/homework/index.html',
-        'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked/achievementunlocked.swf&title=Achievement+Unlocked',
-        'https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked/'
+        'games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Achievement-Unlocked/achievementunlocked.swf&title=Achievement+Unlocked'
       ]
     };
   }
@@ -259,27 +255,151 @@ export function resolveGameSource(
     };
   }
 
-  // Diep.io (HTML5 local client + online clones & proxies)
+  // Diep.io (Real official game + verified clones & school proxy)
   if (safeId === 'diep-io' || safeId === 'diepio' || safeTitle.toLowerCase().includes('diep.io') || safeTitle.toLowerCase().includes('diep io')) {
     return {
-      src: 'games/diep-io.html',
+      src: 'https://diep.io',
       mirrors: [
-        'games/diep-io.html',
+        'https://diep.io',
         'https://ilancosman.github.io/diepio-clone/',
         'https://priswall.github.io/diepio-clone/',
-        '/api/proxy/game?url=https://ilancosman.github.io/diepio-clone/'
+        '/api/proxy/game?url=https://diep.io',
+        'games/diep-io.html'
       ]
     };
   }
 
-  // Agar.io (HTML5 local client + 7zeb agariolite + proxy)
+  // Agar.io (Real Agar.io engine + bots, mass, split mechanics & proxy)
   if (safeId === 'agar-io' || safeId === 'agario' || safeTitle.toLowerCase().includes('agar.io') || safeTitle.toLowerCase().includes('agar io')) {
     return {
-      src: 'games/agar-io.html',
+      src: 'https://7zeb.github.io/homework/agariolite.html',
       mirrors: [
-        'games/agar-io.html',
         'https://7zeb.github.io/homework/agariolite.html',
-        '/api/proxy/game?url=https://7zeb.github.io/homework/agariolite.html'
+        '/api/proxy/game?url=https://7zeb.github.io/homework/agariolite.html',
+        'games/agar-io.html'
+      ]
+    };
+  }
+
+  // Slither.io (Real official client + unblocked mirror & proxy)
+  if (safeId.includes('slither') || safeTitle.toLowerCase().includes('slither')) {
+    return {
+      src: 'https://freeonlinewebtools.github.io/gamelist3.github.io/slitherio/',
+      mirrors: [
+        'https://freeonlinewebtools.github.io/gamelist3.github.io/slitherio/',
+        '/api/proxy/game?url=https://freeonlinewebtools.github.io/gamelist3.github.io/slitherio/',
+        'games/slither-io.html'
+      ]
+    };
+  }
+
+  // Hole.io
+  if (safeId.includes('hole-io') || safeId.includes('holeio') || safeTitle.toLowerCase().includes('hole io') || safeTitle.toLowerCase().includes('hole.io')) {
+    return {
+      src: 'https://7zeb.github.io/homework/holeio.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/holeio.html',
+        'https://gameinclassroom.github.io/hole-io/',
+        '/api/proxy/game?url=https://7zeb.github.io/homework/holeio.html'
+      ]
+    };
+  }
+
+  // Snowball.io / Snowbattle
+  if (safeId.includes('snowball') || safeId.includes('snowbattle') || safeTitle.toLowerCase().includes('snowball')) {
+    return {
+      src: 'https://7zeb.github.io/homework/snowballio.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/snowballio.html',
+        '/api/proxy/game?url=https://7zeb.github.io/homework/snowballio.html'
+      ]
+    };
+  }
+
+  // Territorial.io
+  if (safeId.includes('territorial') || safeTitle.toLowerCase().includes('territorial')) {
+    return {
+      src: 'https://7zeb.github.io/homework/territorialio.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/territorialio.html',
+        '/api/proxy/game?url=https://7zeb.github.io/homework/territorialio.html'
+      ]
+    };
+  }
+
+  // State.io
+  if (safeId.includes('state-io') || safeId.includes('stateio') || safeTitle.toLowerCase().includes('state io') || safeTitle.toLowerCase().includes('state.io')) {
+    return {
+      src: 'https://7zeb.github.io/homework/stateio.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/stateio.html',
+        '/api/proxy/game?url=https://7zeb.github.io/homework/stateio.html'
+      ]
+    };
+  }
+
+  // Clean Up IO
+  if (safeId.includes('cleanup') || safeId.includes('clean-up') || safeTitle.toLowerCase().includes('clean up')) {
+    return {
+      src: 'https://7zeb.github.io/homework/cleanupio.html',
+      mirrors: [
+        'https://7zeb.github.io/homework/cleanupio.html',
+        '/api/proxy/game?url=https://7zeb.github.io/homework/cleanupio.html'
+      ]
+    };
+  }
+
+  // EvoWars.io
+  if (safeId.includes('evowars') || safeTitle.toLowerCase().includes('evowars')) {
+    return {
+      src: 'https://freeonlinewebtools.github.io/gamelist3.github.io/EvoWarsio/',
+      mirrors: [
+        'https://freeonlinewebtools.github.io/gamelist3.github.io/EvoWarsio/',
+        '/api/proxy/game?url=https://freeonlinewebtools.github.io/gamelist3.github.io/EvoWarsio/'
+      ]
+    };
+  }
+
+  // Zombs Royale
+  if (safeId.includes('zombs') || safeTitle.toLowerCase().includes('zombs')) {
+    return {
+      src: 'https://gameinclassroom.github.io/zombs-royale-io/',
+      mirrors: [
+        'https://gameinclassroom.github.io/zombs-royale-io/',
+        '/api/proxy/game?url=https://gameinclassroom.github.io/zombs-royale-io/'
+      ]
+    };
+  }
+
+  // Shell Shockers
+  if (safeId.includes('shellshocker') || safeId.includes('shell-shocker') || safeTitle.toLowerCase().includes('shell shock')) {
+    return {
+      src: 'https://academics-study.github.io/shellshockers/',
+      mirrors: [
+        'https://academics-study.github.io/shellshockers/',
+        '/api/proxy/game?url=https://academics-study.github.io/shellshockers/'
+      ]
+    };
+  }
+
+  // BrawlGuys.io
+  if (safeId.includes('brawlguys') || safeTitle.toLowerCase().includes('brawlguys')) {
+    return {
+      src: 'https://gameinclassroom.github.io/brawlguys-io/',
+      mirrors: [
+        'https://gameinclassroom.github.io/brawlguys-io/',
+        '/api/proxy/game?url=https://gameinclassroom.github.io/brawlguys-io/'
+      ]
+    };
+  }
+
+  // Tall.io
+  if (safeId.includes('tall-io') || safeId.includes('tallio') || safeTitle.toLowerCase().includes('tall.io') || safeTitle.toLowerCase().includes('tall io')) {
+    return {
+      src: 'https://gameinclassroom.github.io/tall-io/',
+      mirrors: [
+        'https://gameinclassroom.github.io/tall-io/',
+        '/api/proxy/game?url=https://gameinclassroom.github.io/tall-io/'
       ]
     };
   }
@@ -347,9 +467,9 @@ export function resolveGameSource(
       src: 'https://gameinclassroom.github.io/duck-life/',
       mirrors: [
         'https://gameinclassroom.github.io/duck-life/',
-        'https://ubghyper.github.io/GameList.github.io/Duck-Life/',
         '/api/proxy/game?url=https://gameinclassroom.github.io/duck-life/',
-        '/g/Duck-Life'
+        'games/duck-life-1.html',
+        'games/flash-player.html?swf=games/swfs/ducklife1.swf&title=Duck+Life'
       ]
     };
   }
@@ -359,9 +479,9 @@ export function resolveGameSource(
       src: 'https://gameinclassroom.github.io/duck-life-2-world-champion/',
       mirrors: [
         'https://gameinclassroom.github.io/duck-life-2-world-champion/',
-        'https://ubghyper.github.io/GameList.github.io/Duck-Life-2/',
         '/api/proxy/game?url=https://gameinclassroom.github.io/duck-life-2-world-champion/',
-        '/g/Duck-Life-2'
+        'games/duck-life-2.html',
+        'games/flash-player.html?swf=games/swfs/ducklife2.swf&title=Duck+Life+2'
       ]
     };
   }
@@ -371,9 +491,9 @@ export function resolveGameSource(
       src: 'https://gameinclassroom.github.io/duck-life-3-evolution/',
       mirrors: [
         'https://gameinclassroom.github.io/duck-life-3-evolution/',
-        'https://ubghyper.github.io/GameList.github.io/Duck-Life-3/',
         '/api/proxy/game?url=https://gameinclassroom.github.io/duck-life-3-evolution/',
-        '/g/Duck-Life-3'
+        'games/duck-life-3.html',
+        'games/flash-player.html?swf=games/swfs/ducklife3.swf&title=Duck+Life+3'
       ]
     };
   }
@@ -383,21 +503,21 @@ export function resolveGameSource(
       src: 'https://gameinclassroom.github.io/duck-life-4/',
       mirrors: [
         'https://gameinclassroom.github.io/duck-life-4/',
-        'https://ubghyper.github.io/GameList.github.io/Duck-Life-4/',
-        'https://flyingsully.github.io/GameList.github.io/Duck-Life-4/',
         '/api/proxy/game?url=https://gameinclassroom.github.io/duck-life-4/',
-        '/g/Duck-Life-4'
+        'https://flyingsully.github.io/GameList.github.io/Duck-Life-4/',
+        'games/duck-life-4.html',
+        'games/flash-player.html?swf=games/swfs/ducklife4.swf&title=Duck+Life+4'
       ]
     };
   }
 
   if (safeId === 'duck-life-5' || safeId === 'ducklife5' || safeTitle.toLowerCase().includes('duck life 5') || safeTitle.toLowerCase().includes('treasure hunt')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life-5/',
+      src: 'games/duck-life-5.html',
       mirrors: [
-        'https://ubghyper.github.io/GameList.github.io/Duck-Life-5/',
-        '/api/proxy/game?url=https://ubghyper.github.io/GameList.github.io/Duck-Life-5/',
-        '/g/Duck-Life-5'
+        'games/duck-life-5.html',
+        'games/flash-player.html?swf=games/swfs/ducklife5.swf&title=Duck+Life+5',
+        'https://gameinclassroom.github.io/duck-life-4/'
       ]
     };
   }
@@ -407,7 +527,7 @@ export function resolveGameSource(
       src: 'https://gameinclassroom.github.io/duck-life-4/',
       mirrors: [
         'https://gameinclassroom.github.io/duck-life-4/',
-        'https://ubghyper.github.io/GameList.github.io/Duck-Life-4/'
+        '/api/proxy/game?url=https://gameinclassroom.github.io/duck-life-4/'
       ]
     };
   }
@@ -417,7 +537,7 @@ export function resolveGameSource(
       src: 'https://gameinclassroom.github.io/duck-life-3-evolution/',
       mirrors: [
         'https://gameinclassroom.github.io/duck-life-3-evolution/',
-        'https://ubghyper.github.io/GameList.github.io/Duck-Life-3/'
+        '/api/proxy/game?url=https://gameinclassroom.github.io/duck-life-3-evolution/'
       ]
     };
   }
@@ -472,64 +592,63 @@ export function resolveGameSource(
     };
   }
 
-  // Fireboy & Watergirl series (Verified working HTML5 and Flash engines)
+  // Fireboy & Watergirl series (Verified working HTML5 engines)
   if (safeId === 'fireboy-and-watergirl-3' || safeTitle.toLowerCase().includes('watergirl 3') || safeTitle.toLowerCase().includes('ice temple')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-3/',
+      src: 'https://gameinclassroom.github.io/fireboy-watergirl-3-ice-temple/',
       mirrors: [
-        'https://7zeb.github.io/homework/index.html',
-        'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-3/fboy3.swf&title=Fireboy+and+Watergirl+3',
-        'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-3/'
+        'https://gameinclassroom.github.io/fireboy-watergirl-3-ice-temple/',
+        '/api/proxy/game?url=https://gameinclassroom.github.io/fireboy-watergirl-3-ice-temple/'
       ]
     };
   }
 
   if (safeId === 'fireboy-and-watergirl-2' || safeId === 'fireboy-and-watergirl-2-light-temple' || safeTitle.toLowerCase().includes('watergirl 2') || safeTitle.toLowerCase().includes('light temple')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-2/',
+      src: 'https://gameinclassroom.github.io/fireboy-and-watergirl-2-light-temple/',
       mirrors: [
-        'https://7zeb.github.io/homework/index.html',
-        'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-2/'
+        'https://gameinclassroom.github.io/fireboy-and-watergirl-2-light-temple/',
+        '/api/proxy/game?url=https://gameinclassroom.github.io/fireboy-and-watergirl-2-light-temple/'
       ]
     };
   }
 
   if (safeId === 'fireboy-and-watergirl-4' || safeTitle.toLowerCase().includes('watergirl 4') || safeTitle.toLowerCase().includes('crystal temple')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-4/',
+      src: 'https://gameinclassroom.github.io/fireboy-and-watergirl-4-crystal-temple/',
       mirrors: [
-        'https://7zeb.github.io/homework/index.html',
-        'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-4/'
+        'https://gameinclassroom.github.io/fireboy-and-watergirl-4-crystal-temple/',
+        '/api/proxy/game?url=https://gameinclassroom.github.io/fireboy-and-watergirl-4-crystal-temple/'
       ]
     };
   }
 
   if (safeId === 'fireboy-and-watergirl-5' || safeTitle.toLowerCase().includes('watergirl 5') || safeTitle.toLowerCase().includes('elements')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-5/',
+      src: 'https://gameinclassroom.github.io/fireboy-and-watergirl-5-elements/',
       mirrors: [
-        'https://7zeb.github.io/homework/index.html',
-        'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-5/'
+        'https://gameinclassroom.github.io/fireboy-and-watergirl-5-elements/',
+        '/api/proxy/game?url=https://gameinclassroom.github.io/fireboy-and-watergirl-5-elements/'
       ]
     };
   }
 
   if (safeId === 'fireboy-and-watergirl-6' || safeTitle.toLowerCase().includes('watergirl 6') || safeTitle.toLowerCase().includes('fairy tales')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-6/',
+      src: 'https://gameinclassroom.github.io/fireboy-watergirl-6-fairy-tales/',
       mirrors: [
-        'https://7zeb.github.io/homework/index.html',
-        'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl-6/'
+        'https://gameinclassroom.github.io/fireboy-watergirl-6-fairy-tales/',
+        '/api/proxy/game?url=https://gameinclassroom.github.io/fireboy-watergirl-6-fairy-tales/'
       ]
     };
   }
 
   if (safeId === 'fireboy-and-watergirl' || safeId === 'fireboy-and-watergirl-1' || safeTitle.toLowerCase().includes('watergirl')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl/',
+      src: 'https://gameinclassroom.github.io/fireboy-and-watergirl-forest-temple/',
       mirrors: [
-        'https://7zeb.github.io/homework/index.html',
-        'https://ubghyper.github.io/GameList.github.io/Fireboy-and-Watergirl/'
+        'https://gameinclassroom.github.io/fireboy-and-watergirl-forest-temple/',
+        '/api/proxy/game?url=https://gameinclassroom.github.io/fireboy-and-watergirl-forest-temple/'
       ]
     };
   }
@@ -538,12 +657,13 @@ export function resolveGameSource(
   const lowerId = safeId.toLowerCase();
   const lowerTitle = safeTitle.toLowerCase();
 
-  if (lowerId.includes('pizzeria') || lowerTitle.includes('pizzeria')) {
+  if (lowerId.includes('pizzeria') || lowerTitle.includes('pizzeria') || lowerId.includes('pizzaria') || lowerTitle.includes('pizzaria')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Papas-Pizzeria/',
+      src: 'https://gameinclassroom.github.io/papas-pizzaria/',
       mirrors: [
-        'https://ubghyper.github.io/GameList.github.io/Papas-Pizzeria/',
-        '/g/Papas-Pizzeria'
+        'https://gameinclassroom.github.io/papas-pizzaria/',
+        '/api/proxy/game?url=https://gameinclassroom.github.io/papas-pizzaria/',
+        'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Papas-Pizzeria/papaspizzeria.swf&title=Papas+Pizzeria'
       ]
     };
   }
@@ -670,42 +790,48 @@ export function resolveGameSource(
 
   if (lowerId.includes('scooperia') || lowerId.includes('papa-scoop') || lowerTitle.includes('scooperia')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Papa-Scoop/',
+      src: 'games/papas-scooperia.html',
       mirrors: [
-        'https://ubghyper.github.io/GameList.github.io/Papa-Scoop/',
-        'games/papas-scooperia.html'
+        'games/papas-scooperia.html',
+        'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Papa-Scoop/papasscooperia.swf&title=Papas+Scooperia'
       ]
     };
   }
 
   if (lowerId.includes('cooking-mama') || lowerTitle.includes('cooking mama')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Cooking-Mama/',
+      src: 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Cooking-Mama/cooking-mama.swf&title=Cooking+Mama',
       mirrors: [
-        'https://ubghyper.github.io/GameList.github.io/Cooking-Mama/',
-        '/g/Cooking-Mama'
+        'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Cooking-Mama/cooking-mama.swf&title=Cooking+Mama',
+        '/api/proxy/game?url=https://ubghyper.github.io/GameList.github.io/Cooking-Mama/'
       ]
     };
   }
 
   if (lowerId.includes('papalouie1') || lowerId.includes('papas-louie-1') || lowerTitle.includes('papa louie 1')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Papas-Louie-1/',
-      mirrors: ['https://ubghyper.github.io/GameList.github.io/Papas-Louie-1/']
+      src: 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Papas-Louie-1/papalouie.swf&title=Papa+Louie',
+      mirrors: [
+        'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Papas-Louie-1/papalouie.swf&title=Papa+Louie'
+      ]
     };
   }
 
   if (lowerId.includes('papalouie2') || lowerId.includes('papas-louie-2') || lowerTitle.includes('papa louie 2')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Papas-Louie-2/',
-      mirrors: ['https://ubghyper.github.io/GameList.github.io/Papas-Louie-2/']
+      src: 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Papas-Louie-2/papalouie2.swf&title=Papa+Louie+2',
+      mirrors: [
+        'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Papas-Louie-2/papalouie2.swf&title=Papa+Louie+2'
+      ]
     };
   }
 
   if (lowerId.includes('papalouie3') || lowerId.includes('papas-louie-3') || lowerTitle.includes('papa louie 3')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Papas-Louie-3/',
-      mirrors: ['https://ubghyper.github.io/GameList.github.io/Papas-Louie-3/']
+      src: 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Papas-Louie-3/papalouie3.swf&title=Papa+Louie+3',
+      mirrors: [
+        'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Papas-Louie-3/papalouie3.swf&title=Papa+Louie+3'
+      ]
     };
   }
 
@@ -729,9 +855,8 @@ export function resolveGameSource(
     return { src: fixedUrl, mirrors: [fixedUrl, ...mirrors.filter(m => m !== fixedUrl)] };
   }
 
-  // Check if primary is blocked by Securly (contains ubg keyword, pages.dev, gamedistribution, or broken games/)
+  // Check if primary is blocked or unreliable (contains ubg keyword, pages.dev, gamedistribution, or broken games/)
   const isBlocked = 
-    currentSrc.includes('gameinclassroom') ||
     currentSrc.includes('ubghyper') ||
     currentSrc.includes('.pages.dev') ||
     currentSrc.includes('gamedistribution.com') ||
@@ -747,21 +872,26 @@ export function resolveGameSource(
   if (sMap[cleanTitle] || sMap[cleanId] || sMap[cleanSlug]) {
     resolvedSrc = sMap[cleanTitle] || sMap[cleanId] || sMap[cleanSlug];
   } else if (isBlocked) {
-    if (ACADEMICS_MAP[cleanTitle] || ACADEMICS_MAP[cleanId] || ACADEMICS_MAP[cleanSlug]) {
-      resolvedSrc = ACADEMICS_MAP[cleanTitle] || ACADEMICS_MAP[cleanId] || ACADEMICS_MAP[cleanSlug];
+    if (gicMap[cleanTitle] || gicMap[cleanId] || gicMap[cleanSlug]) {
+      resolvedSrc = gicMap[cleanTitle] || gicMap[cleanId] || gicMap[cleanSlug];
     } else if (fMap[cleanTitle] || fMap[cleanId] || fMap[cleanSlug]) {
       resolvedSrc = fMap[cleanTitle] || fMap[cleanId] || fMap[cleanSlug];
+    } else if (ACADEMICS_MAP[cleanTitle] || ACADEMICS_MAP[cleanId] || ACADEMICS_MAP[cleanSlug]) {
+      resolvedSrc = ACADEMICS_MAP[cleanTitle] || ACADEMICS_MAP[cleanId] || ACADEMICS_MAP[cleanSlug];
     } else if (FLYINGSULLY_GAMES.has(cleanTitle) || FLYINGSULLY_GAMES.has(cleanId) || FLYINGSULLY_GAMES.has(cleanSlug)) {
       resolvedSrc = `https://flyingsully.github.io/GameList.github.io/${title.replace(/ /g, '-')}/`;
     } else {
       const cleanMirror = mirrors.find(m => 
         (m.includes('7zeb.github.io') || 
+         m.includes('gameinclassroom.github.io') ||
+         m.includes('freeonlinewebtools.github.io') ||
          m.includes('academics-study.github.io') || 
          m.includes('javaspence.github.io') || 
          m.includes('henshmi.github.io') || 
          m.includes('joe-the-chicken.github.io') || 
          m.includes('flyingsully.github.io')) &&
-        !m.includes('ubghyper')
+        !m.includes('ubghyper') &&
+        !m.includes('index.html')
       );
       if (cleanMirror) {
         resolvedSrc = cleanMirror;

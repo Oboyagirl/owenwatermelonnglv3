@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Game } from '../types/game';
 import { DEFAULT_GAMES, formatGameIframe, URL_OVERRIDES, getCanonicalGameKey } from '../data/defaultGames';
+import { resolveGameSource } from '../data/unblockedResolver';
 
 const OVERRIDES_STORAGE_KEY = 'owen_game_overrides_v2';
 const FAVORITES_KEY = 'owen_watermelon_v3_favorites';
@@ -72,22 +73,19 @@ function sanitizeGame(game: Game): Game {
   let iframeSrc = game.iframeSrc || '';
   if (URL_OVERRIDES[game.id]) {
     iframeSrc = URL_OVERRIDES[game.id];
-  } else if (iframeSrc.startsWith('/g/')) {
-    const slug = iframeSrc.replace(/^\/g\//, '').replace(/\/$/, '');
-    iframeSrc = `https://ubghyper.github.io/GameList.github.io/${slug}/`;
-  } else if (iframeSrc.includes('.pages.dev')) {
-    const match = iframeSrc.match(/https:\/\/([^.]+)\.pages\.dev/);
-    if (match) {
-      iframeSrc = `https://ubghyper.github.io/GameList.github.io/${match[1]}/`;
-    }
   } else if (iframeSrc && iframeSrc.startsWith('/games/')) {
     iframeSrc = iframeSrc.slice(1);
   }
+
+  const resolved = resolveGameSource(game.id, game.title, iframeSrc, game.mirrors);
+  iframeSrc = resolved.src;
+  const mirrors = resolved.mirrors;
 
   return { 
     ...game, 
     thumbnail: thumb, 
     iframeSrc, 
+    mirrors,
     sandbox: undefined,
     iframeCode: formatGameIframe(game.title, iframeSrc),
     source: game.source || 'unblocked',

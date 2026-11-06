@@ -62,8 +62,8 @@
         player.style.height = "100%";
         player.load("swfs/ducklife5.swf");
       } catch (err) {
-        console.error("Local Ruffle load failed, falling back to mirror", err);
-        window.location.replace("https://ubghyper.github.io/GameList.github.io/Duck-Life-5/");
+        console.error("Local Ruffle load failed, falling back to flash player wrapper", err);
+        window.location.replace("flash-player.html?swf=swfs/ducklife5.swf&title=Duck+Life+5");
       }
     });
   </script>
