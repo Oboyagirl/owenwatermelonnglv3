@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { REAL_MUSIC_CATALOG, MusicTrack } from '../data/musicData';
 import { resolveAssetUrl } from '../utils/assetUrl';
+import albumSourceUrls from '../data/albumSourceUrls.json';
 
 export interface CustomTrack extends MusicTrack {
   isCustom?: boolean;
@@ -221,6 +222,31 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           } catch {}
         } else {
           const cleanName = target.audioSrc.replace(/^(\.\/|\/)+/, '').replace(/^music\//, '');
+          const remoteFallback = (albumSourceUrls as Record<string, string>)[cleanName];
+          if (remoteFallback) {
+            const isStatic = typeof window !== 'undefined' && 
+              (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:');
+            const proxied = isStatic ? remoteFallback : `/api/music/proxy?url=${encodeURIComponent(remoteFallback)}`;
+            try {
+              audio.src = new URL(proxied, window.location.href).href;
+              await audio.play();
+              setIsPlaying(true);
+              setAudioError(null);
+              currentTrackIdRef.current = target.id;
+              updateMediaSession(target);
+              return;
+            } catch {
+              try {
+                audio.src = new URL(remoteFallback, window.location.href).href;
+                await audio.play();
+                setIsPlaying(true);
+                setAudioError(null);
+                currentTrackIdRef.current = target.id;
+                updateMediaSession(target);
+                return;
+              } catch {}
+            }
+          }
           const fallbackHref = new URL(`./music/${cleanName}`, window.location.href).href;
           if (audio.src !== fallbackHref) {
             audio.src = fallbackHref;
@@ -522,6 +548,22 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             const proxyHref = new URL(proxyUrl, window.location.origin).href;
             if (audio.src !== proxyHref) {
               console.log("Direct remote failed, retrying via same-origin proxy:", activeTrack.title);
+              audio.src = proxyHref;
+              if (isPlaying) {
+                audio.play().catch(() => {});
+              }
+              return;
+            }
+          }
+
+          // If local track audio failed, try streaming from archive.org remote source
+          const cleanName = activeTrack.audioSrc.replace(/^(\.\/|\/)+/, '').replace(/^music\//, '');
+          const fallbackRemote = (albumSourceUrls as Record<string, string>)[cleanName];
+          if (fallbackRemote) {
+            const proxyUrl = `/api/music/proxy?url=${encodeURIComponent(fallbackRemote)}`;
+            const proxyHref = new URL(proxyUrl, window.location.origin).href;
+            if (audio.src !== proxyHref) {
+              console.log("Local audio failed, streaming from remote fallback:", activeTrack.title);
               audio.src = proxyHref;
               if (isPlaying) {
                 audio.play().catch(() => {});

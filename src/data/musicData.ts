@@ -850,10 +850,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 88,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "./music/tyler_cmiygl_01.mp3",
+    "audioSrc": "https://archive.org/download/call-me-if-you-get-lost_20250821/CALL%20ME%20IF%20YOU%20GET%20LOST_%20The%20Estate%20Sale%20%5BAlbum%5D/01%20-%20SIR%20BAUDELAIRE%20feat.%20DJ%20Drama.mp3",
     "albumId": "album-cmiygl",
     "trackNumber": 1,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-cmiygl-track-2",
@@ -865,10 +865,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 146,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "./music/tyler_cmiygl_02.mp3",
+    "audioSrc": "https://archive.org/download/call-me-if-you-get-lost_20250821/CALL%20ME%20IF%20YOU%20GET%20LOST_%20The%20Estate%20Sale%20%5BAlbum%5D/02%20-%20CORSO.mp3",
     "albumId": "album-cmiygl",
     "trackNumber": 2,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-cmiygl-track-3",
@@ -880,10 +880,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 130,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "./music/tyler_cmiygl_03.mp3",
+    "audioSrc": "https://archive.org/download/call-me-if-you-get-lost_20250821/CALL%20ME%20IF%20YOU%20GET%20LOST_%20The%20Estate%20Sale%20%5BAlbum%5D/03%20-%20LEMONHEAD%20feat.%2042%20Dugg.mp3",
     "albumId": "album-cmiygl",
     "trackNumber": 3,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-cmiygl-track-4",
@@ -895,10 +895,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 121,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "./music/tyler_cmiygl_04.mp3",
+    "audioSrc": "https://archive.org/download/call-me-if-you-get-lost_20250821/CALL%20ME%20IF%20YOU%20GET%20LOST_%20The%20Estate%20Sale%20%5BAlbum%5D/04%20-%20WUSYANAME%20feat.%20YoungBoy%20Never%20Broke%20Again%20%26%20Ty%20Dolla%20%24ign.mp3",
     "albumId": "album-cmiygl",
     "trackNumber": 4,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-cmiygl-track-5",
@@ -910,10 +910,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 138,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "./music/tyler_cmiygl_05.mp3",
+    "audioSrc": "https://archive.org/download/call-me-if-you-get-lost_20250821/CALL%20ME%20IF%20YOU%20GET%20LOST_%20The%20Estate%20Sale%20%5BAlbum%5D/05%20-%20LUMBERJACK.mp3",
     "albumId": "album-cmiygl",
     "trackNumber": 5,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-cmiygl-track-6",
@@ -925,10 +925,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 155,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "./music/tyler_cmiygl_06.mp3",
+    "audioSrc": "https://archive.org/download/call-me-if-you-get-lost_20250821/CALL%20ME%20IF%20YOU%20GET%20LOST_%20The%20Estate%20Sale%20%5BAlbum%5D/06%20-%20HOT%20WIND%20BLOWS%20feat.%20Lil%20Wayne.mp3",
     "albumId": "album-cmiygl",
     "trackNumber": 6,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-cmiygl-track-7",
@@ -940,10 +940,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 223,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "./music/tyler_cmiygl_07.mp3",
+    "audioSrc": "https://archive.org/download/call-me-if-you-get-lost_20250821/CALL%20ME%20IF%20YOU%20GET%20LOST_%20The%20Estate%20Sale%20%5BAlbum%5D/07%20-%20MASSA.mp3",
     "albumId": "album-cmiygl",
     "trackNumber": 7,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-cmiygl-track-8",
@@ -955,10 +955,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 229,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "./music/tyler_cmiygl_08.mp3",
+    "audioSrc": "https://archive.org/download/call-me-if-you-get-lost_20250821/CALL%20ME%20IF%20YOU%20GET%20LOST_%20The%20Estate%20Sale%20%5BAlbum%5D/08%20-%20RUNITUP%20feat.%20Teezo%20Touchdown.mp3",
     "albumId": "album-cmiygl",
     "trackNumber": 8,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-cmiygl-track-9",
@@ -970,10 +970,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 175,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "./music/tyler_cmiygl_09.mp3",
+    "audioSrc": "https://archive.org/download/call-me-if-you-get-lost_20250821/CALL%20ME%20IF%20YOU%20GET%20LOST_%20The%20Estate%20Sale%20%5BAlbum%5D/09%20-%20MANIFESTO%20feat.%20Domo%20Genesis.mp3",
     "albumId": "album-cmiygl",
     "trackNumber": 9,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-cmiygl-track-10",
@@ -985,10 +985,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 588,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "./music/tyler_cmiygl_10.mp3",
+    "audioSrc": "https://archive.org/download/call-me-if-you-get-lost_20250821/CALL%20ME%20IF%20YOU%20GET%20LOST_%20The%20Estate%20Sale%20%5BAlbum%5D/10%20-%20SWEET%20_%20I%20THOUGHT%20YOU%20WANTED%20TO%20DANCE%20feat.%20Brent%20Faiyaz%20%26%20Fana%20Hues.mp3",
     "albumId": "album-cmiygl",
     "trackNumber": 10,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-cmiygl-track-11",
@@ -1000,10 +1000,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 70,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "./music/tyler_cmiygl_11.mp3",
+    "audioSrc": "https://archive.org/download/call-me-if-you-get-lost_20250821/CALL%20ME%20IF%20YOU%20GET%20LOST_%20The%20Estate%20Sale%20%5BAlbum%5D/11%20-%20MOMMA%20TALK.mp3",
     "albumId": "album-cmiygl",
     "trackNumber": 11,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-cmiygl-track-12",
@@ -1015,10 +1015,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 203,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "./music/tyler_cmiygl_12.mp3",
+    "audioSrc": "https://archive.org/download/call-me-if-you-get-lost_20250821/CALL%20ME%20IF%20YOU%20GET%20LOST_%20The%20Estate%20Sale%20%5BAlbum%5D/12%20-%20RISE!%20feat.%20DAISY%20WORLD.mp3",
     "albumId": "album-cmiygl",
     "trackNumber": 12,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-cmiygl-track-13",
@@ -1030,10 +1030,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 161,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "./music/tyler_cmiygl_13.mp3",
+    "audioSrc": "https://archive.org/download/call-me-if-you-get-lost_20250821/CALL%20ME%20IF%20YOU%20GET%20LOST_%20The%20Estate%20Sale%20%5BAlbum%5D/21%20-%20DOGTOOTH.mp3",
     "albumId": "album-cmiygl",
     "trackNumber": 13,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-cmiygl-track-14",
@@ -1045,10 +1045,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 146,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "./music/tyler_cmiygl_14.mp3",
+    "audioSrc": "https://archive.org/download/call-me-if-you-get-lost_20250821/CALL%20ME%20IF%20YOU%20GET%20LOST_%20The%20Estate%20Sale%20%5BAlbum%5D/14%20-%20JUGGERNAUT%20feat.%20Lil%20Uzi%20Vert%20%26%20Pharrell%20Williams.mp3",
     "albumId": "album-cmiygl",
     "trackNumber": 14,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-cmiygl-track-15",
@@ -1075,10 +1075,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 177,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "./music/tyler_cmiygl_16.mp3",
+    "audioSrc": "https://archive.org/download/call-me-if-you-get-lost_20250821/CALL%20ME%20IF%20YOU%20GET%20LOST_%20The%20Estate%20Sale%20%5BAlbum%5D/16%20-%20SAFARI.mp3",
     "albumId": "album-cmiygl",
     "trackNumber": 16,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-trick-track-1",
@@ -1225,10 +1225,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 124,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "./music/alex_g_trick_10.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Trick/10%20-%20So.mp3",
     "albumId": "album-trick",
     "trackNumber": 10,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-trick-track-11",
@@ -1240,10 +1240,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 124,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "./music/alex_g_trick_11.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Trick/11%20-%20Mary.mp3",
     "albumId": "album-trick",
     "trackNumber": 11,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-trick-track-12",
@@ -1255,10 +1255,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 194,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "./music/alex_g_trick_12.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Trick/12%20-%20Change.mp3",
     "albumId": "album-trick",
     "trackNumber": 12,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-trick-track-13",
@@ -1270,10 +1270,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 88,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "./music/alex_g_trick_13.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Trick/13%20-%20Clouds.mp3",
     "albumId": "album-trick",
     "trackNumber": 13,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-trick-track-14",
@@ -1930,10 +1930,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 320,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "./music/kanye_tlop_01.mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/01.%20Ultralight%20Beam%20(Feat.%20Chance%20The%20Rapper%2C%20The-Dream%2C%20Kelly%20Price%20%26%20Kirk%20Franklin).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 1,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-the-life-of-pablo-track-2",
@@ -1945,10 +1945,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 135,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "./music/kanye_tlop_02.mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/02.%20Father%20Stretch%20My%20Hands%20Pt.%201%20(Feat.%20Kid%20Cudi).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 2,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-the-life-of-pablo-track-3",
@@ -1960,10 +1960,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 130,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "./music/kanye_tlop_03.mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/03.%20Pt.%202%20(Feat.%20Desiigner%20%26%20Caroline%20Shaw).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 3,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-the-life-of-pablo-track-4",
@@ -1975,10 +1975,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 196,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "./music/kanye_tlop_04.mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/04.%20Famous%20(Feat.%20Rihanna%20%26%20Swizz%20Beatz).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 4,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-the-life-of-pablo-track-5",
@@ -1990,10 +1990,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 147,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "./music/kanye_tlop_05.mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/05.%20Feedback.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 5,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-the-life-of-pablo-track-6",
@@ -2005,10 +2005,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 131,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "./music/kanye_tlop_06.mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/06.%20Low%20Lights.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 6,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-the-life-of-pablo-track-7",
@@ -2020,10 +2020,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 199,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "./music/kanye_tlop_07.mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/07.%20Highlights%20(Feat.%20Young%20Thug).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 7,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-the-life-of-pablo-track-8",
@@ -2035,10 +2035,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 123,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "./music/kanye_tlop_08.mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/08.%20Freestyle%204%20(Feat.%20Desiigner).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 8,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-the-life-of-pablo-track-9",
@@ -2050,10 +2050,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 44,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "./music/kanye_tlop_09.mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/09.%20I%20Love%20Kanye.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 9,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-the-life-of-pablo-track-10",
@@ -2065,10 +2065,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 181,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "./music/kanye_tlop_10.mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/10.%20Waves%20(Feat.%20Chris%20Brown%20%26%20Kid%20Cudi).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 10,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-the-life-of-pablo-track-11",
@@ -2080,10 +2080,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 236,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "./music/kanye_tlop_11.mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/11.%20FML%20(Feat.%20The%20Weeknd).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 11,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-the-life-of-pablo-track-12",
@@ -2095,10 +2095,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 251,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "./music/kanye_tlop_12.mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/12.%20Real%20Friends%20(Feat.%20Ty%20Dolla%20%24ign).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 12,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-the-life-of-pablo-track-13",
@@ -2110,10 +2110,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 301,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "./music/kanye_tlop_13.mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/13.%20Wolves%20(Feat.%20Vic%20Mensa%2C%20Sia%20%26%20Caroline%20Shaw).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 13,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-the-life-of-pablo-track-14",
@@ -2125,10 +2125,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 38,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "./music/kanye_tlop_14.mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/14.%20Frank's%20Track%20(Feat.%20Frank%20Ocean).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 14,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-the-life-of-pablo-track-15",
@@ -2155,10 +2155,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 323,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "./music/kanye_tlop_16.mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/16.%2030%20Hours%20(Feat.%20Andre%203000).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 16,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-the-life-of-pablo-track-17",
@@ -2170,10 +2170,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 374,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "./music/kanye_tlop_17.mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/17.%20No%20More%20Parties%20In%20L.A.%20(Feat.%20Kendrick%20Lamar).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 17,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-the-life-of-pablo-track-18",
@@ -2185,10 +2185,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 200,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "./music/kanye_tlop_18.mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/18.%20Facts%20(Charlie%20Heat%20Version).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 18,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-the-life-of-pablo-track-19",
@@ -2200,10 +2200,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 193,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "./music/kanye_tlop_19.mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/19.%20Fade%20(Feat.%20Post%20Malone%20%26%20Ty%20Dolla%20%24ign).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 19,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-the-life-of-pablo-track-20",
@@ -2230,10 +2230,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 378,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/kanye_808s_01.mp3",
+    "audioSrc": "https://archive.org/download/808s-heartbreak/Say%20You%20Will(MP3_320K).mp3",
     "albumId": "album-808s",
     "trackNumber": 1,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-808s-track-2",
@@ -2245,10 +2245,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 263,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/kanye_808s_02.mp3",
+    "audioSrc": "https://archive.org/download/808s-heartbreak/Welcome%20To%20Heartbreak-%20Kanye%20West(MP3_320K).mp3",
     "albumId": "album-808s",
     "trackNumber": 2,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-808s-track-3",
@@ -2260,10 +2260,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 211,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/kanye_808s_03.mp3",
+    "audioSrc": "https://archive.org/download/808s-heartbreak/Kanye%20West%20-%20Heartless(MP3_320K).mp3",
     "albumId": "album-808s",
     "trackNumber": 3,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-808s-track-4",
@@ -2275,10 +2275,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 238,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/kanye_808s_04.mp3",
+    "audioSrc": "https://archive.org/download/808s-heartbreak/Kanye%20West%20-%20Amazing(MP3_320K).mp3",
     "albumId": "album-808s",
     "trackNumber": 4,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-808s-track-5",
@@ -2290,10 +2290,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 270,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/kanye_808s_05.mp3",
+    "audioSrc": "https://archive.org/download/808s-heartbreak/Kanye%20West%20-%20Love%20Lockdown(MP3_320K).mp3",
     "albumId": "album-808s",
     "trackNumber": 5,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-808s-track-6",
@@ -2305,10 +2305,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 278,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/kanye_808s_06.mp3",
+    "audioSrc": "https://archive.org/download/808s-heartbreak/Paranoid(MP3_160K).mp3",
     "albumId": "album-808s",
     "trackNumber": 6,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-808s-track-7",
@@ -2320,10 +2320,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 274,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/kanye_808s_07.mp3",
+    "audioSrc": "https://archive.org/download/808s-heartbreak/RoboCop(MP3_160K).mp3",
     "albumId": "album-808s",
     "trackNumber": 7,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-808s-track-8",
@@ -2335,10 +2335,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 190,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/kanye_808s_08.mp3",
+    "audioSrc": "https://archive.org/download/808s-heartbreak/Street%20Lights(MP3_160K).mp3",
     "albumId": "album-808s",
     "trackNumber": 8,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-808s-track-9",
@@ -2350,10 +2350,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 239,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/kanye_808s_09.mp3",
+    "audioSrc": "https://archive.org/download/808s-heartbreak/Bad%20News(MP3_160K).mp3",
     "albumId": "album-808s",
     "trackNumber": 9,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-808s-track-10",
@@ -2365,10 +2365,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 258,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/kanye_808s_10.mp3",
+    "audioSrc": "https://archive.org/download/808s-heartbreak/See%20You%20In%20My%20Nightmares(MP3_160K).mp3",
     "albumId": "album-808s",
     "trackNumber": 10,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-808s-track-11",
@@ -2380,10 +2380,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 164,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/kanye_808s_11.mp3",
+    "audioSrc": "https://archive.org/download/808s-heartbreak/Coldest%20Winter(MP3_160K).mp3",
     "albumId": "album-808s",
     "trackNumber": 11,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-808s-track-12",
@@ -2395,10 +2395,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 363,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/kanye_808s_12.mp3",
+    "audioSrc": "https://archive.org/download/808s-heartbreak/Pinocchio%20Story(MP3_160K).mp3",
     "albumId": "album-808s",
     "trackNumber": 12,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-views-track-1",
@@ -2485,10 +2485,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 253,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "./music/drake_views_06.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/Weston%20Road%20Flows.mp3",
     "albumId": "album-views",
     "trackNumber": 6,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-views-track-7",
@@ -2500,10 +2500,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 333,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "./music/drake_views_07.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/Redemption.mp3",
     "albumId": "album-views",
     "trackNumber": 7,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-views-track-8",
@@ -2515,10 +2515,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 195,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "./music/drake_views_08.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/With%20You.mp3",
     "albumId": "album-views",
     "trackNumber": 8,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-views-track-9",
@@ -2530,10 +2530,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 290,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "./music/drake_views_09.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/Faithful.mp3",
     "albumId": "album-views",
     "trackNumber": 9,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-views-track-10",
@@ -2545,10 +2545,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 189,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "./music/drake_views_10.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/Still%20Here.mp3",
     "albumId": "album-views",
     "trackNumber": 10,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-views-track-11",
@@ -2560,10 +2560,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 245,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "./music/drake_views_11.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/Controlla.mp3",
     "albumId": "album-views",
     "trackNumber": 11,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-views-track-12",
@@ -2575,10 +2575,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 174,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "./music/drake_views_12.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/One%20Dance.mp3",
     "albumId": "album-views",
     "trackNumber": 12,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-views-track-13",
@@ -2590,10 +2590,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 220,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "./music/drake_views_13.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/Grammys.mp3",
     "albumId": "album-views",
     "trackNumber": 13,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-views-track-14",
@@ -2605,10 +2605,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 241,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "./music/drake_views_14.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/Childs%20Play.mp3",
     "albumId": "album-views",
     "trackNumber": 14,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-views-track-15",
@@ -2620,10 +2620,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 212,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "./music/drake_views_15.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/Pop%20Style.mp3",
     "albumId": "album-views",
     "trackNumber": 15,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-views-track-16",
@@ -2635,10 +2635,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 263,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "./music/drake_views_16.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/Too%20Good.mp3",
     "albumId": "album-views",
     "trackNumber": 16,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-views-track-17",
@@ -2650,10 +2650,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 106,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "./music/drake_views_17.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/Summers%20Over%20Interlude.mp3",
     "albumId": "album-views",
     "trackNumber": 17,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-views-track-18",
@@ -2665,10 +2665,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 238,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "./music/drake_views_18.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/Fire%20%26%20Desire.mp3",
     "albumId": "album-views",
     "trackNumber": 18,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-views-track-19",
@@ -2680,10 +2680,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 311,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "./music/drake_views_19.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/Views.mp3",
     "albumId": "album-views",
     "trackNumber": 19,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-views-track-20",
@@ -2695,10 +2695,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 267,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "./music/drake_views_20.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/Hotline%20Bling.mp3",
     "albumId": "album-views",
     "trackNumber": 20,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-damn-track-1",
@@ -2710,10 +2710,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 118,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/kendrick_damn_01.mp3",
+    "audioSrc": "https://archive.org/download/12-fear_202604/01%20BLOOD.m4a",
     "albumId": "album-damn",
     "trackNumber": 1,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-damn-track-2",
@@ -2725,10 +2725,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 185,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/kendrick_damn_02.mp3",
+    "audioSrc": "https://archive.org/download/12-fear_202604/02%20DNA.m4a",
     "albumId": "album-damn",
     "trackNumber": 2,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-damn-track-3",
@@ -2740,10 +2740,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 160,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/kendrick_damn_03.mp3",
+    "audioSrc": "https://archive.org/download/12-fear_202604/03%20YAH.m4a",
     "albumId": "album-damn",
     "trackNumber": 3,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-damn-track-4",
@@ -2755,10 +2755,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 208,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/kendrick_damn_04.mp3",
+    "audioSrc": "https://archive.org/download/12-fear_202604/04%20ELEMENT.m4a",
     "albumId": "album-damn",
     "trackNumber": 4,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-damn-track-5",
@@ -2770,10 +2770,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 214,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/kendrick_damn_05.mp3",
+    "audioSrc": "https://archive.org/download/12-fear_202604/05%20FEEL.m4a",
     "albumId": "album-damn",
     "trackNumber": 5,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-damn-track-6",
@@ -2785,10 +2785,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 227,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/kendrick_damn_06.mp3",
+    "audioSrc": "https://archive.org/download/12-fear_202604/06%20LOYALTY.m4a",
     "albumId": "album-damn",
     "trackNumber": 6,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-damn-track-7",
@@ -2800,10 +2800,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 275,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/kendrick_damn_07.mp3",
+    "audioSrc": "https://archive.org/download/12-fear_202604/07%20PRIDE.m4a",
     "albumId": "album-damn",
     "trackNumber": 7,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-damn-track-8",
@@ -2815,10 +2815,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 177,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/kendrick_damn_08.mp3",
+    "audioSrc": "https://archive.org/download/12-fear_202604/08%20HUMBLE.m4a",
     "albumId": "album-damn",
     "trackNumber": 8,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-damn-track-9",
@@ -2830,10 +2830,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 307,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/kendrick_damn_09.mp3",
+    "audioSrc": "https://archive.org/download/12-fear_202604/09%20LUST.m4a",
     "albumId": "album-damn",
     "trackNumber": 9,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-damn-track-10",
@@ -2845,10 +2845,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 213,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/kendrick_damn_10.mp3",
+    "audioSrc": "https://archive.org/download/12-fear_202604/10%20LOVE.m4a",
     "albumId": "album-damn",
     "trackNumber": 10,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-damn-track-11",
@@ -2860,10 +2860,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 254,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/kendrick_damn_11.mp3",
+    "audioSrc": "https://archive.org/download/12-fear_202604/11%20XXX.m4a",
     "albumId": "album-damn",
     "trackNumber": 11,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-damn-track-12",
@@ -2920,10 +2920,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 273,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "./music/kendrick_gkmc_01.mp3",
+    "audioSrc": "https://archive.org/download/good-kid-m.a.a.d-city_202508/(2012)%20Good%20Kid%2C%20M.A.A.D%20City%20%5B24-96%5D/01%20-%20Kendrick%20Lamar%20-%20Sherane%20a.k.a%20Master%20Splinter's%20Daughter.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 1,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gkmc-track-2",
@@ -2935,10 +2935,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 310,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "./music/kendrick_gkmc_02.mp3",
+    "audioSrc": "https://archive.org/download/good-kid-m.a.a.d-city_202508/(2012)%20Good%20Kid%2C%20M.A.A.D%20City%20%5B24-96%5D/02%20-%20Kendrick%20Lamar%20-%20Bitch%2C%20Don't%20Kill%20My%20Vibe.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 2,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gkmc-track-3",
@@ -2950,10 +2950,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 212,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "./music/kendrick_gkmc_03.mp3",
+    "audioSrc": "https://archive.org/download/good-kid-m.a.a.d-city_202508/(2012)%20Good%20Kid%2C%20M.A.A.D%20City%20%5B24-96%5D/03%20-%20Kendrick%20Lamar%20-%20Backseat%20Freestyle.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 3,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gkmc-track-4",
@@ -2965,10 +2965,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 324,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "./music/kendrick_gkmc_04.mp3",
+    "audioSrc": "https://archive.org/download/good-kid-m.a.a.d-city_202508/(2012)%20Good%20Kid%2C%20M.A.A.D%20City%20%5B24-96%5D/04%20-%20Kendrick%20Lamar%20-%20The%20Art%20of%20Peer%20Pressure.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 4,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gkmc-track-5",
@@ -2980,10 +2980,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 386,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "./music/kendrick_gkmc_05.mp3",
+    "audioSrc": "https://archive.org/download/good-kid-m.a.a.d-city_202508/(2012)%20Good%20Kid%2C%20M.A.A.D%20City%20%5B24-96%5D/05%20-%20Kendrick%20Lamar%20-%20Money%20Trees.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 5,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gkmc-track-6",
@@ -2995,10 +2995,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 300,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "./music/kendrick_gkmc_06.mp3",
+    "audioSrc": "https://archive.org/download/good-kid-m.a.a.d-city_202508/(2012)%20Good%20Kid%2C%20M.A.A.D%20City%20%5B24-96%5D/06%20-%20Kendrick%20Lamar%20-%20Poetic%20Justice.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 6,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gkmc-track-7",
@@ -3010,10 +3010,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 214,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "./music/kendrick_gkmc_07.mp3",
+    "audioSrc": "https://archive.org/download/good-kid-m.a.a.d-city_202508/(2012)%20Good%20Kid%2C%20M.A.A.D%20City%20%5B24-96%5D/07%20-%20Kendrick%20Lamar%20-%20good%20kid.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 7,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gkmc-track-8",
@@ -3025,10 +3025,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 350,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "./music/kendrick_gkmc_08.mp3",
+    "audioSrc": "https://archive.org/download/good-kid-m.a.a.d-city_202508/(2012)%20Good%20Kid%2C%20M.A.A.D%20City%20%5B24-96%5D/08%20-%20Kendrick%20Lamar%20-%20m.A.A.d%20city.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 8,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gkmc-track-9",
@@ -3040,10 +3040,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 313,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "./music/kendrick_gkmc_09.mp3",
+    "audioSrc": "https://archive.org/download/good-kid-m.a.a.d-city_202508/(2012)%20Good%20Kid%2C%20M.A.A.D%20City%20%5B24-96%5D/09%20-%20Kendrick%20Lamar%20-%20Swimming%20Pools%20(Drank).mp3",
     "albumId": "album-gkmc",
     "trackNumber": 9,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gkmc-track-10",
@@ -3055,10 +3055,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 723,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "./music/kendrick_gkmc_10.mp3",
+    "audioSrc": "https://archive.org/download/good-kid-m.a.a.d-city_202508/(2012)%20Good%20Kid%2C%20M.A.A.D%20City%20%5B24-96%5D/10%20-%20Kendrick%20Lamar%20-%20Sing%20About%20Me%2C%20I'm%20Dying%20of%20Thirst.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 10,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gkmc-track-11",
@@ -3070,10 +3070,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 443,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "./music/kendrick_gkmc_11.mp3",
+    "audioSrc": "https://archive.org/download/good-kid-m.a.a.d-city_202508/(2012)%20Good%20Kid%2C%20M.A.A.D%20City%20%5B24-96%5D/11%20-%20Kendrick%20Lamar%20-%20Real.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 11,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gkmc-track-12",
@@ -3085,10 +3085,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 248,
     "cover": "./music/covers/kendrick_gkmc.jpg",
     "genre": "Hip Hop / West Coast Rap",
-    "audioSrc": "./music/kendrick_gkmc_12.mp3",
+    "audioSrc": "https://archive.org/download/good-kid-m.a.a.d-city_202508/(2012)%20Good%20Kid%2C%20M.A.A.D%20City%20%5B24-96%5D/12%20-%20Kendrick%20Lamar%20-%20Compton.mp3",
     "albumId": "album-gkmc",
     "trackNumber": 12,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-not-like-us-track-1",
@@ -3115,10 +3115,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 270,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "./music/travis_astroworld_01.mp3",
+    "audioSrc": "https://archive.org/download/travis-astroworld/STARGAZING.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 1,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-astroworld-track-2",
@@ -3130,10 +3130,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 180,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "./music/travis_astroworld_02.mp3",
+    "audioSrc": "https://archive.org/download/travis-astroworld/CAROUSEL.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 2,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-astroworld-track-3",
@@ -3145,10 +3145,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 312,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "./music/travis_astroworld_03.mp3",
+    "audioSrc": "https://archive.org/download/travis-astroworld/SICKO%20MODE.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 3,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-astroworld-track-4",
@@ -3175,10 +3175,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 338,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "./music/travis_astroworld_05.mp3",
+    "audioSrc": "https://archive.org/download/travis-astroworld/STOP%20TRYING%20TO%20BE%20GOD.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 5,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-astroworld-track-6",
@@ -3190,10 +3190,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 218,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "./music/travis_astroworld_06.mp3",
+    "audioSrc": "https://archive.org/download/travis-astroworld/NO%20BYSTANDERS.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 6,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-astroworld-track-7",
@@ -3205,10 +3205,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 145,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "./music/travis_astroworld_07.mp3",
+    "audioSrc": "https://archive.org/download/travis-astroworld/SKELETONS.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 7,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-astroworld-track-8",
@@ -3220,10 +3220,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 231,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "./music/travis_astroworld_08.mp3",
+    "audioSrc": "https://archive.org/download/travis-astroworld/WAKE%20UP.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 8,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-astroworld-track-9",
@@ -3250,10 +3250,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 156,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "./music/travis_astroworld_10.mp3",
+    "audioSrc": "https://archive.org/download/travis-astroworld/NC-17.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 10,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-astroworld-track-11",
@@ -3265,10 +3265,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 142,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "./music/travis_astroworld_11.mp3",
+    "audioSrc": "https://archive.org/download/travis-astroworld/ASTROTHUNDER.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 11,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-astroworld-track-12",
@@ -3280,10 +3280,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 150,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "./music/travis_astroworld_12.mp3",
+    "audioSrc": "https://archive.org/download/travis-astroworld/YOSEMITE.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 12,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-astroworld-track-13",
@@ -3295,10 +3295,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 198,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "./music/travis_astroworld_13.mp3",
+    "audioSrc": "https://archive.org/download/travis-astroworld/CAN'T%20SAY.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 13,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-astroworld-track-14",
@@ -3310,10 +3310,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 176,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "./music/travis_astroworld_14.mp3",
+    "audioSrc": "https://archive.org/download/travis-astroworld/WHO%20WHAT!.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 14,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-astroworld-track-15",
@@ -3325,10 +3325,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 190,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "./music/travis_astroworld_15.mp3",
+    "audioSrc": "https://archive.org/download/travis-astroworld/BUTTERFLY%20EFFECT.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 15,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-astroworld-track-16",
@@ -3370,10 +3370,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 222,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "./music/travis_utopia_01.mp3",
+    "audioSrc": "https://archive.org/download/utopia_202607/01%20-%20HYAENA%20%5BExplicit%5D.mp3",
     "albumId": "album-utopia",
     "trackNumber": 1,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-utopia-track-2",
@@ -3385,10 +3385,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 184,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "./music/travis_utopia_02.mp3",
+    "audioSrc": "https://archive.org/download/utopia_202607/02%20-%20THANK%20GOD%20%5BExplicit%5D.mp3",
     "albumId": "album-utopia",
     "trackNumber": 2,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-utopia-track-3",
@@ -3400,10 +3400,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 255,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "./music/travis_utopia_03.mp3",
+    "audioSrc": "https://archive.org/download/utopia_202607/03%20-%20MODERN%20JAM%20%5BExplicit%5D.mp3",
     "albumId": "album-utopia",
     "trackNumber": 3,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-utopia-track-4",
@@ -3475,10 +3475,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 191,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "./music/travis_utopia_08.mp3",
+    "audioSrc": "https://archive.org/download/utopia_202607/08%20-%20FE!N%20%5BExplicit%5D.mp3",
     "albumId": "album-utopia",
     "trackNumber": 8,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-utopia-track-9",
@@ -3520,10 +3520,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 223,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "./music/travis_utopia_11.mp3",
+    "audioSrc": "https://archive.org/download/utopia_202607/11%20-%20TOPIA%20TWINS%20%5BExplicit%5D.mp3",
     "albumId": "album-utopia",
     "trackNumber": 11,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-utopia-track-12",
@@ -3535,10 +3535,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 258,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "./music/travis_utopia_12.mp3",
+    "audioSrc": "https://archive.org/download/utopia_202607/12%20-%20CIRCUS%20MAXIMUS%20%5BExplicit%5D.mp3",
     "albumId": "album-utopia",
     "trackNumber": 12,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-utopia-track-13",
@@ -3565,10 +3565,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 366,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "./music/travis_utopia_14.mp3",
+    "audioSrc": "https://archive.org/download/utopia_202607/14%20-%20SKITZO%20%5BExplicit%5D.mp3",
     "albumId": "album-utopia",
     "trackNumber": 14,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-utopia-track-15",
@@ -3580,10 +3580,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 175,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "./music/travis_utopia_15.mp3",
+    "audioSrc": "https://archive.org/download/utopia_202607/15%20-%20LOST%20FOREVER%20%5BExplicit%5D.mp3",
     "albumId": "album-utopia",
     "trackNumber": 15,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-utopia-track-16",
@@ -3610,10 +3610,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 185,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "./music/travis_utopia_17.mp3",
+    "audioSrc": "https://archive.org/download/utopia_202607/17%20-%20K-POP%20%5BExplicit%5D.mp3",
     "albumId": "album-utopia",
     "trackNumber": 17,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-utopia-track-18",
@@ -3625,10 +3625,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 353,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "./music/travis_utopia_18.mp3",
+    "audioSrc": "https://archive.org/download/utopia_202607/18%20-%20TELEKINESIS%20%5BExplicit%5D.mp3",
     "albumId": "album-utopia",
     "trackNumber": 18,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-utopia-track-19",
@@ -3640,10 +3640,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 314,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "./music/travis_utopia_19.mp3",
+    "audioSrc": "https://archive.org/download/utopia_202607/19%20-%20TIL%20FURTHER%20NOTICE%20%5BExplicit%5D.mp3",
     "albumId": "album-utopia",
     "trackNumber": 19,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-blonde-track-1",
@@ -3655,10 +3655,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 314,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "./music/frank_blonde_01.mp3",
+    "audioSrc": "https://archive.org/download/17FuturaFree_201703/01%20Nikes.mp3",
     "albumId": "album-blonde",
     "trackNumber": 1,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-blonde-track-2",
@@ -3670,10 +3670,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 249,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "./music/frank_blonde_02.mp3",
+    "audioSrc": "https://archive.org/download/17FuturaFree_201703/02%20Ivy.mp3",
     "albumId": "album-blonde",
     "trackNumber": 2,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-blonde-track-3",
@@ -3685,10 +3685,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 184,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "./music/frank_blonde_03.mp3",
+    "audioSrc": "https://archive.org/download/17FuturaFree_201703/03%20Pink%20%2B%20White.mp3",
     "albumId": "album-blonde",
     "trackNumber": 3,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-blonde-track-4",
@@ -3700,10 +3700,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 86,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "./music/frank_blonde_04.mp3",
+    "audioSrc": "https://archive.org/download/17FuturaFree_201703/04%20Be%20Yourself.mp3",
     "albumId": "album-blonde",
     "trackNumber": 4,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-blonde-track-5",
@@ -3715,10 +3715,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 257,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "./music/frank_blonde_05.mp3",
+    "audioSrc": "https://archive.org/download/17FuturaFree_201703/05%20Solo.mp3",
     "albumId": "album-blonde",
     "trackNumber": 5,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-blonde-track-6",
@@ -3730,10 +3730,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 184,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "./music/frank_blonde_06.mp3",
+    "audioSrc": "https://archive.org/download/17FuturaFree_201703/06%20Skyline%20To.mp3",
     "albumId": "album-blonde",
     "trackNumber": 6,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-blonde-track-7",
@@ -3745,10 +3745,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 249,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "./music/frank_blonde_07.mp3",
+    "audioSrc": "https://archive.org/download/17FuturaFree_201703/07%20Self%20Control.mp3",
     "albumId": "album-blonde",
     "trackNumber": 7,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-blonde-track-8",
@@ -3760,10 +3760,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 66,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "./music/frank_blonde_08.mp3",
+    "audioSrc": "https://archive.org/download/17FuturaFree_201703/08%20Good%20Guy.mp3",
     "albumId": "album-blonde",
     "trackNumber": 8,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-blonde-track-9",
@@ -3775,10 +3775,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 307,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "./music/frank_blonde_09.mp3",
+    "audioSrc": "https://archive.org/download/17FuturaFree_201703/09%20Nights.mp3",
     "albumId": "album-blonde",
     "trackNumber": 9,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-blonde-track-10",
@@ -3790,10 +3790,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 78,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "./music/frank_blonde_10.mp3",
+    "audioSrc": "https://archive.org/download/17FuturaFree_201703/10%20Solo%20(Reprise).mp3",
     "albumId": "album-blonde",
     "trackNumber": 10,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-blonde-track-11",
@@ -3805,10 +3805,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 158,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "./music/frank_blonde_11.mp3",
+    "audioSrc": "https://archive.org/download/17FuturaFree_201703/11%20Pretty%20Sweet.mp3",
     "albumId": "album-blonde",
     "trackNumber": 11,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-blonde-track-12",
@@ -3820,10 +3820,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 68,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "./music/frank_blonde_12.mp3",
+    "audioSrc": "https://archive.org/download/17FuturaFree_201703/12%20Facebook%20Story.mp3",
     "albumId": "album-blonde",
     "trackNumber": 12,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-blonde-track-13",
@@ -3835,10 +3835,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 85,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "./music/frank_blonde_13.mp3",
+    "audioSrc": "https://archive.org/download/17FuturaFree_201703/13%20Close%20to%20You.mp3",
     "albumId": "album-blonde",
     "trackNumber": 13,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-blonde-track-14",
@@ -3850,10 +3850,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 248,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "./music/frank_blonde_14.mp3",
+    "audioSrc": "https://archive.org/download/17FuturaFree_201703/14%20White%20Ferrari.mp3",
     "albumId": "album-blonde",
     "trackNumber": 14,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-blonde-track-15",
@@ -3865,10 +3865,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 334,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "./music/frank_blonde_15.mp3",
+    "audioSrc": "https://archive.org/download/17FuturaFree_201703/15%20Seigfried.mp3",
     "albumId": "album-blonde",
     "trackNumber": 15,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-blonde-track-16",
@@ -3880,10 +3880,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 177,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "./music/frank_blonde_16.mp3",
+    "audioSrc": "https://archive.org/download/17FuturaFree_201703/16%20Godspeed.mp3",
     "albumId": "album-blonde",
     "trackNumber": 16,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-blonde-track-17",
@@ -3895,10 +3895,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 564,
     "cover": "./music/covers/frank_blonde.jpg",
     "genre": "Avant-Garde R&B / Neo Soul",
-    "audioSrc": "./music/frank_blonde_17.mp3",
+    "audioSrc": "https://archive.org/download/17FuturaFree_201703/17%20Futura%20Free.mp3",
     "albumId": "album-blonde",
     "trackNumber": 17,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-channel-orange-track-1",
@@ -3910,10 +3910,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 46,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "./music/frank_channel_orange_01.mp3",
+    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/01%20Start.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 1,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-channel-orange-track-2",
@@ -3925,10 +3925,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 200,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "./music/frank_channel_orange_02.mp3",
+    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/02%20Thinkin%20Bout%20You.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 2,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-channel-orange-track-3",
@@ -3940,10 +3940,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 40,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "./music/frank_channel_orange_03.mp3",
+    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/03%20Fertilizer.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 3,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-channel-orange-track-4",
@@ -3955,10 +3955,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 148,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "./music/frank_channel_orange_04.mp3",
+    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/04%20Sierra%20Leone.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 4,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-channel-orange-track-5",
@@ -3970,10 +3970,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 262,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "./music/frank_channel_orange_05.mp3",
+    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/05%20Sweet%20Life.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 5,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-channel-orange-track-6",
@@ -3985,10 +3985,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 234,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "./music/frank_channel_orange_06.mp3",
+    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/06%20Not%20Just%20Money.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 6,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-channel-orange-track-7",
@@ -4000,10 +4000,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 304,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "./music/frank_channel_orange_07.mp3",
+    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/07%20Super%20Rich%20Kids.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 7,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-channel-orange-track-8",
@@ -4015,10 +4015,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 184,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "./music/frank_channel_orange_08.mp3",
+    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/08%20Pilot%20Jones.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 8,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-channel-orange-track-9",
@@ -4030,10 +4030,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 224,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "./music/frank_channel_orange_09.mp3",
+    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/09%20Crack%20Rock.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 9,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-channel-orange-track-10",
@@ -4045,10 +4045,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 592,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "./music/frank_channel_orange_10.mp3",
+    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/10%20Pyramids.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 10,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-channel-orange-track-11",
@@ -4060,10 +4060,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 234,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "./music/frank_channel_orange_11.mp3",
+    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/11%20Lost.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 11,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-channel-orange-track-12",
@@ -4075,10 +4075,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 76,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "./music/frank_channel_orange_12.mp3",
+    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/12%20White.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 12,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-channel-orange-track-13",
@@ -4090,10 +4090,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 200,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "./music/frank_channel_orange_13.mp3",
+    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/13%20Monks.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 13,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-channel-orange-track-14",
@@ -4105,10 +4105,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 175,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "./music/frank_channel_orange_14.mp3",
+    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/14%20Bad%20Religion.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 14,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-channel-orange-track-15",
@@ -4120,10 +4120,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 268,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "./music/frank_channel_orange_15.mp3",
+    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/15%20Pink%20Matter.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 15,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-channel-orange-track-16",
@@ -4135,10 +4135,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 194,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "./music/frank_channel_orange_16.mp3",
+    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/16%20Forrest%20Gump.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 16,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-channel-orange-track-17",
@@ -4150,10 +4150,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 134,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "./music/frank_channel_orange_17.mp3",
+    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/17%20End.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 17,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gemini-rights-track-1",
@@ -4165,10 +4165,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 156,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "./music/steve_gemini_01.mp3",
+    "audioSrc": "https://archive.org/download/03.-steve-lacy-mercury/01.%20Steve%20Lacy%20-%20Static.mp3",
     "albumId": "album-gemini-rights",
     "trackNumber": 1,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gemini-rights-track-2",
@@ -4180,10 +4180,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 201,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "./music/steve_gemini_02.mp3",
+    "audioSrc": "https://archive.org/download/03.-steve-lacy-mercury/02.%20Steve%20Lacy%20-%20Helmet.mp3",
     "albumId": "album-gemini-rights",
     "trackNumber": 2,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gemini-rights-track-3",
@@ -4195,10 +4195,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 295,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "./music/steve_gemini_03.mp3",
+    "audioSrc": "https://archive.org/download/03.-steve-lacy-mercury/03.%20Steve%20Lacy%20-%20Mercury.mp3",
     "albumId": "album-gemini-rights",
     "trackNumber": 3,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gemini-rights-track-4",
@@ -4210,10 +4210,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 184,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "./music/steve_gemini_04.mp3",
+    "audioSrc": "https://archive.org/download/03.-steve-lacy-mercury/04.%20Steve%20Lacy%20-%20Buttons.mp3",
     "albumId": "album-gemini-rights",
     "trackNumber": 4,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gemini-rights-track-5",
@@ -4225,10 +4225,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 232,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "./music/steve_gemini_05.mp3",
+    "audioSrc": "https://archive.org/download/03.-steve-lacy-mercury/05.%20Steve%20Lacy%20-%20Bad%20Habit.mp3",
     "albumId": "album-gemini-rights",
     "trackNumber": 5,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gemini-rights-track-6",
@@ -4240,10 +4240,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 50,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "./music/steve_gemini_06.mp3",
+    "audioSrc": "https://archive.org/download/03.-steve-lacy-mercury/06.%20Steve%20Lacy%20-%202Gether%20(Enterlude).mp3",
     "albumId": "album-gemini-rights",
     "trackNumber": 6,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gemini-rights-track-7",
@@ -4255,10 +4255,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 240,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "./music/steve_gemini_07.mp3",
+    "audioSrc": "https://archive.org/download/03.-steve-lacy-mercury/07.%20Steve%20Lacy%20-%20Cody%20Freestyle.mp3",
     "albumId": "album-gemini-rights",
     "trackNumber": 7,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gemini-rights-track-8",
@@ -4270,10 +4270,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 173,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "./music/steve_gemini_08.mp3",
+    "audioSrc": "https://archive.org/download/03.-steve-lacy-mercury/08.%20Steve%20Lacy%20-%20Amber.mp3",
     "albumId": "album-gemini-rights",
     "trackNumber": 8,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-gemini-rights-track-9",
@@ -4300,10 +4300,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 273,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "./music/steve_gemini_10.mp3",
+    "audioSrc": "https://archive.org/download/03.-steve-lacy-mercury/10.%20Steve%20Lacy%20-%20Give%20You%20the%20World.mp3",
     "albumId": "album-gemini-rights",
     "trackNumber": 10,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-steve-demo-track-1",
@@ -4315,10 +4315,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 92,
     "cover": "./music/covers/steve_demo.jpg",
     "genre": "Lo-fi Soul / GarageBand R&B",
-    "audioSrc": "./music/steve_demo_01.mp3",
+    "audioSrc": "https://archive.org/download/03-dark-red/Steve%20Lacy's%20Demo/01%20Looks.mp3",
     "albumId": "album-steve-demo",
     "trackNumber": 1,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-steve-demo-track-2",
@@ -4330,10 +4330,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 140,
     "cover": "./music/covers/steve_demo.jpg",
     "genre": "Lo-fi Soul / GarageBand R&B",
-    "audioSrc": "./music/steve_demo_02.mp3",
+    "audioSrc": "https://archive.org/download/03-dark-red/Steve%20Lacy's%20Demo/02%20Ryd.mp3",
     "albumId": "album-steve-demo",
     "trackNumber": 2,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-steve-demo-track-3",
@@ -4345,10 +4345,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 173,
     "cover": "./music/covers/steve_demo.jpg",
     "genre": "Lo-fi Soul / GarageBand R&B",
-    "audioSrc": "./music/steve_demo_03.mp3",
+    "audioSrc": "https://archive.org/download/03-dark-red/Steve%20Lacy's%20Demo/03%20Dark%20Red.mp3",
     "albumId": "album-steve-demo",
     "trackNumber": 3,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-steve-demo-track-4",
@@ -4360,10 +4360,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 110,
     "cover": "./music/covers/steve_demo.jpg",
     "genre": "Lo-fi Soul / GarageBand R&B",
-    "audioSrc": "./music/steve_demo_04.mp3",
+    "audioSrc": "https://archive.org/download/03-dark-red/Steve%20Lacy's%20Demo/04%20Thangs.mp3",
     "albumId": "album-steve-demo",
     "trackNumber": 4,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-steve-demo-track-5",
@@ -4375,10 +4375,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 104,
     "cover": "./music/covers/steve_demo.jpg",
     "genre": "Lo-fi Soul / GarageBand R&B",
-    "audioSrc": "./music/steve_demo_05.mp3",
+    "audioSrc": "https://archive.org/download/03-dark-red/Steve%20Lacy's%20Demo/05%20Haterlovin.mp3",
     "albumId": "album-steve-demo",
     "trackNumber": 5,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-steve-demo-track-6",
@@ -4390,10 +4390,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 118,
     "cover": "./music/covers/steve_demo.jpg",
     "genre": "Lo-fi Soul / GarageBand R&B",
-    "audioSrc": "./music/steve_demo_06.mp3",
+    "audioSrc": "https://archive.org/download/03-dark-red/Steve%20Lacy's%20Demo/06%20Some.mp3",
     "albumId": "album-steve-demo",
     "trackNumber": 6,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-after-hours-track-1",
@@ -4405,10 +4405,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 250,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "./music/weeknd_after_hours_01.mp3",
+    "audioSrc": "https://archive.org/download/after-hours-the-weeknd_202609/01.%20Alone%20Again.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 1,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-after-hours-track-2",
@@ -4420,10 +4420,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 239,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "./music/weeknd_after_hours_02.mp3",
+    "audioSrc": "https://archive.org/download/after-hours-the-weeknd_202609/02.%20Too%20Late.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 2,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-after-hours-track-3",
@@ -4435,10 +4435,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 211,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "./music/weeknd_after_hours_03.mp3",
+    "audioSrc": "https://archive.org/download/after-hours-the-weeknd_202609/03.%20Hardest%20To%20Love.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 3,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-after-hours-track-4",
@@ -4450,10 +4450,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 191,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "./music/weeknd_after_hours_04.mp3",
+    "audioSrc": "https://archive.org/download/after-hours-the-weeknd_202609/04.%20Scared%20To%20Live.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 4,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-after-hours-track-5",
@@ -4465,10 +4465,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 247,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "./music/weeknd_after_hours_05.mp3",
+    "audioSrc": "https://archive.org/download/after-hours-the-weeknd_202609/05.%20Snowchild.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 5,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-after-hours-track-6",
@@ -4480,10 +4480,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 355,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "./music/weeknd_after_hours_06.mp3",
+    "audioSrc": "https://archive.org/download/after-hours-the-weeknd_202609/06.%20Escape%20From%20LA.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 6,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-after-hours-track-7",
@@ -4495,10 +4495,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 198,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "./music/weeknd_after_hours_07.mp3",
+    "audioSrc": "https://archive.org/download/after-hours-the-weeknd_202609/07.%20Heartless.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 7,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-after-hours-track-8",
@@ -4510,10 +4510,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 283,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "./music/weeknd_after_hours_08.mp3",
+    "audioSrc": "https://archive.org/download/after-hours-the-weeknd_202609/08.%20Faith.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 8,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-after-hours-track-9",
@@ -4525,10 +4525,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 200,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "./music/weeknd_after_hours_09.mp3",
+    "audioSrc": "https://archive.org/download/after-hours-the-weeknd_202609/09.%20Blinding%20Lights.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 9,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-after-hours-track-10",
@@ -4540,10 +4540,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 237,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "./music/weeknd_after_hours_10.mp3",
+    "audioSrc": "https://archive.org/download/after-hours-the-weeknd_202609/10.%20In%20Your%20Eyes.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 10,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-after-hours-track-11",
@@ -4555,10 +4555,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 215,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "./music/weeknd_after_hours_11.mp3",
+    "audioSrc": "https://archive.org/download/after-hours-the-weeknd_202609/11.%20Save%20Your%20Tears.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 11,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-after-hours-track-12",
@@ -4570,10 +4570,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 195,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "./music/weeknd_after_hours_12.mp3",
+    "audioSrc": "https://archive.org/download/after-hours-the-weeknd_202609/12.%20Repeat%20After%20Me%20(Interlude).mp3",
     "albumId": "album-after-hours",
     "trackNumber": 12,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-after-hours-track-13",
@@ -4585,10 +4585,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 361,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "./music/weeknd_after_hours_13.mp3",
+    "audioSrc": "https://archive.org/download/after-hours-the-weeknd_202609/13.%20%20After%20Hours.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 13,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-after-hours-track-14",
@@ -4600,10 +4600,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 190,
     "cover": "./music/covers/weeknd_after_hours.jpg",
     "genre": "Synthwave / R&B / Pop",
-    "audioSrc": "./music/weeknd_after_hours_14.mp3",
+    "audioSrc": "https://archive.org/download/after-hours-the-weeknd_202609/14.%20Until%20I%20Bleed%20Out.mp3",
     "albumId": "album-after-hours",
     "trackNumber": 14,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-starboy-track-1",
@@ -4615,10 +4615,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 230,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/weeknd_starboy_01.mp3",
+    "audioSrc": "https://archive.org/download/theweeknd-starboy_20190929_2201/Starboy/The%20Weeknd%20-%20Starboy%20(official)%20ft.%20Daft%20Punk.mp3",
     "albumId": "album-starboy",
     "trackNumber": 1,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-starboy-track-2",
@@ -4630,10 +4630,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 249,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/weeknd_starboy_02.mp3",
+    "audioSrc": "https://archive.org/download/theweeknd-starboy_20190929_2201/Starboy/The%20Weeknd%20-%20Party%20Monster.mp3",
     "albumId": "album-starboy",
     "trackNumber": 2,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-starboy-track-3",
@@ -4645,10 +4645,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 220,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/weeknd_starboy_03.mp3",
+    "audioSrc": "https://archive.org/download/theweeknd-starboy_20190929_2201/Starboy/The%20Weeknd%20-%20False%20Alarm.mp3",
     "albumId": "album-starboy",
     "trackNumber": 3,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-starboy-track-4",
@@ -4660,10 +4660,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 218,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/weeknd_starboy_04.mp3",
+    "audioSrc": "https://archive.org/download/theweeknd-starboy_20190929_2201/Starboy/The%20Weeknd%20-%20Reminder.mp3",
     "albumId": "album-starboy",
     "trackNumber": 4,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-starboy-track-5",
@@ -4675,10 +4675,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 232,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/weeknd_starboy_05.mp3",
+    "audioSrc": "https://archive.org/download/theweeknd-starboy_20190929_2201/Starboy/Rockin%E2%80%99.mp3",
     "albumId": "album-starboy",
     "trackNumber": 5,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-starboy-track-6",
@@ -4690,10 +4690,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 265,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/weeknd_starboy_06.mp3",
+    "audioSrc": "https://archive.org/download/theweeknd-starboy_20190929_2201/Starboy/The%20Weeknd%20-%20Secrets.mp3",
     "albumId": "album-starboy",
     "trackNumber": 6,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-starboy-track-7",
@@ -4705,10 +4705,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 206,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/weeknd_starboy_07.mp3",
+    "audioSrc": "https://archive.org/download/theweeknd-starboy_20190929_2201/Starboy/True%20Colors.mp3",
     "albumId": "album-starboy",
     "trackNumber": 7,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-starboy-track-8",
@@ -4720,10 +4720,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 111,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/weeknd_starboy_08.mp3",
+    "audioSrc": "https://archive.org/download/theweeknd-starboy_20190929_2201/Starboy/Stargirl%20Interlude.mp3",
     "albumId": "album-starboy",
     "trackNumber": 8,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-starboy-track-9",
@@ -4735,10 +4735,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 231,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/weeknd_starboy_09.mp3",
+    "audioSrc": "https://archive.org/download/theweeknd-starboy_20190929_2201/Starboy/The%20Weeknd%20-%20Sidewalks%20(Vevo%20Presents)%20ft.%20Kendrick%20Lamar.mp3",
     "albumId": "album-starboy",
     "trackNumber": 9,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-starboy-track-10",
@@ -4750,10 +4750,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 238,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/weeknd_starboy_10.mp3",
+    "audioSrc": "https://archive.org/download/theweeknd-starboy_20190929_2201/Starboy/Six%20Feet%20Under.mp3",
     "albumId": "album-starboy",
     "trackNumber": 10,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-starboy-track-11",
@@ -4765,10 +4765,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 223,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/weeknd_starboy_11.mp3",
+    "audioSrc": "https://archive.org/download/theweeknd-starboy_20190929_2201/Starboy/Love%20To%20Lay.mp3",
     "albumId": "album-starboy",
     "trackNumber": 11,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-starboy-track-12",
@@ -4780,10 +4780,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 220,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/weeknd_starboy_12.mp3",
+    "audioSrc": "https://archive.org/download/theweeknd-starboy_20190929_2201/Starboy/A%20Lonely%20Night.mp3",
     "albumId": "album-starboy",
     "trackNumber": 12,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-starboy-track-13",
@@ -4795,10 +4795,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 197,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/weeknd_starboy_13.mp3",
+    "audioSrc": "https://archive.org/download/theweeknd-starboy_20190929_2201/Starboy/Attention.mp3",
     "albumId": "album-starboy",
     "trackNumber": 13,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-starboy-track-14",
@@ -4810,10 +4810,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 221,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/weeknd_starboy_14.mp3",
+    "audioSrc": "https://archive.org/download/theweeknd-starboy_20190929_2201/Starboy/Ordinary%20Life.mp3",
     "albumId": "album-starboy",
     "trackNumber": 14,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-starboy-track-15",
@@ -4825,10 +4825,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 198,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/weeknd_starboy_15.mp3",
+    "audioSrc": "https://archive.org/download/theweeknd-starboy_20190929_2201/Starboy/Nothing%20Without%20You.mp3",
     "albumId": "album-starboy",
     "trackNumber": 15,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-starboy-track-16",
@@ -4840,10 +4840,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 321,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/weeknd_starboy_16.mp3",
+    "audioSrc": "https://archive.org/download/theweeknd-starboy_20190929_2201/Starboy/All%20I%20Know.mp3",
     "albumId": "album-starboy",
     "trackNumber": 16,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-starboy-track-17",
@@ -4855,10 +4855,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 260,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/weeknd_starboy_17.mp3",
+    "audioSrc": "https://archive.org/download/theweeknd-starboy_20190929_2201/Starboy/Die%20For%20You.mp3",
     "albumId": "album-starboy",
     "trackNumber": 17,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-starboy-track-18",
@@ -4870,10 +4870,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 269,
     "cover": "./music/covers/weeknd_starboy.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "./music/weeknd_starboy_18.mp3",
+    "audioSrc": "https://archive.org/download/theweeknd-starboy_20190929_2201/Starboy/The%20Weeknd%20-%20I%20Feel%20It%20Coming%20ft.%20Daft%20Punk.mp3",
     "albumId": "album-starboy",
     "trackNumber": 18,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-hit-me-hard-track-1",
@@ -4885,10 +4885,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 219,
     "cover": "./music/covers/billie_hit_me_hard.jpg",
     "genre": "Indie Pop / Alternative",
-    "audioSrc": "./music/billie_hit_me_hard_01.mp3",
+    "audioSrc": "https://archive.org/download/hit-me-hard-and-soft1/01-SKINNY.mp3",
     "albumId": "album-hit-me-hard",
     "trackNumber": 1,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-hit-me-hard-track-2",
@@ -4900,10 +4900,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 179,
     "cover": "./music/covers/billie_hit_me_hard.jpg",
     "genre": "Indie Pop / Alternative",
-    "audioSrc": "./music/billie_hit_me_hard_02.mp3",
+    "audioSrc": "https://archive.org/download/hit-me-hard-and-soft1/02-LUNCH.mp3",
     "albumId": "album-hit-me-hard",
     "trackNumber": 2,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-hit-me-hard-track-3",
@@ -4915,10 +4915,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 303,
     "cover": "./music/covers/billie_hit_me_hard.jpg",
     "genre": "Indie Pop / Alternative",
-    "audioSrc": "./music/billie_hit_me_hard_03.mp3",
+    "audioSrc": "https://archive.org/download/hit-me-hard-and-soft1/03-CHIHIRO.mp3",
     "albumId": "album-hit-me-hard",
     "trackNumber": 3,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-hit-me-hard-track-4",
@@ -4930,10 +4930,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 210,
     "cover": "./music/covers/billie_hit_me_hard.jpg",
     "genre": "Indie Pop / Alternative",
-    "audioSrc": "./music/billie_hit_me_hard_04.mp3",
+    "audioSrc": "https://archive.org/download/hit-me-hard-and-soft1/04-BIRDS%20OF%20A%20FEATHER.mp3",
     "albumId": "album-hit-me-hard",
     "trackNumber": 4,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-hit-me-hard-track-5",
@@ -4945,10 +4945,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 261,
     "cover": "./music/covers/billie_hit_me_hard.jpg",
     "genre": "Indie Pop / Alternative",
-    "audioSrc": "./music/billie_hit_me_hard_05.mp3",
+    "audioSrc": "https://archive.org/download/hit-me-hard-and-soft1/05-WILDFLOWER.mp3",
     "albumId": "album-hit-me-hard",
     "trackNumber": 5,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-hit-me-hard-track-6",
@@ -4960,10 +4960,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 293,
     "cover": "./music/covers/billie_hit_me_hard.jpg",
     "genre": "Indie Pop / Alternative",
-    "audioSrc": "./music/billie_hit_me_hard_06.mp3",
+    "audioSrc": "https://archive.org/download/hit-me-hard-and-soft1/06-THE%20GREATEST.mp3",
     "albumId": "album-hit-me-hard",
     "trackNumber": 6,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-hit-me-hard-track-7",
@@ -4975,10 +4975,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 333,
     "cover": "./music/covers/billie_hit_me_hard.jpg",
     "genre": "Indie Pop / Alternative",
-    "audioSrc": "./music/billie_hit_me_hard_07.mp3",
+    "audioSrc": "https://archive.org/download/hit-me-hard-and-soft1/07-L'AMOUR%20DE%20MA%20VIE.mp3",
     "albumId": "album-hit-me-hard",
     "trackNumber": 7,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-hit-me-hard-track-8",
@@ -4990,10 +4990,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 186,
     "cover": "./music/covers/billie_hit_me_hard.jpg",
     "genre": "Indie Pop / Alternative",
-    "audioSrc": "./music/billie_hit_me_hard_08.mp3",
+    "audioSrc": "https://archive.org/download/hit-me-hard-and-soft1/08-THE%20DINER.mp3",
     "albumId": "album-hit-me-hard",
     "trackNumber": 8,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-hit-me-hard-track-9",
@@ -5005,10 +5005,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 298,
     "cover": "./music/covers/billie_hit_me_hard.jpg",
     "genre": "Indie Pop / Alternative",
-    "audioSrc": "./music/billie_hit_me_hard_09.mp3",
+    "audioSrc": "https://archive.org/download/hit-me-hard-and-soft1/09-BITTERSUITE.mp3",
     "albumId": "album-hit-me-hard",
     "trackNumber": 9,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-hit-me-hard-track-10",
@@ -5020,10 +5020,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 343,
     "cover": "./music/covers/billie_hit_me_hard.jpg",
     "genre": "Indie Pop / Alternative",
-    "audioSrc": "./music/billie_hit_me_hard_10.mp3",
+    "audioSrc": "https://archive.org/download/hit-me-hard-and-soft1/10-BLUE.mp3",
     "albumId": "album-hit-me-hard",
     "trackNumber": 10,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-when-we-all-fall-track-1",
@@ -5035,10 +5035,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 14,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "./music/billie_when_we_all_fall_01.mp3",
+    "audioSrc": "https://archive.org/download/i-love-you_202610/!!!!!!!.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 1,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-when-we-all-fall-track-2",
@@ -5050,10 +5050,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 194,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "./music/billie_when_we_all_fall_02.mp3",
+    "audioSrc": "https://archive.org/download/i-love-you_202610/Bad%20Guy.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 2,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-when-we-all-fall-track-3",
@@ -5065,10 +5065,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 243,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "./music/billie_when_we_all_fall_03.mp3",
+    "audioSrc": "https://archive.org/download/i-love-you_202610/Xanny.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 3,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-when-we-all-fall-track-4",
@@ -5080,10 +5080,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 180,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "./music/billie_when_we_all_fall_04.mp3",
+    "audioSrc": "https://archive.org/download/i-love-you_202610/You%20Should%20See%20Me%20In%20A%20Crown.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 4,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-when-we-all-fall-track-5",
@@ -5095,10 +5095,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 168,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "./music/billie_when_we_all_fall_05.mp3",
+    "audioSrc": "https://archive.org/download/i-love-you_202610/All%20The%20Good%20Girls%20Go%20To%20Hell.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 5,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-when-we-all-fall-track-6",
@@ -5110,10 +5110,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 221,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "./music/billie_when_we_all_fall_06.mp3",
+    "audioSrc": "https://archive.org/download/i-love-you_202610/Wish%20You%20Were%20Gay.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 6,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-when-we-all-fall-track-7",
@@ -5125,10 +5125,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 196,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "./music/billie_when_we_all_fall_07.mp3",
+    "audioSrc": "https://archive.org/download/i-love-you_202610/When%20The%20Party's%20Over.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 7,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-when-we-all-fall-track-8",
@@ -5140,10 +5140,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 173,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "./music/billie_when_we_all_fall_08.mp3",
+    "audioSrc": "https://archive.org/download/i-love-you_202610/8.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 8,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-when-we-all-fall-track-9",
@@ -5155,10 +5155,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 179,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "./music/billie_when_we_all_fall_09.mp3",
+    "audioSrc": "https://archive.org/download/i-love-you_202610/My%20Strange%20Addiction.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 9,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-when-we-all-fall-track-10",
@@ -5170,10 +5170,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 193,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "./music/billie_when_we_all_fall_10.mp3",
+    "audioSrc": "https://archive.org/download/i-love-you_202610/Bury%20A%20Friend.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 10,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-when-we-all-fall-track-11",
@@ -5185,10 +5185,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 156,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "./music/billie_when_we_all_fall_11.mp3",
+    "audioSrc": "https://archive.org/download/i-love-you_202610/Ilomilo.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 11,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-when-we-all-fall-track-12",
@@ -5200,10 +5200,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 242,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "./music/billie_when_we_all_fall_12.mp3",
+    "audioSrc": "https://archive.org/download/i-love-you_202610/Listen%20Before%20I%20Go.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 12,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-when-we-all-fall-track-13",
@@ -5215,10 +5215,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 291,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "./music/billie_when_we_all_fall_13.mp3",
+    "audioSrc": "https://archive.org/download/i-love-you_202610/I%20Love%20You.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 13,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-when-we-all-fall-track-14",
@@ -5230,10 +5230,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 119,
     "cover": "./music/covers/billie_when_we_all_fall.jpg",
     "genre": "Dark Pop / Electropop",
-    "audioSrc": "./music/billie_when_we_all_fall_14.mp3",
+    "audioSrc": "https://archive.org/download/i-love-you_202610/Goodbye.mp3",
     "albumId": "album-when-we-all-fall",
     "trackNumber": 14,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-take-care-track-1",
@@ -5515,10 +5515,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 178,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_02.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/02.%20Papi%E2%80%99s%20Home.mp3",
     "albumId": "album-clb",
     "trackNumber": 2,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-clb-track-3",
@@ -5530,10 +5530,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 221,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_03.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/03.%20Girls%20Want%20Girls%20Ft.%20Lil%20Baby.mp3",
     "albumId": "album-clb",
     "trackNumber": 3,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-clb-track-4",
@@ -5545,10 +5545,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 296,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_04.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/04.%20In%20The%20Bible%20Ft.%20Lil%20Durk%2C%20GIVE%CC%84ON.mp3",
     "albumId": "album-clb",
     "trackNumber": 4,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-clb-track-5",
@@ -5560,10 +5560,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 228,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_05.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/05.%20Love%20All%20Ft.%20JAY%CC%88-Z.mp3",
     "albumId": "album-clb",
     "trackNumber": 5,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-clb-track-6",
@@ -5575,10 +5575,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 291,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_06.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/06.%20Fair%20Trade%20Ft.%20Travis%20Scott.mp3",
     "albumId": "album-clb",
     "trackNumber": 6,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-clb-track-7",
@@ -5590,10 +5590,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 257,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_07.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/07.%20Way%202%20Sexy%20Ft.%20Future%2C%20Young%20Thug.mp3",
     "albumId": "album-clb",
     "trackNumber": 7,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-clb-track-8",
@@ -5605,10 +5605,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 308,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_08.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/08.%20TSU.mp3",
     "albumId": "album-clb",
     "trackNumber": 8,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-clb-track-9",
@@ -5620,10 +5620,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 273,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_09.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/09.%20N%202%20Deep%20Ft.%20Future.mp3",
     "albumId": "album-clb",
     "trackNumber": 9,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-clb-track-10",
@@ -5635,10 +5635,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 205,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_10.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/10.%20Pipe%20Down.mp3",
     "albumId": "album-clb",
     "trackNumber": 10,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-clb-track-11",
@@ -5650,10 +5650,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 133,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_11.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/11.%20Yebba%E2%80%99s%20Heartbreak%20Ft.%20Yebba.mp3",
     "albumId": "album-clb",
     "trackNumber": 11,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-clb-track-12",
@@ -5665,10 +5665,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 204,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_12.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/12.%20No%20Friends%20In%20The%20Industry.mp3",
     "albumId": "album-clb",
     "trackNumber": 12,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-clb-track-13",
@@ -5680,10 +5680,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 242,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_13.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/13.%20Knife%20Talk%20Ft.%2021%20Savage%2C%20Project%20Pat.mp3",
     "albumId": "album-clb",
     "trackNumber": 13,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-clb-track-14",
@@ -5695,10 +5695,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 239,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_14.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/14.%207am%20On%20Bridle%20Path.mp3",
     "albumId": "album-clb",
     "trackNumber": 14,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-clb-track-15",
@@ -5710,10 +5710,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 269,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_15.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/15.%20Race%20My%20Mind.mp3",
     "albumId": "album-clb",
     "trackNumber": 15,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-clb-track-16",
@@ -5725,10 +5725,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 198,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_16.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/16.%20Fountains%20Ft.%20Tems.mp3",
     "albumId": "album-clb",
     "trackNumber": 16,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-clb-track-17",
@@ -5740,10 +5740,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 229,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_17.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/17.%20Get%20Along%20Better%20Ft.%20Ty%20Dolla%20%24ign.mp3",
     "albumId": "album-clb",
     "trackNumber": 17,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-clb-track-18",
@@ -5755,10 +5755,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 213,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_18.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/18.%20You%20Only%20Live%20Twice%20Ft.%20Lil%20Wayne%2C%20Rick%20Ross.mp3",
     "albumId": "album-clb",
     "trackNumber": 18,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-clb-track-19",
@@ -5770,10 +5770,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 252,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_19.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/19.%20IMY2%20Ft.%20Kid%20Cudi.mp3",
     "albumId": "album-clb",
     "trackNumber": 19,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-clb-track-20",
@@ -5785,10 +5785,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 245,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_20.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/20.%20Fucking%20Fans.mp3",
     "albumId": "album-clb",
     "trackNumber": 20,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-clb-track-21",
@@ -5800,10 +5800,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 351,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_21.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/21.%20The%20Remorse.mp3",
     "albumId": "album-clb",
     "trackNumber": 21,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "alex-g-race-01",

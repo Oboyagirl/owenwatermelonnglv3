@@ -54,13 +54,13 @@ const ACADEMICS_MAP: Record<string, string> = {
   "happywheels": "https://gameinclassroom.github.io/happy-wheels/",
   "dumbwaystodie": "games/dumb-ways-to-die.html",
   "hooproyale": "https://ubghyper.github.io/GameList.github.io/Hoop-Royale/",
-  "asmallworldcup": "games/sawyer-for-sawyer.html",
+  "asmallworldcup": "games/a-small-world-cup.html",
   "stickmerge": "https://gameinclassroom.github.io/stick-merge/",
   "stickmerge2": "https://gameinclassroom.github.io/stick-merge/",
   "sausageflip": "https://7zeb.github.io/homework/steal-a-brainrot/go/sausage-flip.html",
   "sausagerun": "https://7zeb.github.io/homework/steal-a-brainrot/go/sausage-flip.html",
   "bindingofisaac": "https://flyingsully.github.io/GameList.github.io/Binding-Of-Isaac/",
-  "ducklife4": "https://gameinclassroom.github.io/duck-life-4/",
+  "ducklife4": "games/duck-life-4.html",
   "clusterrush": "https://gameinclassroom.github.io/cluster-rush/",
   "cuphead": "https://freeonlinewebtools.github.io/gamelist2.github.io/Cuphead/",
   "badicecream": "https://freeonlinewebtools.github.io/gamelist8.github.io/Bad-Ice-Cream/",
@@ -120,7 +120,13 @@ const PRESERVED_LOCAL_GAMES = new Set([
   "games/basket-random.html",
   "games/boxing-random.html",
   "games/spaceflight-simulator.html",
-  "games/duck-life-5.html"
+  "games/duck-life-1.html",
+  "games/duck-life-2.html",
+  "games/duck-life-3.html",
+  "games/duck-life-4.html",
+  "games/duck-life-5.html",
+  "games/sawyer-for-sawyer.html",
+  "games/a-small-world-cup.html"
 ]);
 
 function cleanText(str: string): string {
@@ -461,52 +467,47 @@ export function resolveGameSource(
     };
   }
 
-  // Duck Life Series (100% Working WebGL & HTML5 Builds)
+  // Duck Life Series (100% Reliable Local Ruffle WebAssembly Engines with Local SWFs)
   if (safeId === 'duck-life' || safeId === 'ducklife' || safeId === 'duck-life-1' || safeTitle.toLowerCase() === 'duck life') {
     return {
-      src: 'https://gameinclassroom.github.io/duck-life/',
+      src: 'games/duck-life-1.html',
       mirrors: [
-        'https://gameinclassroom.github.io/duck-life/',
-        '/api/proxy/game?url=https://gameinclassroom.github.io/duck-life/',
         'games/duck-life-1.html',
-        'games/flash-player.html?swf=games/swfs/ducklife1.swf&title=Duck+Life'
+        'games/flash-player.html?swf=games/swfs/ducklife1.swf&title=Duck+Life',
+        '/api/proxy/game?url=https://freeonlinewebtools.github.io/gamelist3.github.io/Duck-Life/'
       ]
     };
   }
 
   if (safeId === 'duck-life-2' || safeId === 'ducklife2' || safeTitle.toLowerCase().includes('duck life 2') || safeTitle.toLowerCase().includes('ducklife 2')) {
     return {
-      src: 'https://gameinclassroom.github.io/duck-life-2-world-champion/',
+      src: 'games/duck-life-2.html',
       mirrors: [
-        'https://gameinclassroom.github.io/duck-life-2-world-champion/',
-        '/api/proxy/game?url=https://gameinclassroom.github.io/duck-life-2-world-champion/',
         'games/duck-life-2.html',
-        'games/flash-player.html?swf=games/swfs/ducklife2.swf&title=Duck+Life+2'
+        'games/flash-player.html?swf=games/swfs/ducklife2.swf&title=Duck+Life+2',
+        '/api/proxy/game?url=https://freeonlinewebtools.github.io/gamelist3.github.io/Duck-Life-2/'
       ]
     };
   }
 
   if (safeId === 'duck-life-3' || safeId === 'ducklife3' || safeTitle.toLowerCase().includes('duck life 3') || safeTitle.toLowerCase().includes('ducklife 3')) {
     return {
-      src: 'https://gameinclassroom.github.io/duck-life-3-evolution/',
+      src: 'games/duck-life-3.html',
       mirrors: [
-        'https://gameinclassroom.github.io/duck-life-3-evolution/',
-        '/api/proxy/game?url=https://gameinclassroom.github.io/duck-life-3-evolution/',
         'games/duck-life-3.html',
-        'games/flash-player.html?swf=games/swfs/ducklife3.swf&title=Duck+Life+3'
+        'games/flash-player.html?swf=games/swfs/ducklife3.swf&title=Duck+Life+3',
+        '/api/proxy/game?url=https://freeonlinewebtools.github.io/gamelist3.github.io/Duck-Life-3/'
       ]
     };
   }
 
   if (safeId === 'duck-life-4' || safeId === 'ducklife4' || safeTitle.toLowerCase().includes('duck life 4') || safeTitle.toLowerCase().includes('ducklife 4')) {
     return {
-      src: 'https://gameinclassroom.github.io/duck-life-4/',
+      src: 'games/duck-life-4.html',
       mirrors: [
-        'https://gameinclassroom.github.io/duck-life-4/',
-        '/api/proxy/game?url=https://gameinclassroom.github.io/duck-life-4/',
-        'https://flyingsully.github.io/GameList.github.io/Duck-Life-4/',
         'games/duck-life-4.html',
-        'games/flash-player.html?swf=games/swfs/ducklife4.swf&title=Duck+Life+4'
+        'games/flash-player.html?swf=games/swfs/ducklife4.swf&title=Duck+Life+4',
+        'https://flyingsully.github.io/GameList.github.io/Duck-Life-4/'
       ]
     };
   }
@@ -516,28 +517,39 @@ export function resolveGameSource(
       src: 'games/duck-life-5.html',
       mirrors: [
         'games/duck-life-5.html',
-        'games/flash-player.html?swf=games/swfs/ducklife5.swf&title=Duck+Life+5',
-        'https://gameinclassroom.github.io/duck-life-4/'
+        'games/flash-player.html?swf=games/swfs/ducklife5.swf&title=Duck+Life+5'
       ]
     };
   }
 
   if (safeId.includes('duck-life-space') || safeTitle.toLowerCase().includes('duck life space')) {
     return {
-      src: 'https://gameinclassroom.github.io/duck-life-4/',
+      src: 'games/duck-life-4.html',
       mirrors: [
-        'https://gameinclassroom.github.io/duck-life-4/',
-        '/api/proxy/game?url=https://gameinclassroom.github.io/duck-life-4/'
+        'games/duck-life-4.html',
+        'games/flash-player.html?swf=games/swfs/ducklife4.swf&title=Duck+Life+Space'
       ]
     };
   }
 
   if (safeId.includes('duck-life-battle') || safeTitle.toLowerCase().includes('duck life battle')) {
     return {
-      src: 'https://gameinclassroom.github.io/duck-life-3-evolution/',
+      src: 'games/duck-life-3.html',
       mirrors: [
-        'https://gameinclassroom.github.io/duck-life-3-evolution/',
-        '/api/proxy/game?url=https://gameinclassroom.github.io/duck-life-3-evolution/'
+        'games/duck-life-3.html',
+        'games/flash-player.html?swf=games/swfs/ducklife3.swf&title=Duck+Life+Battle'
+      ]
+    };
+  }
+
+  // A Small World Cup (Sawyer For Sawyer)
+  if (safeId === 'sawyer-for-sawyer' || safeId.includes('small-world-cup') || safeTitle.toLowerCase().includes('small world cup') || safeTitle.toLowerCase().includes('sawyer for sawyer')) {
+    return {
+      src: 'games/a-small-world-cup.html',
+      mirrors: [
+        'games/a-small-world-cup.html',
+        'https://gameinclassroom.github.io/a-small-world-cup/',
+        '/api/proxy/game?url=https://gameinclassroom.github.io/a-small-world-cup/'
       ]
     };
   }

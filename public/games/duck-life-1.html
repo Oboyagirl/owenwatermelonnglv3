@@ -14,24 +14,67 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
-    #ruffle-container {
+    #player-container {
       width: 100%;
       height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    #loading-overlay {
       position: absolute;
-      top: 0;
-      left: 0;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #030712;
+      color: #fff;
+      z-index: 50;
+      gap: 14px;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: #38bdf8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    #loading-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f1f5f9;
     }
     ruffle-player {
       width: 100% !important;
       height: 100% !important;
       display: block !important;
     }
+    ruffle-player::part(message-overlay),
+    #message-overlay,
+    .message-overlay,
+    #panic,
+    .panic,
+    [id*="panic"],
+    [class*="panic"],
+    [id*="modal"],
+    [class*="modal"] {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
   </style>
-</head>
-<body>
-  <div id="ruffle-container"></div>
-  <script src="../ruffle/ruffle.js"></script>
+
   <script>
     window.RufflePlayer = window.RufflePlayer || {};
     window.RufflePlayer.config = {
@@ -46,26 +89,96 @@
       splashScreen: false,
       openUrlMode: "confirm",
       quality: "high",
+      maxExecutionDuration: 60,
+      playerVersion: 32,
       forceScale: true,
       wmode: "opaque",
       preferredRenderer: "webgl",
-      publicPath: "../ruffle/"
+      publicPath: "/ruffle/"
     };
+  </script>
+  <script src="/ruffle/ruffle.js" onerror="loadCdnRuffle()"></script>
+  <script>
+    function loadCdnRuffle() {
+      if (window.RufflePlayer && window.RufflePlayer.newest) return;
+      window.RufflePlayer.config.publicPath = "https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/";
+      const s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/ruffle.js";
+      document.head.appendChild(s);
+    }
+  </script>
+</head>
+<body>
+  <div id="player-container">
+    <div id="loading-overlay">
+      <div class="spinner"></div>
+      <div id="loading-text">Loading Duck Life...</div>
+    </div>
+  </div>
 
-    window.addEventListener("DOMContentLoaded", () => {
+  <script>
+    function hideOverlay() {
+      const overlay = document.getElementById("loading-overlay");
+      if (overlay) {
+        overlay.style.opacity = "0";
+        setTimeout(() => { overlay.style.display = "none"; }, 300);
+      }
+    }
+
+    function startPlayer() {
+      if (!window.RufflePlayer || typeof window.RufflePlayer.newest !== "function") {
+        setTimeout(startPlayer, 100);
+        return;
+      }
+
       try {
         const ruffle = window.RufflePlayer.newest();
         const player = ruffle.createPlayer();
-        const container = document.getElementById("ruffle-container");
+        const container = document.getElementById("player-container");
         container.appendChild(player);
-        player.style.width = "100%";
-        player.style.height = "100%";
-        player.load("swfs/ducklife1.swf");
+
+        player.addEventListener("loadedmetadata", hideOverlay);
+        setTimeout(hideOverlay, 4500);
+
+        player.load({
+          url: "swfs/ducklife1.swf",
+          autoplay: "auto",
+          backgroundColor: "#000000"
+        }).then(() => {
+          setTimeout(hideOverlay, 200);
+        }).catch((e) => {
+          console.warn("Retrying with absolute path", e);
+          player.load({
+            url: "/games/swfs/ducklife1.swf",
+            autoplay: "auto",
+            backgroundColor: "#000000"
+          }).finally(hideOverlay);
+        });
+
+        const suppressInterval = setInterval(() => {
+          if (player && player.shadowRoot) {
+            const modal = player.shadowRoot.querySelector("#message-overlay") || 
+                          player.shadowRoot.querySelector(".message-overlay") ||
+                          player.shadowRoot.querySelector("#panic") ||
+                          player.shadowRoot.querySelector(".panic");
+            if (modal) modal.remove();
+          }
+        }, 400);
+
+        window.addEventListener("beforeunload", () => {
+          clearInterval(suppressInterval);
+        });
       } catch (err) {
-        console.error("Local Ruffle load failed, falling back to mirror", err);
-        window.location.replace("https://ubghyper.github.io/GameList.github.io/Duck-Life/");
+        hideOverlay();
+        console.error("Ruffle init error", err);
       }
-    });
+    }
+
+    if (document.readyState === "loading") {
+      window.addEventListener("DOMContentLoaded", startPlayer);
+    } else {
+      startPlayer();
+    }
   </script>
 </body>
 </html>

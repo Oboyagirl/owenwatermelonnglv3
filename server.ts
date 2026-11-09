@@ -256,18 +256,26 @@ async function startServer() {
   // Serve static real MP3 music with byte-range streaming support (compatible with iOS iPad Safari & Chrome)
   const streamAudioFile = async (filenameOrPath: string, req: express.Request, res: express.Response) => {
     let filePath = filenameOrPath;
+    const isFileValid = (p: string) => {
+      try {
+        return fs.existsSync(p) && fs.statSync(p).size > 1000;
+      } catch {
+        return false;
+      }
+    };
+
     if (!path.isAbsolute(filePath)) {
       const cleanFilename = path.basename(filenameOrPath);
       filePath = path.join(primaryMusicDir, cleanFilename);
-      if (!fs.existsSync(filePath)) {
+      if (!isFileValid(filePath)) {
         filePath = path.join(cacheMusicDir, cleanFilename);
       }
-      if (!fs.existsSync(filePath)) {
+      if (!isFileValid(filePath)) {
         filePath = path.join(fallbackMusicDir, cleanFilename);
       }
     }
 
-    if (!fs.existsSync(filePath)) {
+    if (!isFileValid(filePath)) {
       const cleanFilename = path.basename(filenameOrPath);
       let sourceUrl = albumSourceUrlsMap[cleanFilename];
       if (!sourceUrl) {
