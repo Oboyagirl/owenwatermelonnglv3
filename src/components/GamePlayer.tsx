@@ -144,12 +144,27 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
       const contentWindow = iframeRef.current?.contentWindow || null;
       await restoreUniversalGameState(game.id, latestSave.saveData, contentWindow);
       const exactTime = formatExactTimestamp(latestSave.updatedAt || latestSave.createdAt);
-      setRestoreNotification(`Restored checkpoint from ${exactTime}! Reloading game...`);
-      setTimeout(() => {
-        handleReload();
+
+      let hasLiveEmulatorState = false;
+      try {
+        const parsed = JSON.parse(latestSave.saveData);
+        if (parsed?.emulator?.stateBase64) {
+          hasLiveEmulatorState = true;
+        }
+      } catch (e) {}
+
+      if (hasLiveEmulatorState) {
+        setRestoreNotification(`Restored exact point in time (${exactTime})! State loaded into game.`);
         setIsRestoringLatest(false);
         setTimeout(() => setRestoreNotification(null), 3500);
-      }, 400);
+      } else {
+        setRestoreNotification(`Restored checkpoint from ${exactTime}! Reloading game...`);
+        setTimeout(() => {
+          handleReload();
+          setIsRestoringLatest(false);
+          setTimeout(() => setRestoreNotification(null), 3500);
+        }, 400);
+      }
     } catch (e) {
       console.error("Restore latest checkpoint error:", e);
       setIsRestoringLatest(false);

@@ -60,7 +60,7 @@ const ACADEMICS_MAP: Record<string, string> = {
   "sausageflip": "https://7zeb.github.io/homework/steal-a-brainrot/go/sausage-flip.html",
   "sausagerun": "https://7zeb.github.io/homework/steal-a-brainrot/go/sausage-flip.html",
   "bindingofisaac": "https://flyingsully.github.io/GameList.github.io/Binding-Of-Isaac/",
-  "ducklife4": "games/duck-life-4.html",
+  "ducklife4": "https://ubghyper.github.io/GameList.github.io/Duck-Life-4/",
   "clusterrush": "https://gameinclassroom.github.io/cluster-rush/",
   "cuphead": "https://freeonlinewebtools.github.io/gamelist2.github.io/Cuphead/",
   "badicecream": "https://freeonlinewebtools.github.io/gamelist8.github.io/Bad-Ice-Cream/",
@@ -185,18 +185,18 @@ export function resolveGameSource(
 
   if (safeId === 'achievement-unlocked' || safeTitle.toLowerCase() === 'achievement unlocked') {
     return {
-      src: 'games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Achievement-Unlocked/achievementunlocked.swf&title=Achievement+Unlocked',
+      src: 'https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked/',
       mirrors: [
-        'games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Achievement-Unlocked/achievementunlocked.swf&title=Achievement+Unlocked'
+        'https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked/',
+        'https://freeonlinewebtools.github.io/gamelist3.github.io/Achievement-Unlocked/'
       ]
     };
   }
 
   if (safeId === 'achievement-unlocked-2' || safeTitle.toLowerCase() === 'achievement unlocked 2') {
     return {
-      src: 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked-2/achievementunlocked2.swf&title=Achievement+Unlocked+2',
+      src: 'https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked-2/',
       mirrors: [
-        'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked-2/achievementunlocked2.swf&title=Achievement+Unlocked+2',
         'https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked-2/'
       ]
     };
@@ -204,9 +204,8 @@ export function resolveGameSource(
 
   if (safeId === 'achievement-unlocked-3' || safeTitle.toLowerCase() === 'achievement unlocked 3') {
     return {
-      src: 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked-3/achievementunlocked3.swf&title=Achievement+Unlocked+3',
+      src: 'https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked-3/',
       mirrors: [
-        'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked-3/achievementunlocked3.swf&title=Achievement+Unlocked+3',
         'https://ubghyper.github.io/GameList.github.io/Achievement-Unlocked-3/'
       ]
     };
@@ -269,7 +268,7 @@ export function resolveGameSource(
         'https://diep.io',
         'https://ilancosman.github.io/diepio-clone/',
         'https://priswall.github.io/diepio-clone/',
-        '/api/proxy/game?url=https://diep.io',
+        "https://diep.io",
         'games/diep-io.html'
       ]
     };
@@ -281,7 +280,7 @@ export function resolveGameSource(
       src: 'https://7zeb.github.io/homework/agariolite.html',
       mirrors: [
         'https://7zeb.github.io/homework/agariolite.html',
-        '/api/proxy/game?url=https://7zeb.github.io/homework/agariolite.html',
+        "https://7zeb.github.io/homework/agariolite.html",
         'games/agar-io.html'
       ]
     };
@@ -293,7 +292,7 @@ export function resolveGameSource(
       src: 'https://freeonlinewebtools.github.io/gamelist3.github.io/slitherio/',
       mirrors: [
         'https://freeonlinewebtools.github.io/gamelist3.github.io/slitherio/',
-        '/api/proxy/game?url=https://freeonlinewebtools.github.io/gamelist3.github.io/slitherio/',
+        "https://freeonlinewebtools.github.io/gamelist3.github.io/slitherio/",
         'games/slither-io.html'
       ]
     };
@@ -306,7 +305,7 @@ export function resolveGameSource(
       mirrors: [
         'https://7zeb.github.io/homework/holeio.html',
         'https://gameinclassroom.github.io/hole-io/',
-        '/api/proxy/game?url=https://7zeb.github.io/homework/holeio.html'
+        "https://7zeb.github.io/homework/holeio.html"
       ]
     };
   }
@@ -317,7 +316,7 @@ export function resolveGameSource(
       src: 'https://7zeb.github.io/homework/snowballio.html',
       mirrors: [
         'https://7zeb.github.io/homework/snowballio.html',
-        '/api/proxy/game?url=https://7zeb.github.io/homework/snowballio.html'
+        "https://7zeb.github.io/homework/snowballio.html"
       ]
     };
   }
@@ -328,7 +327,7 @@ export function resolveGameSource(
       src: 'https://7zeb.github.io/homework/territorialio.html',
       mirrors: [
         'https://7zeb.github.io/homework/territorialio.html',
-        '/api/proxy/game?url=https://7zeb.github.io/homework/territorialio.html'
+        "https://7zeb.github.io/homework/territorialio.html"
       ]
     };
   }
@@ -339,7 +338,7 @@ export function resolveGameSource(
       src: 'https://7zeb.github.io/homework/stateio.html',
       mirrors: [
         'https://7zeb.github.io/homework/stateio.html',
-        '/api/proxy/game?url=https://7zeb.github.io/homework/stateio.html'
+        "https://7zeb.github.io/homework/stateio.html"
       ]
     };
   }
@@ -350,7 +349,7 @@ export function resolveGameSource(
       src: 'https://7zeb.github.io/homework/cleanupio.html',
       mirrors: [
         'https://7zeb.github.io/homework/cleanupio.html',
-        '/api/proxy/game?url=https://7zeb.github.io/homework/cleanupio.html'
+        "https://7zeb.github.io/homework/cleanupio.html"
       ]
     };
   }
@@ -361,7 +360,7 @@ export function resolveGameSource(
       src: 'https://freeonlinewebtools.github.io/gamelist3.github.io/EvoWarsio/',
       mirrors: [
         'https://freeonlinewebtools.github.io/gamelist3.github.io/EvoWarsio/',
-        '/api/proxy/game?url=https://freeonlinewebtools.github.io/gamelist3.github.io/EvoWarsio/'
+        "https://freeonlinewebtools.github.io/gamelist3.github.io/EvoWarsio/"
       ]
     };
   }
@@ -372,7 +371,7 @@ export function resolveGameSource(
       src: 'https://gameinclassroom.github.io/zombs-royale-io/',
       mirrors: [
         'https://gameinclassroom.github.io/zombs-royale-io/',
-        '/api/proxy/game?url=https://gameinclassroom.github.io/zombs-royale-io/'
+        "https://gameinclassroom.github.io/zombs-royale-io/"
       ]
     };
   }
@@ -383,7 +382,7 @@ export function resolveGameSource(
       src: 'https://academics-study.github.io/shellshockers/',
       mirrors: [
         'https://academics-study.github.io/shellshockers/',
-        '/api/proxy/game?url=https://academics-study.github.io/shellshockers/'
+        "https://academics-study.github.io/shellshockers/"
       ]
     };
   }
@@ -394,7 +393,7 @@ export function resolveGameSource(
       src: 'https://gameinclassroom.github.io/brawlguys-io/',
       mirrors: [
         'https://gameinclassroom.github.io/brawlguys-io/',
-        '/api/proxy/game?url=https://gameinclassroom.github.io/brawlguys-io/'
+        "https://gameinclassroom.github.io/brawlguys-io/"
       ]
     };
   }
@@ -405,7 +404,7 @@ export function resolveGameSource(
       src: 'https://gameinclassroom.github.io/tall-io/',
       mirrors: [
         'https://gameinclassroom.github.io/tall-io/',
-        '/api/proxy/game?url=https://gameinclassroom.github.io/tall-io/'
+        "https://gameinclassroom.github.io/tall-io/"
       ]
     };
   }
@@ -417,7 +416,7 @@ export function resolveGameSource(
       mirrors: [
         'https://7zeb.github.io/homework/bloonsTD.html',
         'https://gameinclassroom.github.io/bloons-tower-defense-1/',
-        '/api/proxy/game?url=https://gameinclassroom.github.io/bloons-tower-defense-1/',
+        "https://gameinclassroom.github.io/bloons-tower-defense-1/",
         'https://ubghyper.github.io/GameList.github.io/Bloons-Tower-Defense/'
       ]
     };
@@ -429,7 +428,7 @@ export function resolveGameSource(
       mirrors: [
         'https://7zeb.github.io/homework/bloonsTD2.html',
         'https://ubghyper.github.io/GameList.github.io/Bloonstd-2/',
-        '/api/proxy/game?url=https://ubghyper.github.io/GameList.github.io/Bloonstd-2/'
+        "https://ubghyper.github.io/GameList.github.io/Bloonstd-2/"
       ]
     };
   }
@@ -440,7 +439,7 @@ export function resolveGameSource(
       mirrors: [
         'https://7zeb.github.io/homework/bloonsTD3.html',
         'https://ubghyper.github.io/GameList.github.io/Bloonstd-3/',
-        '/api/proxy/game?url=https://ubghyper.github.io/GameList.github.io/Bloonstd-3/'
+        "https://ubghyper.github.io/GameList.github.io/Bloonstd-3/"
       ]
     };
   }
@@ -451,7 +450,7 @@ export function resolveGameSource(
       mirrors: [
         'https://7zeb.github.io/homework/bloonsTD4.html',
         'https://ubghyper.github.io/GameList.github.io/Bloonstd-4/',
-        '/api/proxy/game?url=https://ubghyper.github.io/GameList.github.io/Bloonstd-4/'
+        "https://ubghyper.github.io/GameList.github.io/Bloonstd-4/"
       ]
     };
   }
@@ -462,82 +461,80 @@ export function resolveGameSource(
       mirrors: [
         'https://7zeb.github.io/homework/bloonsTD5.html',
         'https://ubghyper.github.io/GameList.github.io/Bloonstd-5/',
-        '/api/proxy/game?url=https://ubghyper.github.io/GameList.github.io/Bloonstd-5/'
+        "https://ubghyper.github.io/GameList.github.io/Bloonstd-5/"
       ]
     };
   }
 
-  // Duck Life Series (100% Reliable Local Ruffle WebAssembly Engines with Local SWFs)
+  // Duck Life Series (Direct Standalone Fast GitHub Pages Mirrors with Local Fallbacks)
   if (safeId === 'duck-life' || safeId === 'ducklife' || safeId === 'duck-life-1' || safeTitle.toLowerCase() === 'duck life') {
     return {
-      src: 'games/duck-life-1.html',
+      src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life/',
       mirrors: [
-        'games/duck-life-1.html',
-        'games/flash-player.html?swf=games/swfs/ducklife1.swf&title=Duck+Life',
-        '/api/proxy/game?url=https://freeonlinewebtools.github.io/gamelist3.github.io/Duck-Life/'
+        'https://ubghyper.github.io/GameList.github.io/Duck-Life/',
+        'games/duck-life-1.html'
       ]
     };
   }
 
   if (safeId === 'duck-life-2' || safeId === 'ducklife2' || safeTitle.toLowerCase().includes('duck life 2') || safeTitle.toLowerCase().includes('ducklife 2')) {
     return {
-      src: 'games/duck-life-2.html',
+      src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life-2/',
       mirrors: [
-        'games/duck-life-2.html',
-        'games/flash-player.html?swf=games/swfs/ducklife2.swf&title=Duck+Life+2',
-        '/api/proxy/game?url=https://freeonlinewebtools.github.io/gamelist3.github.io/Duck-Life-2/'
+        'https://ubghyper.github.io/GameList.github.io/Duck-Life-2/',
+        'games/duck-life-2.html'
       ]
     };
   }
 
   if (safeId === 'duck-life-3' || safeId === 'ducklife3' || safeTitle.toLowerCase().includes('duck life 3') || safeTitle.toLowerCase().includes('ducklife 3')) {
     return {
-      src: 'games/duck-life-3.html',
+      src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life-3/',
       mirrors: [
-        'games/duck-life-3.html',
-        'games/flash-player.html?swf=games/swfs/ducklife3.swf&title=Duck+Life+3',
-        '/api/proxy/game?url=https://freeonlinewebtools.github.io/gamelist3.github.io/Duck-Life-3/'
+        'https://ubghyper.github.io/GameList.github.io/Duck-Life-3/',
+        'games/duck-life-3.html'
       ]
     };
   }
 
   if (safeId === 'duck-life-4' || safeId === 'ducklife4' || safeTitle.toLowerCase().includes('duck life 4') || safeTitle.toLowerCase().includes('ducklife 4')) {
     return {
-      src: 'games/duck-life-4.html',
+      src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life-4/',
       mirrors: [
-        'games/duck-life-4.html',
-        'games/flash-player.html?swf=games/swfs/ducklife4.swf&title=Duck+Life+4',
-        'https://flyingsully.github.io/GameList.github.io/Duck-Life-4/'
+        'https://ubghyper.github.io/GameList.github.io/Duck-Life-4/',
+        'https://flyingsully.github.io/GameList.github.io/Duck-Life-4/',
+        'games/duck-life-4.html'
       ]
     };
   }
 
   if (safeId === 'duck-life-5' || safeId === 'ducklife5' || safeTitle.toLowerCase().includes('duck life 5') || safeTitle.toLowerCase().includes('treasure hunt')) {
     return {
-      src: 'games/duck-life-5.html',
+      src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life-5/',
       mirrors: [
-        'games/duck-life-5.html',
-        'games/flash-player.html?swf=games/swfs/ducklife5.swf&title=Duck+Life+5'
+        'https://ubghyper.github.io/GameList.github.io/Duck-Life-5/',
+        'https://mountjustin.github.io/ducklife5.html',
+        'games/duck-life-5.html'
       ]
     };
   }
 
   if (safeId.includes('duck-life-space') || safeTitle.toLowerCase().includes('duck life space')) {
     return {
-      src: 'games/duck-life-4.html',
+      src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life-4/',
       mirrors: [
-        'games/duck-life-4.html',
-        'games/flash-player.html?swf=games/swfs/ducklife4.swf&title=Duck+Life+Space'
+        'https://ubghyper.github.io/GameList.github.io/Duck-Life-4/',
+        'games/duck-life-4.html'
       ]
     };
   }
 
   if (safeId.includes('duck-life-battle') || safeTitle.toLowerCase().includes('duck life battle')) {
     return {
-      src: 'games/duck-life-3.html',
+      src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life-3/',
       mirrors: [
-        'games/duck-life-3.html',
-        'games/flash-player.html?swf=games/swfs/ducklife3.swf&title=Duck+Life+Battle'
+        'https://ubghyper.github.io/GameList.github.io/Duck-Life-3/',
+        'games/duck-life-3.html'
       ]
     };
   }
@@ -549,7 +546,7 @@ export function resolveGameSource(
       mirrors: [
         'games/a-small-world-cup.html',
         'https://gameinclassroom.github.io/a-small-world-cup/',
-        '/api/proxy/game?url=https://gameinclassroom.github.io/a-small-world-cup/'
+        "https://gameinclassroom.github.io/a-small-world-cup/"
       ]
     };
   }
@@ -610,7 +607,7 @@ export function resolveGameSource(
       src: 'https://gameinclassroom.github.io/fireboy-watergirl-3-ice-temple/',
       mirrors: [
         'https://gameinclassroom.github.io/fireboy-watergirl-3-ice-temple/',
-        '/api/proxy/game?url=https://gameinclassroom.github.io/fireboy-watergirl-3-ice-temple/'
+        "https://gameinclassroom.github.io/fireboy-watergirl-3-ice-temple/"
       ]
     };
   }
@@ -620,7 +617,7 @@ export function resolveGameSource(
       src: 'https://gameinclassroom.github.io/fireboy-and-watergirl-2-light-temple/',
       mirrors: [
         'https://gameinclassroom.github.io/fireboy-and-watergirl-2-light-temple/',
-        '/api/proxy/game?url=https://gameinclassroom.github.io/fireboy-and-watergirl-2-light-temple/'
+        "https://gameinclassroom.github.io/fireboy-and-watergirl-2-light-temple/"
       ]
     };
   }
@@ -630,7 +627,7 @@ export function resolveGameSource(
       src: 'https://gameinclassroom.github.io/fireboy-and-watergirl-4-crystal-temple/',
       mirrors: [
         'https://gameinclassroom.github.io/fireboy-and-watergirl-4-crystal-temple/',
-        '/api/proxy/game?url=https://gameinclassroom.github.io/fireboy-and-watergirl-4-crystal-temple/'
+        "https://gameinclassroom.github.io/fireboy-and-watergirl-4-crystal-temple/"
       ]
     };
   }
@@ -640,7 +637,7 @@ export function resolveGameSource(
       src: 'https://gameinclassroom.github.io/fireboy-and-watergirl-5-elements/',
       mirrors: [
         'https://gameinclassroom.github.io/fireboy-and-watergirl-5-elements/',
-        '/api/proxy/game?url=https://gameinclassroom.github.io/fireboy-and-watergirl-5-elements/'
+        "https://gameinclassroom.github.io/fireboy-and-watergirl-5-elements/"
       ]
     };
   }
@@ -650,7 +647,7 @@ export function resolveGameSource(
       src: 'https://gameinclassroom.github.io/fireboy-watergirl-6-fairy-tales/',
       mirrors: [
         'https://gameinclassroom.github.io/fireboy-watergirl-6-fairy-tales/',
-        '/api/proxy/game?url=https://gameinclassroom.github.io/fireboy-watergirl-6-fairy-tales/'
+        "https://gameinclassroom.github.io/fireboy-watergirl-6-fairy-tales/"
       ]
     };
   }
@@ -660,7 +657,7 @@ export function resolveGameSource(
       src: 'https://gameinclassroom.github.io/fireboy-and-watergirl-forest-temple/',
       mirrors: [
         'https://gameinclassroom.github.io/fireboy-and-watergirl-forest-temple/',
-        '/api/proxy/game?url=https://gameinclassroom.github.io/fireboy-and-watergirl-forest-temple/'
+        "https://gameinclassroom.github.io/fireboy-and-watergirl-forest-temple/"
       ]
     };
   }
@@ -674,7 +671,7 @@ export function resolveGameSource(
       src: 'https://gameinclassroom.github.io/papas-pizzaria/',
       mirrors: [
         'https://gameinclassroom.github.io/papas-pizzaria/',
-        '/api/proxy/game?url=https://gameinclassroom.github.io/papas-pizzaria/',
+        "https://gameinclassroom.github.io/papas-pizzaria/",
         'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Papas-Pizzeria/papaspizzeria.swf&title=Papas+Pizzeria'
       ]
     };
@@ -815,7 +812,7 @@ export function resolveGameSource(
       src: 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Cooking-Mama/cooking-mama.swf&title=Cooking+Mama',
       mirrors: [
         'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Cooking-Mama/cooking-mama.swf&title=Cooking+Mama',
-        '/api/proxy/game?url=https://ubghyper.github.io/GameList.github.io/Cooking-Mama/'
+        "https://ubghyper.github.io/GameList.github.io/Cooking-Mama/"
       ]
     };
   }
@@ -924,7 +921,8 @@ export function resolveGameSource(
 
   // If the primary source is an external HTTP(S) URL, add the universal school-filter proxy mirror
   if (resolvedSrc.startsWith('http://') || resolvedSrc.startsWith('https://')) {
-    const proxyMirror = `/api/proxy/game?url=${encodeURIComponent(resolvedSrc)}`;
+    const isStatic = typeof window !== 'undefined' && (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:');
+    const proxyMirror = !isStatic && resolvedSrc.startsWith('http') ? `/api/proxy/game?url=${encodeURIComponent(resolvedSrc)}` : resolvedSrc;
     if (!validMirrors.includes(proxyMirror)) {
       validMirrors.push(proxyMirror);
     }

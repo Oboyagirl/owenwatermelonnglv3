@@ -412,7 +412,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 220,
     "cover": "./music/covers/new_west_those_eyes.jpg",
     "genre": "Indie Pop / Dream Pop",
-    "audioSrc": "./music/new_west_those_eyes.mp3",
+    "audioSrc": "https://archive.org/download/new-west-those-eyes-chapter-1/New%20West%20%20Those%20Eyes%20(Chapter%201%20).mp4",
     "spotifyId": "5V2qgB03dY31bQ6y0h3EwE",
     "albumId": "album-those-eyes",
     "trackNumber": 1,
@@ -428,7 +428,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 180,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "./music/tyler_see_you_again.mp3",
+    "audioSrc": "https://archive.org/download/flowerboy2017_202504/04%20See%20You%20Again.mp3",
     "spotifyId": "7KA4W4McWYRpgf0fWsTG9i",
     "albumId": "album-flower-boy",
     "trackNumber": 4,
@@ -444,7 +444,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 298,
     "cover": "./music/covers/drake_more_life.jpg",
     "genre": "Dancehall / R&B",
-    "audioSrc": "./music/drake_passionfruit.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/One%20Dance.mp3",
     "spotifyId": "5mCPDffwhirusUrfd2v23G",
     "albumId": "album-more-life",
     "trackNumber": 3,
@@ -460,7 +460,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 194,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "./music/tyler_flower_boy_01_foreword.mp3",
+    "audioSrc": "https://archive.org/download/flowerboy2017_202504/01%20Foreword.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 1,
     "hasLocalAudio": true
@@ -475,7 +475,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 194,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "./music/tyler_flower_boy_02_where_this_flower_blooms.mp3",
+    "audioSrc": "https://archive.org/download/flowerboy2017_202504/02%20Where%20This%20Flower%20Blooms.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 2,
     "hasLocalAudio": true
@@ -490,7 +490,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 36,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "./music/tyler_flower_boy_03_sometimes.mp3",
+    "audioSrc": "https://archive.org/download/flowerboy2017_202504/03%20Sometimes....mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 3,
     "hasLocalAudio": true
@@ -505,7 +505,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 180,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "./music/tyler_see_you_again.mp3",
+    "audioSrc": "https://archive.org/download/flowerboy2017_202504/04%20See%20You%20Again.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 4,
     "hasLocalAudio": true
@@ -520,7 +520,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 205,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "./music/tyler_flower_boy_05_who_dat_boy.mp3",
+    "audioSrc": "https://archive.org/download/flowerboy2017_202504/05%20Who%20Dat%20Boy.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 5,
     "hasLocalAudio": true
@@ -535,7 +535,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 237,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "./music/tyler_flower_boy_06_pothole.mp3",
+    "audioSrc": "https://archive.org/download/flowerboy2017_202504/06%20Pothole.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 6,
     "hasLocalAudio": true
@@ -550,7 +550,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 223,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "./music/tyler_flower_boy_07_garden_shed.mp3",
+    "audioSrc": "https://archive.org/download/flowerboy2017_202504/07%20Garden%20Shed.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 7,
     "hasLocalAudio": true
@@ -565,7 +565,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 320,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "./music/tyler_flower_boy_08_boredom.mp3",
+    "audioSrc": "https://archive.org/download/flowerboy2017_202504/08%20Boredom.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 8,
     "hasLocalAudio": true
@@ -580,7 +580,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 206,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "./music/tyler_flower_boy_09_i_aint_got_time.mp3",
+    "audioSrc": "https://archive.org/download/flowerboy2017_202504/09%20I%20Ain%27t%20Got%20Time!.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 9,
     "hasLocalAudio": true
@@ -595,7 +595,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 255,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "./music/tyler_flower_boy_10_911_mr_lonely.mp3",
+    "audioSrc": "https://archive.org/download/flowerboy2017_202504/10%20911%20_%20Mr.%20Lonely.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 10,
     "hasLocalAudio": true
@@ -610,7 +610,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 60,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "./music/tyler_flower_boy_11_droppin_seeds.mp3",
+    "audioSrc": "https://archive.org/download/flowerboy2017_202504/11%20Droppin%27%20Seeds.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 11,
     "hasLocalAudio": true
@@ -625,7 +625,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 225,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "./music/tyler_flower_boy_12_november.mp3",
+    "audioSrc": "https://archive.org/download/flowerboy2017_202504/12%20November.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 12,
     "hasLocalAudio": true
@@ -640,7 +640,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 224,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "./music/tyler_flower_boy_13_glitter.mp3",
+    "audioSrc": "https://archive.org/download/flowerboy2017_202504/13%20Glitter.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 13,
     "hasLocalAudio": true
@@ -655,7 +655,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 235,
     "cover": "./music/covers/tyler_flower_boy.jpg",
     "genre": "Hip Hop / Neo Soul",
-    "audioSrc": "./music/tyler_flower_boy_14_enjoy_right_now_today.mp3",
+    "audioSrc": "https://archive.org/download/flowerboy2017_202504/14%20Enjoy%20Right%20Now%2C%20Today.mp3",
     "albumId": "album-flower-boy",
     "trackNumber": 14,
     "hasLocalAudio": true
@@ -1060,7 +1060,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 515,
     "cover": "./music/covers/tyler_cmiygl.jpg",
     "genre": "Hip Hop / Rap",
-    "audioSrc": "./music/tyler_cmiygl_15.mp3",
+    "audioSrc": "https://archive.org/download/call-me-if-you-get-lost_20250821/CALL%20ME%20IF%20YOU%20GET%20LOST_%20The%20Estate%20Sale%20%5BAlbum%5D/15%20-%20WILSHIRE.mp3",
     "albumId": "album-cmiygl",
     "trackNumber": 15,
     "hasLocalAudio": true
@@ -1090,7 +1090,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 169,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "./music/alex_g_trick_01.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Trick/01%20-%20Memory.mp3",
     "albumId": "album-trick",
     "trackNumber": 1,
     "hasLocalAudio": true
@@ -1105,7 +1105,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 147,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "./music/alex_g_trick_02.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Trick/02%20-%20Forever.mp3",
     "albumId": "album-trick",
     "trackNumber": 2,
     "hasLocalAudio": true
@@ -1120,7 +1120,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 171,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "./music/alex_g_trick_03.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Trick/03%20-%20Animals.mp3",
     "albumId": "album-trick",
     "trackNumber": 3,
     "hasLocalAudio": true
@@ -1135,7 +1135,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 176,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "./music/alex_g_trick_04.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Trick/04%20-%20String.mp3",
     "albumId": "album-trick",
     "trackNumber": 4,
     "hasLocalAudio": true
@@ -1150,7 +1150,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 181,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "./music/alex_g_trick_05.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Trick/05%20-%20Advice.mp3",
     "albumId": "album-trick",
     "trackNumber": 5,
     "hasLocalAudio": true
@@ -1165,7 +1165,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 157,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "./music/alex_g_trick_06.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Trick/06%20-%20People.mp3",
     "albumId": "album-trick",
     "trackNumber": 6,
     "hasLocalAudio": true
@@ -1180,7 +1180,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 104,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "./music/alex_g_trick_07.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Trick/07%20-%20Whale.mp3",
     "albumId": "album-trick",
     "trackNumber": 7,
     "hasLocalAudio": true
@@ -1195,7 +1195,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 82,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "./music/alex_g_trick_08.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Trick/08%20-%20Trick.mp3",
     "albumId": "album-trick",
     "trackNumber": 8,
     "hasLocalAudio": true
@@ -1210,7 +1210,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 100,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "./music/alex_g_trick_09.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Trick/09%20-%20Kute.mp3",
     "albumId": "album-trick",
     "trackNumber": 9,
     "hasLocalAudio": true
@@ -1285,7 +1285,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 143,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "./music/alex_g_trick_14.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Trick/14%20-%20Adam.mp3",
     "albumId": "album-trick",
     "trackNumber": 14,
     "hasLocalAudio": true
@@ -1300,7 +1300,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 161,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "./music/alex_g_trick_15.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Trick/15%20-%20Sarah.mp3",
     "albumId": "album-trick",
     "trackNumber": 15,
     "hasLocalAudio": true
@@ -1315,7 +1315,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 182,
     "cover": "./music/covers/alex_g_trick.jpg",
     "genre": "Indie Rock / Lo-Fi",
-    "audioSrc": "./music/alex_g_trick_16.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Trick/16%20-%2016%20Mirrors.mp3",
     "albumId": "album-trick",
     "trackNumber": 16,
     "hasLocalAudio": true
@@ -1330,7 +1330,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 246,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "./music/alex_g_house_of_sugar_01.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2019%20-%20House%20Of%20Sugar/01%20-%20Walk%20Away.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 1,
     "hasLocalAudio": true
@@ -1345,7 +1345,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 158,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "./music/alex_g_house_of_sugar_02.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2019%20-%20House%20Of%20Sugar/02%20-%20Hope.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 2,
     "hasLocalAudio": true
@@ -1360,7 +1360,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 193,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "./music/alex_g_house_of_sugar_03.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2019%20-%20House%20Of%20Sugar/03%20-%20Southern%20Sky.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 3,
     "hasLocalAudio": true
@@ -1375,7 +1375,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 190,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "./music/alex_g_house_of_sugar_04.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2019%20-%20House%20Of%20Sugar/04%20-%20Gretel.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 4,
     "hasLocalAudio": true
@@ -1390,7 +1390,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 136,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "./music/alex_g_house_of_sugar_05.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2019%20-%20House%20Of%20Sugar/05%20-%20Taking.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 5,
     "hasLocalAudio": true
@@ -1405,7 +1405,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 130,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "./music/alex_g_house_of_sugar_06.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2019%20-%20House%20Of%20Sugar/06%20-%20Near.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 6,
     "hasLocalAudio": true
@@ -1420,7 +1420,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 145,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "./music/alex_g_house_of_sugar_07.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2019%20-%20House%20Of%20Sugar/07%20-%20Project%202.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 7,
     "hasLocalAudio": true
@@ -1435,7 +1435,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 112,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "./music/alex_g_house_of_sugar_08.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2019%20-%20House%20Of%20Sugar/08%20-%20Bad%20Man.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 8,
     "hasLocalAudio": true
@@ -1450,7 +1450,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 174,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "./music/alex_g_house_of_sugar_09.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2019%20-%20House%20Of%20Sugar/09%20-%20Sugar.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 9,
     "hasLocalAudio": true
@@ -1465,7 +1465,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 163,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "./music/alex_g_house_of_sugar_10.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2019%20-%20House%20Of%20Sugar/10%20-%20In%20My%20Arms.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 10,
     "hasLocalAudio": true
@@ -1480,7 +1480,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 165,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "./music/alex_g_house_of_sugar_11.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2019%20-%20House%20Of%20Sugar/11%20-%20Cow.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 11,
     "hasLocalAudio": true
@@ -1495,7 +1495,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 238,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "./music/alex_g_house_of_sugar_12.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2019%20-%20House%20Of%20Sugar/12%20-%20Crime.mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 12,
     "hasLocalAudio": true
@@ -1510,7 +1510,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 210,
     "cover": "./music/covers/alex_g_house_of_sugar.jpg",
     "genre": "Art Pop / Experimental Indie",
-    "audioSrc": "./music/alex_g_house_of_sugar_13.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2019%20-%20House%20Of%20Sugar/13%20-%20SugarHouse%20(Live).mp3",
     "albumId": "album-house-of-sugar",
     "trackNumber": 13,
     "hasLocalAudio": true
@@ -1540,7 +1540,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 199,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "./music/alex_g_god_save_01.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2022%20-%20God%20Save%20The%20Animals/01.%20After%20All.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 1,
     "hasLocalAudio": true
@@ -1555,7 +1555,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 156,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "./music/alex_g_god_save_02.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2022%20-%20God%20Save%20The%20Animals/02.%20Runner.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 2,
     "hasLocalAudio": true
@@ -1570,7 +1570,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 185,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "./music/alex_g_god_save_03.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2022%20-%20God%20Save%20The%20Animals/03.%20Mission.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 3,
     "hasLocalAudio": true
@@ -1585,7 +1585,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 170,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "./music/alex_g_god_save_04.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2022%20-%20God%20Save%20The%20Animals/04.%20S.D.O.S.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 4,
     "hasLocalAudio": true
@@ -1600,7 +1600,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 218,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "./music/alex_g_god_save_05.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2022%20-%20God%20Save%20The%20Animals/05.%20No%20Bitterness.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 5,
     "hasLocalAudio": true
@@ -1615,7 +1615,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 175,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "./music/alex_g_god_save_06.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2022%20-%20God%20Save%20The%20Animals/06.%20Ain't%20It%20Easy.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 6,
     "hasLocalAudio": true
@@ -1630,7 +1630,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 216,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "./music/alex_g_god_save_07.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2022%20-%20God%20Save%20The%20Animals/07.%20Cross%20the%20Sea.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 7,
     "hasLocalAudio": true
@@ -1645,7 +1645,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 195,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "./music/alex_g_god_save_08.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2022%20-%20God%20Save%20The%20Animals/08.%20Blessing.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 8,
     "hasLocalAudio": true
@@ -1660,7 +1660,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 243,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "./music/alex_g_god_save_09.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2022%20-%20God%20Save%20The%20Animals/09.%20Early%20Morning%20Waiting.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 9,
     "hasLocalAudio": true
@@ -1675,7 +1675,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 230,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "./music/alex_g_god_save_10.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2022%20-%20God%20Save%20The%20Animals/10.%20Immunity.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 10,
     "hasLocalAudio": true
@@ -1690,7 +1690,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 173,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "./music/alex_g_god_save_11.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2022%20-%20God%20Save%20The%20Animals/11.%20Headroom%20Piano.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 11,
     "hasLocalAudio": true
@@ -1705,7 +1705,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 224,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "./music/alex_g_god_save_12.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2022%20-%20God%20Save%20The%20Animals/12.%20Miracles.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 12,
     "hasLocalAudio": true
@@ -1720,7 +1720,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 267,
     "cover": "./music/covers/alex_g_god_save.jpg",
     "genre": "Indie Pop / Experimental",
-    "audioSrc": "./music/alex_g_god_save_13.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2022%20-%20God%20Save%20The%20Animals/13.%20Forgive.mp3",
     "albumId": "album-god-save-the-animals",
     "trackNumber": 13,
     "hasLocalAudio": true
@@ -1735,7 +1735,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 195,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "./music/kanye_graduation_01.mp3",
+    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/01%20Good%20Morning.mp3",
     "albumId": "album-graduation",
     "trackNumber": 1,
     "hasLocalAudio": true
@@ -1750,7 +1750,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 167,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "./music/kanye_graduation_02.mp3",
+    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/02%20Champion.mp3",
     "albumId": "album-graduation",
     "trackNumber": 2,
     "hasLocalAudio": true
@@ -1765,7 +1765,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 312,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "./music/kanye_graduation_03.mp3",
+    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/03%20Stronger.mp3",
     "albumId": "album-graduation",
     "trackNumber": 3,
     "hasLocalAudio": true
@@ -1780,7 +1780,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 243,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "./music/kanye_graduation_04.mp3",
+    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/04%20I%20Wonder.mp3",
     "albumId": "album-graduation",
     "trackNumber": 4,
     "hasLocalAudio": true
@@ -1795,7 +1795,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 207,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "./music/kanye_graduation_05.mp3",
+    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/05%20Good%20Life.mp3",
     "albumId": "album-graduation",
     "trackNumber": 5,
     "hasLocalAudio": true
@@ -1810,7 +1810,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 271,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "./music/kanye_graduation_06.mp3",
+    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/06%20Can't%20Tell%20Me%20Nothing.mp3",
     "albumId": "album-graduation",
     "trackNumber": 6,
     "hasLocalAudio": true
@@ -1825,7 +1825,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 204,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "./music/kanye_graduation_07.mp3",
+    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/07%20Barry%20Bonds.mp3",
     "albumId": "album-graduation",
     "trackNumber": 7,
     "hasLocalAudio": true
@@ -1840,7 +1840,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 237,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "./music/kanye_graduation_08.mp3",
+    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/09%20Flashing%20Lights.mp3",
     "albumId": "album-graduation",
     "trackNumber": 8,
     "hasLocalAudio": true
@@ -1855,7 +1855,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 227,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "./music/kanye_graduation_09.mp3",
+    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/10%20Everything%20I%20Am.mp3",
     "albumId": "album-graduation",
     "trackNumber": 9,
     "hasLocalAudio": true
@@ -1870,7 +1870,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 212,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "./music/kanye_graduation_10.mp3",
+    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/11%20The%20Glory.mp3",
     "albumId": "album-graduation",
     "trackNumber": 10,
     "hasLocalAudio": true
@@ -1885,7 +1885,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 203,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "./music/kanye_graduation_11.mp3",
+    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/12%20Homecoming.mp3",
     "albumId": "album-graduation",
     "trackNumber": 11,
     "hasLocalAudio": true
@@ -1900,7 +1900,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 287,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "./music/kanye_graduation_12.mp3",
+    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/13%20Big%20Brother.mp3",
     "albumId": "album-graduation",
     "trackNumber": 12,
     "hasLocalAudio": true
@@ -1915,7 +1915,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 186,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "./music/kanye_graduation_13.mp3",
+    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/08%20Drunk%20And%20Hot%20Girls.mp3",
     "albumId": "album-graduation",
     "trackNumber": 13,
     "hasLocalAudio": true
@@ -2140,7 +2140,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 56,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "./music/kanye_tlop_15.mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/15.%20Siiiiiiiiilver%20Surffffeeeeer%20Intermission%20(Feat.%20Max%20B%20%26%20French%20Montana).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 15,
     "hasLocalAudio": true
@@ -2410,7 +2410,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 328,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "./music/drake_views_01.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/Keep%20The%20Family%20Close.mp3",
     "albumId": "album-views",
     "trackNumber": 1,
     "hasLocalAudio": true
@@ -2425,7 +2425,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 255,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "./music/drake_views_02.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/9.mp3",
     "albumId": "album-views",
     "trackNumber": 2,
     "hasLocalAudio": true
@@ -2440,7 +2440,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 297,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "./music/drake_views_03.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/U%20With%20Me_.mp3",
     "albumId": "album-views",
     "trackNumber": 3,
     "hasLocalAudio": true
@@ -2455,7 +2455,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 240,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "./music/drake_views_04.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/Feel%20No%20Ways.mp3",
     "albumId": "album-views",
     "trackNumber": 4,
     "hasLocalAudio": true
@@ -2470,7 +2470,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 209,
     "cover": "./music/covers/drake_views.jpg",
     "genre": "Hip Hop / Dancehall / R&B",
-    "audioSrc": "./music/drake_views_05.mp3",
+    "audioSrc": "https://archive.org/download/views-by-drake/SpotiDownloader.com%20-%20Views/Hype.mp3",
     "albumId": "album-views",
     "trackNumber": 5,
     "hasLocalAudio": true
@@ -2875,7 +2875,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 460,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/kendrick_damn_12.mp3",
+    "audioSrc": "https://archive.org/download/12-fear_202604/12%20FEAR.m4a",
     "albumId": "album-damn",
     "trackNumber": 12,
     "hasLocalAudio": true
@@ -2890,7 +2890,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 248,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/kendrick_damn_13.mp3",
+    "audioSrc": "https://archive.org/download/12-fear_202604/13%20GOD.m4a",
     "albumId": "album-damn",
     "trackNumber": 13,
     "hasLocalAudio": true
@@ -2905,7 +2905,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 248,
     "cover": "./music/covers/kendrick_damn.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/kendrick_damn_14.mp3",
+    "audioSrc": "https://archive.org/download/12-fear_202604/14%20DUCKWORTH.m4a",
     "albumId": "album-damn",
     "trackNumber": 14,
     "hasLocalAudio": true
@@ -3100,7 +3100,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 274,
     "cover": "./music/covers/kendrick_not_like_us.jpg",
     "genre": "West Coast Hip Hop",
-    "audioSrc": "./music/kendrick_not_like_us.mp3",
+    "audioSrc": "https://archive.org/download/not-like-us_202606/Not_Like_Us.mp4",
     "albumId": "album-not-like-us",
     "trackNumber": 1,
     "hasLocalAudio": true
@@ -3160,7 +3160,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 185,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "./music/travis_astroworld_04.mp3",
+    "audioSrc": "https://archive.org/download/travis-astroworld/R.I.P.%20SCREW.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 4,
     "hasLocalAudio": true
@@ -3235,7 +3235,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 196,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "./music/travis_astroworld_09.mp3",
+    "audioSrc": "https://archive.org/download/travis-astroworld/5%25%20TINT.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 9,
     "hasLocalAudio": true
@@ -3340,7 +3340,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 217,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "./music/travis_astroworld_16.mp3",
+    "audioSrc": "https://archive.org/download/travis-astroworld/HOUSTONFORNICATION.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 16,
     "hasLocalAudio": true
@@ -3355,7 +3355,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 209,
     "cover": "./music/covers/travis_astroworld.jpg",
     "genre": "Psychedelic Trap",
-    "audioSrc": "./music/travis_astroworld_17.mp3",
+    "audioSrc": "https://archive.org/download/travis-astroworld/COFFEE%20BEAN.mp3",
     "albumId": "album-astroworld",
     "trackNumber": 17,
     "hasLocalAudio": true
@@ -3415,7 +3415,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 251,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "./music/travis_utopia_04.mp3",
+    "audioSrc": "https://archive.org/download/utopia_202607/04%20-%20MY%20EYES%20%5BExplicit%5D.mp3",
     "albumId": "album-utopia",
     "trackNumber": 4,
     "hasLocalAudio": true
@@ -3430,7 +3430,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 127,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "./music/travis_utopia_05.mp3",
+    "audioSrc": "https://archive.org/download/utopia_202607/05%20-%20GOD'S%20COUNTRY%20%5BExplicit%5D.mp3",
     "albumId": "album-utopia",
     "trackNumber": 5,
     "hasLocalAudio": true
@@ -3445,7 +3445,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 204,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "./music/travis_utopia_06.mp3",
+    "audioSrc": "https://archive.org/download/utopia_202607/06%20-%20SIRENS%20%5BExplicit%5D.mp3",
     "albumId": "album-utopia",
     "trackNumber": 6,
     "hasLocalAudio": true
@@ -3460,7 +3460,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 246,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "./music/travis_utopia_07.mp3",
+    "audioSrc": "https://archive.org/download/utopia_202607/07%20-%20MELTDOWN%20%5BExplicit%5D.mp3",
     "albumId": "album-utopia",
     "trackNumber": 7,
     "hasLocalAudio": true
@@ -3490,7 +3490,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 274,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "./music/travis_utopia_09.mp3",
+    "audioSrc": "https://archive.org/download/utopia_202607/09%20-%20DELRESTO%20(ECHOES).mp3",
     "albumId": "album-utopia",
     "trackNumber": 9,
     "hasLocalAudio": true
@@ -3505,7 +3505,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 211,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "./music/travis_utopia_10.mp3",
+    "audioSrc": "https://archive.org/download/utopia_202607/10%20-%20I%20KNOW%20_%20%5BExplicit%5D.mp3",
     "albumId": "album-utopia",
     "trackNumber": 10,
     "hasLocalAudio": true
@@ -3550,7 +3550,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 154,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "./music/travis_utopia_13.mp3",
+    "audioSrc": "https://archive.org/download/utopia_202607/13%20-%20PARASAIL.mp3",
     "albumId": "album-utopia",
     "trackNumber": 13,
     "hasLocalAudio": true
@@ -3595,7 +3595,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 226,
     "cover": "./music/covers/travis_utopia.jpg",
     "genre": "Rage / Industrial Trap",
-    "audioSrc": "./music/travis_utopia_16.mp3",
+    "audioSrc": "https://archive.org/download/utopia_202607/16%20-%20LOOOVE%20%5BExplicit%5D.mp3",
     "albumId": "album-utopia",
     "trackNumber": 16,
     "hasLocalAudio": true
@@ -4285,7 +4285,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 293,
     "cover": "./music/covers/steve_gemini_rights.jpg",
     "genre": "Indie R&B / Psychedelic Funk",
-    "audioSrc": "./music/steve_gemini_09.mp3",
+    "audioSrc": "https://archive.org/download/03.-steve-lacy-mercury/09.%20Steve%20Lacy%20-%20Sunshine%20(feat.%20Foushe%C3%A9).mp3",
     "albumId": "album-gemini-rights",
     "trackNumber": 9,
     "hasLocalAudio": true
@@ -5245,7 +5245,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 272,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "./music/drake_take_care_01_over_my_dead_body.mp3",
+    "audioSrc": "https://archive.org/download/take-care-deluxe-by-drake/SpotiDownloader.com%20-%20Take%20Care%20(Deluxe)/Over%20My%20Dead%20Body.mp3",
     "albumId": "album-take-care",
     "trackNumber": 1,
     "hasLocalAudio": true
@@ -5260,7 +5260,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 224,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "./music/drake_take_care_02_shot_for_me.mp3",
+    "audioSrc": "https://archive.org/download/take-care-deluxe-by-drake/SpotiDownloader.com%20-%20Take%20Care%20(Deluxe)/Shot%20For%20Me.mp3",
     "albumId": "album-take-care",
     "trackNumber": 2,
     "hasLocalAudio": true
@@ -5275,7 +5275,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 236,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "./music/drake_take_care_03_headlines.mp3",
+    "audioSrc": "https://archive.org/download/take-care-deluxe-by-drake/SpotiDownloader.com%20-%20Take%20Care%20(Deluxe)/Headlines.mp3",
     "albumId": "album-take-care",
     "trackNumber": 3,
     "hasLocalAudio": true
@@ -5290,7 +5290,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 209,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "./music/drake_take_care_04_crew_love.mp3",
+    "audioSrc": "https://archive.org/download/take-care-deluxe-by-drake/SpotiDownloader.com%20-%20Take%20Care%20(Deluxe)/Crew%20Love.mp3",
     "albumId": "album-take-care",
     "trackNumber": 4,
     "hasLocalAudio": true
@@ -5305,7 +5305,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 277,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "./music/drake_take_care_05_take_care.mp3",
+    "audioSrc": "https://archive.org/download/take-care-deluxe-by-drake/SpotiDownloader.com%20-%20Take%20Care%20(Deluxe)/Take%20Care.mp3",
     "albumId": "album-take-care",
     "trackNumber": 5,
     "hasLocalAudio": true
@@ -5320,7 +5320,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 347,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "./music/drake_take_care_06_marvins_room.mp3",
+    "audioSrc": "https://archive.org/download/take-care-deluxe-by-drake/SpotiDownloader.com%20-%20Take%20Care%20(Deluxe)/Marvins%20Room.mp3",
     "albumId": "album-take-care",
     "trackNumber": 6,
     "hasLocalAudio": true
@@ -5335,7 +5335,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 212,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "./music/drake_take_care_07_buried_alive.mp3",
+    "audioSrc": "https://archive.org/download/take-care-deluxe-by-drake/SpotiDownloader.com%20-%20Take%20Care%20(Deluxe)/Buried%20Alive%20Interlude.mp3",
     "albumId": "album-take-care",
     "trackNumber": 7,
     "hasLocalAudio": true
@@ -5350,7 +5350,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 242,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "./music/drake_take_care_08_under_ground_kings.mp3",
+    "audioSrc": "https://archive.org/download/take-care-deluxe-by-drake/SpotiDownloader.com%20-%20Take%20Care%20(Deluxe)/Under%20Ground%20Kings.mp3",
     "albumId": "album-take-care",
     "trackNumber": 8,
     "hasLocalAudio": true
@@ -5365,7 +5365,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 216,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "./music/drake_take_care_09_well_be_fine.mp3",
+    "audioSrc": "https://archive.org/download/take-care-deluxe-by-drake/SpotiDownloader.com%20-%20Take%20Care%20(Deluxe)/We%27ll%20Be%20Fine.mp3",
     "albumId": "album-take-care",
     "trackNumber": 9,
     "hasLocalAudio": true
@@ -5380,7 +5380,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 307,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "./music/drake_take_care_10_make_me_proud.mp3",
+    "audioSrc": "https://archive.org/download/take-care-deluxe-by-drake/SpotiDownloader.com%20-%20Take%20Care%20(Deluxe)/Make%20Me%20Proud.mp3",
     "albumId": "album-take-care",
     "trackNumber": 10,
     "hasLocalAudio": true
@@ -5395,7 +5395,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 435,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "./music/drake_take_care_11_lord_knows.mp3",
+    "audioSrc": "https://archive.org/download/take-care-deluxe-by-drake/SpotiDownloader.com%20-%20Take%20Care%20(Deluxe)/Lord%20Knows.mp3",
     "albumId": "album-take-care",
     "trackNumber": 11,
     "hasLocalAudio": true
@@ -5410,7 +5410,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 265,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "./music/drake_take_care_12_cameras_good_ones_go.mp3",
+    "audioSrc": "https://archive.org/download/take-care-deluxe-by-drake/SpotiDownloader.com%20-%20Take%20Care%20(Deluxe)/Cameras%2F%20Good%20Ones%20Go%20Interlude%20-%20Medley.mp3",
     "albumId": "album-take-care",
     "trackNumber": 12,
     "hasLocalAudio": true
@@ -5425,7 +5425,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 321,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "./music/drake_take_care_13_doing_it_wrong.mp3",
+    "audioSrc": "https://archive.org/download/take-care-deluxe-by-drake/SpotiDownloader.com%20-%20Take%20Care%20(Deluxe)/Doing%20It%20Wrong.mp3",
     "albumId": "album-take-care",
     "trackNumber": 13,
     "hasLocalAudio": true
@@ -5440,7 +5440,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 302,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "./music/drake_take_care_14_the_real_her.mp3",
+    "audioSrc": "https://archive.org/download/take-care-deluxe-by-drake/SpotiDownloader.com%20-%20Take%20Care%20(Deluxe)/The%20Real%20Her.mp3",
     "albumId": "album-take-care",
     "trackNumber": 14,
     "hasLocalAudio": true
@@ -5455,7 +5455,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 207,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "./music/drake_take_care_15_look_what_youve_done.mp3",
+    "audioSrc": "https://archive.org/download/take-care-deluxe-by-drake/SpotiDownloader.com%20-%20Take%20Care%20(Deluxe)/Look%20What%20You%27ve%20Done.mp3",
     "albumId": "album-take-care",
     "trackNumber": 15,
     "hasLocalAudio": true
@@ -5470,7 +5470,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 238,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "./music/drake_take_care_16_hyfr.mp3",
+    "audioSrc": "https://archive.org/download/take-care-deluxe-by-drake/SpotiDownloader.com%20-%20Take%20Care%20(Deluxe)/HYFR%20(Hell%20Ya%20Fucking%20Right).mp3",
     "albumId": "album-take-care",
     "trackNumber": 16,
     "hasLocalAudio": true
@@ -5485,7 +5485,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 351,
     "cover": "./music/covers/drake_take_care.jpg",
     "genre": "Hip Hop / R&B",
-    "audioSrc": "./music/drake_take_care_18_the_ride.mp3",
+    "audioSrc": "https://archive.org/download/take-care-deluxe-by-drake/SpotiDownloader.com%20-%20Take%20Care%20(Deluxe)/The%20Ride.mp3",
     "albumId": "album-take-care",
     "trackNumber": 17,
     "hasLocalAudio": true
@@ -5500,7 +5500,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 336,
     "cover": "./music/covers/drake_clb.jpg",
     "genre": "Hip Hop / Trap / R&B",
-    "audioSrc": "./music/drake_clb_01.mp3",
+    "audioSrc": "https://archive.org/download/certified-lover-boy-drake_202609/01.%20Champagne%20Poetry.mp3",
     "albumId": "album-clb",
     "trackNumber": 1,
     "hasLocalAudio": true
@@ -5815,7 +5815,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 105,
     "cover": "./music/covers/alex_g_race.jpg",
     "genre": "Lo-Fi Indie / Slacker Rock",
-    "audioSrc": "./music/alex_g_race_01.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2010%20-%20Race/01%20-%20Remember.mp3",
     "albumId": "album-alex-g-race",
     "trackNumber": 1,
     "hasLocalAudio": true
@@ -5830,7 +5830,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 166,
     "cover": "./music/covers/alex_g_race.jpg",
     "genre": "Lo-Fi Indie / Slacker Rock",
-    "audioSrc": "./music/alex_g_race_02.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2010%20-%20Race/02%20-%20The%20Same.mp3",
     "albumId": "album-alex-g-race",
     "trackNumber": 2,
     "hasLocalAudio": true
@@ -5845,7 +5845,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 75,
     "cover": "./music/covers/alex_g_race.jpg",
     "genre": "Lo-Fi Indie / Slacker Rock",
-    "audioSrc": "./music/alex_g_race_03.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2010%20-%20Race/03%20-%20TV.mp3",
     "albumId": "album-alex-g-race",
     "trackNumber": 3,
     "hasLocalAudio": true
@@ -5860,7 +5860,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 198,
     "cover": "./music/covers/alex_g_race.jpg",
     "genre": "Lo-Fi Indie / Slacker Rock",
-    "audioSrc": "./music/alex_g_race_04.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2010%20-%20Race/04%20-%20Gnaw.mp3",
     "albumId": "album-alex-g-race",
     "trackNumber": 4,
     "hasLocalAudio": true
@@ -5875,7 +5875,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 104,
     "cover": "./music/covers/alex_g_race.jpg",
     "genre": "Lo-Fi Indie / Slacker Rock",
-    "audioSrc": "./music/alex_g_race_05.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2010%20-%20Race/05%20-%20Trash.mp3",
     "albumId": "album-alex-g-race",
     "trackNumber": 5,
     "hasLocalAudio": true
@@ -5890,7 +5890,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 147,
     "cover": "./music/covers/alex_g_race.jpg",
     "genre": "Lo-Fi Indie / Slacker Rock",
-    "audioSrc": "./music/alex_g_race_06.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2010%20-%20Race/06%20-%20House.mp3",
     "albumId": "album-alex-g-race",
     "trackNumber": 6,
     "hasLocalAudio": true
@@ -5905,7 +5905,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 156,
     "cover": "./music/covers/alex_g_race.jpg",
     "genre": "Lo-Fi Indie / Slacker Rock",
-    "audioSrc": "./music/alex_g_race_07.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2010%20-%20Race/07%20-%20Crab.mp3",
     "albumId": "album-alex-g-race",
     "trackNumber": 7,
     "hasLocalAudio": true
@@ -5920,7 +5920,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 82,
     "cover": "./music/covers/alex_g_race.jpg",
     "genre": "Lo-Fi Indie / Slacker Rock",
-    "audioSrc": "./music/alex_g_race_08.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2010%20-%20Race/08%20-%20Go%20Away.mp3",
     "albumId": "album-alex-g-race",
     "trackNumber": 8,
     "hasLocalAudio": true
@@ -5935,7 +5935,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 133,
     "cover": "./music/covers/alex_g_race.jpg",
     "genre": "Lo-Fi Indie / Slacker Rock",
-    "audioSrc": "./music/alex_g_race_09.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2010%20-%20Race/09%20-%20Let%20It%20Go.mp3",
     "albumId": "album-alex-g-race",
     "trackNumber": 9,
     "hasLocalAudio": true
@@ -5950,7 +5950,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 161,
     "cover": "./music/covers/alex_g_race.jpg",
     "genre": "Lo-Fi Indie / Slacker Rock",
-    "audioSrc": "./music/alex_g_race_10.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2010%20-%20Race/10%20-%20Things%20to%20Do.mp3",
     "albumId": "album-alex-g-race",
     "trackNumber": 10,
     "hasLocalAudio": true
@@ -5965,7 +5965,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 100,
     "cover": "./music/covers/alex_g_race.jpg",
     "genre": "Lo-Fi Indie / Slacker Rock",
-    "audioSrc": "./music/alex_g_race_11.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2010%20-%20Race/11%20-%20Time_Space.mp3",
     "albumId": "album-alex-g-race",
     "trackNumber": 11,
     "hasLocalAudio": true
@@ -5980,7 +5980,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 88,
     "cover": "./music/covers/alex_g_race.jpg",
     "genre": "Lo-Fi Indie / Slacker Rock",
-    "audioSrc": "./music/alex_g_race_12.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2010%20-%20Race/12%20-%20Cross%20Country.mp3",
     "albumId": "album-alex-g-race",
     "trackNumber": 12,
     "hasLocalAudio": true
@@ -5995,7 +5995,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 214,
     "cover": "./music/covers/alex_g_race.jpg",
     "genre": "Lo-Fi Indie / Slacker Rock",
-    "audioSrc": "./music/alex_g_race_13.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2010%20-%20Race/13%20-%20Race.mp3",
     "albumId": "album-alex-g-race",
     "trackNumber": 13,
     "hasLocalAudio": true
@@ -6010,7 +6010,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 163,
     "cover": "./music/covers/alex_g_rules.jpg",
     "genre": "Lo-Fi Indie / Indie Folk",
-    "audioSrc": "./music/alex_g_rules_01.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Rules/01%20-%20Water.mp3",
     "albumId": "album-alex-g-rules",
     "trackNumber": 1,
     "hasLocalAudio": true
@@ -6025,7 +6025,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 133,
     "cover": "./music/covers/alex_g_rules.jpg",
     "genre": "Lo-Fi Indie / Indie Folk",
-    "audioSrc": "./music/alex_g_rules_02.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Rules/02%20-%20Come%20Back.mp3",
     "albumId": "album-alex-g-rules",
     "trackNumber": 2,
     "hasLocalAudio": true
@@ -6040,7 +6040,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 128,
     "cover": "./music/covers/alex_g_rules.jpg",
     "genre": "Lo-Fi Indie / Indie Folk",
-    "audioSrc": "./music/alex_g_rules_03.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Rules/03%20-%20Fighting.mp3",
     "albumId": "album-alex-g-rules",
     "trackNumber": 3,
     "hasLocalAudio": true
@@ -6055,7 +6055,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 120,
     "cover": "./music/covers/alex_g_rules.jpg",
     "genre": "Lo-Fi Indie / Indie Folk",
-    "audioSrc": "./music/alex_g_rules_04.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Rules/04%20-%20Wicked%20Boy.mp3",
     "albumId": "album-alex-g-rules",
     "trackNumber": 4,
     "hasLocalAudio": true
@@ -6070,7 +6070,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 147,
     "cover": "./music/covers/alex_g_rules.jpg",
     "genre": "Lo-Fi Indie / Indie Folk",
-    "audioSrc": "./music/alex_g_rules_05.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Rules/05%20-%20Candy.mp3",
     "albumId": "album-alex-g-rules",
     "trackNumber": 5,
     "hasLocalAudio": true
@@ -6085,7 +6085,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 151,
     "cover": "./music/covers/alex_g_rules.jpg",
     "genre": "Lo-Fi Indie / Indie Folk",
-    "audioSrc": "./music/alex_g_rules_06.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Rules/06%20-%20Mis.mp3",
     "albumId": "album-alex-g-rules",
     "trackNumber": 6,
     "hasLocalAudio": true
@@ -6100,7 +6100,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 146,
     "cover": "./music/covers/alex_g_rules.jpg",
     "genre": "Lo-Fi Indie / Indie Folk",
-    "audioSrc": "./music/alex_g_rules_07.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Rules/07%20-%20Master.mp3",
     "albumId": "album-alex-g-rules",
     "trackNumber": 7,
     "hasLocalAudio": true
@@ -6115,7 +6115,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 96,
     "cover": "./music/covers/alex_g_rules.jpg",
     "genre": "Lo-Fi Indie / Indie Folk",
-    "audioSrc": "./music/alex_g_rules_08.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Rules/08%20-%20New.mp3",
     "albumId": "album-alex-g-rules",
     "trackNumber": 8,
     "hasLocalAudio": true
@@ -6130,7 +6130,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 108,
     "cover": "./music/covers/alex_g_rules.jpg",
     "genre": "Lo-Fi Indie / Indie Folk",
-    "audioSrc": "./music/alex_g_rules_09.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Rules/09%20-%20Know%20Now.mp3",
     "albumId": "album-alex-g-rules",
     "trackNumber": 9,
     "hasLocalAudio": true
@@ -6145,7 +6145,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 125,
     "cover": "./music/covers/alex_g_rules.jpg",
     "genre": "Lo-Fi Indie / Indie Folk",
-    "audioSrc": "./music/alex_g_rules_10.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Rules/10%20-%20Rules.mp3",
     "albumId": "album-alex-g-rules",
     "trackNumber": 10,
     "hasLocalAudio": true
@@ -6160,7 +6160,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 157,
     "cover": "./music/covers/alex_g_rules.jpg",
     "genre": "Lo-Fi Indie / Indie Folk",
-    "audioSrc": "./music/alex_g_rules_11.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Rules/11%20-%20Message.mp3",
     "albumId": "album-alex-g-rules",
     "trackNumber": 11,
     "hasLocalAudio": true
@@ -6175,7 +6175,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 157,
     "cover": "./music/covers/alex_g_rules.jpg",
     "genre": "Lo-Fi Indie / Indie Folk",
-    "audioSrc": "./music/alex_g_rules_12.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Rules/12%20-%20Sandy.mp3",
     "albumId": "album-alex-g-rules",
     "trackNumber": 12,
     "hasLocalAudio": true
@@ -6190,7 +6190,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 77,
     "cover": "./music/covers/alex_g_rules.jpg",
     "genre": "Lo-Fi Indie / Indie Folk",
-    "audioSrc": "./music/alex_g_rules_13.mp3",
+    "audioSrc": "https://archive.org/download/full-discography-alex-g/Alex%20G/2012%20-%20Rules/13%20-%20Good.mp3",
     "albumId": "album-alex-g-rules",
     "trackNumber": 13,
     "hasLocalAudio": true
@@ -6205,7 +6205,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 272,
     "cover": "./music/covers/arctic_monkeys_am.jpg",
     "genre": "Indie Rock / Desert Rock",
-    "audioSrc": "./music/arctic_monkeys_am_01.mp3",
+    "audioSrc": "https://archive.org/download/01-do-i-wanna-know/AM%20-%20Arctic%20Monkeys/01%20-%20Do%20I%20Wanna%20Know.mp3",
     "albumId": "album-arctic-monkeys-am",
     "trackNumber": 1,
     "hasLocalAudio": true
@@ -6220,7 +6220,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 201,
     "cover": "./music/covers/arctic_monkeys_am.jpg",
     "genre": "Indie Rock / Desert Rock",
-    "audioSrc": "./music/arctic_monkeys_am_02.mp3",
+    "audioSrc": "https://archive.org/download/01-do-i-wanna-know/AM%20-%20Arctic%20Monkeys/02%20-%20R%20U%20Mine.mp3",
     "albumId": "album-arctic-monkeys-am",
     "trackNumber": 2,
     "hasLocalAudio": true
@@ -6235,7 +6235,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 206,
     "cover": "./music/covers/arctic_monkeys_am.jpg",
     "genre": "Indie Rock / Desert Rock",
-    "audioSrc": "./music/arctic_monkeys_am_03.mp3",
+    "audioSrc": "https://archive.org/download/01-do-i-wanna-know/AM%20-%20Arctic%20Monkeys/03%20-%20One%20For%20The%20Road.mp3",
     "albumId": "album-arctic-monkeys-am",
     "trackNumber": 3,
     "hasLocalAudio": true
@@ -6250,7 +6250,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 207,
     "cover": "./music/covers/arctic_monkeys_am.jpg",
     "genre": "Indie Rock / Desert Rock",
-    "audioSrc": "./music/arctic_monkeys_am_04.mp3",
+    "audioSrc": "https://archive.org/download/01-do-i-wanna-know/AM%20-%20Arctic%20Monkeys/04%20-%20Arabella.mp3",
     "albumId": "album-arctic-monkeys-am",
     "trackNumber": 4,
     "hasLocalAudio": true
@@ -6265,7 +6265,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 185,
     "cover": "./music/covers/arctic_monkeys_am.jpg",
     "genre": "Indie Rock / Desert Rock",
-    "audioSrc": "./music/arctic_monkeys_am_05.mp3",
+    "audioSrc": "https://archive.org/download/01-do-i-wanna-know/AM%20-%20Arctic%20Monkeys/05%20-%20I%20Want%20It%20All.mp3",
     "albumId": "album-arctic-monkeys-am",
     "trackNumber": 5,
     "hasLocalAudio": true
@@ -6280,7 +6280,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 243,
     "cover": "./music/covers/arctic_monkeys_am.jpg",
     "genre": "Indie Rock / Desert Rock",
-    "audioSrc": "./music/arctic_monkeys_am_06.mp3",
+    "audioSrc": "https://archive.org/download/01-do-i-wanna-know/AM%20-%20Arctic%20Monkeys/06%20-%20No%201%20Party%20Anthem.mp3",
     "albumId": "album-arctic-monkeys-am",
     "trackNumber": 6,
     "hasLocalAudio": true
@@ -6295,7 +6295,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 215,
     "cover": "./music/covers/arctic_monkeys_am.jpg",
     "genre": "Indie Rock / Desert Rock",
-    "audioSrc": "./music/arctic_monkeys_am_07.mp3",
+    "audioSrc": "https://archive.org/download/01-do-i-wanna-know/AM%20-%20Arctic%20Monkeys/07%20-%20Mad%20Sounds.mp3",
     "albumId": "album-arctic-monkeys-am",
     "trackNumber": 7,
     "hasLocalAudio": true
@@ -6310,7 +6310,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 181,
     "cover": "./music/covers/arctic_monkeys_am.jpg",
     "genre": "Indie Rock / Desert Rock",
-    "audioSrc": "./music/arctic_monkeys_am_08.mp3",
+    "audioSrc": "https://archive.org/download/01-do-i-wanna-know/AM%20-%20Arctic%20Monkeys/08%20-%20Fireside.mp3",
     "albumId": "album-arctic-monkeys-am",
     "trackNumber": 8,
     "hasLocalAudio": true
@@ -6325,7 +6325,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 161,
     "cover": "./music/covers/arctic_monkeys_am.jpg",
     "genre": "Indie Rock / Desert Rock",
-    "audioSrc": "./music/arctic_monkeys_am_09.mp3",
+    "audioSrc": "https://archive.org/download/01-do-i-wanna-know/AM%20-%20Arctic%20Monkeys/09%20-%20Why'd%20You%20Only%20Call%20Me%20When%20You're%20High.mp3",
     "albumId": "album-arctic-monkeys-am",
     "trackNumber": 9,
     "hasLocalAudio": true
@@ -6340,7 +6340,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 193,
     "cover": "./music/covers/arctic_monkeys_am.jpg",
     "genre": "Indie Rock / Desert Rock",
-    "audioSrc": "./music/arctic_monkeys_am_10.mp3",
+    "audioSrc": "https://archive.org/download/01-do-i-wanna-know/AM%20-%20Arctic%20Monkeys/10%20-%20Snap%20Out%20Of%20It.mp3",
     "albumId": "album-arctic-monkeys-am",
     "trackNumber": 10,
     "hasLocalAudio": true
@@ -6355,7 +6355,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 257,
     "cover": "./music/covers/arctic_monkeys_am.jpg",
     "genre": "Indie Rock / Desert Rock",
-    "audioSrc": "./music/arctic_monkeys_am_11.mp3",
+    "audioSrc": "https://archive.org/download/01-do-i-wanna-know/AM%20-%20Arctic%20Monkeys/11%20-%20Knee%20Socks.mp3",
     "albumId": "album-arctic-monkeys-am",
     "trackNumber": 11,
     "hasLocalAudio": true
@@ -6370,7 +6370,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 184,
     "cover": "./music/covers/arctic_monkeys_am.jpg",
     "genre": "Indie Rock / Desert Rock",
-    "audioSrc": "./music/arctic_monkeys_am_12.mp3",
+    "audioSrc": "https://archive.org/download/01-do-i-wanna-know/AM%20-%20Arctic%20Monkeys/12%20-%20I%20Wanna%20Be%20Yours.mp3",
     "albumId": "album-arctic-monkeys-am",
     "trackNumber": 12,
     "hasLocalAudio": true
@@ -6385,7 +6385,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 129,
     "cover": "./music/covers/j_cole_2014_forest_hills_drive.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/j_cole_fhd_01.mp3",
+    "audioSrc": "https://archive.org/download/13-note-to-self_202605/01%20Intro.mp3",
     "albumId": "album-j-cole-fhd",
     "trackNumber": 1,
     "hasLocalAudio": true
@@ -6400,7 +6400,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 242,
     "cover": "./music/covers/j_cole_2014_forest_hills_drive.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/j_cole_fhd_02.mp3",
+    "audioSrc": "https://archive.org/download/13-note-to-self_202605/02%20January%2028th.mp3",
     "albumId": "album-j-cole-fhd",
     "trackNumber": 2,
     "hasLocalAudio": true
@@ -6415,7 +6415,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 239,
     "cover": "./music/covers/j_cole_2014_forest_hills_drive.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/j_cole_fhd_03.mp3",
+    "audioSrc": "https://archive.org/download/13-note-to-self_202605/03%20Wet%20Dreamz.mp3",
     "albumId": "album-j-cole-fhd",
     "trackNumber": 3,
     "hasLocalAudio": true
@@ -6430,7 +6430,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 264,
     "cover": "./music/covers/j_cole_2014_forest_hills_drive.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/j_cole_fhd_04.mp3",
+    "audioSrc": "https://archive.org/download/13-note-to-self_202605/04%2003'%20Adolescence.mp3",
     "albumId": "album-j-cole-fhd",
     "trackNumber": 4,
     "hasLocalAudio": true
@@ -6445,7 +6445,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 269,
     "cover": "./music/covers/j_cole_2014_forest_hills_drive.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/j_cole_fhd_05.mp3",
+    "audioSrc": "https://archive.org/download/13-note-to-self_202605/05%20A%20Tale%20Of%202%20Citiez.mp3",
     "albumId": "album-j-cole-fhd",
     "trackNumber": 5,
     "hasLocalAudio": true
@@ -6460,7 +6460,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 288,
     "cover": "./music/covers/j_cole_2014_forest_hills_drive.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/j_cole_fhd_06.mp3",
+    "audioSrc": "https://archive.org/download/13-note-to-self_202605/06%20Fire%20Squad.mp3",
     "albumId": "album-j-cole-fhd",
     "trackNumber": 6,
     "hasLocalAudio": true
@@ -6475,7 +6475,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 257,
     "cover": "./music/covers/j_cole_2014_forest_hills_drive.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/j_cole_fhd_07.mp3",
+    "audioSrc": "https://archive.org/download/13-note-to-self_202605/07%20St.%20Tropez.mp3",
     "albumId": "album-j-cole-fhd",
     "trackNumber": 7,
     "hasLocalAudio": true
@@ -6490,7 +6490,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 301,
     "cover": "./music/covers/j_cole_2014_forest_hills_drive.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/j_cole_fhd_08.mp3",
+    "audioSrc": "https://archive.org/download/13-note-to-self_202605/08%20G.O.M.D..mp3",
     "albumId": "album-j-cole-fhd",
     "trackNumber": 8,
     "hasLocalAudio": true
@@ -6505,7 +6505,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 292,
     "cover": "./music/covers/j_cole_2014_forest_hills_drive.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/j_cole_fhd_09.mp3",
+    "audioSrc": "https://archive.org/download/13-note-to-self_202605/09%20No%20Role%20Modelz.mp3",
     "albumId": "album-j-cole-fhd",
     "trackNumber": 9,
     "hasLocalAudio": true
@@ -6520,7 +6520,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 219,
     "cover": "./music/covers/j_cole_2014_forest_hills_drive.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/j_cole_fhd_10.mp3",
+    "audioSrc": "https://archive.org/download/13-note-to-self_202605/10%20Hello.mp3",
     "albumId": "album-j-cole-fhd",
     "trackNumber": 10,
     "hasLocalAudio": true
@@ -6535,7 +6535,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 293,
     "cover": "./music/covers/j_cole_2014_forest_hills_drive.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/j_cole_fhd_11.mp3",
+    "audioSrc": "https://archive.org/download/13-note-to-self_202605/11%20Apparently.mp3",
     "albumId": "album-j-cole-fhd",
     "trackNumber": 11,
     "hasLocalAudio": true
@@ -6550,7 +6550,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 211,
     "cover": "./music/covers/j_cole_2014_forest_hills_drive.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/j_cole_fhd_12.mp3",
+    "audioSrc": "https://archive.org/download/13-note-to-self_202605/12%20Love%20Yourz.mp3",
     "albumId": "album-j-cole-fhd",
     "trackNumber": 12,
     "hasLocalAudio": true
@@ -6565,7 +6565,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 875,
     "cover": "./music/covers/j_cole_2014_forest_hills_drive.jpg",
     "genre": "Hip Hop / Conscious Rap",
-    "audioSrc": "./music/j_cole_fhd_13.mp3",
+    "audioSrc": "https://archive.org/download/13-note-to-self_202605/13%20Note%20To%20Self.mp3",
     "albumId": "album-j-cole-fhd",
     "trackNumber": 13,
     "hasLocalAudio": true
@@ -6580,7 +6580,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 284,
     "cover": "./music/covers/radiohead_ok_computer.jpg",
     "genre": "Alternative Rock / Art Rock",
-    "audioSrc": "./music/radiohead_ok_computer_01.mp3",
+    "audioSrc": "https://archive.org/download/radiohead-ok-computer-oknotok-1997-2017-remastered/01%20Airbag%20(Remastered).mp3",
     "albumId": "album-radiohead-ok-computer",
     "trackNumber": 1,
     "hasLocalAudio": true
@@ -6595,7 +6595,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 383,
     "cover": "./music/covers/radiohead_ok_computer.jpg",
     "genre": "Alternative Rock / Art Rock",
-    "audioSrc": "./music/radiohead_ok_computer_02.mp3",
+    "audioSrc": "https://archive.org/download/radiohead-ok-computer-oknotok-1997-2017-remastered/02%20Paranoid%20Android%20(Remastered).mp3",
     "albumId": "album-radiohead-ok-computer",
     "trackNumber": 2,
     "hasLocalAudio": true
@@ -6610,7 +6610,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 267,
     "cover": "./music/covers/radiohead_ok_computer.jpg",
     "genre": "Alternative Rock / Art Rock",
-    "audioSrc": "./music/radiohead_ok_computer_03.mp3",
+    "audioSrc": "https://archive.org/download/radiohead-ok-computer-oknotok-1997-2017-remastered/03%20Subterranean%20Homesick%20Alien%20(Re.mp3",
     "albumId": "album-radiohead-ok-computer",
     "trackNumber": 3,
     "hasLocalAudio": true
@@ -6625,7 +6625,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 264,
     "cover": "./music/covers/radiohead_ok_computer.jpg",
     "genre": "Alternative Rock / Art Rock",
-    "audioSrc": "./music/radiohead_ok_computer_04.mp3",
+    "audioSrc": "https://archive.org/download/radiohead-ok-computer-oknotok-1997-2017-remastered/04%20Exit%20Music%20(For%20a%20Film)%20(Remast.mp3",
     "albumId": "album-radiohead-ok-computer",
     "trackNumber": 4,
     "hasLocalAudio": true
@@ -6640,7 +6640,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 299,
     "cover": "./music/covers/radiohead_ok_computer.jpg",
     "genre": "Alternative Rock / Art Rock",
-    "audioSrc": "./music/radiohead_ok_computer_05.mp3",
+    "audioSrc": "https://archive.org/download/radiohead-ok-computer-oknotok-1997-2017-remastered/05%20Let%20Down%20(Remastered).mp3",
     "albumId": "album-radiohead-ok-computer",
     "trackNumber": 5,
     "hasLocalAudio": true
@@ -6655,7 +6655,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 261,
     "cover": "./music/covers/radiohead_ok_computer.jpg",
     "genre": "Alternative Rock / Art Rock",
-    "audioSrc": "./music/radiohead_ok_computer_06.mp3",
+    "audioSrc": "https://archive.org/download/radiohead-ok-computer-oknotok-1997-2017-remastered/06%20Karma%20Police%20(Remastered).mp3",
     "albumId": "album-radiohead-ok-computer",
     "trackNumber": 6,
     "hasLocalAudio": true
@@ -6670,7 +6670,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 117,
     "cover": "./music/covers/radiohead_ok_computer.jpg",
     "genre": "Alternative Rock / Art Rock",
-    "audioSrc": "./music/radiohead_ok_computer_07.mp3",
+    "audioSrc": "https://archive.org/download/radiohead-ok-computer-oknotok-1997-2017-remastered/07%20Fitter%20Happier%20(Remastered).mp3",
     "albumId": "album-radiohead-ok-computer",
     "trackNumber": 7,
     "hasLocalAudio": true
@@ -6685,7 +6685,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 230,
     "cover": "./music/covers/radiohead_ok_computer.jpg",
     "genre": "Alternative Rock / Art Rock",
-    "audioSrc": "./music/radiohead_ok_computer_08.mp3",
+    "audioSrc": "https://archive.org/download/radiohead-ok-computer-oknotok-1997-2017-remastered/08%20Electioneering%20(Remastered).mp3",
     "albumId": "album-radiohead-ok-computer",
     "trackNumber": 8,
     "hasLocalAudio": true
@@ -6700,7 +6700,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 285,
     "cover": "./music/covers/radiohead_ok_computer.jpg",
     "genre": "Alternative Rock / Art Rock",
-    "audioSrc": "./music/radiohead_ok_computer_09.mp3",
+    "audioSrc": "https://archive.org/download/radiohead-ok-computer-oknotok-1997-2017-remastered/09%20Climbing%20the%20Walls%20(Remastered).mp3",
     "albumId": "album-radiohead-ok-computer",
     "trackNumber": 9,
     "hasLocalAudio": true
@@ -6715,7 +6715,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 228,
     "cover": "./music/covers/radiohead_ok_computer.jpg",
     "genre": "Alternative Rock / Art Rock",
-    "audioSrc": "./music/radiohead_ok_computer_10.mp3",
+    "audioSrc": "https://archive.org/download/radiohead-ok-computer-oknotok-1997-2017-remastered/10%20No%20Surprises%20(Remastered).mp3",
     "albumId": "album-radiohead-ok-computer",
     "trackNumber": 10,
     "hasLocalAudio": true
@@ -6730,7 +6730,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 259,
     "cover": "./music/covers/radiohead_ok_computer.jpg",
     "genre": "Alternative Rock / Art Rock",
-    "audioSrc": "./music/radiohead_ok_computer_11.mp3",
+    "audioSrc": "https://archive.org/download/radiohead-ok-computer-oknotok-1997-2017-remastered/11%20Lucky%20(Remastered).mp3",
     "albumId": "album-radiohead-ok-computer",
     "trackNumber": 11,
     "hasLocalAudio": true
@@ -6745,7 +6745,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 324,
     "cover": "./music/covers/radiohead_ok_computer.jpg",
     "genre": "Alternative Rock / Art Rock",
-    "audioSrc": "./music/radiohead_ok_computer_12.mp3",
+    "audioSrc": "https://archive.org/download/radiohead-ok-computer-oknotok-1997-2017-remastered/12%20The%20Tourist%20(Remastered).mp3",
     "albumId": "album-radiohead-ok-computer",
     "trackNumber": 12,
     "hasLocalAudio": true

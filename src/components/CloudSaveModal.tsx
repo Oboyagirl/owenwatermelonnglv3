@@ -162,19 +162,35 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
       const restored = await restoreUniversalGameState(game.id, save.saveData, contentWindow);
       const exactTime = formatExactTimestamp(save.updatedAt || save.createdAt);
 
-      setRestoreSuccessMsg(`Restored to checkpoint from ${exactTime}! Reloading game...`);
-
-      // Reload game iframe to apply the restored state
-      setTimeout(() => {
-        if (onReloadGame) {
-          onReloadGame();
+      let hasLiveEmulatorState = false;
+      try {
+        const parsed = JSON.parse(save.saveData);
+        if (parsed?.emulator?.stateBase64) {
+          hasLiveEmulatorState = true;
         }
+      } catch (e) {}
+
+      if (hasLiveEmulatorState) {
+        setRestoreSuccessMsg(`Restored exact point in time (${exactTime})! State loaded into game.`);
         setIsRestoring(false);
         setRestoredSaveId(null);
         setTimeout(() => {
           onClose();
         }, 1200);
-      }, 600);
+      } else {
+        setRestoreSuccessMsg(`Restored to checkpoint from ${exactTime}! Reloading game...`);
+        // Reload game iframe to apply the restored storage state
+        setTimeout(() => {
+          if (onReloadGame) {
+            onReloadGame();
+          }
+          setIsRestoring(false);
+          setRestoredSaveId(null);
+          setTimeout(() => {
+            onClose();
+          }, 1200);
+        }, 600);
+      }
     } catch (err) {
       console.error("Failed to restore checkpoint:", err);
       setIsRestoring(false);

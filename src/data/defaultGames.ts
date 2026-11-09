@@ -1048,8 +1048,8 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "thumbnails/ducklife1.jpg",
     mirrors: [
       "games/duck-life-1.html",
-      "games/flash-player.html?swf=games/swfs/ducklife1.swf&title=Duck+Life",
-      "/api/proxy/game?url=https://freeonlinewebtools.github.io/gamelist3.github.io/Duck-Life/"
+      "https://ubghyper.github.io/GameList.github.io/Duck-Life/",
+      "games/flash-player.html?swf=games/swfs/ducklife1.swf&title=Duck+Life"
     ],
     tags: ["Duck Life", "Duck", "Racing", "Training", "Animal", "Casual", "Owen OG", "Unblocked"],
     rating: 4.9,
@@ -1073,8 +1073,8 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "thumbnails/ducklife2.jpg",
     mirrors: [
       "games/duck-life-2.html",
-      "games/flash-player.html?swf=games/swfs/ducklife2.swf&title=Duck+Life+2",
-      "/api/proxy/game?url=https://freeonlinewebtools.github.io/gamelist3.github.io/Duck-Life-2/"
+      "https://ubghyper.github.io/GameList.github.io/Duck-Life-2/",
+      "games/flash-player.html?swf=games/swfs/ducklife2.swf&title=Duck+Life+2"
     ],
     tags: ["Duck Life", "Duck Life 2", "Duck", "Racing", "Training", "Animal", "Owen OG", "Unblocked"],
     rating: 4.9,
@@ -1098,8 +1098,8 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "thumbnails/ducklife3.jpg",
     mirrors: [
       "games/duck-life-3.html",
-      "games/flash-player.html?swf=games/swfs/ducklife3.swf&title=Duck+Life+3",
-      "/api/proxy/game?url=https://freeonlinewebtools.github.io/gamelist3.github.io/Duck-Life-3/"
+      "https://ubghyper.github.io/GameList.github.io/Duck-Life-3/",
+      "games/flash-player.html?swf=games/swfs/ducklife3.swf&title=Duck+Life+3"
     ],
     tags: ["Duck Life", "Duck Life 3", "Duck", "Evolution", "Racing", "Training", "Owen OG", "Unblocked"],
     rating: 4.9,
@@ -1123,8 +1123,9 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "thumbnails/ducklife4.jpg",
     mirrors: [
       "games/duck-life-4.html",
-      "games/flash-player.html?swf=games/swfs/ducklife4.swf&title=Duck+Life+4",
-      "https://flyingsully.github.io/GameList.github.io/Duck-Life-4/"
+      "https://ubghyper.github.io/GameList.github.io/Duck-Life-4/",
+      "https://flyingsully.github.io/GameList.github.io/Duck-Life-4/",
+      "games/flash-player.html?swf=games/swfs/ducklife4.swf&title=Duck+Life+4"
     ],
     tags: ["Duck Life", "Duck Life 4", "Duck", "Adventure", "Racing", "Training", "Owen OG", "Unblocked"],
     rating: 4.9,
@@ -1148,6 +1149,7 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "thumbnails/ducklife5.png",
     mirrors: [
       "games/duck-life-5.html",
+      "https://mountjustin.github.io/ducklife5.html",
       "games/flash-player.html?swf=games/swfs/ducklife5.swf&title=Duck+Life+5"
     ],
     tags: ["Duck Life", "Duck Life 5", "Treasure Hunt", "Duck", "Platformer", "Casual", "Owen OG", "Unblocked"],

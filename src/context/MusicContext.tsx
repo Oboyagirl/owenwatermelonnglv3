@@ -225,7 +225,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           const remoteFallback = (albumSourceUrls as Record<string, string>)[cleanName];
           if (remoteFallback) {
             const isStatic = typeof window !== 'undefined' && 
-              (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:');
+              (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:' || (!window.location.port && window.location.hostname !== 'localhost'));
             const proxied = isStatic ? remoteFallback : `/api/music/proxy?url=${encodeURIComponent(remoteFallback)}`;
             try {
               audio.src = new URL(proxied, window.location.href).href;
@@ -268,13 +268,13 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // When running fullstack (dev/preview), use same-origin /api/music/proxy (unblocked, supports byte ranges)
     // On static hosting (like GitHub Pages where /api/ doesn't exist), use direct archive.org CDN URL
     const isStaticHost = typeof window !== 'undefined' && 
-      (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:');
+      (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:' || (!window.location.port && window.location.hostname !== 'localhost'));
 
     const directUrl = target.audioSrc;
-    const proxiedUrl = `/api/music/proxy?url=${encodeURIComponent(directUrl)}`;
+    const proxiedUrl = isStaticHost ? directUrl : `/api/music/proxy?url=${encodeURIComponent(directUrl)}`;
 
     const primaryUrl = isStaticHost ? directUrl : proxiedUrl;
-    const secondaryUrl = isStaticHost ? proxiedUrl : directUrl;
+    const secondaryUrl = directUrl;
 
     const trySource = async (url: string): Promise<boolean> => {
       try {
@@ -539,8 +539,29 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             }
           }
 
-          // If direct remote failed, retry via same-origin proxy
+          const isStaticHost = typeof window !== 'undefined' && 
+            (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:' || (!window.location.port && window.location.hostname !== 'localhost'));
+
+          // If local or direct track audio failed, try streaming from verified archive.org remote source
+          const cleanName = activeTrack.audioSrc.replace(/^(\.\/|\/)+/, '').replace(/^music\//, '');
+          const fallbackRemote = (albumSourceUrls as Record<string, string>)[cleanName];
+          if (fallbackRemote) {
+            const nextSrc = isStaticHost ? fallbackRemote : `/api/music/proxy?url=${encodeURIComponent(fallbackRemote)}`;
+            const nextHref = new URL(nextSrc, window.location.href).href;
+            if (audio.src !== nextHref) {
+              console.log("Audio failed, switching to remote fallback stream:", activeTrack.title);
+              audio.src = nextHref;
+              audio.load();
+              if (isPlaying) {
+                audio.play().catch(() => {});
+              }
+              return;
+            }
+          }
+
+          // If direct remote failed on fullstack dev server, retry via same-origin proxy
           if (
+            !isStaticHost &&
             !audio.src.includes('/api/music/proxy') && 
             (activeTrack.audioSrc.startsWith('http://') || activeTrack.audioSrc.startsWith('https://'))
           ) {
@@ -549,22 +570,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             if (audio.src !== proxyHref) {
               console.log("Direct remote failed, retrying via same-origin proxy:", activeTrack.title);
               audio.src = proxyHref;
-              if (isPlaying) {
-                audio.play().catch(() => {});
-              }
-              return;
-            }
-          }
-
-          // If local track audio failed, try streaming from archive.org remote source
-          const cleanName = activeTrack.audioSrc.replace(/^(\.\/|\/)+/, '').replace(/^music\//, '');
-          const fallbackRemote = (albumSourceUrls as Record<string, string>)[cleanName];
-          if (fallbackRemote) {
-            const proxyUrl = `/api/music/proxy?url=${encodeURIComponent(fallbackRemote)}`;
-            const proxyHref = new URL(proxyUrl, window.location.origin).href;
-            if (audio.src !== proxyHref) {
-              console.log("Local audio failed, streaming from remote fallback:", activeTrack.title);
-              audio.src = proxyHref;
+              audio.load();
               if (isPlaying) {
                 audio.play().catch(() => {});
               }

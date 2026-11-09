@@ -11,7 +11,7 @@ export function resolveAssetUrl(url: string): string {
   if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:') || url.startsWith('blob:') || url.startsWith('/api/')) {
     return url;
   }
-  const clean = url.startsWith('/') ? url.slice(1) : url;
+  const clean = url.replace(/^(\.\/|\/)+/, '');
 
   // On GitHub Pages (static hosting without Express backend), fallback /g/:slug to ubghyper direct shell
   if (typeof window !== 'undefined' && window.location.hostname.endsWith('github.io')) {
