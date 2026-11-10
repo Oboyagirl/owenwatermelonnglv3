@@ -670,10 +670,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 200,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "./music/tyler_igor_01_igors_theme.mp3",
+    "audioSrc": "https://archive.org/download/igor2019_202504/01%20IGOR%27S%20THEME.mp3",
     "albumId": "album-igor",
     "trackNumber": 1,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-igor-track-2",
@@ -685,10 +685,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 190,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "./music/tyler_igor_02_earfquake.mp3",
+    "audioSrc": "https://archive.org/download/igor2019_202504/02%20EARFQUAKE.mp3",
     "albumId": "album-igor",
     "trackNumber": 2,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-igor-track-3",
@@ -700,10 +700,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 212,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "./music/tyler_igor_03_i_think.mp3",
+    "audioSrc": "https://archive.org/download/igor2019_202504/03%20I%20THINK.mp3",
     "albumId": "album-igor",
     "trackNumber": 3,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-igor-track-4",
@@ -715,10 +715,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 14,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "./music/tyler_igor_04_exactly_what_you_run_from.mp3",
+    "audioSrc": "https://archive.org/download/igor2019_202504/02%20EARFQUAKE.mp3",
     "albumId": "album-igor",
     "trackNumber": 4,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-igor-track-5",
@@ -730,10 +730,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 177,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "./music/tyler_igor_05_running_out_of_time.mp3",
+    "audioSrc": "https://archive.org/download/igor2019_202504/05%20RUNNING%20OUT%20OF%20TIME.mp3",
     "albumId": "album-igor",
     "trackNumber": 5,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-igor-track-6",
@@ -745,10 +745,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 195,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "./music/tyler_igor_06_new_magic_wand.mp3",
+    "audioSrc": "https://archive.org/download/igor2019_202504/06%20NEW%20MAGIC%20WAND.mp3",
     "albumId": "album-igor",
     "trackNumber": 6,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-igor-track-7",
@@ -760,10 +760,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 210,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "./music/tyler_igor_07_a_boy_is_a_gun.mp3",
+    "audioSrc": "https://archive.org/download/igor2019_202504/07%20A%20BOY%20IS%20A%20GUN.mp3",
     "albumId": "album-igor",
     "trackNumber": 7,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-igor-track-8",
@@ -775,10 +775,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 179,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "./music/tyler_igor_08_puppet.mp3",
+    "audioSrc": "https://archive.org/download/igor2019_202504/08%20PUPPET.mp3",
     "albumId": "album-igor",
     "trackNumber": 8,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-igor-track-9",
@@ -790,10 +790,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 205,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "./music/tyler_igor_09_whats_good.mp3",
+    "audioSrc": "https://archive.org/download/igor2019_202504/09%20WHAT%27S%20GOOD.mp3",
     "albumId": "album-igor",
     "trackNumber": 9,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-igor-track-10",
@@ -805,10 +805,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 375,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "./music/tyler_igor_10_gone_gone_thank_you.mp3",
+    "audioSrc": "https://archive.org/download/igor2019_202504/10%20GONE%20GONE%20-%20THANK%20YOU.mp3",
     "albumId": "album-igor",
     "trackNumber": 10,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-igor-track-11",
@@ -820,10 +820,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 161,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "./music/tyler_igor_11_i_dont_love_you_anymore.mp3",
+    "audioSrc": "https://archive.org/download/igor2019_202504/11%20I%20DON%27T%20LOVE%20YOU%20ANYMORE.mp3",
     "albumId": "album-igor",
     "trackNumber": 11,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-igor-track-12",
@@ -835,10 +835,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 265,
     "cover": "./music/covers/tyler_igor.jpg",
     "genre": "Experimental Hip Hop / Funk",
-    "audioSrc": "./music/tyler_igor_12_are_we_still_friends.mp3",
+    "audioSrc": "https://archive.org/download/igor2019_202504/12%20ARE%20WE%20STILL%20FRIENDS.mp3",
     "albumId": "album-igor",
     "trackNumber": 12,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-cmiygl-track-1",
@@ -2215,10 +2215,10 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 372,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "./music/kanye_tlop_20.mp3",
+    "audioSrc": "https://archive.org/download/kanyewest_202605/19.%20Fade%20(Feat.%20Post%20Malone%20%26%20Ty%20Dolla%20%24ign).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 20,
-    "hasLocalAudio": true
+    "hasLocalAudio": false
   },
   {
     "id": "album-808s-track-1",

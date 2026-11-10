@@ -225,7 +225,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           const remoteFallback = (albumSourceUrls as Record<string, string>)[cleanName];
           if (remoteFallback) {
             const isStatic = typeof window !== 'undefined' && 
-              (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:' || (!window.location.port && window.location.hostname !== 'localhost'));
+              (window.location.hostname.endsWith('github.io') || window.location.hostname.endsWith('pages.dev') || window.location.protocol === 'file:');
             const proxied = isStatic ? remoteFallback : `/api/music/proxy?url=${encodeURIComponent(remoteFallback)}`;
             try {
               audio.src = new URL(proxied, window.location.href).href;
@@ -268,13 +268,13 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // When running fullstack (dev/preview), use same-origin /api/music/proxy (unblocked, supports byte ranges)
     // On static hosting (like GitHub Pages where /api/ doesn't exist), use direct archive.org CDN URL
     const isStaticHost = typeof window !== 'undefined' && 
-      (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:' || (!window.location.port && window.location.hostname !== 'localhost'));
+      (window.location.hostname.endsWith('github.io') || window.location.hostname.endsWith('pages.dev') || window.location.protocol === 'file:');
 
     const directUrl = target.audioSrc;
-    const proxiedUrl = isStaticHost ? directUrl : `/api/music/proxy?url=${encodeURIComponent(directUrl)}`;
+    const proxiedUrl = `/api/music/proxy?url=${encodeURIComponent(directUrl)}`;
 
     const primaryUrl = isStaticHost ? directUrl : proxiedUrl;
-    const secondaryUrl = directUrl;
+    const secondaryUrl = isStaticHost ? proxiedUrl : directUrl;
 
     const trySource = async (url: string): Promise<boolean> => {
       try {

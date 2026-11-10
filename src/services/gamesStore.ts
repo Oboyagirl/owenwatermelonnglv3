@@ -50,46 +50,37 @@ const defaultGamesMap = new Map(DEFAULT_GAMES.map(g => [g.id, g]));
 
 function sanitizeGame(game: Game): Game {
   const authoritative = defaultGamesMap.get(game.id);
-  if (authoritative) {
-    return {
-      ...game,
-      thumbnail: authoritative.thumbnail,
-      banner: authoritative.banner,
-      iframeSrc: authoritative.iframeSrc,
-      sandbox: undefined,
-      iframeCode: formatGameIframe(authoritative.title, authoritative.iframeSrc),
-      source: authoritative.source || game.source || 'unblocked',
-      secondaryCategory: authoritative.secondaryCategory || game.secondaryCategory || 'Potato Classics',
-      mirrors: authoritative.mirrors || game.mirrors,
-      controls: authoritative.controls || game.controls
-    };
-  }
+  const base = authoritative ? {
+    ...game,
+    ...authoritative,
+    source: authoritative.source || game.source || 'unblocked',
+    secondaryCategory: authoritative.secondaryCategory || game.secondaryCategory || 'Potato Classics',
+    controls: authoritative.controls || game.controls
+  } : game;
 
-  let thumb = game.thumbnail || '';
+  let thumb = base.thumbnail || '';
   if (thumb.includes('arcade_hero_banner') || thumb.includes('watermelon_logo') || thumb.includes('retro_bowl_thumb') || thumb.includes('granny_horror_thumb')) {
     thumb = 'https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Slope/slope.jpg';
   }
 
-  let iframeSrc = game.iframeSrc || '';
+  let iframeSrc = base.iframeSrc || '';
   if (URL_OVERRIDES[game.id]) {
     iframeSrc = URL_OVERRIDES[game.id];
   } else if (iframeSrc && iframeSrc.startsWith('/games/')) {
     iframeSrc = iframeSrc.slice(1);
   }
 
-  const resolved = resolveGameSource(game.id, game.title, iframeSrc, game.mirrors);
+  const resolved = resolveGameSource(game.id, base.title, iframeSrc, base.mirrors);
   iframeSrc = resolved.src;
   const mirrors = resolved.mirrors;
 
-  return { 
-    ...game, 
-    thumbnail: thumb, 
-    iframeSrc, 
+  return {
+    ...base,
+    thumbnail: thumb,
+    iframeSrc,
     mirrors,
-    sandbox: undefined,
-    iframeCode: formatGameIframe(game.title, iframeSrc),
-    source: game.source || 'unblocked',
-    secondaryCategory: game.secondaryCategory || 'Potato Classics'
+    iframeCode: formatGameIframe(base.title, iframeSrc),
+    sandbox: undefined
   };
 }
 

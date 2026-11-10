@@ -590,6 +590,33 @@ export interface UniversalSavePayload {
     gameName?: string;
   };
   manualCode?: string;
+  saveFileName?: string;
+  saveFileBase64?: string;
+}
+
+export function createCodeSavePayload(gameId: string, manualCode: string): string {
+  const payload: UniversalSavePayload = {
+    version: 2,
+    capturedAt: new Date().toISOString(),
+    gameId,
+    device: detectDeviceLabel(),
+    keysCount: 1,
+    manualCode
+  };
+  return JSON.stringify(payload);
+}
+
+export function createFileSavePayload(gameId: string, saveFileName: string, saveFileBase64: string): string {
+  const payload: UniversalSavePayload = {
+    version: 2,
+    capturedAt: new Date().toISOString(),
+    gameId,
+    device: detectDeviceLabel(),
+    keysCount: 1,
+    saveFileName,
+    saveFileBase64
+  };
+  return JSON.stringify(payload);
 }
 
 function uint8ArrayToBase64(bytes: Uint8Array): string {
@@ -1159,18 +1186,33 @@ export async function restoreUniversalGameState(
     }
   }
 
-  // 5. Broadcast postMessage for custom game shells
+  // 5. If manual save code is present, copy to clipboard for instantaneous in-game paste
+  if (parsed.manualCode && typeof navigator !== 'undefined' && navigator.clipboard) {
+    try {
+      await navigator.clipboard.writeText(parsed.manualCode);
+      anyRestored = true;
+    } catch {}
+  }
+
+  // 6. Broadcast postMessage for custom game shells and HTML5 iframes
   if (contentWindow) {
     try {
       contentWindow.postMessage({
         type: 'UNIVERSAL_GAME_RESTORE',
         gameId,
-        payload: parsed
+        payload: parsed,
+        saveData: parsed.manualCode || rawData
       }, '*');
+      contentWindow.postMessage({
+        type: 'RESTORE_GAME_STATE',
+        gameId,
+        saveData: parsed.manualCode || rawData
+      }, '*');
+      anyRestored = true;
     } catch (e) {}
   }
 
-  return anyRestored || Boolean(storageData);
+  return anyRestored || Boolean(storageData) || Boolean(parsed.manualCode) || Boolean(parsed.saveFileBase64);
 }
 
 /**

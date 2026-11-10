@@ -466,13 +466,12 @@ export function resolveGameSource(
     };
   }
 
-  // Duck Life Series (Direct Standalone Fast GitHub Pages Mirrors with Local Fallbacks)
+  // Duck Life Series (Direct Standalone Fast GitHub Pages Mirrors)
   if (safeId === 'duck-life' || safeId === 'ducklife' || safeId === 'duck-life-1' || safeTitle.toLowerCase() === 'duck life') {
     return {
       src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life/',
       mirrors: [
-        'https://ubghyper.github.io/GameList.github.io/Duck-Life/',
-        'games/duck-life-1.html'
+        'https://ubghyper.github.io/GameList.github.io/Duck-Life/'
       ]
     };
   }
@@ -481,8 +480,7 @@ export function resolveGameSource(
     return {
       src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life-2/',
       mirrors: [
-        'https://ubghyper.github.io/GameList.github.io/Duck-Life-2/',
-        'games/duck-life-2.html'
+        'https://ubghyper.github.io/GameList.github.io/Duck-Life-2/'
       ]
     };
   }
@@ -491,8 +489,7 @@ export function resolveGameSource(
     return {
       src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life-3/',
       mirrors: [
-        'https://ubghyper.github.io/GameList.github.io/Duck-Life-3/',
-        'games/duck-life-3.html'
+        'https://ubghyper.github.io/GameList.github.io/Duck-Life-3/'
       ]
     };
   }
@@ -502,8 +499,7 @@ export function resolveGameSource(
       src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life-4/',
       mirrors: [
         'https://ubghyper.github.io/GameList.github.io/Duck-Life-4/',
-        'https://flyingsully.github.io/GameList.github.io/Duck-Life-4/',
-        'games/duck-life-4.html'
+        'https://gameinclassroom.github.io/duck-life-4/'
       ]
     };
   }
@@ -512,9 +508,7 @@ export function resolveGameSource(
     return {
       src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life-5/',
       mirrors: [
-        'https://ubghyper.github.io/GameList.github.io/Duck-Life-5/',
-        'https://mountjustin.github.io/ducklife5.html',
-        'games/duck-life-5.html'
+        'https://ubghyper.github.io/GameList.github.io/Duck-Life-5/'
       ]
     };
   }
@@ -523,8 +517,7 @@ export function resolveGameSource(
     return {
       src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life-4/',
       mirrors: [
-        'https://ubghyper.github.io/GameList.github.io/Duck-Life-4/',
-        'games/duck-life-4.html'
+        'https://ubghyper.github.io/GameList.github.io/Duck-Life-4/'
       ]
     };
   }
@@ -533,20 +526,33 @@ export function resolveGameSource(
     return {
       src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life-3/',
       mirrors: [
-        'https://ubghyper.github.io/GameList.github.io/Duck-Life-3/',
-        'games/duck-life-3.html'
+        'https://ubghyper.github.io/GameList.github.io/Duck-Life-3/'
       ]
     };
   }
 
-  // A Small World Cup (Sawyer For Sawyer)
-  if (safeId === 'sawyer-for-sawyer' || safeId.includes('small-world-cup') || safeTitle.toLowerCase().includes('small world cup') || safeTitle.toLowerCase().includes('sawyer for sawyer')) {
+  // Deep Sleep Trilogy (Scriptwelder Classics)
+  if (safeId.includes('deep-sleep-3') || safeTitle.toLowerCase().includes('deep sleep 3')) {
     return {
-      src: 'games/a-small-world-cup.html',
+      src: 'https://ubghyper.github.io/GameList.github.io/Deep-Sleep-3/',
       mirrors: [
-        'games/a-small-world-cup.html',
-        'https://gameinclassroom.github.io/a-small-world-cup/',
-        "https://gameinclassroom.github.io/a-small-world-cup/"
+        'https://ubghyper.github.io/GameList.github.io/Deep-Sleep-3/'
+      ]
+    };
+  }
+  if (safeId.includes('deep-sleep-2') || safeTitle.toLowerCase().includes('deep sleep 2')) {
+    return {
+      src: 'https://ubghyper.github.io/GameList.github.io/Deep-Sleep-2/',
+      mirrors: [
+        'https://ubghyper.github.io/GameList.github.io/Deep-Sleep-2/'
+      ]
+    };
+  }
+  if (safeId.includes('deep-sleep') || safeTitle.toLowerCase().includes('deep sleep')) {
+    return {
+      src: 'https://ubghyper.github.io/GameList.github.io/Deep-Sleep-1/',
+      mirrors: [
+        'https://ubghyper.github.io/GameList.github.io/Deep-Sleep-1/'
       ]
     };
   }

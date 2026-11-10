@@ -1047,17 +1047,15 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/ducklife1.jpg",
     mirrors: [
-      "games/duck-life-1.html",
-      "https://ubghyper.github.io/GameList.github.io/Duck-Life/",
-      "games/flash-player.html?swf=games/swfs/ducklife1.swf&title=Duck+Life"
+      "https://ubghyper.github.io/GameList.github.io/Duck-Life/"
     ],
     tags: ["Duck Life", "Duck", "Racing", "Training", "Animal", "Casual", "Owen OG", "Unblocked"],
     rating: 4.9,
     plays: 280000,
     author: "Wix Games",
     featured: true,
-    iframeSrc: "games/duck-life-1.html",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life" src="games/duck-life-1.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Duck-Life/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life" src="https://ubghyper.github.io/GameList.github.io/Duck-Life/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "↑ / W", action: "Jump (Running Mode)" },
       { key: "← / → / A / D", action: "Move Left & Right (Swimming / Flying)" }
@@ -1072,17 +1070,15 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/ducklife2.jpg",
     mirrors: [
-      "games/duck-life-2.html",
-      "https://ubghyper.github.io/GameList.github.io/Duck-Life-2/",
-      "games/flash-player.html?swf=games/swfs/ducklife2.swf&title=Duck+Life+2"
+      "https://ubghyper.github.io/GameList.github.io/Duck-Life-2/"
     ],
     tags: ["Duck Life", "Duck Life 2", "Duck", "Racing", "Training", "Animal", "Owen OG", "Unblocked"],
     rating: 4.9,
     plays: 295000,
     author: "Wix Games",
     featured: true,
-    iframeSrc: "games/duck-life-2.html",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 2: World Champion" src="games/duck-life-2.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Duck-Life-2/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 2: World Champion" src="https://ubghyper.github.io/GameList.github.io/Duck-Life-2/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "↑ / W", action: "Jump / Climb" },
       { key: "← / → / A / D", action: "Steer Duck" }
@@ -1097,17 +1093,15 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/ducklife3.jpg",
     mirrors: [
-      "games/duck-life-3.html",
-      "https://ubghyper.github.io/GameList.github.io/Duck-Life-3/",
-      "games/flash-player.html?swf=games/swfs/ducklife3.swf&title=Duck+Life+3"
+      "https://ubghyper.github.io/GameList.github.io/Duck-Life-3/"
     ],
     tags: ["Duck Life", "Duck Life 3", "Duck", "Evolution", "Racing", "Training", "Owen OG", "Unblocked"],
     rating: 4.9,
     plays: 310000,
     author: "Wix Games",
     featured: true,
-    iframeSrc: "games/duck-life-3.html",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 3: Evolution" src="games/duck-life-3.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Duck-Life-3/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 3: Evolution" src="https://ubghyper.github.io/GameList.github.io/Duck-Life-3/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Arrow Keys / WASD", action: "Control Duck in Training & Races" },
       { key: "Space", action: "Action / Jump" }
@@ -1122,18 +1116,16 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/ducklife4.jpg",
     mirrors: [
-      "games/duck-life-4.html",
       "https://ubghyper.github.io/GameList.github.io/Duck-Life-4/",
-      "https://flyingsully.github.io/GameList.github.io/Duck-Life-4/",
-      "games/flash-player.html?swf=games/swfs/ducklife4.swf&title=Duck+Life+4"
+      "https://gameinclassroom.github.io/duck-life-4/"
     ],
     tags: ["Duck Life", "Duck Life 4", "Duck", "Adventure", "Racing", "Training", "Owen OG", "Unblocked"],
     rating: 4.9,
     plays: 350000,
     author: "Wix Games",
     featured: true,
-    iframeSrc: "games/duck-life-4.html",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 4" src="games/duck-life-4.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Duck-Life-4/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 4" src="https://ubghyper.github.io/GameList.github.io/Duck-Life-4/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Arrow Keys / WASD", action: "Move Duck / Navigate World" },
       { key: "Space / Mouse", action: "Jump / Interact" }
@@ -1148,17 +1140,15 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/ducklife5.png",
     mirrors: [
-      "games/duck-life-5.html",
-      "https://mountjustin.github.io/ducklife5.html",
-      "games/flash-player.html?swf=games/swfs/ducklife5.swf&title=Duck+Life+5"
+      "https://ubghyper.github.io/GameList.github.io/Duck-Life-5/"
     ],
     tags: ["Duck Life", "Duck Life 5", "Treasure Hunt", "Duck", "Platformer", "Casual", "Owen OG", "Unblocked"],
     rating: 4.8,
     plays: 180000,
     author: "Wix Games",
     featured: true,
-    iframeSrc: "games/duck-life-5.html",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 5: Treasure Hunt" src="games/duck-life-5.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Duck-Life-5/",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 5: Treasure Hunt" src="https://ubghyper.github.io/GameList.github.io/Duck-Life-5/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Arrow Keys / WASD", action: "Move & Jump" },
       { key: "Space", action: "Activate Gadget" }
@@ -1502,24 +1492,24 @@ export const URL_OVERRIDES: Record<string, string> = {
   "sawyer-for-sawyer": "games/a-small-world-cup.html",
   "a-small-world-cup": "games/a-small-world-cup.html",
   "asmallworldcup": "games/a-small-world-cup.html",
-  "duck-life": "games/duck-life-1.html",
-  "ducklife": "games/duck-life-1.html",
-  "duck-life-1": "games/duck-life-1.html",
-  "ducklife1": "games/duck-life-1.html",
-  "duck-life-2": "games/duck-life-2.html",
-  "ducklife2": "games/duck-life-2.html",
-  "strongdog-ducklife2": "games/duck-life-2.html",
-  "duck-life-3": "games/duck-life-3.html",
-  "ducklife3": "games/duck-life-3.html",
-  "strongdog-ducklife3": "games/duck-life-3.html",
-  "duck-life-4": "games/duck-life-4.html",
-  "ducklife4": "games/duck-life-4.html",
-  "duck-life-5": "games/duck-life-5.html",
-  "ducklife5": "games/duck-life-5.html",
-  "duck-life-space": "games/duck-life-4.html",
-  "ducklifespace": "games/duck-life-4.html",
-  "duck-life-battle": "games/duck-life-3.html",
-  "ducklifebattle": "games/duck-life-3.html",
+  "duck-life": "https://ubghyper.github.io/GameList.github.io/Duck-Life/",
+  "ducklife": "https://ubghyper.github.io/GameList.github.io/Duck-Life/",
+  "duck-life-1": "https://ubghyper.github.io/GameList.github.io/Duck-Life/",
+  "ducklife1": "https://ubghyper.github.io/GameList.github.io/Duck-Life/",
+  "duck-life-2": "https://ubghyper.github.io/GameList.github.io/Duck-Life-2/",
+  "ducklife2": "https://ubghyper.github.io/GameList.github.io/Duck-Life-2/",
+  "strongdog-ducklife2": "https://ubghyper.github.io/GameList.github.io/Duck-Life-2/",
+  "duck-life-3": "https://ubghyper.github.io/GameList.github.io/Duck-Life-3/",
+  "ducklife3": "https://ubghyper.github.io/GameList.github.io/Duck-Life-3/",
+  "strongdog-ducklife3": "https://ubghyper.github.io/GameList.github.io/Duck-Life-3/",
+  "duck-life-4": "https://ubghyper.github.io/GameList.github.io/Duck-Life-4/",
+  "ducklife4": "https://ubghyper.github.io/GameList.github.io/Duck-Life-4/",
+  "duck-life-5": "https://ubghyper.github.io/GameList.github.io/Duck-Life-5/",
+  "ducklife5": "https://ubghyper.github.io/GameList.github.io/Duck-Life-5/",
+  "duck-life-space": "https://ubghyper.github.io/GameList.github.io/Duck-Life-4/",
+  "ducklifespace": "https://ubghyper.github.io/GameList.github.io/Duck-Life-4/",
+  "duck-life-battle": "https://ubghyper.github.io/GameList.github.io/Duck-Life-3/",
+  "ducklifebattle": "https://ubghyper.github.io/GameList.github.io/Duck-Life-3/",
   "jacksmith": "https://ubghyper.github.io/GameList.github.io/Jacksmith/",
   "learntofly": "https://gameinclassroom.github.io/learn-to-fly/",
   "learntofly2": "https://ubghyper.github.io/GameList.github.io/Learn-To-Fly-2/",
