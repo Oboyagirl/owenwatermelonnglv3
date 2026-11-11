@@ -60,7 +60,7 @@ const ACADEMICS_MAP: Record<string, string> = {
   "sausageflip": "https://7zeb.github.io/homework/steal-a-brainrot/go/sausage-flip.html",
   "sausagerun": "https://7zeb.github.io/homework/steal-a-brainrot/go/sausage-flip.html",
   "bindingofisaac": "https://flyingsully.github.io/GameList.github.io/Binding-Of-Isaac/",
-  "ducklife4": "https://ubghyper.github.io/GameList.github.io/Duck-Life-4/",
+  "ducklife4": "https://gameinclassroom.github.io/duck-life-4/",
   "clusterrush": "https://gameinclassroom.github.io/cluster-rush/",
   "cuphead": "https://freeonlinewebtools.github.io/gamelist2.github.io/Cuphead/",
   "badicecream": "https://freeonlinewebtools.github.io/gamelist8.github.io/Bad-Ice-Cream/",
@@ -82,7 +82,7 @@ const ACADEMICS_MAP: Record<string, string> = {
 const FLYINGSULLY_GAMES = new Set([
   "2048", "awesomeplanes", "awesometanks2", "btd4", "bindingofisaac",
   "bitlife", "bloonstd5", "bobtherobber", "cookieclicker", "doom",
-  "ducklife4", "eggycar", "gunmayham2", "happywheels", "ironsnout"
+  "eggycar", "gunmayham2", "happywheels", "ironsnout"
 ]);
 
 // Retain local client-side offline game canvas implementations
@@ -467,10 +467,12 @@ export function resolveGameSource(
   }
 
   // Duck Life Series (Direct Standalone Fast GitHub Pages Mirrors)
+  // Duck Life Series (Direct Native WebGL Confirmed Working Mirrors - No Ruffle Stuck Screens)
   if (safeId === 'duck-life' || safeId === 'ducklife' || safeId === 'duck-life-1' || safeTitle.toLowerCase() === 'duck life') {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life/',
+      src: 'https://gameinclassroom.github.io/duck-life/',
       mirrors: [
+        'https://gameinclassroom.github.io/duck-life/',
         'https://ubghyper.github.io/GameList.github.io/Duck-Life/'
       ]
     };
@@ -478,8 +480,9 @@ export function resolveGameSource(
 
   if (safeId === 'duck-life-2' || safeId === 'ducklife2' || safeTitle.toLowerCase().includes('duck life 2') || safeTitle.toLowerCase().includes('ducklife 2')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life-2/',
+      src: 'https://gameinclassroom.github.io/duck-life-2-world-champion/',
       mirrors: [
+        'https://gameinclassroom.github.io/duck-life-2-world-champion/',
         'https://ubghyper.github.io/GameList.github.io/Duck-Life-2/'
       ]
     };
@@ -487,8 +490,9 @@ export function resolveGameSource(
 
   if (safeId === 'duck-life-3' || safeId === 'ducklife3' || safeTitle.toLowerCase().includes('duck life 3') || safeTitle.toLowerCase().includes('ducklife 3')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life-3/',
+      src: 'https://gameinclassroom.github.io/duck-life-3-evolution/',
       mirrors: [
+        'https://gameinclassroom.github.io/duck-life-3-evolution/',
         'https://ubghyper.github.io/GameList.github.io/Duck-Life-3/'
       ]
     };
@@ -496,9 +500,8 @@ export function resolveGameSource(
 
   if (safeId === 'duck-life-4' || safeId === 'ducklife4' || safeTitle.toLowerCase().includes('duck life 4') || safeTitle.toLowerCase().includes('ducklife 4')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life-4/',
+      src: 'https://gameinclassroom.github.io/duck-life-4/',
       mirrors: [
-        'https://ubghyper.github.io/GameList.github.io/Duck-Life-4/',
         'https://gameinclassroom.github.io/duck-life-4/'
       ]
     };
@@ -515,44 +518,44 @@ export function resolveGameSource(
 
   if (safeId.includes('duck-life-space') || safeTitle.toLowerCase().includes('duck life space')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life-4/',
+      src: 'https://gameinclassroom.github.io/duck-life-4/',
       mirrors: [
-        'https://ubghyper.github.io/GameList.github.io/Duck-Life-4/'
+        'https://gameinclassroom.github.io/duck-life-4/'
       ]
     };
   }
 
   if (safeId.includes('duck-life-battle') || safeTitle.toLowerCase().includes('duck life battle')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Duck-Life-3/',
+      src: 'https://gameinclassroom.github.io/duck-life-3-evolution/',
       mirrors: [
-        'https://ubghyper.github.io/GameList.github.io/Duck-Life-3/'
+        'https://gameinclassroom.github.io/duck-life-3-evolution/'
       ]
     };
   }
 
-  // Deep Sleep Trilogy (Scriptwelder Classics)
+  // Deep Sleep Trilogy (Scriptwelder Classics - Clean Player Without Stuck Splash)
   if (safeId.includes('deep-sleep-3') || safeTitle.toLowerCase().includes('deep sleep 3')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Deep-Sleep-3/',
+      src: 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Deep-Sleep-3/deep-sleep-3.swf&title=Deep+Sleep+3',
       mirrors: [
-        'https://ubghyper.github.io/GameList.github.io/Deep-Sleep-3/'
+        'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Deep-Sleep-3/deep-sleep-3.swf&title=Deep+Sleep+3'
       ]
     };
   }
   if (safeId.includes('deep-sleep-2') || safeTitle.toLowerCase().includes('deep sleep 2')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Deep-Sleep-2/',
+      src: 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Deep-Sleep-2/deepsleep2.swf&title=Deep+Sleep+2',
       mirrors: [
-        'https://ubghyper.github.io/GameList.github.io/Deep-Sleep-2/'
+        'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Deep-Sleep-2/deepsleep2.swf&title=Deep+Sleep+2'
       ]
     };
   }
   if (safeId.includes('deep-sleep') || safeTitle.toLowerCase().includes('deep sleep')) {
     return {
-      src: 'https://ubghyper.github.io/GameList.github.io/Deep-Sleep-1/',
+      src: 'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Deep-Sleep-1/deepsleep1.swf&title=Deep+Sleep+1',
       mirrors: [
-        'https://ubghyper.github.io/GameList.github.io/Deep-Sleep-1/'
+        'games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Deep-Sleep-1/deepsleep1.swf&title=Deep+Sleep+1'
       ]
     };
   }
