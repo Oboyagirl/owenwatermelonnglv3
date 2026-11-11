@@ -664,8 +664,25 @@ Example format:
 
   const httpServer = http.createServer(app);
 
-  if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.resolve('dist')));
+  // Always serve compiled production assets if they exist to prevent MIME-type errors
+  if (fs.existsSync(path.resolve('dist/assets'))) {
+    app.use('/assets', express.static(path.resolve('dist/assets'), {
+      immutable: true,
+      maxAge: '1y'
+    }));
+  }
+
+  const isDev = process.env.npm_lifecycle_event === 'dev' || 
+                process.env.NODE_ENV === 'development' || 
+                process.argv.includes('--dev');
+  const hasDist = fs.existsSync(path.resolve('dist/index.html'));
+  const isProduction = process.env.NODE_ENV === 'production' || (!isDev && hasDist);
+
+  if (isProduction && hasDist) {
+    app.use(express.static(path.resolve('dist'), {
+      index: 'index.html',
+      maxAge: '1h'
+    }));
     app.get('*', (req, res) => {
       res.sendFile(path.resolve('dist/index.html'));
     });

@@ -8,18 +8,22 @@
     // Universal GitHub Pages SPA Redirect
     (function() {
       try {
-        var isGithubIo = window.location.hostname.endsWith('github.io');
+        var host = window.location.hostname.toLowerCase();
+        var isGithubIo = host.endsWith('github.io');
         var path = window.location.pathname;
         var segments = path.split('/').filter(Boolean);
-        if (isGithubIo && segments.length > 0) {
-          // Repo subdirectory on GitHub Pages (e.g. /owenwatermelonv3/)
+        var hostUser = host.split('.')[0];
+        var isUserRootSite = host === (hostUser + '.github.io');
+
+        if (isGithubIo && !isUserRootSite && segments.length > 0) {
+          // Repo subdirectory on GitHub Pages (e.g. username.github.io/repo/)
           window.location.replace('/' + segments[0] + '/' + window.location.search + window.location.hash);
         } else {
-          // Root domain or custom domain
+          // User root site (e.g. oboyagirl.github.io) or custom root domain
           window.location.replace('/' + window.location.search + window.location.hash);
         }
       } catch (e) {
-        window.location.replace('./');
+        window.location.replace('/');
       }
     })();
   </script>
