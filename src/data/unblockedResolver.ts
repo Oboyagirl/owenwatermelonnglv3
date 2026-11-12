@@ -930,7 +930,7 @@ export function resolveGameSource(
 
   // If the primary source is an external HTTP(S) URL, add the universal school-filter proxy mirror
   if (resolvedSrc.startsWith('http://') || resolvedSrc.startsWith('https://')) {
-    const isStatic = typeof window !== 'undefined' && (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:');
+    const isStatic = typeof window !== 'undefined' && Boolean(window.location?.hostname?.endsWith('github.io') || window.location?.protocol === 'file:');
     const proxyMirror = !isStatic && resolvedSrc.startsWith('http') ? `/api/proxy/game?url=${encodeURIComponent(resolvedSrc)}` : resolvedSrc;
     if (!validMirrors.includes(proxyMirror)) {
       validMirrors.push(proxyMirror);

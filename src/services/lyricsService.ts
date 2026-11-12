@@ -181,7 +181,7 @@ export async function fetchLyricsForTrack(artist: string, title: string, duratio
   // 3. Fetch from /api/music/lyrics backend proxy (same-origin, unblocked at school)
   try {
     const isStaticHost = typeof window !== 'undefined' && 
-      (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:');
+      Boolean(window.location?.hostname?.endsWith('github.io') || window.location?.protocol === 'file:');
 
     let data: any = null;
 

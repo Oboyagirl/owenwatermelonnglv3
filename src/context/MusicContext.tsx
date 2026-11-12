@@ -233,8 +233,12 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const cleanName = target.audioSrc.replace(/^(\.\/|\/)+/, '').replace(/^music\//, '');
       const remoteFallback = (albumSourceUrls as Record<string, string>)[cleanName];
       if (remoteFallback) {
-        const isStatic = typeof window !== 'undefined' && 
-          (window.location.hostname.endsWith('github.io') || window.location.hostname.endsWith('pages.dev') || window.location.protocol === 'file:' || (!window.location.port && window.location.hostname !== 'localhost'));
+        const isStatic = typeof window !== 'undefined' && Boolean(
+          window.location?.hostname?.endsWith('github.io') || 
+          window.location?.hostname?.endsWith('pages.dev') || 
+          window.location?.protocol === 'file:' || 
+          (!window.location?.port && window.location?.hostname && window.location?.hostname !== 'localhost')
+        );
         const proxied = isStatic ? remoteFallback : `/api/music/proxy?url=${encodeURIComponent(remoteFallback)}`;
         const okProxy = await trySource(proxied);
         if (okProxy) return;
@@ -249,8 +253,11 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // For remote tracks:
     // When running fullstack (dev/preview), use same-origin /api/music/proxy (unblocked, supports byte ranges)
     // On static hosting (like GitHub Pages where /api/ doesn't exist), use direct archive.org CDN URL
-    const isStaticHost = typeof window !== 'undefined' && 
-      (window.location.hostname.endsWith('github.io') || window.location.hostname.endsWith('pages.dev') || window.location.protocol === 'file:');
+    const isStaticHost = typeof window !== 'undefined' && Boolean(
+      window.location?.hostname?.endsWith('github.io') || 
+      window.location?.hostname?.endsWith('pages.dev') || 
+      window.location?.protocol === 'file:'
+    );
 
     const directUrl = target.audioSrc;
     const proxiedUrl = `/api/music/proxy?url=${encodeURIComponent(directUrl)}`;
@@ -411,7 +418,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (!audio.src || audio.src === "about:blank" || audio.src === window.location.href) {
       const isRemoteUrl = currentTrack.audioSrc.startsWith('http://') || currentTrack.audioSrc.startsWith('https://');
       const isStaticHost = typeof window !== 'undefined' && 
-        (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:');
+        Boolean(window.location?.hostname?.endsWith('github.io') || window.location?.protocol === 'file:');
 
       const initialUrl = isRemoteUrl
         ? currentTrack.audioSrc
@@ -500,8 +507,11 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             }
           }
 
-          const isStaticHost = typeof window !== 'undefined' && 
-            (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:' || (!window.location.port && window.location.hostname !== 'localhost'));
+          const isStaticHost = typeof window !== 'undefined' && Boolean(
+            window.location?.hostname?.endsWith('github.io') || 
+            window.location?.protocol === 'file:' || 
+            (!window.location?.port && window.location?.hostname && window.location?.hostname !== 'localhost')
+          );
 
           // If local or direct track audio failed, try streaming from verified archive.org remote source
           const cleanName = activeTrack.audioSrc.replace(/^(\.\/|\/)+/, '').replace(/^music\//, '');

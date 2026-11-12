@@ -14,7 +14,7 @@ export function resolveAssetUrl(url: string): string {
   const clean = url.replace(/^(\.\/|\/)+/, '');
 
   // On GitHub Pages (static hosting without Express backend), fallback /g/:slug to ubghyper direct shell
-  if (typeof window !== 'undefined' && window.location.hostname.endsWith('github.io')) {
+  if (typeof window !== 'undefined' && Boolean(window.location?.hostname?.endsWith('github.io'))) {
     if (clean.startsWith('g/')) {
       const slug = clean.replace(/^g\//, '').replace(/\/$/, '');
       return `https://ubghyper.github.io/GameList.github.io/${slug}/`;

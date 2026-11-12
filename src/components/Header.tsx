@@ -61,7 +61,7 @@ export const Header: React.FC<HeaderProps> = ({
   activeTheme
 }) => {
   const [inputValue, setInputValue] = useState(omnibarValue);
-  const isGithubPages = typeof window !== 'undefined' && window.location.hostname.endsWith('github.io');
+  const isGithubPages = typeof window !== 'undefined' && Boolean(window.location?.hostname?.endsWith('github.io'));
   const { profile } = useAuth();
   const { currentTrack, isPlaying, togglePlay, nextTrack } = useMusic();
   const currentAvatar = AVATAR_PRESETS.find(a => a.id === (profile?.avatarId || 'melon_classic')) || AVATAR_PRESETS[0];
