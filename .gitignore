@@ -11,3 +11,10 @@ coverage/
 .dev.env.json
 *.tar.gz
 *.zip
+
+# Audio media files (380+ MP3s ~1GB) - prevent GitHub API commit timeouts; player streams from archive.org fallbacks
+public/music/*.mp3
+*.mp3
+
+# Obsolete build directories
+assets/
