@@ -24,13 +24,32 @@
         min-height: 100vh;
       }
       @keyframes melonPulse {
-        0%, 100% { transform: scale(1); opacity: 0.9; }
-        50% { transform: scale(1.08); opacity: 1; }
+        0%, 100% { transform: scale(1); opacity: 0.85; filter: drop-shadow(0 0 10px rgba(16,185,129,0.3)); }
+        50% { transform: scale(1.08); opacity: 1; filter: drop-shadow(0 0 25px rgba(16,185,129,0.6)); }
+      }
+      @keyframes barLoad {
+        0% { transform: translateX(-100%); }
+        50% { transform: translateX(0%); }
+        100% { transform: translateX(100%); }
       }
     </style>
   </head>
   <body class="bg-[#020813] text-white min-h-screen" style="background-color: #020813; color: #ffffff; margin: 0; min-height: 100vh;">
-    <div id="root"></div>
+    <div id="root">
+      <div id="initial-preloader" style="min-height: 100vh; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #020813; color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; text-align: center; padding: 20px; box-sizing: border-box;">
+        <div style="font-size: 56px; margin-bottom: 16px; animation: melonPulse 1.4s infinite ease-in-out; display: inline-block;">🍉</div>
+        <h1 style="font-size: 22px; font-weight: 900; margin: 0 0 6px 0; color: #ffffff; letter-spacing: -0.02em;">
+          Owen Watermelon <span style="color: #10b981;">V3</span>
+        </h1>
+        <p style="font-size: 13px; color: #94a3b8; margin: 0 0 20px 0; max-width: 300px;">
+          Unblocked Games Arcade & Music
+        </p>
+        <div style="width: 180px; height: 4px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden; position: relative;">
+          <div style="position: absolute; top: 0; left: 0; bottom: 0; width: 60%; background: linear-gradient(90deg, #10b981, #34d399); border-radius: 99px; animation: barLoad 1.2s infinite ease-in-out;"></div>
+        </div>
+        <span style="font-size: 11px; color: #64748b; margin-top: 12px; font-mono: monospace;">Loading catalog...</span>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
