@@ -664,14 +664,6 @@ Example format:
 
   const httpServer = http.createServer(app);
 
-  // Always serve compiled production assets if they exist to prevent MIME-type errors
-  if (fs.existsSync(path.resolve('dist/assets'))) {
-    app.use('/assets', express.static(path.resolve('dist/assets'), {
-      immutable: true,
-      maxAge: '1y'
-    }));
-  }
-
   const isDev = process.env.npm_lifecycle_event === 'dev' || 
                 process.env.NODE_ENV === 'development' || 
                 process.argv.includes('--dev');
@@ -679,6 +671,12 @@ Example format:
   const isProduction = process.env.NODE_ENV === 'production' || (!isDev && hasDist);
 
   if (isProduction && hasDist) {
+    if (fs.existsSync(path.resolve('dist/assets'))) {
+      app.use('/assets', express.static(path.resolve('dist/assets'), {
+        immutable: true,
+        maxAge: '1y'
+      }));
+    }
     app.use(express.static(path.resolve('dist'), {
       index: 'index.html',
       maxAge: '1h'

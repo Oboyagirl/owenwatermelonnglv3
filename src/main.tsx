@@ -6,17 +6,18 @@ import {AuthProvider} from './context/AuthContext.tsx';
 import {MusicProvider} from './context/MusicContext.tsx';
 import './index.css';
 
+let hasMounted = false;
+
 function mountApp() {
+  if (hasMounted) return;
   const rootElement = document.getElementById('root');
   if (!rootElement) {
-    // Retry if DOM parsing is in progress
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', mountApp);
-    } else {
-      setTimeout(mountApp, 50);
-    }
+    setTimeout(mountApp, 20);
     return;
   }
+
+  hasMounted = true;
+  console.log('[OwenWatermelon] Mounting React application...');
 
   try {
     const root = createRoot(rootElement);
@@ -53,8 +54,9 @@ function mountApp() {
   }
 }
 
-if (document.readyState === 'loading') {
+// Call mountApp immediately; retry in case DOM element isn't ready yet
+mountApp();
+if (typeof document !== 'undefined' && document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', mountApp);
-} else {
-  mountApp();
 }
+
