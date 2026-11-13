@@ -3,28 +3,28 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, Suspense, lazy } from 'react';
 import { Header, REQUEST_GAME_URL } from './components/Header';
 import { HeroBanner } from './components/HeroBanner';
 import { GameCard } from './components/GameCard';
-import { GamePlayer } from './components/GamePlayer';
-import { TabCloaker } from './components/TabCloaker';
 import { StarfieldBackground } from './components/StarfieldBackground';
-import { ThemeModal } from './components/ThemeModal';
-import { UserAccountModal } from './components/UserAccountModal';
 import { Sidebar, TabItem } from './components/Sidebar';
 import { PasscodeGate, PASSCODE_STORAGE_KEY } from './components/PasscodeGate';
-import { WelcomeAnimation } from './components/WelcomeAnimation';
 import { HomeDashboard } from './components/HomeDashboard';
-import { AppsView } from './components/AppsView';
-import { MusicView } from './components/MusicView';
 import { FloatingMusicPlayer } from './components/FloatingMusicPlayer';
-import { CloudSaveModal } from './components/CloudSaveModal';
 import { useGamesStore } from './services/gamesStore';
 import { useSiteSettingsStore } from './services/siteSettingsStore';
 import { useThemeStore } from './services/themeStore';
 import { Game } from './types/game';
 import { triggerPanic } from './data/cloakPresets';
+
+const GamePlayer = lazy(() => import('./components/GamePlayer').then(m => ({ default: m.GamePlayer })));
+const TabCloaker = lazy(() => import('./components/TabCloaker').then(m => ({ default: m.TabCloaker })));
+const ThemeModal = lazy(() => import('./components/ThemeModal').then(m => ({ default: m.ThemeModal })));
+const UserAccountModal = lazy(() => import('./components/UserAccountModal').then(m => ({ default: m.UserAccountModal })));
+const WelcomeAnimation = lazy(() => import('./components/WelcomeAnimation').then(m => ({ default: m.WelcomeAnimation })));
+const AppsView = lazy(() => import('./components/AppsView').then(m => ({ default: m.AppsView })));
+const MusicView = lazy(() => import('./components/MusicView').then(m => ({ default: m.MusicView })));
 import { Heart, Gamepad2, ExternalLink, RotateCcw, Search, Sparkles, Flame, Globe, Bot, X, Shuffle } from 'lucide-react';
 
 export function isOwenWatermelonOG(game: Game): boolean {
@@ -468,11 +468,19 @@ export default function App() {
 
 
     if (space === 'apps') {
-      return <AppsView activeTheme={activeTheme} />;
+      return (
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center p-8 text-xs text-slate-400">Loading Apps...</div>}>
+          <AppsView activeTheme={activeTheme} />
+        </Suspense>
+      );
     }
 
     if (space === 'music') {
-      return <MusicView activeTheme={activeTheme} />;
+      return (
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center p-8 text-xs text-slate-400">Loading Music Studio...</div>}>
+          <MusicView activeTheme={activeTheme} />
+        </Suspense>
+      );
     }
 
 
@@ -495,7 +503,9 @@ export default function App() {
                 Disguise this browser tab to look like Google Classroom, Canvas, or Google Drive.
               </p>
             </div>
-            <TabCloaker />
+            <Suspense fallback={<div className="text-xs text-slate-400">Loading Cloaker...</div>}>
+              <TabCloaker />
+            </Suspense>
           </div>
         </div>
       );
@@ -550,17 +560,19 @@ export default function App() {
         style={{ backgroundColor: activeTheme.bgPrimary }}
       >
         {selectedGame ? (
-          <GamePlayer
-            game={selectedGame}
-            onBack={() => setSelectedGame(null)}
-            onToggleFavorite={toggleFavorite}
-            isFavorite={favorites.includes(selectedGame.id)}
-            onUpdateGame={updateGame}
-            allGames={games}
-            onSelectGame={handleSelectGame}
-            activeTheme={activeTheme}
-            onOpenMusicSpace={() => handleSelectSpace('music')}
-          />
+          <Suspense fallback={<div className="flex-1 flex items-center justify-center p-8 text-xs text-slate-400">Loading Game Player...</div>}>
+            <GamePlayer
+              game={selectedGame}
+              onBack={() => setSelectedGame(null)}
+              onToggleFavorite={toggleFavorite}
+              isFavorite={favorites.includes(selectedGame.id)}
+              onUpdateGame={updateGame}
+              allGames={games}
+              onSelectGame={handleSelectGame}
+              activeTheme={activeTheme}
+              onOpenMusicSpace={() => handleSelectSpace('music')}
+            />
+          </Suspense>
         ) : (
           <div className="max-w-7xl mx-auto w-full flex flex-col gap-8">
             {/* Header Title & Search */}
@@ -704,10 +716,12 @@ export default function App() {
 
       {/* Welcome Animation on First Unlock */}
       {showWelcomeAnimation && (
-        <WelcomeAnimation
-          activeTheme={activeTheme}
-          onComplete={() => setShowWelcomeAnimation(false)}
-        />
+        <Suspense fallback={null}>
+          <WelcomeAnimation
+            activeTheme={activeTheme}
+            onComplete={() => setShowWelcomeAnimation(false)}
+          />
+        </Suspense>
       )}
 
       {/* OwenWatermelon Left Sidebar */}
@@ -797,24 +811,32 @@ export default function App() {
       </div>
 
       {/* Account & Profile Modal */}
-      <UserAccountModal
-        isOpen={isAccountModalOpen}
-        onClose={() => setIsAccountModalOpen(false)}
-        allGames={games}
-        onSelectGame={handleSelectGame}
-        theme={activeTheme}
-      />
+      {isAccountModalOpen && (
+        <Suspense fallback={null}>
+          <UserAccountModal
+            isOpen={isAccountModalOpen}
+            onClose={() => setIsAccountModalOpen(false)}
+            allGames={games}
+            onSelectGame={handleSelectGame}
+            theme={activeTheme}
+          />
+        </Suspense>
+      )}
 
       {/* Theme Studio Modal */}
-      <ThemeModal
-        isOpen={isThemeModalOpen}
-        onClose={() => setIsThemeModalOpen(false)}
-        activeThemeId={themeId}
-        onSelectTheme={setTheme}
-        customTheme={customTheme}
-        onUpdateCustomTheme={updateCustomTheme}
-        onResetCustomTheme={resetCustomTheme}
-      />
+      {isThemeModalOpen && (
+        <Suspense fallback={null}>
+          <ThemeModal
+            isOpen={isThemeModalOpen}
+            onClose={() => setIsThemeModalOpen(false)}
+            activeThemeId={themeId}
+            onSelectTheme={setTheme}
+            customTheme={customTheme}
+            onUpdateCustomTheme={updateCustomTheme}
+            onResetCustomTheme={resetCustomTheme}
+          />
+        </Suspense>
+      )}
 
       {/* Tab Cloaker Dialog Modal */}
       {isCloakerOpen && (
@@ -828,7 +850,9 @@ export default function App() {
             </button>
             <h2 className="text-xl font-bold text-white mb-2">School Tab Cloaker</h2>
             <p className="text-xs text-slate-400 mb-6">Change tab title and favicon to look like school software.</p>
-            <TabCloaker />
+            <Suspense fallback={<div className="text-xs text-slate-400">Loading Cloaker...</div>}>
+              <TabCloaker />
+            </Suspense>
           </div>
         </div>
       )}

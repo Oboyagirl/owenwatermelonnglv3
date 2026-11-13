@@ -388,12 +388,15 @@ export async function getUserGameSaves(userId: string): Promise<GameSave[]> {
 }
 
 export function subscribeToUserGameSaves(userId: string, callback: (saves: GameSave[]) => void) {
-  const path = `users/${userId}/saves`;
-  const coll = collection(db, 'users', userId, 'saves');
-
   // Immediately feed current local saves so the UI has instant reactivity with zero delay
   const initialLocal = getLocalBackups(userId);
   callback(initialLocal);
+
+  if (!auth.currentUser || auth.currentUser.uid !== userId) {
+    return () => {};
+  }
+
+  const coll = collection(db, 'users', userId, 'saves');
 
   return onSnapshot(
     coll,

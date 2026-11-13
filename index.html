@@ -50,7 +50,7 @@
         <span id="preloader-status" style="font-size: 11px; color: #64748b; margin-top: 12px; font-family: monospace;">Loading catalog...</span>
         <div id="preloader-troubleshoot" style="display: none; margin-top: 16px;">
           <p style="font-size: 12px; color: #f59e0b; margin: 0 0 10px 0;">Loading taking longer than usual?</p>
-          <button onclick="try { localStorage.clear(); sessionStorage.clear(); } catch(e){} window.location.reload();" style="padding: 8px 16px; background-color: #10b981; color: #042f1f; font-weight: 700; font-size: 12px; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(16,185,129,0.3);">
+          <button onclick="try { localStorage.clear(); sessionStorage.clear(); if ('caches' in window) { caches.keys().then(function(names){ names.forEach(function(n){ caches.delete(n); }); }); } if (navigator.serviceWorker) { navigator.serviceWorker.getRegistrations().then(function(regs){ regs.forEach(function(r){ r.unregister(); }); }); } } catch(e){} window.location.reload();" style="padding: 8px 16px; background-color: #10b981; color: #042f1f; font-weight: 700; font-size: 12px; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(16,185,129,0.3);">
             Reset Cache & Reload
           </button>
         </div>
@@ -58,32 +58,43 @@
     </div>
     <script>
       (function() {
-        // Show troubleshooting button if React takes longer than 3.5s to mount
+        // Show troubleshooting button if React takes longer than 5s to mount
         var timer = setTimeout(function() {
           var ts = document.getElementById('preloader-troubleshoot');
           if (ts) ts.style.display = 'block';
-        }, 3500);
+        }, 5000);
+
+        function showError(msg) {
+          clearTimeout(timer);
+          var status = document.getElementById('preloader-status');
+          var ts = document.getElementById('preloader-troubleshoot');
+          if (status) {
+            status.style.color = '#f87171';
+            status.innerText = msg;
+          }
+          if (ts) ts.style.display = 'block';
+        }
 
         window.addEventListener('error', function(e) {
-          clearTimeout(timer);
-          var status = document.getElementById('preloader-status');
-          var ts = document.getElementById('preloader-troubleshoot');
-          if (status) {
-            status.style.color = '#f87171';
-            status.innerText = 'Error: ' + (e.message || 'Script failed to execute');
+          var target = e && e.target;
+          if (target && (target.tagName === 'SCRIPT' || target.tagName === 'LINK')) {
+            showError('Failed to load module: ' + (target.src || target.href || 'unknown'));
+            return;
           }
-          if (ts) ts.style.display = 'block';
-        });
+          showError('Error: ' + ((e && e.message) || 'Script failed to execute'));
+        }, true);
 
         window.addEventListener('unhandledrejection', function(e) {
-          clearTimeout(timer);
-          var status = document.getElementById('preloader-status');
-          var ts = document.getElementById('preloader-troubleshoot');
-          if (status) {
-            status.style.color = '#f87171';
-            status.innerText = 'Async error: ' + (e.reason && (e.reason.message || e.reason) || 'Promise failed');
-          }
-          if (ts) ts.style.display = 'block';
+          showError('Async error: ' + (e.reason && (e.reason.message || e.reason) || 'Promise failed'));
+        });
+
+        window.addEventListener('vite:preloadError', function() {
+          try {
+            if (!sessionStorage.getItem('vite_preload_reloaded')) {
+              sessionStorage.setItem('vite_preload_reloaded', '1');
+              window.location.reload();
+            }
+          } catch (err) {}
         });
       })();
     </script>

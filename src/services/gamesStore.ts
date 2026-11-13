@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Game } from '../types/game';
-import { DEFAULT_GAMES, formatGameIframe, URL_OVERRIDES, getCanonicalGameKey } from '../data/defaultGames';
-import { resolveGameSource } from '../data/unblockedResolver';
+import { CURATED_STARTER_GAMES, loadAllDefaultGames, formatGameIframe, URL_OVERRIDES, getCanonicalGameKey } from '../data/defaultGames';
 
 const OVERRIDES_STORAGE_KEY = 'owen_game_overrides_v2';
 const FAVORITES_KEY = 'owen_watermelon_v3_favorites';
@@ -46,43 +45,7 @@ export function deduplicateGames(list: Game[]): Game[] {
   return unique;
 }
 
-const defaultGamesMap = new Map(DEFAULT_GAMES.map(g => [g.id, g]));
-
-function sanitizeGame(game: Game): Game {
-  const authoritative = defaultGamesMap.get(game.id);
-  const base = authoritative ? {
-    ...game,
-    ...authoritative,
-    source: authoritative.source || game.source || 'unblocked',
-    secondaryCategory: authoritative.secondaryCategory || game.secondaryCategory || 'Potato Classics',
-    controls: authoritative.controls || game.controls
-  } : game;
-
-  let thumb = base.thumbnail || '';
-  if (thumb.includes('arcade_hero_banner') || thumb.includes('watermelon_logo') || thumb.includes('retro_bowl_thumb') || thumb.includes('granny_horror_thumb')) {
-    thumb = 'https://raw.githubusercontent.com/ubghyper/GameList.github.io/main/Slope/slope.jpg';
-  }
-
-  let iframeSrc = base.iframeSrc || '';
-  if (URL_OVERRIDES[game.id]) {
-    iframeSrc = URL_OVERRIDES[game.id];
-  } else if (iframeSrc && iframeSrc.startsWith('/games/')) {
-    iframeSrc = iframeSrc.slice(1);
-  }
-
-  const resolved = resolveGameSource(game.id, base.title, iframeSrc, base.mirrors);
-  iframeSrc = resolved.src;
-  const mirrors = resolved.mirrors;
-
-  return {
-    ...base,
-    thumbnail: thumb,
-    iframeSrc,
-    mirrors,
-    iframeCode: formatGameIframe(base.title, iframeSrc),
-    sandbox: undefined
-  };
-}
+const defaultGamesMap = new Map(CURATED_STARTER_GAMES.map(g => [g.id, g]));
 
 export function useGamesStore() {
   // Overrides map: gameId -> partial game fields (e.g. customized plays, custom iframe, custom html)
@@ -134,14 +97,50 @@ export function useGamesStore() {
     } catch {}
 
     if (Object.keys(initialOverrides).length === 0) {
-      return DEFAULT_GAMES;
+      return CURATED_STARTER_GAMES;
     }
 
-    return DEFAULT_GAMES.map(g => {
+    return CURATED_STARTER_GAMES.map(g => {
       const mod = initialOverrides[g.id];
       return mod ? { ...g, ...mod } : g;
     });
   });
+
+  const fullCatalogRef = useRef<Game[] | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    loadAllDefaultGames()
+      .then((allGames) => {
+        if (!active) return;
+        fullCatalogRef.current = allGames;
+        for (const g of allGames) {
+          defaultGamesMap.set(g.id, g);
+        }
+        let currentOverrides: Record<string, Partial<Game>> = {};
+        try {
+          const cached = localStorage.getItem(OVERRIDES_STORAGE_KEY);
+          if (cached) {
+            currentOverrides = JSON.parse(cached) || {};
+          }
+        } catch {}
+
+        setGames(
+          Object.keys(currentOverrides).length === 0
+            ? allGames
+            : allGames.map(g => {
+                const mod = currentOverrides[g.id];
+                return mod ? { ...g, ...mod } : g;
+              })
+        );
+      })
+      .catch((err) => {
+        console.warn('Failed to hydrate extended game catalog:', err);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const [favorites, setFavorites] = useState<string[]>(() => {
     try {
@@ -224,7 +223,7 @@ export function useGamesStore() {
   };
 
   const resetGames = () => {
-    setGames(DEFAULT_GAMES);
+    setGames(fullCatalogRef.current || CURATED_STARTER_GAMES);
     setOverrides({});
     try {
       localStorage.removeItem(OVERRIDES_STORAGE_KEY);

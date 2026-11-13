@@ -18,6 +18,8 @@ function mountApp() {
 
   hasMounted = true;
   console.log('[OwenWatermelon] Mounting React application...');
+  const statusEl = document.getElementById('preloader-status');
+  if (statusEl) statusEl.textContent = 'Starting arcade...';
 
   try {
     const root = createRoot(rootElement);

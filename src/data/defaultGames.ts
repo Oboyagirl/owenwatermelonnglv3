@@ -1,9 +1,5 @@
 import { Game } from '../types/game';
-import ubgGamesList from './ubgFilteredGames.json';
-import strongdogGamesList from './strongdogGames.json';
-import { TRIPPLE_POTATOES_GAMES } from './tripplePotatoesGames';
-import { resolveGameSource } from './unblockedResolver';
-import sevenZebMap from './sevenZebGamesMap.json';
+
 
 const CURATED_GAMES: Game[] = [
   {
@@ -1755,127 +1751,158 @@ const SEVEN_ZEB_METADATA: Record<string, { title: string; category: string; desc
   "zombierush": { title: "Zombie Rush", category: "Action", description: "Fend off relentless waves of bloodthirsty zombies with shotguns, assault rifles, and barricades.", thumbnail: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80" }
 };
 
-function buildDefaultGames(): Game[] {
-  const seenIds = new Set<string>();
-  const gamesByKey = new Map<string, Game>();
-  const games: Game[] = [];
-
-  const normalizeGame = (g: Game, defaultCategory: string): Game => {
-    let initialSrc = g.iframeSrc || '';
-    if (URL_OVERRIDES[g.id]) {
-      initialSrc = URL_OVERRIDES[g.id];
-    } else if (initialSrc.startsWith('/g/')) {
-      const slug = initialSrc.replace(/^\/g\//, '').replace(/\/$/, '');
-      initialSrc = `https://ubghyper.github.io/GameList.github.io/${slug}/`;
-    }
-
-    const { src, mirrors } = resolveGameSource(g.id, g.title, initialSrc, g.mirrors);
-
-    // Decode any HTML entities in title
-    const cleanTitle = (g.title || '')
-      .replace(/&#39;/g, "'")
-      .replace(/&amp;/g, '&')
-      .replace(/&quot;/g, '"');
-
-    return {
-      ...g,
-      title: cleanTitle,
-      iframeSrc: src,
-      mirrors,
-      sandbox: undefined, // Unrestricted so Unity and HTML5 games load without sandbox errors
-      iframeCode: formatGameIframe(cleanTitle, src),
-      secondaryCategory: g.secondaryCategory || defaultCategory
-    };
+export const CURATED_STARTER_GAMES: Game[] = CURATED_GAMES.map(g => {
+  const src = URL_OVERRIDES[g.id] || g.iframeSrc || '';
+  return {
+    ...g,
+    iframeSrc: src,
+    sandbox: undefined,
+    iframeCode: formatGameIframe(g.title, src),
+    secondaryCategory: g.secondaryCategory || 'Potato Classics'
   };
+});
 
-  const addGameCandidate = (rawGame: Game, defaultCategory: string) => {
-    if (!rawGame || !rawGame.id) return;
-    const key = getCanonicalGameKey(rawGame);
-    if (!key || key === '__skip__') return;
+let cachedFullCatalogPromise: Promise<Game[]> | null = null;
 
-    if (gamesByKey.has(key) || seenIds.has(rawGame.id)) {
-      // Replicate detected! Deduplicate and merge tags/mirrors into existing
-      const existing = gamesByKey.get(key) || games.find(g => g.id === rawGame.id);
-      if (existing) {
-        if (Array.isArray(rawGame.tags)) {
-          const tagSet = new Set(existing.tags || []);
-          rawGame.tags.forEach(t => tagSet.add(t));
-          if (rawGame.secondaryCategory === 'Potato Classics' || rawGame.id.startsWith('potatoes-')) {
-            tagSet.add('Potato Classics');
-          }
-          existing.tags = Array.from(tagSet);
-        }
-        if (Array.isArray(rawGame.mirrors)) {
-          const mirrorSet = new Set(existing.mirrors || []);
-          rawGame.mirrors.forEach(m => mirrorSet.add(m));
-          existing.mirrors = Array.from(mirrorSet);
-        }
+export async function loadAllDefaultGames(): Promise<Game[]> {
+  if (cachedFullCatalogPromise) return cachedFullCatalogPromise;
+
+  cachedFullCatalogPromise = (async () => {
+    const [
+      { default: ubgGamesList },
+      { default: strongdogGamesList },
+      { TRIPPLE_POTATOES_GAMES },
+      { resolveGameSource },
+      { default: sevenZebMap }
+    ] = await Promise.all([
+      import('./ubgFilteredGames.json'),
+      import('./strongdogGames.json'),
+      import('./tripplePotatoesGames'),
+      import('./unblockedResolver'),
+      import('./sevenZebGamesMap.json')
+    ]);
+
+    const seenIds = new Set<string>();
+    const gamesByKey = new Map<string, Game>();
+    const games: Game[] = [];
+
+    const normalizeGame = (g: Game, defaultCategory: string): Game => {
+      let initialSrc = g.iframeSrc || '';
+      if (URL_OVERRIDES[g.id]) {
+        initialSrc = URL_OVERRIDES[g.id];
+      } else if (initialSrc.startsWith('/g/')) {
+        const slug = initialSrc.replace(/^\/g\//, '').replace(/\/$/, '');
+        initialSrc = `https://ubghyper.github.io/GameList.github.io/${slug}/`;
       }
-      return;
+
+      const { src, mirrors } = resolveGameSource(g.id, g.title, initialSrc, g.mirrors);
+
+      // Decode any HTML entities in title
+      const cleanTitle = (g.title || '')
+        .replace(/&#39;/g, "'")
+        .replace(/&amp;/g, '&')
+        .replace(/&quot;/g, '"');
+
+      return {
+        ...g,
+        title: cleanTitle,
+        iframeSrc: src,
+        mirrors,
+        sandbox: undefined, // Unrestricted so Unity and HTML5 games load without sandbox errors
+        iframeCode: formatGameIframe(cleanTitle, src),
+        secondaryCategory: g.secondaryCategory || defaultCategory
+      };
+    };
+
+    const addGameCandidate = (rawGame: Game, defaultCategory: string) => {
+      if (!rawGame || !rawGame.id) return;
+      const key = getCanonicalGameKey(rawGame);
+      if (!key || key === '__skip__') return;
+
+      if (gamesByKey.has(key) || seenIds.has(rawGame.id)) {
+        // Replicate detected! Deduplicate and merge tags/mirrors into existing
+        const existing = gamesByKey.get(key) || games.find(g => g.id === rawGame.id);
+        if (existing) {
+          if (Array.isArray(rawGame.tags)) {
+            const tagSet = new Set(existing.tags || []);
+            rawGame.tags.forEach(t => tagSet.add(t));
+            if (rawGame.secondaryCategory === 'Potato Classics' || rawGame.id.startsWith('potatoes-')) {
+              tagSet.add('Potato Classics');
+            }
+            existing.tags = Array.from(tagSet);
+          }
+          if (Array.isArray(rawGame.mirrors)) {
+            const mirrorSet = new Set(existing.mirrors || []);
+            rawGame.mirrors.forEach(m => mirrorSet.add(m));
+            existing.mirrors = Array.from(mirrorSet);
+          }
+        }
+        return;
+      }
+
+      const game = normalizeGame(rawGame, defaultCategory);
+      gamesByKey.set(key, game);
+      seenIds.add(game.id);
+      games.push(game);
+    };
+
+    // Add curated games first (highest priority)
+    for (const g of CURATED_GAMES) {
+      addGameCandidate(g, 'Potato Classics');
     }
 
-    const game = normalizeGame(rawGame, defaultCategory);
-    gamesByKey.set(key, game);
-    seenIds.add(game.id);
-    games.push(game);
-  };
+    // Add all games from TrippleThePotatoes collection (deduplicated against curated)
+    for (const g of TRIPPLE_POTATOES_GAMES) {
+      addGameCandidate(g, 'Potato Classics');
+    }
 
-  // Add curated games first (highest priority)
-  for (const g of CURATED_GAMES) {
-    addGameCandidate(g, 'Potato Classics');
-  }
+    // Add ubg filtered games (deduplicated against curated and potatoes)
+    for (const g of (ubgGamesList as unknown as Game[])) {
+      addGameCandidate(g, 'Unblocked Archive');
+    }
 
-  // Add all games from TrippleThePotatoes collection (deduplicated against curated)
-  for (const g of TRIPPLE_POTATOES_GAMES) {
-    addGameCandidate(g, 'Potato Classics');
-  }
+    // Add all StrongDog XP games (deduplicated against all above with tag & mirror merge)
+    for (const g of (strongdogGamesList as unknown as Game[])) {
+      addGameCandidate(g, 'StrongDog XP');
+    }
 
-  // Add ubg filtered games (deduplicated against curated and potatoes)
-  for (const g of (ubgGamesList as unknown as Game[])) {
-    addGameCandidate(g, 'Unblocked Archive');
-  }
+    // Add all unblocked 7zeb games
+    for (const [key, url] of Object.entries(sevenZebMap as Record<string, string>)) {
+      if (key === 'crazytaxi' || url.includes('crazy-taxi')) continue;
 
-  // Add all StrongDog XP games (deduplicated against all above with tag & mirror merge)
-  for (const g of (strongdogGamesList as unknown as Game[])) {
-    addGameCandidate(g, 'StrongDog XP');
-  }
+      const meta = SEVEN_ZEB_METADATA[key] || {
+        title: key.charAt(0).toUpperCase() + key.slice(1),
+        category: 'Arcade',
+        description: `Play unblocked ${key} with smooth 60 FPS performance, verified unblocked school mirrors, and full audio support.`,
+        thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80"
+      };
 
-  // Add all unblocked 7zeb games
-  for (const [key, url] of Object.entries(sevenZebMap as Record<string, string>)) {
-    if (key === 'crazytaxi' || url.includes('crazy-taxi')) continue;
+      const newGame: Game = {
+        id: `7zeb-${key}`,
+        source: 'unblocked',
+        title: meta.title,
+        description: meta.description,
+        category: meta.category,
+        secondaryCategory: "Owen Watermelon OG’s",
+        thumbnail: meta.thumbnail || "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80",
+        mirrors: [
+          url,
+          `/api/proxy/game?url=${encodeURIComponent(url)}`
+        ],
+        tags: [meta.title, '7zeb', 'Unblocked', 'Owen OG', meta.category],
+        rating: 4.9,
+        plays: Math.floor(150000 + (key.length * 12345) % 150000),
+        author: meta.author || 'Owen OG',
+        featured: false,
+        iframeSrc: url,
+        iframeCode: `<iframe class="game-iframe" id="game-area" title="${meta.title}" src="${url}" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`
+      };
 
-    const meta = SEVEN_ZEB_METADATA[key] || {
-      title: key.charAt(0).toUpperCase() + key.slice(1),
-      category: 'Arcade',
-      description: `Play unblocked ${key} with smooth 60 FPS performance, verified unblocked school mirrors, and full audio support.`,
-      thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80"
-    };
+      addGameCandidate(newGame, "Owen Watermelon OG’s");
+    }
 
-    const newGame: Game = {
-      id: `7zeb-${key}`,
-      source: 'unblocked',
-      title: meta.title,
-      description: meta.description,
-      category: meta.category,
-      secondaryCategory: "Owen Watermelon OG’s",
-      thumbnail: meta.thumbnail || "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80",
-      mirrors: [
-        url,
-        `/api/proxy/game?url=${encodeURIComponent(url)}`
-      ],
-      tags: [meta.title, '7zeb', 'Unblocked', 'Owen OG', meta.category],
-      rating: 4.9,
-      plays: Math.floor(150000 + (key.length * 12345) % 150000),
-      author: meta.author || 'Owen OG',
-      featured: false,
-      iframeSrc: url,
-      iframeCode: `<iframe class="game-iframe" id="game-area" title="${meta.title}" src="${url}" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`
-    };
+    return games;
+  })();
 
-    addGameCandidate(newGame, "Owen Watermelon OG’s");
-  }
-
-  return games;
+  return cachedFullCatalogPromise;
 }
-
-export const DEFAULT_GAMES: Game[] = buildDefaultGames();
