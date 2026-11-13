@@ -17,7 +17,7 @@ import { Game } from '../types/game';
 import { ThemeConfig } from '../services/themeStore';
 
 interface HomeDashboardProps {
-  onNavigateTab: (tab: 'home' | 'games' | 'apps' | 'music' | 'tools' | 'saved') => void;
+  onNavigateTab: (tab: 'home' | 'games' | 'apps' | 'music' | 'chess' | 'tools' | 'saved') => void;
   onSelectGame: (game: Game) => void;
   featuredGames: Game[];
   trendingGames: Game[];
@@ -195,6 +195,21 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             </div>
             <span className="text-xs md:text-sm font-bold text-white group-hover:text-amber-300">Plinko</span>
             <span className="text-[10px] text-slate-400">Pegboard Multipliers</span>
+          </button>
+
+          <button
+            onClick={() => onNavigateTab('chess')}
+            className="group p-4 md:p-5 rounded-2xl border transition-all duration-300 flex flex-col items-center text-center gap-2.5 cursor-pointer shadow-lg hover:-translate-y-1"
+            style={{
+              backgroundColor: cardBg,
+              borderColor: border
+            }}
+          >
+            <div className="w-12 h-12 rounded-2xl bg-sky-500/20 text-sky-300 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+              ♟️
+            </div>
+            <span className="text-xs md:text-sm font-bold text-white group-hover:text-sky-300">Chess</span>
+            <span className="text-[10px] text-slate-400">AI & 2-Player</span>
           </button>
 
           <button
