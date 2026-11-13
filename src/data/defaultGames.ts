@@ -1768,19 +1768,13 @@ export async function loadAllDefaultGames(): Promise<Game[]> {
   if (cachedFullCatalogPromise) return cachedFullCatalogPromise;
 
   cachedFullCatalogPromise = (async () => {
-    const [
-      { default: ubgGamesList },
-      { default: strongdogGamesList },
-      { TRIPPLE_POTATOES_GAMES },
-      { resolveGameSource },
-      { default: sevenZebMap }
-    ] = await Promise.all([
-      import('./ubgFilteredGames.json'),
-      import('./strongdogGames.json'),
-      import('./tripplePotatoesGames'),
-      import('./unblockedResolver'),
-      import('./sevenZebGamesMap.json')
-    ]);
+    const {
+      ubgGamesList,
+      strongdogGamesList,
+      TRIPPLE_POTATOES_GAMES,
+      resolveGameSource,
+      sevenZebMap
+    } = await import('./catalogArchive');
 
     const seenIds = new Set<string>();
     const gamesByKey = new Map<string, Game>();

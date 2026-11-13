@@ -7,7 +7,7 @@
     <meta name="description" content="Unblocked games website template with built-in iframe games catalog, tab cloaker, music studio, and customizable games JSON." />
     <meta property="og:title" content="Owen Watermelon V3" />
     <meta property="og:description" content="Unblocked games website template with built-in iframe games catalog, tab cloaker, music studio, and customizable games JSON." />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
@@ -77,8 +77,10 @@
 
         window.addEventListener('error', function(e) {
           var target = e && e.target;
-          if (target && (target.tagName === 'SCRIPT' || target.tagName === 'LINK')) {
-            showError('Failed to load module: ' + (target.src || target.href || 'unknown'));
+          if (target && target.tagName) {
+            if (target.tagName === 'SCRIPT') {
+              showError('Failed to load script: ' + (target.src || 'unknown'));
+            }
             return;
           }
           showError('Error: ' + ((e && e.message) || 'Script failed to execute'));
