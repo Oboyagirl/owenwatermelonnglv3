@@ -7,6 +7,9 @@ export interface CustomTrack extends MusicTrack {
   isCustom?: boolean;
 }
 
+export type StreamMode = 'auto' | 'apple';
+export type ActiveStreamSource = 'proxy' | 'apple' | 'direct' | 'local';
+
 interface MusicContextType {
   currentTrack: CustomTrack;
   isPlaying: boolean;
@@ -17,6 +20,9 @@ interface MusicContextType {
   isShuffle: boolean;
   isLoop: boolean;
   audioError: string | null;
+  streamMode: StreamMode;
+  activeStreamSource: ActiveStreamSource;
+  setStreamMode: (mode: StreamMode) => void;
   allTracks: CustomTrack[];
   customTracks: CustomTrack[];
   likedTrackIds: string[];
@@ -45,11 +51,92 @@ const MusicContext = createContext<MusicContextType | null>(null);
 const CUSTOM_MUSIC_KEY = 'owen_custom_music_list';
 const LIKED_MUSIC_KEY = 'owen_liked_music';
 const MUSIC_VOL_KEY = 'owen_music_volume';
+const STREAM_MODE_KEY = 'owen_music_stream_mode';
+const APPLE_CACHE_KEY = 'owen_apple_cdn_cache_v1';
+
+// Live Cloud Run proxy URL used when running from static hosts (e.g. GitHub Pages) where /api/* isn't local
+const CLOUD_PROXY_BASE = 'https://ais-pre-7ylqt33cxq7bzpzpildi3y-58002627990.us-east1.run.app';
+
+function detectStaticHost(): boolean {
+  if (typeof window === 'undefined') return false;
+  const host = window.location?.hostname || '';
+  if (
+    host.endsWith('github.io') ||
+    host.endsWith('pages.dev') ||
+    host.endsWith('netlify.app') ||
+    host.endsWith('vercel.app') ||
+    window.location?.protocol === 'file:'
+  ) {
+    return true;
+  }
+  return false;
+}
+
+function cleanQueryTerm(str: string): string {
+  return str
+    .replace(/\([^)]*feat[^)]*\)/gi, '')
+    .replace(/\[[^\]]*\]/g, '')
+    .replace(/\([^)]*remaster[^)]*\)/gi, '')
+    .replace(/\([^)]*explicit[^)]*\)/gi, '')
+    .replace(/\([^)]*clean[^)]*\)/gi, '')
+    .trim();
+}
 
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentTrackIdRef = useRef<string | null>(null);
   const activeTrackRef = useRef<CustomTrack | null>(null);
+  const playAttemptRef = useRef<number>(0);
+  const nextTrackRef = useRef<() => void>(() => {});
+  const prevTrackRef = useRef<() => void>(() => {});
+  const isPlayingRef = useRef<boolean>(false);
+
+  // Remember blocked upstreams in this session so subsequent songs don't stall waiting for blocked filters
+  const proxyBlockedRef = useRef<boolean>(false);
+  const archiveBlockedRef = useRef<boolean>(false);
+
+  // Apple iTunes CDN cache (unblocked on school iPads & works directly in Safari without proxy)
+  const appleCacheRef = useRef<Record<string, string>>({});
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(APPLE_CACHE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') {
+          appleCacheRef.current = parsed;
+        }
+      }
+    } catch {}
+  }, []);
+
+  const persistAppleCacheEntry = useCallback((trackId: string, url: string) => {
+    appleCacheRef.current[trackId] = url;
+    try {
+      const entries = Object.entries(appleCacheRef.current);
+      if (entries.length > 250) {
+        appleCacheRef.current = Object.fromEntries(entries.slice(-200));
+      }
+      localStorage.setItem(APPLE_CACHE_KEY, JSON.stringify(appleCacheRef.current));
+    } catch {}
+  }, []);
+
+  const [streamMode, setStreamModeState] = useState<StreamMode>(() => {
+    try {
+      const saved = localStorage.getItem(STREAM_MODE_KEY);
+      if (saved === 'apple' || saved === 'auto') return saved;
+    } catch {}
+    return 'auto';
+  });
+
+  const setStreamMode = useCallback((mode: StreamMode) => {
+    setStreamModeState(mode);
+    setAudioError(null);
+    try {
+      localStorage.setItem(STREAM_MODE_KEY, mode);
+    } catch {}
+  }, []);
+
+  const [activeStreamSource, setActiveStreamSource] = useState<ActiveStreamSource>('proxy');
 
   // Custom uploaded tracks
   const [customTracks, setCustomTracks] = useState<CustomTrack[]>(() => {
@@ -57,7 +144,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const saved = localStorage.getItem(CUSTOM_MUSIC_KEY);
       if (!saved) return [];
       const parsed = JSON.parse(saved);
-      return Array.isArray(parsed) 
+      return Array.isArray(parsed)
         ? parsed.filter(t => t && typeof t.audioSrc === 'string' && t.audioSrc.trim().length > 0)
         : [];
     } catch {
@@ -69,13 +156,14 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [likedTrackIds, setLikedTrackIds] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem(LIKED_MUSIC_KEY);
-      return saved ? JSON.parse(saved) : ['track-tyler-see-you-again', 'track-alex-g-mary', 'track-kanye-stronger', 'track-kendrick-not-like-us'];
+      return saved
+        ? JSON.parse(saved)
+        : ['track-tyler-see-you-again', 'track-alex-g-mary', 'track-kanye-stronger', 'track-kendrick-not-like-us'];
     } catch {
       return ['track-tyler-see-you-again', 'track-alex-g-mary', 'track-kanye-stronger'];
     }
   });
 
-  // Combined tracks (custom uploads + real MP3 catalogue)
   const allTracks: CustomTrack[] = useMemo(() => {
     return [...customTracks, ...REAL_MUSIC_CATALOG];
   }, [customTracks]);
@@ -84,6 +172,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const currentTrack: CustomTrack = allTracks[currentTrackIndex] || REAL_MUSIC_CATALOG[0];
 
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  isPlayingRef.current = isPlaying;
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [volume, setVolumeState] = useState<number>(() => {
     try {
@@ -99,11 +188,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isLoop, setIsLoop] = useState<boolean>(false);
   const [audioError, setAudioError] = useState<string | null>(null);
 
-  // Floating Mini-Player state
   const [isMiniPlayerOpen, setIsMiniPlayerOpen] = useState<boolean>(true);
   const [isMiniPlayerCollapsed, setIsMiniPlayerCollapsed] = useState<boolean>(false);
 
-  // Sync volume with audio element
   const setVolume = useCallback((val: number) => {
     const clamped = Math.max(0, Math.min(1, val));
     setVolumeState(clamped);
@@ -135,7 +222,83 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setIsLoop(prev => !prev);
   }, []);
 
-  // Update MediaSession API for OS media notifications & keyboard keys
+  // Resolve an unblocked Apple iTunes CDN AAC stream (.m4a on audio-ssl.itunes.apple.com)
+  const resolveAppleCdnUrl = useCallback(
+    async (track: CustomTrack): Promise<string | null> => {
+      if (track.audioSrc?.includes('audio-ssl.itunes.apple.com')) {
+        return track.audioSrc;
+      }
+      const cached = appleCacheRef.current[track.id];
+      if (cached) return cached;
+
+      const cleanTitle = cleanQueryTerm(track.title);
+      const cleanArtist = track.artist.split(',')[0].split('&')[0].trim();
+      const query = `${cleanArtist} ${cleanTitle}`.trim();
+
+      try {
+        const res = await fetch(
+          `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=6`,
+          { signal: AbortSignal.timeout(6000) }
+        );
+        if (res.ok) {
+          const data: any = await res.json();
+          const results: any[] = Array.isArray(data?.results) ? data.results : [];
+          const titleLower = cleanTitle.toLowerCase();
+          const best =
+            results.find(
+              r =>
+                r.previewUrl &&
+                String(r.trackName || '').toLowerCase().includes(titleLower)
+            ) || results.find(r => r.previewUrl);
+          if (best?.previewUrl) {
+            persistAppleCacheEntry(track.id, best.previewUrl);
+            return best.previewUrl;
+          }
+        }
+      } catch {}
+
+      // Secondary fallback via our backend /api/music/resolve if fullstack
+      if (!detectStaticHost()) {
+        try {
+          const r = await fetch(
+            `/api/music/resolve?artist=${encodeURIComponent(cleanArtist)}&title=${encodeURIComponent(cleanTitle)}`,
+            { signal: AbortSignal.timeout(6000) }
+          );
+          if (r.ok) {
+            const j: any = await r.json();
+            if (j?.streamUrl) {
+              persistAppleCacheEntry(track.id, j.streamUrl);
+              return j.streamUrl;
+            }
+          }
+        } catch {}
+      }
+
+      return null;
+    },
+    [persistAppleCacheEntry]
+  );
+
+  // Pre-warm Apple CDN cache for current track + next 2 tracks in background so Safari taps are synchronous
+  useEffect(() => {
+    const indices = [
+      currentTrackIndex,
+      (currentTrackIndex + 1) % allTracks.length,
+      (currentTrackIndex + 2) % allTracks.length
+    ];
+    for (const idx of indices) {
+      const t = allTracks[idx];
+      if (t && !t.isCustom && !appleCacheRef.current[t.id] && !t.audioSrc.includes('audio-ssl.itunes.apple.com')) {
+        resolveAppleCdnUrl(t).catch(() => {});
+      }
+    }
+  }, [currentTrackIndex, allTracks, resolveAppleCdnUrl]);
+
+  // Build ordered candidate URLs for a track (always puts synchronous unblocked option first!)
+  const buildProxyUrl = useCallback((rawUrl: string, track: CustomTrack, base = '') => {
+    return `${base}/api/music/proxy?url=${encodeURIComponent(rawUrl)}&artist=${encodeURIComponent(track.artist)}&title=${encodeURIComponent(track.title)}`;
+  }, []);
+
   const updateMediaSession = useCallback((track: CustomTrack) => {
     if (typeof window === 'undefined' || !('mediaSession' in navigator)) return;
     try {
@@ -144,9 +307,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         title: track.title,
         artist: track.artist,
         album: track.album,
-        artwork: [
-          { src: coverUrl, sizes: '512x512', type: 'image/jpeg' }
-        ]
+        artwork: [{ src: coverUrl, sizes: '512x512', type: 'image/jpeg' }]
       });
 
       navigator.mediaSession.setActionHandler('play', () => {
@@ -162,159 +323,233 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
       });
       navigator.mediaSession.setActionHandler('previoustrack', () => {
-        prevTrack();
+        prevTrackRef.current();
       });
       navigator.mediaSession.setActionHandler('nexttrack', () => {
-        nextTrack();
+        nextTrackRef.current();
       });
-      navigator.mediaSession.setActionHandler('seekto', (details) => {
+      navigator.mediaSession.setActionHandler('seekto', details => {
         if (details.seekTime !== undefined && audioRef.current) {
           audioRef.current.currentTime = details.seekTime;
           setCurrentTime(details.seekTime);
         }
       });
-    } catch (e) {
-      // MediaSession error ignore
-    }
+    } catch {}
   }, []);
 
-  // Play a specific track with robust streaming (every song plays its own audio)
-  const playTrack = useCallback(async (target: CustomTrack) => {
-    if (!audioRef.current || !target || !target.audioSrc) return;
-    setAudioError(null);
-    activeTrackRef.current = target;
-    const audio = audioRef.current;
+  const getImmediatePlayUrl = useCallback(
+    (target: CustomTrack): { url: string; source: ActiveStreamSource } | null => {
+      const src = target.audioSrc;
+      const isRemote = src.startsWith('http://') || src.startsWith('https://');
+      const isLocalAudio =
+        !isRemote &&
+        (src.startsWith('./music/') ||
+          src.startsWith('/music/') ||
+          src.startsWith('music/') ||
+          src.startsWith('blob:') ||
+          src.startsWith('data:'));
 
-    // Update current index if found in catalog
-    const foundIdx = allTracks.findIndex(t => t.id === target.id);
-    if (foundIdx !== -1) {
-      setCurrentTrackIndex(foundIdx);
-    }
+      if (isLocalAudio) {
+        if (src.startsWith('blob:') || src.startsWith('data:')) {
+          return { url: src, source: 'local' };
+        }
+        const cleanName = src.replace(/^(\.\/|\/)+/, '').replace(/^music\//, '');
+        const mappedRemote = (albumSourceUrls as Record<string, string>)[cleanName];
+        if (!mappedRemote) {
+          return { url: resolveAssetUrl(src), source: 'local' };
+        }
+        // Treat mappedRemote cleanly below
+        if (streamMode === 'apple' && appleCacheRef.current[target.id]) {
+          return { url: appleCacheRef.current[target.id], source: 'apple' };
+        }
+        if (detectStaticHost()) {
+          if (appleCacheRef.current[target.id] && proxyBlockedRef.current) {
+            return { url: appleCacheRef.current[target.id], source: 'apple' };
+          }
+          if (!proxyBlockedRef.current) {
+            return { url: buildProxyUrl(mappedRemote, target, CLOUD_PROXY_BASE), source: 'proxy' };
+          }
+          return { url: mappedRemote, source: 'direct' };
+        }
+        return { url: buildProxyUrl(mappedRemote, target, ''), source: 'proxy' };
+      }
 
-    const isRemote = target.audioSrc.startsWith('http://') || target.audioSrc.startsWith('https://');
-    const isLocalAudio = !isRemote && (
-      target.audioSrc.startsWith('./music/') || 
-      target.audioSrc.startsWith('/music/') ||
-      target.audioSrc.startsWith('music/') ||
-      target.audioSrc.startsWith('blob:') ||
-      target.audioSrc.startsWith('data:')
-    );
+      if (src.includes('audio-ssl.itunes.apple.com')) {
+        return { url: src, source: 'apple' };
+      }
 
-    // Helper to attempt playing from a specific URL
-    const trySource = async (url: string): Promise<boolean> => {
+      if (streamMode === 'apple') {
+        const cachedApple = appleCacheRef.current[target.id];
+        if (cachedApple) {
+          return { url: cachedApple, source: 'apple' };
+        }
+        return null; // Caller will async-resolve Apple URL
+      }
+
+      const isStaticHost = detectStaticHost();
+      if (!isStaticHost) {
+        // Fullstack: proxy first (unblocked on school Wi-Fi because it streams from same origin)
+        if (!proxyBlockedRef.current) {
+          return { url: buildProxyUrl(src, target, ''), source: 'proxy' };
+        }
+        if (appleCacheRef.current[target.id]) {
+          return { url: appleCacheRef.current[target.id], source: 'apple' };
+        }
+        return { url: src, source: 'direct' };
+      }
+
+      // Static host (GitHub Pages): try Cloud Run proxy if healthy, else cached Apple CDN, else direct
+      if (!proxyBlockedRef.current) {
+        return { url: buildProxyUrl(src, target, CLOUD_PROXY_BASE), source: 'proxy' };
+      }
+      if (appleCacheRef.current[target.id]) {
+        return { url: appleCacheRef.current[target.id], source: 'apple' };
+      }
+      if (!archiveBlockedRef.current) {
+        return { url: src, source: 'direct' };
+      }
+      return null;
+    },
+    [streamMode, buildProxyUrl]
+  );
+
+  // Attempt playing a specific URL; preserves synchronous gesture when called first!
+  const attemptAudioUrl = useCallback(
+    async (
+      url: string,
+      source: ActiveStreamSource,
+      target: CustomTrack,
+      attemptId: number
+    ): Promise<'ok' | 'gesture' | 'failed'> => {
+      const audio = audioRef.current;
+      if (!audio || playAttemptRef.current !== attemptId) return 'failed';
+
       try {
         const targetHref = new URL(url, window.location.href).href;
         if (audio.src !== targetHref) {
           audio.src = targetHref;
-          try { audio.load(); } catch {}
         }
+        audio.muted = isMuted;
+        audio.volume = volume;
+        setActiveStreamSource(source);
+        currentTrackIdRef.current = target.id;
         await audio.play();
+        if (playAttemptRef.current !== attemptId) return 'failed';
         setIsPlaying(true);
         setAudioError(null);
-        currentTrackIdRef.current = target.id;
         updateMediaSession(target);
-        return true;
+        return 'ok';
       } catch (err: any) {
-        if (err && err.name === "NotAllowedError") {
+        if (playAttemptRef.current !== attemptId) return 'failed';
+        if (err && err.name === 'NotAllowedError') {
           setIsPlaying(false);
-          return true;
+          return 'gesture';
         }
-        return false;
+        return 'failed';
       }
-    };
+    },
+    [isMuted, volume, updateMediaSession]
+  );
 
-    // For local tracks, play direct relative asset URL with fallback to archive.org
-    if (isLocalAudio) {
-      const localUrl = resolveAssetUrl(target.audioSrc);
-      const played = await trySource(localUrl);
-      if (played) return;
+  const playTrack = useCallback(
+    async (target: CustomTrack) => {
+      if (!audioRef.current || !target || !target.audioSrc) return;
+      const attemptId = ++playAttemptRef.current;
+      setAudioError(null);
+      activeTrackRef.current = target;
 
-      // If local asset fails (e.g. purged for bundle size), stream from known CDN source
-      const cleanName = target.audioSrc.replace(/^(\.\/|\/)+/, '').replace(/^music\//, '');
-      const remoteFallback = (albumSourceUrls as Record<string, string>)[cleanName];
-      if (remoteFallback) {
-        const isStatic = typeof window !== 'undefined' && Boolean(
-          window.location?.hostname?.endsWith('github.io') || 
-          window.location?.hostname?.endsWith('pages.dev') || 
-          window.location?.protocol === 'file:' || 
-          (!window.location?.port && window.location?.hostname && window.location?.hostname !== 'localhost')
-        );
-        const proxied = isStatic ? remoteFallback : `/api/music/proxy?url=${encodeURIComponent(remoteFallback)}`;
-        const okProxy = await trySource(proxied);
-        if (okProxy) return;
-        const okDirect = await trySource(remoteFallback);
-        if (okDirect) return;
+      const foundIdx = allTracks.findIndex(t => t.id === target.id);
+      if (foundIdx !== -1) {
+        setCurrentTrackIndex(foundIdx);
       }
 
-      setAudioError(`Could not play "${target.title}". Tap to retry.`);
-      return;
-    }
+      // 1. Try immediate synchronous URL first (preserves iPad Safari user-gesture lock!)
+      const immediate = getImmediatePlayUrl(target);
+      if (immediate) {
+        const result = await attemptAudioUrl(immediate.url, immediate.source, target, attemptId);
+        if (playAttemptRef.current !== attemptId) return;
+        if (result === 'ok') return;
+        if (result === 'gesture') {
+          setAudioError(`Tap Play to start "${target.title}" on your iPad.`);
+          return;
+        }
+        // Mark failed channel to speed up subsequent songs
+        if (immediate.source === 'proxy') proxyBlockedRef.current = true;
+        if (immediate.source === 'direct' && target.audioSrc.includes('archive.org')) {
+          archiveBlockedRef.current = true;
+        }
+      }
 
-    // For remote tracks:
-    // When running fullstack (dev/preview), use same-origin /api/music/proxy (unblocked, supports byte ranges)
-    // On static hosting (like GitHub Pages where /api/ doesn't exist), use direct archive.org CDN URL
-    const isStaticHost = typeof window !== 'undefined' && Boolean(
-      window.location?.hostname?.endsWith('github.io') || 
-      window.location?.hostname?.endsWith('pages.dev') || 
-      window.location?.protocol === 'file:'
-    );
+      // 2. Fallback: Resolve unblocked Apple iTunes CDN stream (works on ALL school iPads!)
+      const appleUrl = await resolveAppleCdnUrl(target);
+      if (playAttemptRef.current !== attemptId) return;
 
-    const directUrl = target.audioSrc;
-    const proxiedUrl = `/api/music/proxy?url=${encodeURIComponent(directUrl)}`;
+      if (appleUrl) {
+        const appleResult = await attemptAudioUrl(appleUrl, 'apple', target, attemptId);
+        if (playAttemptRef.current !== attemptId) return;
+        if (appleResult === 'ok') return;
+        if (appleResult === 'gesture') {
+          // Apple stream is now loaded in audio.src! Next tap plays synchronously in 0ms.
+          setAudioError(`Unblocked iPad stream loaded for "${target.title}" — tap Play!`);
+          return;
+        }
+      }
 
-    const primaryUrl = isStaticHost ? directUrl : proxiedUrl;
-    const secondaryUrl = isStaticHost ? proxiedUrl : directUrl;
+      // 3. Last resort: direct URL if not tried yet
+      if (target.audioSrc.startsWith('http') && !archiveBlockedRef.current) {
+        const directRes = await attemptAudioUrl(target.audioSrc, 'direct', target, attemptId);
+        if (playAttemptRef.current !== attemptId) return;
+        if (directRes === 'ok') return;
+        if (directRes === 'gesture') {
+          setAudioError(`Tap Play to start "${target.title}".`);
+          return;
+        }
+      }
 
-    // 1. Try primary stream
-    const directOk = await trySource(primaryUrl);
-    if (directOk) return;
-
-    // 2. Try secondary stream fallback
-    const proxyOk = await trySource(secondaryUrl);
-    if (proxyOk) return;
-
-    // 3. If stream cannot be loaded, show error without playing a different song
-    setIsPlaying(false);
-    setAudioError(`Could not stream "${target.title}". Tap play to retry.`);
-  }, [allTracks, updateMediaSession]);
+      setIsPlaying(false);
+      setAudioError(`Could not stream "${target.title}". Try switching to iPad Apple CDN or tapping retry.`);
+    },
+    [allTracks, getImmediatePlayUrl, attemptAudioUrl, resolveAppleCdnUrl]
+  );
 
   const togglePlay = useCallback(async () => {
     if (!audioRef.current || !currentTrack) return;
     setAudioError(null);
     const audio = audioRef.current;
 
-    // Pausing: simply pause the audio element and keep currentTime intact!
     if (isPlaying) {
       audio.pause();
       setIsPlaying(false);
       return;
     }
 
-    // Unpausing / Resuming: If the track is already loaded on the audio element, resume directly!
+    // Synchronous direct resume if loaded cleanly for this track
     if (
-      audio.src && 
-      audio.src !== "about:blank" && 
-      !audio.error && 
+      audio.src &&
+      audio.src !== 'about:blank' &&
+      !audio.error &&
       currentTrackIdRef.current === currentTrack.id
     ) {
       try {
+        audio.muted = isMuted;
+        audio.volume = volume;
         await audio.play();
         setIsPlaying(true);
         setAudioError(null);
         updateMediaSession(currentTrack);
         return;
       } catch (resumeErr: any) {
-        if (resumeErr && resumeErr.name === "NotAllowedError") {
+        if (resumeErr && resumeErr.name === 'NotAllowedError') {
           setIsPlaying(false);
+          setAudioError('Tap Play once more to unlock iPad audio.');
           return;
         }
-        console.warn("Direct resume hit error, will reload track:", resumeErr);
       }
     }
 
-    // Otherwise load and play the track
     await playTrack(currentTrack);
-  }, [currentTrack, isPlaying, playTrack, updateMediaSession]);
+  }, [currentTrack, isPlaying, isMuted, volume, playTrack, updateMediaSession]);
+
   const nextTrack = useCallback(() => {
     if (allTracks.length <= 1) return;
     setAudioError(null);
@@ -345,6 +580,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [allTracks, currentTrackIndex, playTrack]);
 
+  nextTrackRef.current = nextTrack;
+  prevTrackRef.current = prevTrack;
+
   const seek = useCallback((secs: number) => {
     setCurrentTime(secs);
     if (audioRef.current) {
@@ -355,81 +593,82 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const toggleLikeTrack = useCallback((id: string) => {
     setLikedTrackIds(prev => {
       const next = prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id];
-      try { localStorage.setItem(LIKED_MUSIC_KEY, JSON.stringify(next)); } catch {}
+      try {
+        localStorage.setItem(LIKED_MUSIC_KEY, JSON.stringify(next));
+      } catch {}
       return next;
     });
   }, []);
 
-  // Upload custom MP3 files
-  const uploadCustomFiles = useCallback((files: FileList | File[]) => {
-    if (!files || files.length === 0) return;
+  const uploadCustomFiles = useCallback(
+    (files: FileList | File[]) => {
+      if (!files || files.length === 0) return;
 
-    const newTracks: CustomTrack[] = [];
-    const filesArray = Array.from(files);
+      const newTracks: CustomTrack[] = [];
+      const filesArray = Array.from(files);
 
-    for (let i = 0; i < filesArray.length; i++) {
-      const file = filesArray[i];
-      const blobUrl = URL.createObjectURL(file);
-      const cleanName = file.name.replace(/\.[^/.]+$/, '');
-      const parts = cleanName.split(' - ');
-      const artist = parts.length > 1 ? parts[0].trim() : 'Downloaded Audio';
-      const title = parts.length > 1 ? parts.slice(1).join(' - ').trim() : cleanName;
+      for (let i = 0; i < filesArray.length; i++) {
+        const file = filesArray[i];
+        const blobUrl = URL.createObjectURL(file);
+        const cleanName = file.name.replace(/\.[^/.]+$/, '');
+        const parts = cleanName.split(' - ');
+        const artist = parts.length > 1 ? parts[0].trim() : 'Downloaded Audio';
+        const title = parts.length > 1 ? parts.slice(1).join(' - ').trim() : cleanName;
 
-      const newTrack: CustomTrack = {
-        id: 'custom-' + Date.now() + '-' + i,
-        title,
-        artist,
-        album: 'My MP3 Uploads',
-        year: new Date().getFullYear(),
-        duration: '3:30',
-        durationSec: 210,
-        cover: './music/covers/tyler_flower_boy.jpg',
-        genre: 'User MP3',
-        audioSrc: blobUrl,
-        isCustom: true,
-        hasLocalAudio: true
-      };
-      newTracks.push(newTrack);
-    }
+        const newTrack: CustomTrack = {
+          id: 'custom-' + Date.now() + '-' + i,
+          title,
+          artist,
+          album: 'My MP3 Uploads',
+          year: new Date().getFullYear(),
+          duration: '3:30',
+          durationSec: 210,
+          cover: './music/covers/tyler_flower_boy.jpg',
+          genre: 'User MP3',
+          audioSrc: blobUrl,
+          isCustom: true,
+          hasLocalAudio: true
+        };
+        newTracks.push(newTrack);
+      }
 
-    setCustomTracks(prev => {
-      const next = [...newTracks, ...prev];
-      try {
-        const serialized = next.map(t => ({ ...t, audioSrc: t.audioSrc.startsWith('blob:') ? '' : t.audioSrc }));
-        localStorage.setItem(CUSTOM_MUSIC_KEY, JSON.stringify(serialized.slice(0, 10)));
-      } catch {}
-      return next;
-    });
+      setCustomTracks(prev => {
+        const next = [...newTracks, ...prev];
+        try {
+          const serialized = next.map(t => ({
+            ...t,
+            audioSrc: t.audioSrc.startsWith('blob:') ? '' : t.audioSrc
+          }));
+          localStorage.setItem(CUSTOM_MUSIC_KEY, JSON.stringify(serialized.slice(0, 10)));
+        } catch {}
+        return next;
+      });
 
-    if (newTracks.length > 0) {
-      setCurrentTrackIndex(0);
-      playTrack(newTracks[0]);
-    }
-  }, [playTrack]);
+      if (newTracks.length > 0) {
+        setCurrentTrackIndex(0);
+        playTrack(newTracks[0]);
+      }
+    },
+    [playTrack]
+  );
 
   const deleteCustomTrack = useCallback((id: string) => {
     setCustomTracks(prev => prev.filter(t => t.id !== id));
   }, []);
 
-  // Initialize initial audio src only on mount if empty (never reset when pausing)
+  // Initialize initial audio src on mount so tapping Play immediately resumes synchronously
   useEffect(() => {
     if (!audioRef.current || !currentTrack) return;
     const audio = audioRef.current;
-    if (!audio.src || audio.src === "about:blank" || audio.src === window.location.href) {
-      const isRemoteUrl = currentTrack.audioSrc.startsWith('http://') || currentTrack.audioSrc.startsWith('https://');
-      const isStaticHost = typeof window !== 'undefined' && 
-        Boolean(window.location?.hostname?.endsWith('github.io') || window.location?.protocol === 'file:');
-
-      const initialUrl = isRemoteUrl
-        ? currentTrack.audioSrc
-        : resolveAssetUrl(currentTrack.audioSrc);
-
-      if (initialUrl) {
-        audio.src = initialUrl;
+    if (!audio.src || audio.src === 'about:blank' || audio.src === window.location.href) {
+      const pref = getImmediatePlayUrl(currentTrack);
+      if (pref?.url) {
+        audio.src = new URL(pref.url, window.location.href).href;
+        setActiveStreamSource(pref.source);
         currentTrackIdRef.current = currentTrack.id;
       }
     }
-  }, [currentTrack]);
+  }, [currentTrack, getImmediatePlayUrl]);
 
   return (
     <MusicContext.Provider
@@ -443,6 +682,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         isShuffle,
         isLoop,
         audioError,
+        streamMode,
+        activeStreamSource,
+        setStreamMode,
         allTracks,
         customTracks,
         likedTrackIds,
@@ -466,9 +708,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setCurrentTrackIndex
       }}
     >
-      {/* Root persistent HTML5 Audio Element with byte-range MP3 streaming */}
       <audio
         ref={audioRef}
+        playsInline
         loop={isLoop}
         preload="none"
         onTimeUpdate={() => {
@@ -478,79 +720,49 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           }
         }}
         onEnded={nextTrack}
-        onError={() => {
+        onError={async () => {
           const audio = audioRef.current;
-          if (!audio || !audio.src || audio.src === "about:blank" || audio.src === window.location.href) {
+          if (!audio || !audio.src || audio.src === 'about:blank' || audio.src === window.location.href) {
             return;
           }
           if (audio.error && audio.error.code === 1) {
-            return; // Aborted by user
+            return;
           }
-          console.warn("Audio element error on:", audio.src, audio.error);
 
           const activeTrack = activeTrackRef.current || currentTrack;
           if (!activeTrack) return;
 
-          // If current stream failed and was using proxy, try direct URL
-          if (
-            audio.src.includes('/api/music/proxy') && 
-            (activeTrack.audioSrc.startsWith('http://') || activeTrack.audioSrc.startsWith('https://'))
-          ) {
-            const directHref = new URL(activeTrack.audioSrc, window.location.origin).href;
-            if (audio.src !== directHref) {
-              console.log("Proxy stream failed, retrying direct URL for:", activeTrack.title);
-              audio.src = directHref;
-              if (isPlaying) {
-                audio.play().catch(() => {});
-              }
-              return;
+          // If current stream failed, try recovering onto Apple iTunes CDN cleanly
+          if (!audio.src.includes('audio-ssl.itunes.apple.com')) {
+            if (audio.src.includes('/api/music/proxy')) {
+              proxyBlockedRef.current = true;
             }
-          }
+            const attemptId = playAttemptRef.current;
+            const appleUrl = await resolveAppleCdnUrl(activeTrack);
+            if (playAttemptRef.current !== attemptId) return;
 
-          const isStaticHost = typeof window !== 'undefined' && Boolean(
-            window.location?.hostname?.endsWith('github.io') || 
-            window.location?.protocol === 'file:' || 
-            (!window.location?.port && window.location?.hostname && window.location?.hostname !== 'localhost')
-          );
-
-          // If local or direct track audio failed, try streaming from verified archive.org remote source
-          const cleanName = activeTrack.audioSrc.replace(/^(\.\/|\/)+/, '').replace(/^music\//, '');
-          const fallbackRemote = (albumSourceUrls as Record<string, string>)[cleanName];
-          if (fallbackRemote) {
-            const nextSrc = isStaticHost ? fallbackRemote : `/api/music/proxy?url=${encodeURIComponent(fallbackRemote)}`;
-            const nextHref = new URL(nextSrc, window.location.href).href;
-            if (audio.src !== nextHref) {
-              console.log("Audio failed, switching to remote fallback stream:", activeTrack.title);
-              audio.src = nextHref;
+            if (appleUrl && audio.src !== appleUrl) {
+              audio.src = appleUrl;
+              setActiveStreamSource('apple');
               audio.load();
-              if (isPlaying) {
-                audio.play().catch(() => {});
-              }
-              return;
-            }
-          }
-
-          // If direct remote failed on fullstack dev server, retry via same-origin proxy
-          if (
-            !isStaticHost &&
-            !audio.src.includes('/api/music/proxy') && 
-            (activeTrack.audioSrc.startsWith('http://') || activeTrack.audioSrc.startsWith('https://'))
-          ) {
-            const proxyUrl = `/api/music/proxy?url=${encodeURIComponent(activeTrack.audioSrc)}`;
-            const proxyHref = new URL(proxyUrl, window.location.origin).href;
-            if (audio.src !== proxyHref) {
-              console.log("Direct remote failed, retrying via same-origin proxy:", activeTrack.title);
-              audio.src = proxyHref;
-              audio.load();
-              if (isPlaying) {
-                audio.play().catch(() => {});
+              if (isPlayingRef.current) {
+                audio
+                  .play()
+                  .then(() => {
+                    setIsPlaying(true);
+                    setAudioError(null);
+                  })
+                  .catch(() => {
+                    setIsPlaying(false);
+                    setAudioError(`Unblocked iPad stream loaded for "${activeTrack.title}" — tap Play!`);
+                  });
               }
               return;
             }
           }
 
           setIsPlaying(false);
-          setAudioError(`Audio connection error on "${activeTrack.title}". Tap to retry.`);
+          setAudioError(`Could not stream "${activeTrack.title}". Tap Play to retry.`);
         }}
         onPlay={() => {
           setIsPlaying(true);

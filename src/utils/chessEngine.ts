@@ -1,3 +1,29 @@
+import {
+  CHESS_BOTS,
+  UNIVERSAL_DEFENSE_LINES,
+  getBotById,
+  pickBotVoiceline
+} from './chessBots.ts';
+import type {
+  BotStyle,
+  BotVoicelineEvent,
+  ChessBot,
+  OpeningBookLine
+} from './chessBots.ts';
+
+export {
+  CHESS_BOTS,
+  UNIVERSAL_DEFENSE_LINES,
+  getBotById,
+  pickBotVoiceline
+};
+export type {
+  BotStyle,
+  BotVoicelineEvent,
+  ChessBot,
+  OpeningBookLine
+};
+
 export type PieceColor = 'w' | 'b';
 export type PieceType = 'p' | 'n' | 'b' | 'r' | 'q' | 'k';
 export type PromotionPieceType = 'q' | 'r' | 'b' | 'n';
@@ -854,25 +880,109 @@ const KING_END_PST = [
   [-50,-30,-30,-30,-30,-30,-30,-50]
 ];
 
-function evaluateBoard(board: (Piece | null)[][]): number {
+export function getPremoveTargets(
+  board: (Piece | null)[][],
+  from: Square,
+  color: PieceColor
+): Square[] {
+  const piece = board[from.r][from.c];
+  if (!piece || piece.color !== color) return [];
+
+  const targets: Square[] = [];
+  const push = (r: number, c: number) => {
+    if (r >= 0 && r < 8 && c >= 0 && c < 8 && (r !== from.r || c !== from.c)) {
+      targets.push({ r, c });
+    }
+  };
+
+  if (piece.type === 'p') {
+    const dir = color === 'w' ? -1 : 1;
+    const startRow = color === 'w' ? 6 : 1;
+    push(from.r + dir, from.c);
+    if (from.r === startRow) {
+      push(from.r + dir * 2, from.c);
+    }
+    push(from.r + dir, from.c - 1);
+    push(from.r + dir, from.c + 1);
+  } else if (piece.type === 'n') {
+    for (const [dr, dc] of KNIGHT_DELTAS) {
+      push(from.r + dr, from.c + dc);
+    }
+  } else if (piece.type === 'k') {
+    for (const [dr, dc] of KING_DELTAS) {
+      push(from.r + dr, from.c + dc);
+    }
+    const homeRow = color === 'w' ? 7 : 0;
+    if (from.r === homeRow && from.c === 4) {
+      push(homeRow, 6);
+      push(homeRow, 2);
+    }
+  } else {
+    const dirs =
+      piece.type === 'b'
+        ? BISHOP_DIRS
+        : piece.type === 'r'
+        ? ROOK_DIRS
+        : [...BISHOP_DIRS, ...ROOK_DIRS];
+    for (const [dr, dc] of dirs) {
+      let nr = from.r + dr;
+      let nc = from.c + dc;
+      while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+        push(nr, nc);
+        nr += dr;
+        nc += dc;
+      }
+    }
+  }
+
+  return targets;
+}
+
+const PASSED_PAWN_BONUS = [0, 14, 24, 38, 60, 92, 135, 0];
+
+function evaluateBoard(board: (Piece | null)[][], aggressionBias = 0): number {
   let score = 0;
   let nonKingMaterial = 0;
   let wBishops = 0;
   let bBishops = 0;
+  let wMinorUndeveloped = 0;
+  let bMinorUndeveloped = 0;
+  let wHasQueen = false;
+  let bHasQueen = false;
+  const wPawnsOnFile = [0, 0, 0, 0, 0, 0, 0, 0];
+  const bPawnsOnFile = [0, 0, 0, 0, 0, 0, 0, 0];
+  const wPawnRows: number[] = [];
+  const bPawnRows: number[] = [];
 
   for (let r = 0; r < 8; r++) {
     for (let c = 0; c < 8; c++) {
       const p = board[r][c];
       if (!p || p.type === 'k') continue;
       nonKingMaterial += PIECE_VALUES[p.type];
-      if (p.type === 'b') {
+      if (p.type === 'p') {
+        if (p.color === 'w') {
+          wPawnsOnFile[c]++;
+          wPawnRows.push(r * 8 + c);
+        } else {
+          bPawnsOnFile[c]++;
+          bPawnRows.push(r * 8 + c);
+        }
+      } else if (p.type === 'b') {
         if (p.color === 'w') wBishops++;
         else bBishops++;
+      } else if (p.type === 'q') {
+        if (p.color === 'w') wHasQueen = true;
+        else bHasQueen = true;
+      }
+      if (p.type === 'n' || p.type === 'b') {
+        if (p.color === 'w' && r === 7) wMinorUndeveloped++;
+        if (p.color === 'b' && r === 0) bMinorUndeveloped++;
       }
     }
   }
 
   const isEndgame = nonKingMaterial <= 2600;
+  const isOpeningPhase = nonKingMaterial >= 5200;
 
   for (let r = 0; r < 8; r++) {
     for (let c = 0; c < 8; c++) {
@@ -884,6 +994,8 @@ function evaluateBoard(board: (Piece | null)[][]): number {
       switch (p.type) {
         case 'p':
           pstBonus = PAWN_PST[pstR][c];
+          if (p.color === 'w' && wPawnsOnFile[c] > 1) pstBonus -= 10;
+          if (p.color === 'b' && bPawnsOnFile[c] > 1) pstBonus -= 10;
           break;
         case 'n':
           pstBonus = KNIGHT_PST[pstR][c];
@@ -893,27 +1005,133 @@ function evaluateBoard(board: (Piece | null)[][]): number {
           break;
         case 'r':
           pstBonus = ROOK_PST[pstR][c];
+          if (p.color === 'w') {
+            if (wPawnsOnFile[c] === 0) {
+              pstBonus += bPawnsOnFile[c] === 0 ? 18 : 10;
+            }
+            if (r === 1) pstBonus += 20;
+          } else {
+            if (bPawnsOnFile[c] === 0) {
+              pstBonus += wPawnsOnFile[c] === 0 ? 18 : 10;
+            }
+            if (r === 6) pstBonus += 20;
+          }
           break;
         case 'q':
           pstBonus = QUEEN_PST[pstR][c];
+          if (isOpeningPhase) {
+            const minorsBack = p.color === 'w' ? wMinorUndeveloped : bMinorUndeveloped;
+            const homeRank = p.color === 'w' ? 7 : 0;
+            if (minorsBack >= 2 && Math.abs(r - homeRank) >= 2) {
+              pstBonus -= 22;
+            }
+          }
           break;
         case 'k':
           pstBonus = isEndgame ? KING_END_PST[pstR][c] : KING_MID_PST[pstR][c];
+          if (!isEndgame) {
+            const enemyHasQueen = p.color === 'w' ? bHasQueen : wHasQueen;
+            const homeRank = p.color === 'w' ? 7 : 0;
+            if (enemyHasQueen && r === homeRank && c >= 3 && c <= 5) {
+              pstBonus -= 18;
+            }
+            // Pawn shield bonus for castled king
+            if (r === homeRank && (c <= 2 || c >= 6)) {
+              const shieldRow = p.color === 'w' ? 6 : 1;
+              for (let sc = Math.max(0, c - 1); sc <= Math.min(7, c + 1); sc++) {
+                const sp = board[shieldRow][sc];
+                if (sp && sp.color === p.color && sp.type === 'p') {
+                  pstBonus += 9;
+                }
+              }
+            }
+          }
           break;
       }
 
-      const val = PIECE_VALUES[p.type] + pstBonus;
+      // Style aggression: reward pieces advanced into enemy half
+      let advanceBonus = 0;
+      if (aggressionBias !== 0 && p.type !== 'k') {
+        const enemyHalfDepth = p.color === 'w' ? Math.max(0, 4 - r) : Math.max(0, r - 3);
+        advanceBonus = Math.round(enemyHalfDepth * aggressionBias);
+      }
+
+      const val = PIECE_VALUES[p.type] + pstBonus + advanceBonus;
       score += p.color === 'w' ? val : -val;
+    }
+  }
+
+  // Passed pawn bonus
+  for (const sq of wPawnRows) {
+    const r = Math.floor(sq / 8);
+    const c = sq % 8;
+    let passed = true;
+    for (const bsq of bPawnRows) {
+      const br = Math.floor(bsq / 8);
+      const bc = bsq % 8;
+      if (Math.abs(bc - c) <= 1 && br < r) {
+        passed = false;
+        break;
+      }
+    }
+    if (passed) {
+      score += PASSED_PAWN_BONUS[7 - r] || 0;
+    }
+  }
+  for (const sq of bPawnRows) {
+    const r = Math.floor(sq / 8);
+    const c = sq % 8;
+    let passed = true;
+    for (const wsq of wPawnRows) {
+      const wr = Math.floor(wsq / 8);
+      const wc = wsq % 8;
+      if (Math.abs(wc - c) <= 1 && wr > r) {
+        passed = false;
+        break;
+      }
+    }
+    if (passed) {
+      score -= PASSED_PAWN_BONUS[r] || 0;
     }
   }
 
   if (wBishops >= 2) score += 35;
   if (bBishops >= 2) score -= 35;
 
+  if (isOpeningPhase) {
+    score -= wMinorUndeveloped * 10;
+    score += bMinorUndeveloped * 10;
+  }
+
   return score;
 }
 
-function scoreMoveForOrdering(board: (Piece | null)[][], move: ChessMove): number {
+function fisherYatesShuffle<T>(arr: T[]): T[] {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function sameMove(a?: ChessMove | null, b?: ChessMove | null): boolean {
+  if (!a || !b) return false;
+  return (
+    a.from.r === b.from.r &&
+    a.from.c === b.from.c &&
+    a.to.r === b.to.r &&
+    a.to.c === b.to.c &&
+    a.promotion === b.promotion
+  );
+}
+
+function scoreMoveForOrdering(
+  board: (Piece | null)[][],
+  move: ChessMove,
+  killer1?: ChessMove | null,
+  killer2?: ChessMove | null
+): number {
   let score = 0;
   const attacker = board[move.from.r][move.from.c];
   const victim = move.isEnPassant
@@ -922,13 +1140,18 @@ function scoreMoveForOrdering(board: (Piece | null)[][], move: ChessMove): numbe
 
   if (victim && attacker) {
     // MVV-LVA
-    score += 10000 + PIECE_VALUES[victim.type] * 10 - PIECE_VALUES[attacker.type];
+    score += 100000 + PIECE_VALUES[victim.type] * 10 - PIECE_VALUES[attacker.type];
   }
   if (move.promotion) {
-    score += 8000 + PIECE_VALUES[move.promotion];
+    score += 80000 + PIECE_VALUES[move.promotion];
+  }
+  if (!victim && sameMove(move, killer1)) {
+    score += 65000;
+  } else if (!victim && sameMove(move, killer2)) {
+    score += 60000;
   }
   if (move.isCastle) {
-    score += 65;
+    score += 75;
   }
   // Slight center preference
   const centerDist = Math.abs(3.5 - move.to.r) + Math.abs(3.5 - move.to.c);
@@ -936,32 +1159,61 @@ function scoreMoveForOrdering(board: (Piece | null)[][], move: ChessMove): numbe
   return score;
 }
 
-function orderMoves(board: (Piece | null)[][], moves: ChessMove[], bestMove?: ChessMove | null): ChessMove[] {
+function orderMoves(
+  board: (Piece | null)[][],
+  moves: ChessMove[],
+  bestMove?: ChessMove | null,
+  killer1?: ChessMove | null,
+  killer2?: ChessMove | null
+): ChessMove[] {
   return [...moves].sort((a, b) => {
     if (bestMove) {
-      const aMatch =
-        a.from.r === bestMove.from.r &&
-        a.from.c === bestMove.from.c &&
-        a.to.r === bestMove.to.r &&
-        a.to.c === bestMove.to.c &&
-        a.promotion === bestMove.promotion;
-      if (aMatch) return -1;
-      const bMatch =
-        b.from.r === bestMove.from.r &&
-        b.from.c === bestMove.from.c &&
-        b.to.r === bestMove.to.r &&
-        b.to.c === bestMove.to.c &&
-        b.promotion === bestMove.promotion;
-      if (bMatch) return 1;
+      if (sameMove(a, bestMove)) return -1;
+      if (sameMove(b, bestMove)) return 1;
     }
-    return scoreMoveForOrdering(board, b) - scoreMoveForOrdering(board, a);
+    return (
+      scoreMoveForOrdering(board, b, killer1, killer2) -
+      scoreMoveForOrdering(board, a, killer1, killer2)
+    );
   });
+}
+
+interface TTEntry {
+  depth: number;
+  score: number;
+  flag: 'exact' | 'lower' | 'upper';
+  bestMove?: ChessMove;
 }
 
 interface SearchContext {
   deadline: number;
   nodes: number;
   aborted: boolean;
+  aggressionBias: number;
+  tt: Map<string, TTEntry> | null;
+  killers: [ChessMove | null, ChessMove | null][];
+  allowCheckExtension: boolean;
+}
+
+function toTTScore(score: number, ply: number): number {
+  if (score > 40000) return score + ply;
+  if (score < -40000) return score - ply;
+  return score;
+}
+
+function fromTTScore(score: number, ply: number): number {
+  if (score > 40000) return score - ply;
+  if (score < -40000) return score + ply;
+  return score;
+}
+
+function recordKiller(ctx: SearchContext, ply: number, move: ChessMove) {
+  if (ply < 0 || ply >= ctx.killers.length || move.isCapture || move.promotion) return;
+  const slot = ctx.killers[ply];
+  if (!sameMove(slot[0], move)) {
+    slot[1] = slot[0];
+    slot[0] = move;
+  }
 }
 
 function quiescence(
@@ -980,7 +1232,7 @@ function quiescence(
     return 0;
   }
 
-  const rawEval = evaluateBoard(board);
+  const rawEval = evaluateBoard(board, ctx.aggressionBias);
   const standPat = turn === 'w' ? rawEval : -rawEval;
 
   if (qDepth <= 0) return standPat;
@@ -1031,24 +1283,51 @@ function negamax(
     return 0;
   }
 
-  const moves = getLegalMovesForBoard(board, turn, castling, enPassantTarget);
-  if (moves.length === 0) {
-    if (isKingInCheck(board, turn)) {
-      return -50000 + ply; // Prefer faster checkmate
+  const origAlpha = alpha;
+  const ttKey = ctx.tt ? getPositionKey(board, turn, castling, enPassantTarget) : '';
+  let ttBestMove: ChessMove | undefined;
+
+  if (ctx.tt && ttKey) {
+    const entry = ctx.tt.get(ttKey);
+    if (entry) {
+      ttBestMove = entry.bestMove;
+      if (entry.depth >= depth) {
+        const cachedScore = fromTTScore(entry.score, ply);
+        if (entry.flag === 'exact') return cachedScore;
+        if (entry.flag === 'lower' && cachedScore > alpha) alpha = cachedScore;
+        else if (entry.flag === 'upper' && cachedScore < beta) beta = cachedScore;
+        if (alpha >= beta) return cachedScore;
+      }
     }
-    return 0; // Stalemate
   }
 
-  if (depth <= 0) {
+  const moves = getLegalMovesForBoard(board, turn, castling, enPassantTarget);
+  const inCheck = isKingInCheck(board, turn);
+
+  if (moves.length === 0) {
+    if (inCheck) {
+      return -50000 + ply;
+    }
+    return 0;
+  }
+
+  // Check extension for apex/deep search so tactical mates are never missed on the horizon
+  const effectiveDepth =
+    ctx.allowCheckExtension && inCheck && depth === 0 && ply < 8 ? 1 : depth;
+
+  if (effectiveDepth <= 0) {
     if (quiescenceDepth > 0) {
       return quiescence(board, turn, castling, enPassantTarget, alpha, beta, quiescenceDepth, ctx);
     }
-    const rawEval = evaluateBoard(board);
+    const rawEval = evaluateBoard(board, ctx.aggressionBias);
     return turn === 'w' ? rawEval : -rawEval;
   }
 
-  const ordered = orderMoves(board, moves);
+  const kPair = ply < ctx.killers.length ? ctx.killers[ply] : [null, null];
+  const ordered = orderMoves(board, moves, ttBestMove, kPair[0], kPair[1]);
+
   let bestScore = -Infinity;
+  let bestMove: ChessMove | undefined = ordered[0];
 
   for (const move of ordered) {
     const movingPiece = board[move.from.r][move.from.c];
@@ -1065,7 +1344,7 @@ function negamax(
       oppositeColor(turn),
       nextCastling,
       nextEp,
-      depth - 1,
+      effectiveDepth - 1,
       ply + 1,
       -beta,
       -alpha,
@@ -1077,68 +1356,146 @@ function negamax(
 
     if (score > bestScore) {
       bestScore = score;
+      bestMove = move;
     }
     if (score > alpha) {
       alpha = score;
     }
     if (alpha >= beta) {
+      recordKiller(ctx, ply, move);
       break;
     }
+  }
+
+  if (ctx.tt && ttKey && !ctx.aborted && ctx.tt.size < 45000) {
+    let flag: TTEntry['flag'] = 'exact';
+    if (bestScore <= origAlpha) flag = 'upper';
+    else if (bestScore >= beta) flag = 'lower';
+    ctx.tt.set(ttKey, {
+      depth: effectiveDepth,
+      score: toTTScore(bestScore, ply),
+      flag,
+      bestMove
+    });
   }
 
   return bestScore;
 }
 
+export function evaluatePositionForSide(board: (Piece | null)[][], side: PieceColor): number {
+  const raw = evaluateBoard(board, 0);
+  return side === 'w' ? raw : -raw;
+}
+
+function pickVariedMoveFromScored(
+  scored: { move: ChessMove; score: number }[],
+  varietyWindow: number
+): ChessMove {
+  const sorted = [...scored].sort((a, b) => b.score - a.score);
+  const best = sorted[0];
+
+  // Always execute immediate forced checkmate or strict apex top-move without random deviations
+  if (best.score > 40000 || varietyWindow <= 0 || sorted.length === 1) {
+    return best.move;
+  }
+
+  const threshold = best.score - varietyWindow;
+  const pool = sorted.filter(item => item.score >= threshold);
+  if (pool.length <= 1) {
+    return best.move;
+  }
+
+  // Weight candidates so top moves remain preferred while strong alternatives appear frequently
+  const temp = Math.max(12, varietyWindow * 0.65);
+  const weights = pool.map(item => Math.exp((item.score - best.score) / temp));
+  const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+
+  let roll = Math.random() * totalWeight;
+  for (let i = 0; i < pool.length; i++) {
+    roll -= weights[i];
+    if (roll <= 0) {
+      return pool[i].move;
+    }
+  }
+  return pool[0].move;
+}
+
 export function chooseAIMove(
   state: ChessState,
   difficulty: AIDifficulty,
-  timeBudgetMs = 950
+  timeBudgetMs = 950,
+  options?: {
+    aggressionBias?: number;
+    jitter?: number;
+    varietyWindow?: number;
+    apexMode?: boolean;
+  }
 ): ChessMove | null {
-  const legalMoves = getLegalMoves(state);
-  if (legalMoves.length === 0) return null;
-  if (legalMoves.length === 1) return legalMoves[0];
+  const rawLegalMoves = getLegalMoves(state);
+  if (rawLegalMoves.length === 0) return null;
+  if (rawLegalMoves.length === 1) return rawLegalMoves[0];
+
+  const isApex = Boolean(options?.apexMode);
+  const legalMoves = isApex ? orderMoves(state.board, rawLegalMoves) : fisherYatesShuffle(rawLegalMoves);
 
   const turn = state.turn;
+  const aggressionBias = options?.aggressionBias ?? 0;
   const ctx: SearchContext = {
     deadline: Date.now() + timeBudgetMs,
     nodes: 0,
-    aborted: false
+    aborted: false,
+    aggressionBias,
+    tt: difficulty === 'hard' || difficulty === 'expert' || isApex ? new Map() : null,
+    killers: Array.from({ length: 16 }, () => [null, null] as [ChessMove | null, ChessMove | null]),
+    allowCheckExtension: isApex || difficulty === 'expert'
   };
 
   if (difficulty === 'easy') {
-    // Evaluate 1-ply with noticeable jitter and occasional casual suboptimal pick
+    const jitterScale = options?.jitter ?? 180;
+    const varietyWindow = options?.varietyWindow ?? 110;
     const scored = legalMoves.map(move => {
       const next = applyMove(state, move).nextState;
       if (next.status === 'checkmate') {
         return { move, score: 50000 };
       }
-      const raw = evaluateBoard(next.board);
-      const perspective = turn === 'w' ? raw : -raw;
-      const noise = (Math.random() - 0.5) * 240;
+      const quickScore = -quiescence(
+        next.board,
+        next.turn,
+        next.castling,
+        next.enPassantTarget,
+        -60000,
+        60000,
+        1,
+        ctx
+      );
+      let perspective = Number.isFinite(quickScore)
+        ? quickScore
+        : turn === 'w'
+        ? evaluateBoard(next.board, aggressionBias)
+        : -evaluateBoard(next.board, aggressionBias);
+      if (next.inCheckColor && aggressionBias > 0) perspective += aggressionBias * 4;
+      const noise = (Math.random() - 0.5) * jitterScale;
       return { move, score: perspective + noise };
     });
-    scored.sort((a, b) => b.score - a.score);
-    const poolSize = Math.min(3, scored.length);
-    const roll = Math.random();
-    if (roll < 0.65 || scored[0].score > 40000) {
-      return scored[0].move;
-    }
-    return scored[Math.floor(Math.random() * poolSize)].move;
+    return pickVariedMoveFromScored(scored, varietyWindow);
   }
 
-  const maxDepth = difficulty === 'medium' ? 2 : difficulty === 'hard' ? 3 : 4;
-  const qDepth = difficulty === 'medium' ? 0 : difficulty === 'hard' ? 2 : 3;
+  const maxDepth = isApex ? 6 : difficulty === 'medium' ? 2 : difficulty === 'hard' ? 3 : 4;
+  const qDepth = isApex ? 5 : difficulty === 'medium' ? 3 : difficulty === 'hard' ? 3 : 4;
+  const defaultWindow = isApex ? 0 : difficulty === 'medium' ? 40 : difficulty === 'hard' ? 22 : 14;
+  const varietyWindow = isApex ? 0 : (options?.varietyWindow ?? defaultWindow);
 
   let globalBestMove: ChessMove = legalMoves[0];
+  let bestCompletedScores: { move: ChessMove; score: number }[] = legalMoves.map(m => ({ move: m, score: 0 }));
 
   // Iterative deepening up to maxDepth
   for (let depth = 1; depth <= maxDepth; depth++) {
     ctx.aborted = false;
-    const orderedRoot = orderMoves(state.board, legalMoves, globalBestMove);
+    const orderedRoot =
+      depth === 1 ? legalMoves : orderMoves(state.board, legalMoves, globalBestMove);
     let bestAtDepth = orderedRoot[0];
     let bestScoreAtDepth = -Infinity;
-    let alpha = -Infinity;
-    const beta = Infinity;
+    const scoresAtDepth: { move: ChessMove; score: number }[] = [];
 
     for (const move of orderedRoot) {
       const movingPiece = state.board[move.from.r][move.from.c];
@@ -1150,11 +1507,16 @@ export function chooseAIMove(
       if (nextState.status === 'checkmate') {
         score = 50000;
       } else if (nextState.winner === 'draw') {
-        // Avoid accidental threefold draw if ahead, accept if behind
-        const curRaw = evaluateBoard(state.board);
+        const curRaw = evaluateBoard(state.board, aggressionBias);
         const curPerspective = turn === 'w' ? curRaw : -curRaw;
         score = curPerspective > 50 ? -150 : 50;
       } else {
+        const searchAlpha =
+          bestScoreAtDepth > -Infinity
+            ? varietyWindow > 0
+              ? bestScoreAtDepth - varietyWindow - 40
+              : bestScoreAtDepth
+            : -Infinity;
         score = -negamax(
           nextState.board,
           nextState.turn,
@@ -1162,8 +1524,8 @@ export function chooseAIMove(
           nextState.enPassantTarget,
           depth - 1,
           1,
-          -beta,
-          -alpha,
+          -Infinity,
+          searchAlpha === -Infinity ? Infinity : -searchAlpha,
           qDepth,
           ctx
         );
@@ -1171,27 +1533,124 @@ export function chooseAIMove(
 
       if (ctx.aborted) break;
 
-      // Tiny jitter on medium so openings vary
-      if (difficulty === 'medium') {
-        score += (Math.random() - 0.5) * 18;
+      if (aggressionBias > 0 && nextState.inCheckColor) {
+        score += aggressionBias * 3;
+      } else if (aggressionBias < 0 && move.isCastle) {
+        score += Math.abs(aggressionBias) * 4;
       }
+
+      const jitter = isApex ? 0 : (options?.jitter ?? (difficulty === 'medium' ? 18 : 4));
+      if (jitter > 0) {
+        score += (Math.random() - 0.5) * jitter;
+      }
+
+      scoresAtDepth.push({ move, score });
 
       if (score > bestScoreAtDepth) {
         bestScoreAtDepth = score;
         bestAtDepth = move;
       }
-      if (score > alpha) {
-        alpha = score;
-      }
     }
 
-    if (!ctx.aborted) {
+    if (!ctx.aborted && scoresAtDepth.length === orderedRoot.length) {
       globalBestMove = bestAtDepth;
+      bestCompletedScores = scoresAtDepth;
       if (bestScoreAtDepth > 45000) break; // Forced mate found
     } else {
       break;
     }
   }
 
-  return globalBestMove;
+  return isApex ? globalBestMove : pickVariedMoveFromScored(bestCompletedScores, varietyWindow);
+}
+
+function stripSanSuffix(san: string): string {
+  return san.replace(/[+#!?]+$/g, '');
+}
+
+export interface BotMoveDecision {
+  move: ChessMove | null;
+  openingName: string | null;
+  usedBook: boolean;
+}
+
+function findMatchingBookCandidates(
+  lines: OpeningBookLine[],
+  turn: PieceColor,
+  playedSans: string[]
+): { lineName: string; targetSan: string }[] {
+  const candidates: { lineName: string; targetSan: string }[] = [];
+
+  for (const line of lines) {
+    if (line.color !== turn) continue;
+    if (line.moves.length <= playedSans.length) continue;
+
+    let prefixMatches = true;
+    for (let i = 0; i < playedSans.length; i++) {
+      if (stripSanSuffix(line.moves[i]) !== playedSans[i]) {
+        prefixMatches = false;
+        break;
+      }
+    }
+    if (prefixMatches) {
+      candidates.push({
+        lineName: line.name,
+        targetSan: stripSanSuffix(line.moves[playedSans.length])
+      });
+    }
+  }
+
+  return candidates;
+}
+
+export function chooseBotMove(
+  state: ChessState,
+  bot: ChessBot,
+  history: MoveRecord[] = []
+): BotMoveDecision {
+  const legalMoves = getLegalMoves(state);
+  if (legalMoves.length === 0) {
+    return { move: null, openingName: null, usedBook: false };
+  }
+
+  const playedSans = history.map(h => stripSanSuffix(h.san));
+
+  // 1. Check bot's personal multi-branch opening lines first
+  let candidates = findMatchingBookCandidates(bot.openingLines, state.turn, playedSans);
+
+  // 2. If player stepped outside bot's signature book, check broad defensive/counter repertoire (for effective rating >= 900)
+  const effectiveRating = bot.secretRating ?? bot.rating;
+  if (candidates.length === 0 && effectiveRating >= 900 && playedSans.length > 0 && playedSans.length <= 8) {
+    candidates = findMatchingBookCandidates(UNIVERSAL_DEFENSE_LINES, state.turn, playedSans);
+  }
+
+  if (candidates.length > 0) {
+    // Shuffle candidate book lines so bots vary between multiple openings from game to game
+    const shuffled = fisherYatesShuffle(candidates);
+    for (const picked of shuffled) {
+      for (const legal of legalMoves) {
+        const { record } = applyMove(state, legal);
+        if (stripSanSuffix(record.san) === picked.targetSan) {
+          return {
+            move: legal,
+            openingName: picked.lineName,
+            usedBook: true
+          };
+        }
+      }
+    }
+  }
+
+  const aiMove = chooseAIMove(state, bot.difficulty, bot.timeBudgetMs, {
+    aggressionBias: bot.aggressionBias,
+    jitter: bot.jitter,
+    varietyWindow: bot.varietyWindow,
+    apexMode: bot.apexMode
+  });
+
+  return {
+    move: aiMove,
+    openingName: null,
+    usedBook: false
+  };
 }

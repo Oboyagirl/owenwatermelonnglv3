@@ -46,6 +46,9 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
     isShuffle,
     isLoop,
     audioError,
+    streamMode,
+    activeStreamSource,
+    setStreamMode,
     allTracks,
     customTracks,
     likedTrackIds,
@@ -406,28 +409,45 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
               </div>
 
               {/* Mode Badges & Lyrics Toggle */}
-              <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/5">
+              <div className="flex flex-wrap items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/5">
                 <button
                   onClick={() => setShowLyrics(true)}
-                  className="px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 bg-gradient-to-r from-sky-500/20 to-indigo-500/20 hover:from-sky-500/30 hover:to-indigo-500/30 text-sky-300 border border-sky-400/30 shadow-sm hover:scale-105"
+                  className="px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 bg-gradient-to-r from-sky-500/20 to-indigo-500/20 hover:from-sky-500/30 hover:to-indigo-500/30 text-sky-300 border border-sky-400/30 shadow-sm whitespace-nowrap shrink-0"
                   title="Open Apple Music-style kinetic synchronized lyrics"
                 >
-                  <Mic2 className="w-3.5 h-3.5 text-sky-400 animate-pulse" />
+                  <Mic2 className="w-3.5 h-3.5 text-sky-400" />
                   <span>Lyrics</span>
                 </button>
                 <button
                   onClick={() => setPlayerMode('stream')}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                     playerMode === 'stream' ? 'text-black shadow-md' : 'text-slate-400 hover:text-white'
                   }`}
                   style={{ backgroundColor: playerMode === 'stream' ? accent : 'transparent' }}
                 >
-                  Real MP3
+                  Audio Player
+                </button>
+                <button
+                  onClick={() => {
+                    const nextMode = streamMode === 'apple' ? 'auto' : 'apple';
+                    setStreamMode(nextMode);
+                    if (currentTrack) {
+                      playTrack(currentTrack);
+                    }
+                  }}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 border ${
+                    streamMode === 'apple' || activeStreamSource === 'apple'
+                      ? 'bg-sky-500/20 text-sky-300 border-sky-400/40'
+                      : 'text-slate-400 border-transparent hover:text-white'
+                  }`}
+                  title="Toggle direct Apple CDN mode for school iPads where proxies are blocked"
+                >
+                  {streamMode === 'apple' ? 'iPad Apple CDN: On' : 'Auto Unblock'}
                 </button>
                 {currentTrack.spotifyId && (
                   <button
                     onClick={() => setPlayerMode('spotify')}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                       playerMode === 'spotify' ? 'bg-[#1DB954] text-black shadow-md' : 'text-slate-400 hover:text-white'
                     }`}
                   >
@@ -437,7 +457,7 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                 {currentTrack.youtubeId && (
                   <button
                     onClick={() => setPlayerMode('youtube')}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                       playerMode === 'youtube' ? 'bg-[#FF0000] text-white shadow-md' : 'text-slate-400 hover:text-white'
                     }`}
                   >
@@ -448,17 +468,33 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
             </div>
 
             {audioError && (
-              <button
-                type="button"
-                onClick={() => togglePlay()}
-                className="w-full text-left p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center justify-between gap-2 hover:bg-amber-500/20 active:scale-[0.99] transition-all cursor-pointer"
-              >
+              <div className="w-full p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{audioError}</span>
                 </div>
-                <span className="font-semibold underline shrink-0 px-2 py-0.5 rounded bg-amber-500/20">Retry</span>
-              </button>
+                <div className="flex items-center gap-2 shrink-0">
+                  {streamMode !== 'apple' && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStreamMode('apple');
+                        if (currentTrack) playTrack(currentTrack);
+                      }}
+                      className="font-bold px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-200 border border-sky-400/30 hover:bg-sky-500/30 cursor-pointer whitespace-nowrap"
+                    >
+                      Use iPad Apple CDN
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => togglePlay()}
+                    className="font-semibold underline px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 cursor-pointer whitespace-nowrap"
+                  >
+                    Play / Retry
+                  </button>
+                </div>
+              </div>
             )}
 
             {/* Mode-specific embed or audio scrubber */}

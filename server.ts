@@ -10,6 +10,7 @@ import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { Readable } from 'node:stream';
 import { GoogleGenAI } from '@google/genai';
+import { attachChessRoomServer } from './server/chessRooms.ts';
 
 const execFileAsync = promisify(execFile);
 
@@ -253,7 +254,73 @@ async function startServer() {
   };
   loadSourceUrls();
 
-  // Serve static real MP3 music with byte-range streaming support (compatible with iOS iPad Safari & Chrome)
+  const inferAudioContentType = (urlOrPath: string, upstreamType?: string | null): string => {
+    const cleanUpstream = (upstreamType || '').split(';')[0].trim().toLowerCase();
+    if (
+      cleanUpstream === 'audio/x-m4p' ||
+      cleanUpstream === 'audio/x-m4a' ||
+      cleanUpstream === 'audio/m4a' ||
+      cleanUpstream === 'audio/mp4a-latm'
+    ) {
+      return 'audio/mp4';
+    }
+    if (cleanUpstream === 'audio/mp3' || cleanUpstream === 'audio/x-mpeg') {
+      return 'audio/mpeg';
+    }
+    if (cleanUpstream === 'audio/x-wav') {
+      return 'audio/wav';
+    }
+    if (cleanUpstream.startsWith('audio/')) {
+      return cleanUpstream;
+    }
+    const cleanPath = urlOrPath.split('?')[0].split('#')[0].toLowerCase();
+    if (cleanPath.endsWith('.m4a') || cleanPath.endsWith('.mp4')) return 'audio/mp4';
+    if (cleanPath.endsWith('.aac')) return 'audio/aac';
+    if (cleanPath.endsWith('.ogg') || cleanPath.endsWith('.oga')) return 'audio/ogg';
+    if (cleanPath.endsWith('.wav')) return 'audio/wav';
+    if (cleanPath.endsWith('.webm')) return 'audio/webm';
+    return 'audio/mpeg';
+  };
+
+  const appleFallbackCache = new Map<string, string | null>();
+  const findUnblockedAppleStream = async (artist: string, title: string): Promise<string | null> => {
+    const cleanArtist = artist.replace(/\([^)]*\)/g, '').split(',')[0].split('&')[0].trim();
+    const cleanTitle = title
+      .replace(/\([^)]*feat[^)]*\)/gi, '')
+      .replace(/\[[^\]]*\]/g, '')
+      .replace(/\([^)]*remaster[^)]*\)/gi, '')
+      .trim();
+    const key = `${cleanArtist}::${cleanTitle}`.toLowerCase();
+    if (appleFallbackCache.has(key)) {
+      return appleFallbackCache.get(key) || null;
+    }
+    try {
+      const q = `${cleanArtist} ${cleanTitle}`.trim();
+      const r = await fetch(
+        `https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=6`,
+        { signal: AbortSignal.timeout(7000) }
+      );
+      if (r.ok) {
+        const j: any = await r.json();
+        const results: any[] = Array.isArray(j.results) ? j.results : [];
+        const lowerTitle = cleanTitle.toLowerCase();
+        const best =
+          results.find(
+            x =>
+              x.previewUrl &&
+              String(x.trackName || '').toLowerCase().includes(lowerTitle)
+          ) || results.find(x => x.previewUrl);
+        if (best?.previewUrl) {
+          appleFallbackCache.set(key, best.previewUrl);
+          return best.previewUrl;
+        }
+      }
+    } catch {}
+    appleFallbackCache.set(key, null);
+    return null;
+  };
+
+  // Serve static real MP3/M4A music with byte-range streaming support (compatible with iOS iPad Safari & Chrome)
   const streamAudioFile = async (filenameOrPath: string, req: express.Request, res: express.Response) => {
     let filePath = filenameOrPath;
     const isFileValid = (p: string) => {
@@ -286,25 +353,26 @@ async function startServer() {
       if (sourceUrl) {
         const targetDiskPath = path.join(primaryMusicDir, cleanFilename);
         try {
-          const targetUrl = await resolveTargetAudioUrl(sourceUrl);
           const clientRange = req.headers.range;
           const fetchHeaders: Record<string, string> = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1',
             'Accept': '*/*'
           };
           if (clientRange) fetchHeaders['Range'] = clientRange;
 
-          const remoteRes = await fetch(targetUrl, {
+          const remoteRes = await fetch(sourceUrl, {
             headers: fetchHeaders,
             redirect: 'follow',
             signal: AbortSignal.timeout(20000)
           });
 
           if (remoteRes.ok || remoteRes.status === 206) {
+            const contentType = inferAudioContentType(sourceUrl, remoteRes.headers.get('content-type'));
             res.status(remoteRes.status);
-            res.setHeader('Content-Type', 'audio/mpeg');
+            res.setHeader('Content-Type', contentType);
             res.setHeader('Accept-Ranges', 'bytes');
             res.setHeader('Access-Control-Allow-Origin', '*');
+            res.setHeader('Access-Control-Expose-Headers', 'Content-Range, Content-Length, Accept-Ranges, Content-Type');
             res.setHeader('Cache-Control', 'public, max-age=86400');
             if (remoteRes.headers.get('content-length')) {
               res.setHeader('Content-Length', remoteRes.headers.get('content-length')!);
@@ -318,9 +386,8 @@ async function startServer() {
               const nodeStream = Readable.fromWeb(remoteRes.body as any);
               nodeStream.pipe(res);
 
-              // Asynchronously save to local disk if not already present
               if (!fs.existsSync(targetDiskPath)) {
-                fetch(targetUrl, {
+                fetch(sourceUrl, {
                   headers: { 'User-Agent': 'Mozilla/5.0' },
                   redirect: 'follow'
                 })
@@ -346,10 +413,12 @@ async function startServer() {
     const stat = fs.statSync(filePath);
     const fileSize = stat.size;
     const range = req.headers.range;
+    const contentType = inferAudioContentType(filePath);
 
     res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Expose-Headers', 'Content-Range, Content-Length, Accept-Ranges, Content-Type');
     res.setHeader('Accept-Ranges', 'bytes');
-    res.setHeader('Content-Type', 'audio/mpeg');
+    res.setHeader('Content-Type', contentType);
     res.setHeader('Cache-Control', 'public, max-age=86400');
 
     if (range) {
@@ -372,7 +441,7 @@ async function startServer() {
         'Content-Range': `bytes ${start}-${end}/${fileSize}`,
         'Accept-Ranges': 'bytes',
         'Content-Length': chunkSize,
-        'Content-Type': 'audio/mpeg',
+        'Content-Type': contentType,
       });
       fileStream.pipe(res);
       req.on('close', () => {
@@ -382,7 +451,7 @@ async function startServer() {
       res.writeHead(200, {
         'Content-Length': fileSize,
         'Accept-Ranges': 'bytes',
-        'Content-Type': 'audio/mpeg',
+        'Content-Type': contentType,
       });
       const fileStream = fs.createReadStream(filePath);
       fileStream.pipe(res);
@@ -392,50 +461,42 @@ async function startServer() {
     }
   };
 
-  // Dedicated Real MP3 Streaming & School-Unblocked Audio Proxy
-  const resolvedTargetCache = new Map<string, string>();
-
-  async function resolveTargetAudioUrl(originalUrl: string): Promise<string> {
-    const cached = resolvedTargetCache.get(originalUrl);
-    if (cached) return cached;
-
-    let target = originalUrl;
-    // Follow up to 5 redirects manually to avoid sending client headers (like Range) on redirect hops
-    for (let hop = 0; hop < 5; hop++) {
-      try {
-        const headRes = await fetch(target, {
-          method: 'HEAD',
-          redirect: 'manual',
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-            'Accept': '*/*'
-          },
-          signal: AbortSignal.timeout(6000)
-        });
-        if ([301, 302, 303, 307, 308].includes(headRes.status)) {
-          const loc = headRes.headers.get('location');
-          if (loc) {
-            target = new URL(loc, target).href;
-            continue;
-          }
-        }
-        break;
-      } catch {
-        break;
-      }
-    }
-    resolvedTargetCache.set(originalUrl, target);
-    return target;
-  }
-
-  app.get(['/api/music/proxy', '/api/music/stream'], async (req, res) => {
+  const setAudioCorsHeaders = (res: express.Response) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Range, Origin, Accept, Content-Type');
+    res.setHeader('Access-Control-Expose-Headers', 'Content-Range, Content-Length, Accept-Ranges, Content-Type');
     res.setHeader('Accept-Ranges', 'bytes');
+  };
 
-    const remoteUrl = String(req.query.url || '');
-    const local = String(req.query.local || '');
+  app.options(['/api/music/proxy', '/api/music/stream', '/api/music/resolve'], (_req, res) => {
+    setAudioCorsHeaders(res);
+    res.status(204).end();
+  });
 
-    // Check direct local request
+  app.get('/api/music/resolve', async (req, res) => {
+    setAudioCorsHeaders(res);
+    const artist = String(req.query.artist || '').trim();
+    const title = String(req.query.title || '').trim();
+    if (!title) {
+      return res.status(400).json({ error: 'title is required' });
+    }
+    const streamUrl = await findUnblockedAppleStream(artist, title);
+    if (!streamUrl) {
+      return res.status(404).json({ error: 'No unblocked stream found' });
+    }
+    return res.json({ streamUrl, source: 'apple-cdn' });
+  });
+
+  const handleMusicProxyRequest = async (req: express.Request, res: express.Response) => {
+    setAudioCorsHeaders(res);
+
+    const remoteUrl = String(req.query.url || '').trim();
+    const local = String(req.query.local || '').trim();
+    const artist = String(req.query.artist || '').trim();
+    const title = String(req.query.title || '').trim();
+    const isHead = req.method === 'HEAD';
+
     if (local) {
       const cleanFilename = path.basename(local);
       const localPath = path.join(primaryMusicDir, cleanFilename);
@@ -444,84 +505,120 @@ async function startServer() {
       }
     }
 
-    // 1. Direct proxy for full-length MP3 URLs (archive.org, etc.) - Bypasses all school web filters
+    const streamRemote = async (targetUrl: string): Promise<boolean> => {
+      const clientRange = req.headers.range;
+      const fetchHeaders: Record<string, string> = {
+        'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1',
+        'Accept': '*/*'
+      };
+      if (clientRange) {
+        fetchHeaders['Range'] = clientRange;
+      }
+
+      const remoteRes = await fetch(targetUrl, {
+        method: isHead ? 'HEAD' : 'GET',
+        headers: fetchHeaders,
+        redirect: 'follow',
+        signal: AbortSignal.timeout(15000)
+      });
+
+      if (!remoteRes.ok && remoteRes.status !== 206) {
+        return false;
+      }
+
+      const contentType = inferAudioContentType(targetUrl, remoteRes.headers.get('content-type'));
+      res.status(remoteRes.status);
+      res.setHeader('Content-Type', contentType);
+      if (remoteRes.headers.get('content-length')) {
+        res.setHeader('Content-Length', remoteRes.headers.get('content-length')!);
+      }
+      if (remoteRes.headers.get('content-range')) {
+        res.setHeader('Content-Range', remoteRes.headers.get('content-range')!);
+      }
+      res.setHeader('Accept-Ranges', 'bytes');
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+
+      if (isHead) {
+        res.end();
+        return true;
+      }
+
+      res.flushHeaders?.();
+      if (remoteRes.body) {
+        const nodeStream = Readable.fromWeb(remoteRes.body as any);
+        nodeStream.on('error', () => {
+          if (!res.headersSent) {
+            res.status(502).end();
+          }
+        });
+        req.on('close', () => {
+          try { nodeStream.destroy(); } catch {}
+        });
+        res.on('error', () => {
+          try { nodeStream.destroy(); } catch {}
+        });
+        nodeStream.pipe(res);
+        return true;
+      }
+      return false;
+    };
+
     if (remoteUrl && (remoteUrl.startsWith('http://') || remoteUrl.startsWith('https://'))) {
-      // Check if this URL corresponds to an existing local track in public/music/
+      // Check if local cached file exists
       try {
         const decodedUrl = decodeURIComponent(remoteUrl);
         const urlBasename = path.basename(decodedUrl).toLowerCase();
-        const primaryFiles = fs.readdirSync(primaryMusicDir);
-        const matched = primaryFiles.find(f => {
-          const lower = f.toLowerCase();
-          return lower === urlBasename || (urlBasename.length > 5 && lower.includes(urlBasename.slice(0, 15)));
-        });
-        if (matched) {
-          return streamAudioFile(path.join(primaryMusicDir, matched), req, res);
+        if (fs.existsSync(primaryMusicDir)) {
+          const primaryFiles = fs.readdirSync(primaryMusicDir);
+          const matched = primaryFiles.find(f => {
+            const lower = f.toLowerCase();
+            return lower === urlBasename || (urlBasename.length > 5 && lower.includes(urlBasename.slice(0, 15)));
+          });
+          if (matched) {
+            return streamAudioFile(path.join(primaryMusicDir, matched), req, res);
+          }
         }
       } catch {}
 
       try {
-        const targetUrl = await resolveTargetAudioUrl(remoteUrl);
-        const clientRange = req.headers.range;
-        const fetchHeaders: Record<string, string> = {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-          'Accept': '*/*'
-        };
-        if (clientRange) {
-          fetchHeaders['Range'] = clientRange;
-        }
-
-        const remoteRes = await fetch(targetUrl, { 
-          headers: fetchHeaders,
-          redirect: 'follow',
-          signal: AbortSignal.timeout(15000)
-        });
-
-        if (!remoteRes.ok && remoteRes.status !== 206) {
-          resolvedTargetCache.delete(remoteUrl);
-          return res.status(remoteRes.status).send('Remote audio not available: ' + remoteRes.statusText);
-        }
-
-        res.status(remoteRes.status);
-        res.setHeader('Content-Type', 'audio/mpeg');
-        if (remoteRes.headers.get('content-length')) {
-          res.setHeader('Content-Length', remoteRes.headers.get('content-length')!);
-        }
-        if (remoteRes.headers.get('content-range')) {
-          res.setHeader('Content-Range', remoteRes.headers.get('content-range')!);
-        }
-        res.setHeader('Accept-Ranges', 'bytes');
-        res.setHeader('Cache-Control', 'public, max-age=86400');
-        res.flushHeaders?.();
-
-        if (remoteRes.body) {
-          const nodeStream = Readable.fromWeb(remoteRes.body as any);
-          nodeStream.on('error', () => {
-            if (!res.headersSent) {
-              res.status(502).end();
-            }
-          });
-          req.on('close', () => {
-            try { nodeStream.destroy(); } catch {}
-          });
-          res.on('error', () => {
-            try { nodeStream.destroy(); } catch {}
-          });
-          nodeStream.pipe(res);
-          return;
-        }
+        const ok = await streamRemote(remoteUrl);
+        if (ok) return;
       } catch (proxyErr) {
-        resolvedTargetCache.delete(remoteUrl);
-        console.warn('Direct MP3 proxy failed for URL:', remoteUrl, proxyErr);
-        if (!res.headersSent) {
-          return res.status(502).send('Proxy error streaming remote track');
-        }
+        console.warn('Direct proxy failed, attempting Apple CDN fallback:', remoteUrl);
+      }
+
+      // Automatic unblocked server fallback via Apple iTunes CDN
+      if (title) {
+        try {
+          const appleUrl = await findUnblockedAppleStream(artist, title);
+          if (appleUrl) {
+            const appleOk = await streamRemote(appleUrl);
+            if (appleOk) return;
+          }
+        } catch {}
+      }
+
+      if (!res.headersSent) {
+        return res.status(502).send('Audio stream temporarily unavailable');
+      }
+      return;
+    }
+
+    // If only artist & title supplied (no remoteUrl), resolve & stream Apple CDN
+    if (title) {
+      const appleUrl = await findUnblockedAppleStream(artist, title);
+      if (appleUrl && (await streamRemote(appleUrl))) {
         return;
       }
     }
 
-    res.status(404).send('Audio track not found');
-  });
+    if (!res.headersSent) {
+      res.status(404).send('Audio track not found');
+    }
+  };
+
+  app.head(['/api/music/proxy', '/api/music/stream'], handleMusicProxyRequest);
+  app.get(['/api/music/proxy', '/api/music/stream'], handleMusicProxyRequest);
 
   // High-Accuracy LRCLIB + Search + Gemini AI Synced Lyrics Engine (School-unblocked)
   const lyricsCache = new Map<string, any>();
@@ -663,6 +760,7 @@ Example format:
   }, express.static(fs.existsSync(primaryMusicDir) ? primaryMusicDir : fallbackMusicDir));
 
   const httpServer = http.createServer(app);
+  attachChessRoomServer(httpServer, app);
 
   const isDev = process.env.npm_lifecycle_event === 'dev' || 
                 process.env.NODE_ENV === 'development' || 

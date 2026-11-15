@@ -53,6 +53,7 @@ export const FloatingMusicPlayer: React.FC<FloatingMusicPlayerProps> = ({
     toggleMute,
     toggleShuffle,
     toggleLoop,
+    allTracks,
     isMiniPlayerOpen,
     isMiniPlayerCollapsed,
     setIsMiniPlayerOpen,
@@ -175,10 +176,6 @@ export const FloatingMusicPlayer: React.FC<FloatingMusicPlayerProps> = ({
           {/* Card Header */}
           <div className="flex items-center justify-between pb-1 border-b border-white/5">
             <div className="flex items-center gap-2">
-              <span 
-                className="w-2 h-2 rounded-full animate-pulse"
-                style={{ backgroundColor: isPlaying ? accent : '#94a3b8' }}
-              />
               <span className="text-[11px] font-mono uppercase tracking-wider font-bold text-slate-300 flex items-center gap-1.5">
                 <Music className="w-3 h-3" style={{ color: accent }} />
                 <span>Background Music {isGameActive ? '· In-Game' : ''}</span>
@@ -389,7 +386,7 @@ export const FloatingMusicPlayer: React.FC<FloatingMusicPlayerProps> = ({
               className="text-[11px] font-bold flex items-center gap-1 hover:underline cursor-pointer"
               style={{ color: accent }}
             >
-              <span>Browse Catalog (24 Songs)</span>
+              <span>Browse Catalog ({allTracks.length} Songs)</span>
               <ExternalLink className="w-3 h-3" />
             </button>
           </div>

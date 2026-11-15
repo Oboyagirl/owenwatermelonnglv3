@@ -187,7 +187,13 @@ export default function App() {
     { id: 'tab_apps', title: 'Apps', spaceType: 'apps', icon: '📱' },
     { id: 'tab_music', title: 'Music', spaceType: 'music', icon: '🎵' }
   ]);
-  const [activeTabId, setActiveTabId] = useState<string>('tab_home');
+  const [activeTabId, setActiveTabId] = useState<string>(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('chessRoom')) return 'tab_chess';
+    } catch {}
+    return 'tab_home';
+  });
   const [splitTabId, setSplitTabId] = useState<string | null>(null);
 
   // Active space corresponds to active tab's spaceType

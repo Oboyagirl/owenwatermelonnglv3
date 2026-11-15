@@ -1735,7 +1735,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 195,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/01%20Good%20Morning.mp3",
+    "audioSrc": "https://archive.org/download/iGraduation-CD/01%20-%20Kanye%20West%20-%20Good%20Morning.mp3",
     "albumId": "album-graduation",
     "trackNumber": 1,
     "hasLocalAudio": true
@@ -1750,7 +1750,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 167,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/02%20Champion.mp3",
+    "audioSrc": "https://archive.org/download/iGraduation-CD/02%20-%20Kanye%20West%20-%20Champion.mp3",
     "albumId": "album-graduation",
     "trackNumber": 2,
     "hasLocalAudio": true
@@ -1765,7 +1765,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 312,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/03%20Stronger.mp3",
+    "audioSrc": "https://archive.org/download/iGraduation-CD/03%20-%20Kanye%20West%20-%20Stronger.mp3",
     "albumId": "album-graduation",
     "trackNumber": 3,
     "hasLocalAudio": true
@@ -1780,7 +1780,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 243,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/04%20I%20Wonder.mp3",
+    "audioSrc": "https://archive.org/download/iGraduation-CD/04%20-%20Kanye%20West%20-%20I%20Wonder.mp3",
     "albumId": "album-graduation",
     "trackNumber": 4,
     "hasLocalAudio": true
@@ -1795,7 +1795,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 207,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/05%20Good%20Life.mp3",
+    "audioSrc": "https://archive.org/download/iGraduation-CD/05%20-%20Kanye%20West%20-%20Good%20Life%20(feat.%20T-Pain).mp3",
     "albumId": "album-graduation",
     "trackNumber": 5,
     "hasLocalAudio": true
@@ -1810,7 +1810,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 271,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/06%20Can't%20Tell%20Me%20Nothing.mp3",
+    "audioSrc": "https://archive.org/download/iGraduation-CD/06%20-%20Kanye%20West%20-%20Can%27t%20Tell%20Me%20Nothing.mp3",
     "albumId": "album-graduation",
     "trackNumber": 6,
     "hasLocalAudio": true
@@ -1825,7 +1825,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 204,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/07%20Barry%20Bonds.mp3",
+    "audioSrc": "https://archive.org/download/iGraduation-CD/07%20-%20Kanye%20West%20-%20Barry%20Bonds%20(feat.%20Lil%20Wayne).mp3",
     "albumId": "album-graduation",
     "trackNumber": 7,
     "hasLocalAudio": true
@@ -1840,7 +1840,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 237,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/09%20Flashing%20Lights.mp3",
+    "audioSrc": "https://archive.org/download/iGraduation-CD/09%20-%20Kanye%20West%20-%20Flashing%20Lights%20(feat.%20Dwele).mp3",
     "albumId": "album-graduation",
     "trackNumber": 8,
     "hasLocalAudio": true
@@ -1855,7 +1855,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 227,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/10%20Everything%20I%20Am.mp3",
+    "audioSrc": "https://archive.org/download/iGraduation-CD/10%20-%20Kanye%20West%20-%20Everything%20I%20Am%20(feat.%20scratches%20by%20DJ%20Premire).mp3",
     "albumId": "album-graduation",
     "trackNumber": 9,
     "hasLocalAudio": true
@@ -1870,7 +1870,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 212,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/11%20The%20Glory.mp3",
+    "audioSrc": "https://archive.org/download/iGraduation-CD/11%20-%20Kanye%20West%20-%20The%20Glory.mp3",
     "albumId": "album-graduation",
     "trackNumber": 10,
     "hasLocalAudio": true
@@ -1885,7 +1885,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 203,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/12%20Homecoming.mp3",
+    "audioSrc": "https://archive.org/download/iGraduation-CD/12%20-%20Kanye%20West%20-%20Homecoming.mp3",
     "albumId": "album-graduation",
     "trackNumber": 11,
     "hasLocalAudio": true
@@ -1900,7 +1900,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 287,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/13%20Big%20Brother.mp3",
+    "audioSrc": "https://archive.org/download/iGraduation-CD/13%20-%20Kanye%20West%20-%20Big%20Brother.mp3",
     "albumId": "album-graduation",
     "trackNumber": 12,
     "hasLocalAudio": true
@@ -1915,7 +1915,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 186,
     "cover": "./music/covers/kanye_graduation.jpg",
     "genre": "Hip Hop / Synthpop",
-    "audioSrc": "https://archive.org/download/kanyewestgraduation_202606/08%20Drunk%20And%20Hot%20Girls.mp3",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1b/56/3a/1b563ae1-1d46-5c40-cf88-556bed50deee/mzaf_10636000425829464416.plus.aac.p.m4a",
     "albumId": "album-graduation",
     "trackNumber": 13,
     "hasLocalAudio": true
@@ -1930,7 +1930,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 320,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/01.%20Ultralight%20Beam%20(Feat.%20Chance%20The%20Rapper%2C%20The-Dream%2C%20Kelly%20Price%20%26%20Kirk%20Franklin).mp3",
+    "audioSrc": "https://archive.org/download/foo_20240918_202409/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/01.%20Ultralight%20Beam%20(Ft.%20Chance%20The%20Rapper%20%26%20Kirk%20Franklin).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 1,
     "hasLocalAudio": false
@@ -1945,7 +1945,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 135,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/02.%20Father%20Stretch%20My%20Hands%20Pt.%201%20(Feat.%20Kid%20Cudi).mp3",
+    "audioSrc": "https://archive.org/download/foo_20240918_202409/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/02.%20Father%20Stretch%20My%20Hands%20Pt.%201%20(Ft.%20Kid%20Cudi).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 2,
     "hasLocalAudio": false
@@ -1960,7 +1960,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 130,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/03.%20Pt.%202%20(Feat.%20Desiigner%20%26%20Caroline%20Shaw).mp3",
+    "audioSrc": "https://archive.org/download/foo_20240918_202409/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/03.%20Father%20Stretch%20My%20Hands%20Pt.%202%20(Ft.%20Desiigner).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 3,
     "hasLocalAudio": false
@@ -1975,7 +1975,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 196,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/04.%20Famous%20(Feat.%20Rihanna%20%26%20Swizz%20Beatz).mp3",
+    "audioSrc": "https://archive.org/download/foo_20240918_202409/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/04.%20Famous%20(Ft.%20Rihanna).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 4,
     "hasLocalAudio": false
@@ -1990,7 +1990,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 147,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/05.%20Feedback.mp3",
+    "audioSrc": "https://archive.org/download/foo_20240918_202409/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/05.%20Feedback.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 5,
     "hasLocalAudio": false
@@ -2005,7 +2005,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 131,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/06.%20Low%20Lights.mp3",
+    "audioSrc": "https://archive.org/download/foo_20240918_202409/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/06.%20Low%20Lights.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 6,
     "hasLocalAudio": false
@@ -2020,7 +2020,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 199,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/07.%20Highlights%20(Feat.%20Young%20Thug).mp3",
+    "audioSrc": "https://archive.org/download/foo_20240918_202409/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/07.%20Highlights%20(Ft.%20Young%20Thug).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 7,
     "hasLocalAudio": false
@@ -2035,7 +2035,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 123,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/08.%20Freestyle%204%20(Feat.%20Desiigner).mp3",
+    "audioSrc": "https://archive.org/download/foo_20240918_202409/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/08.%20Freestyle%204%20(Ft.%20Desiigner).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 8,
     "hasLocalAudio": false
@@ -2050,7 +2050,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 44,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/09.%20I%20Love%20Kanye.mp3",
+    "audioSrc": "https://archive.org/download/foo_20240918_202409/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/09.%20I%20Love%20Kanye.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 9,
     "hasLocalAudio": false
@@ -2065,7 +2065,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 181,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/10.%20Waves%20(Feat.%20Chris%20Brown%20%26%20Kid%20Cudi).mp3",
+    "audioSrc": "https://archive.org/download/foo_20240918_202409/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/10.%20Waves%20(Ft.%20Chris%20Brown).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 10,
     "hasLocalAudio": false
@@ -2080,7 +2080,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 236,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/11.%20FML%20(Feat.%20The%20Weeknd).mp3",
+    "audioSrc": "https://archive.org/download/foo_20240918_202409/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/11.%20FML%20(Ft.%20The%20Weeknd).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 11,
     "hasLocalAudio": false
@@ -2095,7 +2095,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 251,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/12.%20Real%20Friends%20(Feat.%20Ty%20Dolla%20%24ign).mp3",
+    "audioSrc": "https://archive.org/download/foo_20240918_202409/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/12.%20Real%20Friends%20(Ft.%20Ty%20Dolla%20Sign).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 12,
     "hasLocalAudio": false
@@ -2110,7 +2110,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 301,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/13.%20Wolves%20(Feat.%20Vic%20Mensa%2C%20Sia%20%26%20Caroline%20Shaw).mp3",
+    "audioSrc": "https://archive.org/download/foo_20240918_202409/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/13.%20Wolves%20(Ft.%20Frank%20Ocean%20%26%20Caroline%20Shaw).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 13,
     "hasLocalAudio": false
@@ -2125,7 +2125,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 38,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/14.%20Frank's%20Track%20(Feat.%20Frank%20Ocean).mp3",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/89/26/7f/89267fe3-1be9-cbc2-a9f2-24171527dd7e/mzaf_2376633459582564133.plus.aac.p.m4a",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 14,
     "hasLocalAudio": false
@@ -2140,7 +2140,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 56,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/15.%20Siiiiiiiiilver%20Surffffeeeeer%20Intermission%20(Feat.%20Max%20B%20%26%20French%20Montana).mp3",
+    "audioSrc": "https://archive.org/download/foo_20240918_202409/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/14.%20Silver%20Surfer%20Intermission.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 15,
     "hasLocalAudio": true
@@ -2155,7 +2155,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 323,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/16.%2030%20Hours%20(Feat.%20Andre%203000).mp3",
+    "audioSrc": "https://archive.org/download/foo_20240918_202409/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/15.%2030%20Hours%20(Ft.%20Andre%203000).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 16,
     "hasLocalAudio": false
@@ -2170,7 +2170,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 374,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/17.%20No%20More%20Parties%20In%20L.A.%20(Feat.%20Kendrick%20Lamar).mp3",
+    "audioSrc": "https://archive.org/download/foo_20240918_202409/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/16.%20No%20More%20Parties%20In%20LA%20(Ft.%20Kendrick%20Lamar).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 17,
     "hasLocalAudio": false
@@ -2185,7 +2185,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 200,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/18.%20Facts%20(Charlie%20Heat%20Version).mp3",
+    "audioSrc": "https://archive.org/download/foo_20240918_202409/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/17.%20Facts%20(Charlie%20Heat%20Version).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 18,
     "hasLocalAudio": false
@@ -2200,7 +2200,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 193,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/19.%20Fade%20(Feat.%20Post%20Malone%20%26%20Ty%20Dolla%20%24ign).mp3",
+    "audioSrc": "https://archive.org/download/foo_20240918_202409/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/Kanye%20West%20-%20The%20Life%20Of%20Pablo%20(TLOP)/18.%20Fade%20(Ft.%20Post%20Malone%20%26%20Ty%20Dolla%20Sign).mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 19,
     "hasLocalAudio": false
@@ -2215,7 +2215,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 372,
     "cover": "./music/covers/kanye_tlop.jpg",
     "genre": "Hip Hop / Gospel Rap",
-    "audioSrc": "https://archive.org/download/kanyewest_202605/19.%20Fade%20(Feat.%20Post%20Malone%20%26%20Ty%20Dolla%20%24ign).mp3",
+    "audioSrc": "https://archive.org/download/comp-075878a8-bb7e-4f77-a588-db9d6414cf60/000-06bdb2cb-SAINT_PABLO__Sak_s_VERSION_.mp3",
     "albumId": "album-the-life-of-pablo",
     "trackNumber": 20,
     "hasLocalAudio": false
@@ -2230,7 +2230,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 378,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://archive.org/download/808s-heartbreak/Say%20You%20Will(MP3_320K).mp3",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/bd/66/48/bd664829-e740-907c-f1b1-e886eb04383c/mzaf_2589743817157851735.plus.aac.p.m4a",
     "albumId": "album-808s",
     "trackNumber": 1,
     "hasLocalAudio": false
@@ -2245,7 +2245,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 263,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://archive.org/download/808s-heartbreak/Welcome%20To%20Heartbreak-%20Kanye%20West(MP3_320K).mp3",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/45/74/33/4574338a-7a61-8e23-c83c-f0d1093cdc39/mzaf_7146393203303618033.plus.aac.p.m4a",
     "albumId": "album-808s",
     "trackNumber": 2,
     "hasLocalAudio": false
@@ -2260,7 +2260,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 211,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://archive.org/download/808s-heartbreak/Kanye%20West%20-%20Heartless(MP3_320K).mp3",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c3/2e/bb/c32ebbd5-9ed4-659e-161f-41e79ce1a0ad/mzaf_17099620641848520890.plus.aac.p.m4a",
     "albumId": "album-808s",
     "trackNumber": 3,
     "hasLocalAudio": false
@@ -2275,7 +2275,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 238,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://archive.org/download/808s-heartbreak/Kanye%20West%20-%20Amazing(MP3_320K).mp3",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/fa/69/4c/fa694c0f-c645-fd36-fa6a-8ae182e7ce86/mzaf_6111461460443869199.plus.aac.p.m4a",
     "albumId": "album-808s",
     "trackNumber": 4,
     "hasLocalAudio": false
@@ -2290,7 +2290,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 270,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://archive.org/download/808s-heartbreak/Kanye%20West%20-%20Love%20Lockdown(MP3_320K).mp3",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/cd/41/a0/cd41a029-144c-ef10-b945-5c29b0966552/mzaf_16533792012921979472.plus.aac.p.m4a",
     "albumId": "album-808s",
     "trackNumber": 5,
     "hasLocalAudio": false
@@ -2305,7 +2305,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 278,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://archive.org/download/808s-heartbreak/Paranoid(MP3_160K).mp3",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4e/87/57/4e875781-339c-01cf-d737-089802a06c36/mzaf_11814102611167681551.plus.aac.p.m4a",
     "albumId": "album-808s",
     "trackNumber": 6,
     "hasLocalAudio": false
@@ -2320,7 +2320,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 274,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://archive.org/download/808s-heartbreak/RoboCop(MP3_160K).mp3",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a8/f6/b6/a8f6b687-4440-fc78-bc46-5b2c602c1497/mzaf_9829547161811521638.plus.aac.p.m4a",
     "albumId": "album-808s",
     "trackNumber": 7,
     "hasLocalAudio": false
@@ -2335,7 +2335,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 190,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://archive.org/download/808s-heartbreak/Street%20Lights(MP3_160K).mp3",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/cb/0d/30/cb0d30a1-24b3-6983-a81f-c618264adb08/mzaf_16953060916766290616.plus.aac.p.m4a",
     "albumId": "album-808s",
     "trackNumber": 8,
     "hasLocalAudio": false
@@ -2350,7 +2350,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 239,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://archive.org/download/808s-heartbreak/Bad%20News(MP3_160K).mp3",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0f/e0/72/0fe0720d-c41e-b556-67a8-9be3a997089f/mzaf_524758049107904390.plus.aac.p.m4a",
     "albumId": "album-808s",
     "trackNumber": 9,
     "hasLocalAudio": false
@@ -2365,7 +2365,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 258,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://archive.org/download/808s-heartbreak/See%20You%20In%20My%20Nightmares(MP3_160K).mp3",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e9/07/44/e907443e-b810-fa3e-8f02-3831e0d6d20d/mzaf_15785536552927438628.plus.aac.p.m4a",
     "albumId": "album-808s",
     "trackNumber": 10,
     "hasLocalAudio": false
@@ -2380,7 +2380,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 164,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://archive.org/download/808s-heartbreak/Coldest%20Winter(MP3_160K).mp3",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/dc/88/a7/dc88a7ef-ccd8-36d2-efea-24d376e575b9/mzaf_8988321132685600771.plus.aac.p.m4a",
     "albumId": "album-808s",
     "trackNumber": 11,
     "hasLocalAudio": false
@@ -2395,7 +2395,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 363,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://archive.org/download/808s-heartbreak/Pinocchio%20Story(MP3_160K).mp3",
+    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/35/2c/9f/352c9f5e-708e-3398-87ff-9c019125095e/mzaf_11593560217716283670.plus.aac.p.m4a",
     "albumId": "album-808s",
     "trackNumber": 12,
     "hasLocalAudio": false
