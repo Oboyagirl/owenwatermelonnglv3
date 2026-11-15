@@ -134,3 +134,30 @@
     }
     ```
     *Expected: PERMISSION_DENIED*
+
+---
+
+## 3. Chess Rooms (`/chessRooms/{roomCode}`) Security Invariants & Adversarial Tests
+
+### Invariants
+1. **No Room Enumeration (`allow list: if false`)**: Unlisted queries against `/chessRooms` are forbidden; a player must know the exact 4–8 character uppercase alphanumeric `roomCode` to `get` or subscribe.
+2. **Creator & Seat Identity Integrity**: On creation, `creatorAuthUid == request.auth.uid`, exactly one seat holds `request.auth.uid`, `moves` is empty, `status == 'waiting'`, and `createdAt == request.time && updatedAt == request.time`.
+3. **Action-Based Update Isolation**: Every update uses `affectedKeys().hasOnly(...)` across distinct actions (`Join`, `Leave`, `Move`, `End`, `RematchVote`, `RematchReset`), preventing arbitrary field tampering.
+4. **Turn Enforcement**: Only the seated player matching `existing().turn` (`whiteAuthUid` or `blackAuthUid`) can append exactly 1 move (`moves.size() == existing().moves.size() + 1`).
+5. **Terminal State Locking**: Once `status == 'finished'`, moves, resignations, timeouts, and joins are locked out; only seated participants may vote for or trigger a rematch reset.
+6. **Immortal & Temporal Integrity**: `code`, `creatorAuthUid`, `createdAt`, `timeControlId`, `baseMs`, and `incMs` cannot change after creation; `updatedAt == request.time` is enforced on every write.
+
+### Chess Room "Dirty Dozen" Malicious Payloads
+1. **Unauthenticated Room Create/Read**: `{ "path": "/chessRooms/ABC234", "auth": null, "operation": "get" }` -> `PERMISSION_DENIED`
+2. **Collection Enumeration (`list`)**: `{ "path": "/chessRooms", "auth": { "uid": "u1" }, "operation": "list" }` -> `PERMISSION_DENIED`
+3. **Invalid Room Code ID Poisoning**: `{ "path": "/chessRooms/../../evil", "auth": { "uid": "u1" }, "operation": "create" }` -> `PERMISSION_DENIED`
+4. **Spoofed Creator UID on Create**: `{ "path": "/chessRooms/ABC234", "auth": { "uid": "attacker" }, "data": { "creatorAuthUid": "victim" } }` -> `PERMISSION_DENIED`
+5. **Shadow Ghost Field on Create**: `{ "path": "/chessRooms/ABC234", "auth": { "uid": "u1" }, "data": { "...valid", "isAdmin": true } }` -> `PERMISSION_DENIED`
+6. **Pre-Seeded Moves on Create**: `{ "path": "/chessRooms/ABC234", "auth": { "uid": "u1" }, "data": { "...valid", "moves": ["6,4->4,4"] } }` -> `PERMISSION_DENIED`
+7. **Client-Spoofed Timestamp**: `{ "path": "/chessRooms/ABC234", "auth": { "uid": "u1" }, "data": { "...valid", "createdAt": "2020-01-01T00:00:00Z" } }` -> `PERMISSION_DENIED`
+8. **Seat Hijacking (Replacing Already-Seated Opponent)**: `{ "path": "/chessRooms/ABC234", "auth": { "uid": "intruder" }, "update": { "blackAuthUid": "intruder" } }` when `existing.blackAuthUid == "u2"` -> `PERMISSION_DENIED`
+9. **Out-of-Turn Move / Moving Opponent's Pieces**: `{ "path": "/chessRooms/ABC234", "auth": { "uid": "blackUid" }, "update": { "moves": ["6,4->4,4"] } }` when `existing.turn == "w"` -> `PERMISSION_DENIED`
+10. **Double-Move / History Rewrite**: `{ "path": "/chessRooms/ABC234", "auth": { "uid": "whiteUid" }, "update": { "moves": ["6,4->4,4", "1,4->3,4"] } }` when `existing.moves.size() == 0` -> `PERMISSION_DENIED`
+11. **Post-Finish State Mutation (Terminal Lock Bypass)**: `{ "path": "/chessRooms/ABC234", "auth": { "uid": "whiteUid" }, "update": { "resignedWinner": "w" } }` when `existing.status == "finished"` -> `PERMISSION_DENIED`
+12. **Time Control Tampering After Create**: `{ "path": "/chessRooms/ABC234", "auth": { "uid": "whiteUid" }, "update": { "baseMs": 1000 } }` -> `PERMISSION_DENIED`
+

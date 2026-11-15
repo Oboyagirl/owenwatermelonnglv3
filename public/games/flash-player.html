@@ -15,6 +15,7 @@
       align-items: center;
       justify-content: center;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      touch-action: manipulation;
     }
     #player-container {
       width: 100%;
@@ -28,6 +29,93 @@
       width: 100% !important;
       height: 100% !important;
       display: block !important;
+    }
+    #loading-badge {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: #050507;
+      color: #e2e8f0;
+      z-index: 20;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .spinner {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, 0.14);
+      border-top-color: #10b981;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    #touch-toggle {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      z-index: 30;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(15, 23, 42, 0.78);
+      color: #e2e8f0;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+    }
+    #touch-pad {
+      display: none;
+      position: fixed;
+      inset: auto 14px 46px 14px;
+      z-index: 29;
+      justify-content: space-between;
+      align-items: flex-end;
+      pointer-events: none;
+    }
+    #touch-pad.visible {
+      display: flex;
+    }
+    .pad-group {
+      display: flex;
+      gap: 8px;
+      pointer-events: auto;
+    }
+    .dpad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 44px);
+      grid-template-rows: repeat(2, 44px);
+      gap: 5px;
+      pointer-events: auto;
+    }
+    .vkey {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.28);
+      background: rgba(15, 23, 42, 0.72);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    .vkey:active {
+      background: rgba(16, 185, 129, 0.55);
+    }
+    .vkey-wide {
+      width: 78px;
+      font-size: 12px;
     }
     /* Completely suppress Ruffle warnings, modals, and panic popups */
     ruffle-player::part(message-overlay),
@@ -78,7 +166,27 @@
   </script>
 </head>
 <body>
-  <div id="player-container"></div>
+  <div id="player-container">
+    <div id="loading-badge">
+      <div class="spinner"></div>
+      <div id="loading-text">Loading Flash Player...</div>
+    </div>
+  </div>
+
+  <button id="touch-toggle" type="button">Keys</button>
+  <div id="touch-pad" aria-hidden="true">
+    <div class="dpad-grid">
+      <div></div>
+      <button class="vkey" type="button" data-key="ArrowUp" data-code="ArrowUp" data-kc="38">▲</button>
+      <div></div>
+      <button class="vkey" type="button" data-key="ArrowLeft" data-code="ArrowLeft" data-kc="37">◀</button>
+      <button class="vkey" type="button" data-key="ArrowDown" data-code="ArrowDown" data-kc="40">▼</button>
+      <button class="vkey" type="button" data-key="ArrowRight" data-code="ArrowRight" data-kc="39">▶</button>
+    </div>
+    <div class="pad-group">
+      <button class="vkey vkey-wide" type="button" data-key=" " data-code="Space" data-kc="32">SPACE</button>
+    </div>
+  </div>
 
   <script>
     const params = new URLSearchParams(window.location.search);
@@ -86,11 +194,61 @@
     const title = params.get('title') || 'Arcade Game';
     document.title = title;
 
+    const loadingBadge = document.getElementById('loading-badge');
+    const loadingText = document.getElementById('loading-text');
+    const touchToggle = document.getElementById('touch-toggle');
+    const touchPad = document.getElementById('touch-pad');
+
     let playerInstance = null;
     let suppressInterval = null;
-    function hideOverlay() {}
+
+    function hideOverlay() {
+      if (loadingBadge) loadingBadge.style.display = 'none';
+    }
+
+    // Optional on-screen virtual keys for iPad / touchscreen devices
+    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    if (!isTouchDevice) {
+      touchToggle.style.opacity = '0.55';
+    }
+    touchToggle.addEventListener('click', () => {
+      touchPad.classList.toggle('visible');
+      if (playerInstance) playerInstance.focus();
+    });
+
+    function dispatchVirtualKey(type, key, code, keyCode) {
+      const target = playerInstance || document;
+      try {
+        if (playerInstance) playerInstance.focus();
+        const ev = new KeyboardEvent(type, {
+          key: key,
+          code: code,
+          keyCode: keyCode,
+          which: keyCode,
+          bubbles: true,
+          cancelable: true
+        });
+        target.dispatchEvent(ev);
+        window.dispatchEvent(ev);
+      } catch {}
+    }
+
+    document.querySelectorAll('.vkey[data-key]').forEach((btn) => {
+      const key = btn.getAttribute('data-key');
+      const code = btn.getAttribute('data-code');
+      const kc = Number(btn.getAttribute('data-kc'));
+      const press = (e) => { e.preventDefault(); dispatchVirtualKey('keydown', key, code, kc); };
+      const release = (e) => { e.preventDefault(); dispatchVirtualKey('keyup', key, code, kc); };
+      btn.addEventListener('touchstart', press, { passive: false });
+      btn.addEventListener('touchend', release, { passive: false });
+      btn.addEventListener('mousedown', press);
+      btn.addEventListener('mouseup', release);
+      btn.addEventListener('mouseleave', release);
+    });
 
     if (rawSwf) {
+      loadingText.textContent = 'Loading ' + title + '...';
+
       function startPlayer() {
         if (!window.RufflePlayer || typeof window.RufflePlayer.newest !== 'function') {
           setTimeout(startPlayer, 100);
@@ -101,26 +259,34 @@
           const ruffle = window.RufflePlayer.newest();
           playerInstance = ruffle.createPlayer();
           const container = document.getElementById("player-container");
-
           container.appendChild(playerInstance);
 
           playerInstance.addEventListener("loadedmetadata", hideOverlay);
+          playerInstance.addEventListener("loadeddata", hideOverlay);
 
           let swfBase = "";
           if (rawSwf.startsWith('http://') || rawSwf.startsWith('https://')) {
             swfBase = rawSwf.substring(0, rawSwf.lastIndexOf('/') + 1);
           }
 
-          // Safety timeout
-          setTimeout(hideOverlay, 8000);
+          setTimeout(hideOverlay, 7000);
+
+          const isCorsCdn = rawSwf.includes('cdn.jsdelivr.net');
+          const isStaticHost = window.location.hostname.endsWith('github.io') ||
+                               window.location.protocol === 'file:' ||
+                               (!window.location.port && window.location.hostname !== 'localhost');
 
           let primaryUrl = rawSwf;
-          const isStaticHost = window.location.hostname.endsWith('github.io') || 
-                               window.location.protocol === 'file:' || 
-                               (!window.location.port && window.location.hostname !== 'localhost');
-          if (!isStaticHost && (rawSwf.startsWith('http://') || rawSwf.startsWith('https://'))) {
-            if (!rawSwf.startsWith(window.location.origin)) {
-              primaryUrl = '/api/swf?url=' + encodeURIComponent(rawSwf);
+          // Prefer direct CDN load when hosted on CORS-friendly jsDelivr, with /api/swf proxy as automatic fallback (and vice versa)
+          let fallbackUrl = rawSwf;
+          if (!isStaticHost && (rawSwf.startsWith('http://') || rawSwf.startsWith('https://')) && !rawSwf.startsWith(window.location.origin)) {
+            const proxied = '/api/swf?url=' + encodeURIComponent(rawSwf);
+            if (isCorsCdn) {
+              primaryUrl = rawSwf;
+              fallbackUrl = proxied;
+            } else {
+              primaryUrl = proxied;
+              fallbackUrl = rawSwf;
             }
           }
 
@@ -131,22 +297,25 @@
             autoplay: "auto",
             backgroundColor: "#000000"
           }).then(() => {
-            setTimeout(hideOverlay, 200);
+            setTimeout(hideOverlay, 150);
           }).catch(() => {
-            // Fall back to direct SWF URL if proxy had an issue
-            playerInstance.load({
-              url: rawSwf,
-              base: swfBase,
-              parameters: "",
-              autoplay: "auto",
-              backgroundColor: "#000000"
-            }).finally(hideOverlay);
+            if (fallbackUrl !== primaryUrl) {
+              playerInstance.load({
+                url: fallbackUrl,
+                base: swfBase,
+                parameters: "",
+                autoplay: "auto",
+                backgroundColor: "#000000"
+              }).finally(hideOverlay);
+            } else {
+              hideOverlay();
+            }
           });
 
           // Continuously silence any Ruffle shadowRoot dialogs
           suppressInterval = setInterval(() => {
             if (playerInstance && playerInstance.shadowRoot) {
-              const modal = playerInstance.shadowRoot.querySelector('#message-overlay') || 
+              const modal = playerInstance.shadowRoot.querySelector('#message-overlay') ||
                             playerInstance.shadowRoot.querySelector('.message-overlay') ||
                             playerInstance.shadowRoot.querySelector('#panic') ||
                             playerInstance.shadowRoot.querySelector('.panic');
@@ -157,7 +326,6 @@
           window.addEventListener('beforeunload', () => {
             if (suppressInterval) clearInterval(suppressInterval);
           });
-
         } catch (e) {
           hideOverlay();
         }

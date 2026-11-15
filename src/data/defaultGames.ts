@@ -1043,6 +1043,8 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/ducklife1.jpg",
     mirrors: [
+      "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/BinBashBanana/gstore@master/ducklife.swf&title=Duck+Life",
+      "https://duck-life.pages.dev/",
       "https://gameinclassroom.github.io/duck-life/"
     ],
     tags: ["Duck Life", "Duck", "Racing", "Training", "Animal", "Casual", "Owen OG", "Unblocked"],
@@ -1050,8 +1052,8 @@ const CURATED_GAMES: Game[] = [
     plays: 280000,
     author: "Wix Games",
     featured: true,
-    iframeSrc: "https://gameinclassroom.github.io/duck-life/",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life" src="https://gameinclassroom.github.io/duck-life/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/BinBashBanana/gstore@master/ducklife.swf&title=Duck+Life",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life" src="games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/BinBashBanana/gstore@master/ducklife.swf&title=Duck+Life" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "↑ / W", action: "Jump (Running Mode)" },
       { key: "← / → / A / D", action: "Move Left & Right (Swimming / Flying)" }
@@ -1066,15 +1068,17 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/ducklife2.jpg",
     mirrors: [
-      "https://gameinclassroom.github.io/duck-life-2-world-champion/"
+      "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-2/ducklife2.swf&title=Duck+Life+2",
+      "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/BinBashBanana/gstore@master/ducklife2.swf&title=Duck+Life+2",
+      "https://ubghyper.github.io/g/Duck-Life-2/"
     ],
     tags: ["Duck Life", "Duck Life 2", "Duck", "Racing", "Training", "Animal", "Owen OG", "Unblocked"],
     rating: 4.9,
     plays: 295000,
     author: "Wix Games",
     featured: true,
-    iframeSrc: "https://gameinclassroom.github.io/duck-life-2-world-champion/",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 2: World Champion" src="https://gameinclassroom.github.io/duck-life-2-world-champion/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-2/ducklife2.swf&title=Duck+Life+2",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 2: World Champion" src="games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-2/ducklife2.swf&title=Duck+Life+2" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "↑ / W", action: "Jump / Climb" },
       { key: "← / → / A / D", action: "Steer Duck" }
@@ -1089,15 +1093,17 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/ducklife3.jpg",
     mirrors: [
-      "https://gameinclassroom.github.io/duck-life-3-evolution/"
+      "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-3/ducklife3.swf&title=Duck+Life+3",
+      "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/BinBashBanana/gstore@master/ducklife3.swf&title=Duck+Life+3",
+      "https://ubghyper.github.io/g/Duck-Life-3/"
     ],
     tags: ["Duck Life", "Duck Life 3", "Duck", "Evolution", "Racing", "Training", "Owen OG", "Unblocked"],
     rating: 4.9,
     plays: 310000,
     author: "Wix Games",
     featured: true,
-    iframeSrc: "https://gameinclassroom.github.io/duck-life-3-evolution/",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 3: Evolution" src="https://gameinclassroom.github.io/duck-life-3-evolution/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-3/ducklife3.swf&title=Duck+Life+3",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 3: Evolution" src="games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-3/ducklife3.swf&title=Duck+Life+3" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Arrow Keys / WASD", action: "Control Duck in Training & Races" },
       { key: "Space", action: "Action / Jump" }
@@ -1112,15 +1118,17 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/ducklife4.jpg",
     mirrors: [
-      "https://gameinclassroom.github.io/duck-life-4/"
+      "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-4/ducklife4.swf&title=Duck+Life+4",
+      "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/BinBashBanana/gstore@master/ducklife4.swf&title=Duck+Life+4",
+      "https://ubghyper.github.io/g/Duck-Life-4/"
     ],
     tags: ["Duck Life", "Duck Life 4", "Duck", "Adventure", "Racing", "Training", "Owen OG", "Unblocked"],
     rating: 4.9,
     plays: 350000,
     author: "Wix Games",
     featured: true,
-    iframeSrc: "https://gameinclassroom.github.io/duck-life-4/",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 4" src="https://gameinclassroom.github.io/duck-life-4/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-4/ducklife4.swf&title=Duck+Life+4",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 4" src="games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-4/ducklife4.swf&title=Duck+Life+4" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Arrow Keys / WASD", action: "Move Duck / Navigate World" },
       { key: "Space / Mouse", action: "Jump / Interact" }
@@ -1135,15 +1143,16 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/ducklife5.png",
     mirrors: [
-      "https://ubghyper.github.io/GameList.github.io/Duck-Life-5/"
+      "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-5/Duck-Life-5.swf&title=Duck+Life+5+Treasure+Hunt",
+      "https://ubghyper.github.io/g/Duck-Life-5/"
     ],
     tags: ["Duck Life", "Duck Life 5", "Treasure Hunt", "Duck", "Platformer", "Casual", "Owen OG", "Unblocked"],
     rating: 4.8,
     plays: 180000,
     author: "Wix Games",
     featured: true,
-    iframeSrc: "https://ubghyper.github.io/GameList.github.io/Duck-Life-5/",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 5: Treasure Hunt" src="https://ubghyper.github.io/GameList.github.io/Duck-Life-5/" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-5/Duck-Life-5.swf&title=Duck+Life+5+Treasure+Hunt",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life 5: Treasure Hunt" src="games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-5/Duck-Life-5.swf&title=Duck+Life+5+Treasure+Hunt" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Arrow Keys / WASD", action: "Move & Jump" },
       { key: "Space", action: "Activate Gadget" }
@@ -1153,21 +1162,21 @@ const CURATED_GAMES: Game[] = [
     id: "duck-life-space",
     source: "unblocked",
     title: "Duck Life: Space",
-    description: "Launch your champion duck into outer space! Travel across planets, master zero-G gravity races, and upgrade your duck skills across the galaxy.",
+    description: "Launch your champion duck into outer space! Travel across worlds, master gravity races, and upgrade your duck skills across the galaxy.",
     category: "Casual",
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/ducklife4.jpg",
     mirrors: [
-      "games/duck-life-4.html",
-      "games/flash-player.html?swf=games/swfs/ducklife4.swf&title=Duck+Life+Space"
+      "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-4/ducklife4.swf&title=Duck+Life+Space",
+      "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-5/Duck-Life-5.swf&title=Duck+Life+Space"
     ],
     tags: ["Duck Life", "Space", "Duck", "Racing", "Training", "Animal", "Owen OG", "Unblocked"],
     rating: 4.9,
     plays: 210000,
     author: "Wix Games",
     featured: true,
-    iframeSrc: "games/duck-life-4.html",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life: Space" src="games/duck-life-4.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-4/ducklife4.swf&title=Duck+Life+Space",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life: Space" src="games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-4/ducklife4.swf&title=Duck+Life+Space" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Arrow Keys / WASD", action: "Control Duck" },
       { key: "Space", action: "Jump / Boost" }
@@ -1182,16 +1191,16 @@ const CURATED_GAMES: Game[] = [
     secondaryCategory: "Potato Classics",
     thumbnail: "thumbnails/ducklife3.jpg",
     mirrors: [
-      "games/duck-life-3.html",
-      "games/flash-player.html?swf=games/swfs/ducklife3.swf&title=Duck+Life+Battle"
+      "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-5/Duck-Life-5.swf&title=Duck+Life+Battle",
+      "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-3/ducklife3.swf&title=Duck+Life+Battle"
     ],
     tags: ["Duck Life", "Battle", "Duck", "Combat", "Training", "Animal", "Owen OG", "Unblocked"],
     rating: 4.9,
     plays: 240000,
     author: "Wix Games",
     featured: true,
-    iframeSrc: "games/duck-life-3.html",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life: Battle" src="games/duck-life-3.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-5/Duck-Life-5.swf&title=Duck+Life+Battle",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Duck Life: Battle" src="games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-5/Duck-Life-5.swf&title=Duck+Life+Battle" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "Arrow Keys / WASD", action: "Move Duck / Navigate Arena" },
       { key: "Mouse Click", action: "Select Attacks & Items" }
@@ -1487,24 +1496,26 @@ export const URL_OVERRIDES: Record<string, string> = {
   "sawyer-for-sawyer": "games/a-small-world-cup.html",
   "a-small-world-cup": "games/a-small-world-cup.html",
   "asmallworldcup": "games/a-small-world-cup.html",
-  "duck-life": "https://gameinclassroom.github.io/duck-life/",
-  "ducklife": "https://gameinclassroom.github.io/duck-life/",
-  "duck-life-1": "https://gameinclassroom.github.io/duck-life/",
-  "ducklife1": "https://gameinclassroom.github.io/duck-life/",
-  "duck-life-2": "https://gameinclassroom.github.io/duck-life-2-world-champion/",
-  "ducklife2": "https://gameinclassroom.github.io/duck-life-2-world-champion/",
-  "strongdog-ducklife2": "https://gameinclassroom.github.io/duck-life-2-world-champion/",
-  "duck-life-3": "https://gameinclassroom.github.io/duck-life-3-evolution/",
-  "ducklife3": "https://gameinclassroom.github.io/duck-life-3-evolution/",
-  "strongdog-ducklife3": "https://gameinclassroom.github.io/duck-life-3-evolution/",
-  "duck-life-4": "https://gameinclassroom.github.io/duck-life-4/",
-  "ducklife4": "https://gameinclassroom.github.io/duck-life-4/",
-  "duck-life-5": "https://gameinclassroom.github.io/duck-life-4/",
-  "ducklife5": "https://gameinclassroom.github.io/duck-life-4/",
-  "duck-life-space": "https://gameinclassroom.github.io/duck-life-4/",
-  "ducklifespace": "https://gameinclassroom.github.io/duck-life-4/",
-  "duck-life-battle": "https://gameinclassroom.github.io/duck-life-3-evolution/",
-  "ducklifebattle": "https://gameinclassroom.github.io/duck-life-3-evolution/",
+  "duck-life": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/BinBashBanana/gstore@master/ducklife.swf&title=Duck+Life",
+  "ducklife": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/BinBashBanana/gstore@master/ducklife.swf&title=Duck+Life",
+  "duck-life-1": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/BinBashBanana/gstore@master/ducklife.swf&title=Duck+Life",
+  "ducklife1": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/BinBashBanana/gstore@master/ducklife.swf&title=Duck+Life",
+  "duck-life-2": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-2/ducklife2.swf&title=Duck+Life+2",
+  "ducklife2": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-2/ducklife2.swf&title=Duck+Life+2",
+  "strongdog-ducklife2": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-2/ducklife2.swf&title=Duck+Life+2",
+  "duck-life-3": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-3/ducklife3.swf&title=Duck+Life+3",
+  "ducklife3": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-3/ducklife3.swf&title=Duck+Life+3",
+  "strongdog-ducklife3": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-3/ducklife3.swf&title=Duck+Life+3",
+  "duck-life-4": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-4/ducklife4.swf&title=Duck+Life+4",
+  "ducklife4": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-4/ducklife4.swf&title=Duck+Life+4",
+  "duck-life-5": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-5/Duck-Life-5.swf&title=Duck+Life+5+Treasure+Hunt",
+  "ducklife5": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-5/Duck-Life-5.swf&title=Duck+Life+5+Treasure+Hunt",
+  "duck-life-space": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-4/ducklife4.swf&title=Duck+Life+Space",
+  "ducklifespace": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-4/ducklife4.swf&title=Duck+Life+Space",
+  "duck-life-battle": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-5/Duck-Life-5.swf&title=Duck+Life+Battle",
+  "ducklifebattle": "games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Duck-Life-5/Duck-Life-5.swf&title=Duck+Life+Battle",
+  "buckshot-roulete": "games/buckshot-roulette.html",
+  "buckshot-roulette": "games/buckshot-roulette.html",
   "deep-sleep": "games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Deep-Sleep-1/deepsleep1.swf&title=Deep+Sleep+1",
   "deep-sleep-1": "games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Deep-Sleep-1/deepsleep1.swf&title=Deep+Sleep+1",
   "deepsleep1": "games/flash-player.html?swf=https://ubghyper.github.io/GameList.github.io/Deep-Sleep-1/deepsleep1.swf&title=Deep+Sleep+1",

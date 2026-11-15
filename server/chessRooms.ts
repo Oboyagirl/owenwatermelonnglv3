@@ -4,7 +4,9 @@ import { WebSocketServer, WebSocket } from 'ws';
 import {
   applyMove,
   createInitialState,
-  getLegalMoves
+  getLegalMoves,
+  getTimeControlById,
+  hasOnlyInsufficientMaterialForSide
 } from '../src/utils/chessEngine.ts';
 import type {
   ChessMove,
@@ -29,6 +31,13 @@ interface ChessRoom {
   black: RoomSeat | null;
   spectators: Map<string, WebSocket>;
   resignedWinner: PieceColor | null;
+  timeoutWinner: PieceColor | 'draw' | null;
+  timeControlId: string;
+  baseMs: number;
+  incMs: number;
+  whiteTimeMs: number;
+  blackTimeMs: number;
+  clockLastTickAt: number | null;
   rematchVotes: Set<PieceColor>;
   createdAt: number;
   lastActivityAt: number;
@@ -63,12 +72,51 @@ function sanitizeRoomCode(raw: unknown): string {
 function isRoomGameOver(room: ChessRoom): boolean {
   return (
     Boolean(room.resignedWinner) ||
+    Boolean(room.timeoutWinner) ||
     room.state.status === 'checkmate' ||
     room.state.status === 'stalemate' ||
     room.state.status === 'draw_repetition' ||
     room.state.status === 'draw_fifty_move' ||
     room.state.status === 'draw_insufficient_material'
   );
+}
+
+function syncRoomClockNow(room: ChessRoom, now: number): boolean {
+  if (
+    room.baseMs <= 0 ||
+    isRoomGameOver(room) ||
+    room.history.length === 0 ||
+    room.clockLastTickAt === null
+  ) {
+    return false;
+  }
+
+  const elapsed = Math.max(0, now - room.clockLastTickAt);
+  room.clockLastTickAt = now;
+
+  if (room.state.turn === 'w') {
+    room.whiteTimeMs = Math.max(0, room.whiteTimeMs - elapsed);
+    if (room.whiteTimeMs <= 0) {
+      room.whiteTimeMs = 0;
+      room.clockLastTickAt = null;
+      room.timeoutWinner = hasOnlyInsufficientMaterialForSide(room.state.board, 'b')
+        ? 'draw'
+        : 'b';
+      return true;
+    }
+  } else {
+    room.blackTimeMs = Math.max(0, room.blackTimeMs - elapsed);
+    if (room.blackTimeMs <= 0) {
+      room.blackTimeMs = 0;
+      room.clockLastTickAt = null;
+      room.timeoutWinner = hasOnlyInsufficientMaterialForSide(room.state.board, 'w')
+        ? 'draw'
+        : 'w';
+      return true;
+    }
+  }
+
+  return false;
 }
 
 export function attachChessRoomServer(httpServer: http.Server, app: express.Express) {
@@ -101,6 +149,7 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
     return res.json({
       exists: true,
       code: room.code,
+      timeControlId: room.timeControlId,
       hasWhite: Boolean(room.white),
       hasBlack: Boolean(room.black),
       moveCount: room.history.length
@@ -113,6 +162,24 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
       if (room.white?.id === recipientPlayerId) myColor = 'w';
       else if (room.black?.id === recipientPlayerId) myColor = 'b';
     }
+    const now = Date.now();
+    let whiteTimeMs = room.whiteTimeMs;
+    let blackTimeMs = room.blackTimeMs;
+    const isRunning =
+      room.baseMs > 0 &&
+      !isRoomGameOver(room) &&
+      room.history.length >= 1 &&
+      room.clockLastTickAt !== null;
+
+    if (isRunning && room.clockLastTickAt !== null) {
+      const elapsed = Math.max(0, now - room.clockLastTickAt);
+      if (room.state.turn === 'w') {
+        whiteTimeMs = Math.max(0, whiteTimeMs - elapsed);
+      } else {
+        blackTimeMs = Math.max(0, blackTimeMs - elapsed);
+      }
+    }
+
     return {
       type: 'room:sync',
       code: room.code,
@@ -120,7 +187,18 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
       state: room.state,
       history: room.history,
       resignedWinner: room.resignedWinner,
+      timeoutWinner: room.timeoutWinner,
       rematchVotes: Array.from(room.rematchVotes),
+      clock: {
+        timeControlId: room.timeControlId,
+        baseMs: room.baseMs,
+        incMs: room.incMs,
+        whiteTimeMs,
+        blackTimeMs,
+        activeColor: isRunning ? room.state.turn : null,
+        serverNow: now,
+        timeoutWinner: room.timeoutWinner
+      },
       players: {
         w: room.white
           ? {
@@ -159,6 +237,22 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
       sendJson(ws, buildSyncPayload(room, specId));
     }
   };
+
+  // Authoritative 250ms timeout watcher for active timed rooms
+  setInterval(() => {
+    const now = Date.now();
+    for (const room of rooms.values()) {
+      if (room.baseMs > 0 && room.clockLastTickAt !== null && !isRoomGameOver(room)) {
+        const elapsed = now - room.clockLastTickAt;
+        const activeMs = room.state.turn === 'w' ? room.whiteTimeMs : room.blackTimeMs;
+        if (elapsed >= activeMs) {
+          if (syncRoomClockNow(room, now)) {
+            broadcastRoom(room);
+          }
+        }
+      }
+    }
+  }, 250).unref();
 
   const detachFromCurrentRoom = (ws: WebSocket) => {
     const meta = wsMeta.get(ws);
@@ -225,7 +319,17 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
         detachFromCurrentRoom(ws);
         const code = generateRoomCode(rooms);
         const playerName = sanitizeName(msg.playerName);
-        const pref = msg.preferredColor === 'b' ? 'b' : msg.preferredColor === 'random' ? (Math.random() < 0.5 ? 'w' : 'b') : 'w';
+        const pref =
+          msg.preferredColor === 'b'
+            ? 'b'
+            : msg.preferredColor === 'random'
+            ? Math.random() < 0.5
+              ? 'w'
+              : 'b'
+            : 'w';
+        const tc = getTimeControlById(
+          typeof msg.timeControlId === 'string' ? msg.timeControlId : 'none'
+        );
         const seat: RoomSeat = { id: playerId, name: playerName, elo: 1200, ws };
         const room: ChessRoom = {
           code,
@@ -235,6 +339,13 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
           black: pref === 'b' ? seat : null,
           spectators: new Map(),
           resignedWinner: null,
+          timeoutWinner: null,
+          timeControlId: tc.id,
+          baseMs: tc.baseMs,
+          incMs: tc.incMs,
+          whiteTimeMs: tc.baseMs,
+          blackTimeMs: tc.baseMs,
+          clockLastTickAt: null,
           rematchVotes: new Set(),
           createdAt: Date.now(),
           lastActivityAt: Date.now()
@@ -302,7 +413,15 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
       }
 
       if (msg.type === 'room:move') {
-        room.lastActivityAt = Date.now();
+        const now = Date.now();
+        room.lastActivityAt = now;
+
+        // Deduct active player's elapsed clock first; if flagged, reject move & broadcast timeout
+        if (syncRoomClockNow(room, now)) {
+          broadcastRoom(room);
+          return;
+        }
+
         // Idempotent guard if client resends move from stale moveIndex
         if (typeof msg.moveIndex === 'number' && msg.moveIndex !== room.history.length) {
           sendJson(ws, buildSyncPayload(room, playerId));
@@ -339,10 +458,27 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
           return;
         }
 
+        const moverColor = room.state.turn;
+        const wasClockRunning = room.history.length >= 1 && room.clockLastTickAt !== null;
+
         const { nextState, record } = applyMove(room.state, legal);
         room.state = nextState;
         room.history = [...room.history, record];
         room.rematchVotes.clear();
+
+        if (room.baseMs > 0) {
+          // Award increment for completed moves once the clock is active (after move 1 or when running)
+          if (wasClockRunning && room.incMs > 0) {
+            if (moverColor === 'w') room.whiteTimeMs += room.incMs;
+            else room.blackTimeMs += room.incMs;
+          }
+          if (isRoomGameOver(room)) {
+            room.clockLastTickAt = null;
+          } else {
+            room.clockLastTickAt = now;
+          }
+        }
+
         broadcastRoom(room);
         return;
       }
@@ -354,6 +490,7 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
         if (!resignColor) return;
         room.lastActivityAt = Date.now();
         room.resignedWinner = resignColor === 'w' ? 'b' : 'w';
+        room.clockLastTickAt = null;
         broadcastRoom(room);
         return;
       }
@@ -375,6 +512,10 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
           room.state = createInitialState();
           room.history = [];
           room.resignedWinner = null;
+          room.timeoutWinner = null;
+          room.whiteTimeMs = room.baseMs;
+          room.blackTimeMs = room.baseMs;
+          room.clockLastTickAt = null;
           room.rematchVotes.clear();
         }
         broadcastRoom(room);

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base href="https://cdn.jsdelivr.net/gh/freeonlinewebtools/gamelist2.github.io@408d7c4e1177fe8926c754144ad3b2a50ba340fb/buckshot-roulette/">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+  <title>Buckshot Roulette</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #060608;
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    #loader-ui {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 24px;
+      background: radial-gradient(circle at center, #18181b 0%, #050507 100%);
+      text-align: center;
+    }
+    #loader-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: #f8fafc;
+    }
+    #loader-sub {
+      font-size: 13px;
+      color: #94a3b8;
+      max-width: 360px;
+      line-height: 1.45;
+    }
+    #loader-bar-wrap {
+      width: min(360px, 82vw);
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    #loader-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #ef4444, #f97316);
+      transition: width 150ms ease;
+    }
+    #loader-status {
+      font-size: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: #cbd5e1;
+    }
+    #retry-btn {
+      display: none;
+      margin-top: 6px;
+      padding: 9px 18px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: #ef4444;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="loader-ui">
+    <div id="loader-title">BUCKSHOT ROULETTE</div>
+    <div id="loader-sub">Downloading 3D Godot WebGL assets from CDN (first load takes a few seconds)...</div>
+    <div id="loader-bar-wrap"><div id="loader-bar-fill"></div></div>
+    <div id="loader-status">Preparing assets (0 / 20)...</div>
+    <button id="retry-btn" type="button" onclick="window.location.reload()">Retry Load</button>
+  </div>
+
+  <canvas id="canvas">Your browser does not support the canvas tag.</canvas>
+  <noscript>Your browser does not support JavaScript.</noscript>
+
+  <div id="status">
+    <img id="status-splash" class="show-image--true fullsize--true use-filter--true" src="buckshot-roulette.png" alt="">
+    <progress id="status-progress"></progress>
+    <div id="status-notice"></div>
+  </div>
+
+  <script src="buckshot-roulette.js"></script>
+  <script>
+    (function () {
+      const CDN_BASE = 'https://cdn.jsdelivr.net/gh/freeonlinewebtools/gamelist2.github.io@408d7c4e1177fe8926c754144ad3b2a50ba340fb/buckshot-roulette/';
+      const originalFetch = window.fetch.bind(window);
+
+      const loaderUi = document.getElementById('loader-ui');
+      const barFill = document.getElementById('loader-bar-fill');
+      const statusEl = document.getElementById('loader-status');
+      const retryBtn = document.getElementById('retry-btn');
+
+      function getParts(file, start, end) {
+        const parts = [];
+        for (let i = start; i <= end; i++) {
+          parts.push(CDN_BASE + file + '.part' + i);
+        }
+        return parts;
+      }
+
+      const pckParts = getParts('buckshot-roulette.pck', 1, 17);
+      const wasmParts = getParts('buckshot-roulette.wasm', 1, 3);
+      const totalChunks = pckParts.length + wasmParts.length;
+      let completedChunks = 0;
+      let bytesLoaded = 0;
+
+      function updateProgress(addedBytes) {
+        bytesLoaded += addedBytes;
+        const pct = Math.min(99, Math.round((completedChunks / totalChunks) * 100));
+        barFill.style.width = pct + '%';
+        const mb = (bytesLoaded / (1024 * 1024)).toFixed(1);
+        statusEl.textContent = 'Downloading assets (' + completedChunks + ' / ' + totalChunks + ') · ' + mb + ' MB';
+      }
+
+      async function fetchPartsBatched(urls, mimeType) {
+        const results = new Array(urls.length);
+        let cursor = 0;
+        const concurrency = 4;
+
+        async function worker() {
+          while (cursor < urls.length) {
+            const idx = cursor++;
+            const url = urls[idx];
+            const res = await originalFetch(url);
+            if (!res.ok) {
+              throw new Error('Failed to load chunk (' + res.status + ')');
+            }
+            const buf = await res.arrayBuffer();
+            results[idx] = buf;
+            completedChunks++;
+            updateProgress(buf.byteLength);
+          }
+        }
+
+        await Promise.all(
+          Array.from({ length: Math.min(concurrency, urls.length) }, () => worker())
+        );
+
+        const mergedBlob = new Blob(results, { type: mimeType });
+        results.length = 0; // Free intermediate chunk references for GC
+        return URL.createObjectURL(mergedBlob);
+      }
+
+      function showError(err) {
+        statusEl.textContent = 'Could not start Buckshot Roulette: ' + (err && err.message ? err.message : String(err));
+        statusEl.style.color = '#fca5a5';
+        retryBtn.style.display = 'inline-block';
+      }
+
+      const GODOT_CONFIG = {
+        args: [],
+        canvasResizePolicy: 2,
+        ensureCrossOriginIsolationHeaders: false,
+        executable: 'buckshot-roulette',
+        experimentalVK: false,
+        fileSizes: {
+          'buckshot-roulette.pck': 344705792,
+          'buckshot-roulette.wasm': 43444261
+        },
+        focusCanvas: true,
+        gdextensionLibs: []
+      };
+
+      Promise.all([
+        fetchPartsBatched(pckParts, 'application/octet-stream'),
+        fetchPartsBatched(wasmParts, 'application/wasm')
+      ]).then(([pckUrl, wasmUrl]) => {
+        barFill.style.width = '100%';
+        statusEl.textContent = 'Starting Godot WebGL engine...';
+
+        window.fetch = async function (url, ...args) {
+          const urlStr = typeof url === 'string' ? url : (url && url.url) || '';
+          if (urlStr.endsWith('buckshot-roulette.pck')) {
+            return originalFetch(pckUrl, ...args);
+          }
+          if (urlStr.endsWith('buckshot-roulette.wasm')) {
+            return originalFetch(wasmUrl, ...args);
+          }
+          return originalFetch(url, ...args);
+        };
+
+        if (typeof Engine === 'undefined') {
+          throw new Error('Godot engine script did not initialize.');
+        }
+
+        const engine = new Engine(GODOT_CONFIG);
+        const missing = Engine.getMissingFeatures({ threads: false });
+        if (missing.length !== 0) {
+          throw new Error('Missing browser features: ' + missing.join(', '));
+        }
+
+        const statusOverlay = document.getElementById('status');
+        const statusProgress = document.getElementById('status-progress');
+        const statusNotice = document.getElementById('status-notice');
+
+        statusOverlay.style.visibility = 'visible';
+        statusProgress.style.display = 'block';
+        loaderUi.remove();
+
+        engine.startGame({
+          onProgress: function (current, total) {
+            if (current > 0 && total > 0) {
+              statusProgress.value = current;
+              statusProgress.max = total;
+            } else {
+              statusProgress.removeAttribute('value');
+              statusProgress.removeAttribute('max');
+            }
+          }
+        }).then(() => {
+          statusOverlay.remove();
+        }).catch((err) => {
+          statusOverlay.style.visibility = 'visible';
+          statusProgress.style.display = 'none';
+          statusNotice.style.display = 'block';
+          statusNotice.textContent = (err && err.message) ? err.message : 'Failed to initialize WebGL context.';
+        });
+      }).catch(showError);
+    })();
+  </script>
+</body>
+</html>

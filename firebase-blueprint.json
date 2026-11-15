@@ -153,6 +153,154 @@
         }
       },
       "required": ["id", "userId", "gameId"]
+    },
+    "chessRoom": {
+      "title": "Chess Room",
+      "description": "Real-time multiplayer chess room synchronized via Firestore across static and hosted origins",
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Unique 4-8 character uppercase room code",
+          "minLength": 4,
+          "maxLength": 8,
+          "pattern": "^[A-Z0-9]+$"
+        },
+        "creatorAuthUid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the room creator",
+          "maxLength": 128
+        },
+        "status": {
+          "type": "string",
+          "description": "Room lifecycle state",
+          "enum": ["waiting", "active", "finished"],
+          "maxLength": 16
+        },
+        "timeControlId": {
+          "type": "string",
+          "description": "Chess clock time control identifier",
+          "maxLength": 16
+        },
+        "baseMs": {
+          "type": "number",
+          "description": "Initial clock milliseconds per side"
+        },
+        "incMs": {
+          "type": "number",
+          "description": "Increment milliseconds added per move"
+        },
+        "whiteAuthUid": {
+          "type": "string",
+          "description": "Firebase Auth UID seated as White or null",
+          "maxLength": 128
+        },
+        "whitePlayerId": {
+          "type": "string",
+          "description": "Session player ID for White or null",
+          "maxLength": 64
+        },
+        "whiteName": {
+          "type": "string",
+          "description": "Display name for White or null",
+          "maxLength": 24
+        },
+        "whiteElo": {
+          "type": "number",
+          "description": "Display Elo rating for White"
+        },
+        "blackAuthUid": {
+          "type": "string",
+          "description": "Firebase Auth UID seated as Black or null",
+          "maxLength": 128
+        },
+        "blackPlayerId": {
+          "type": "string",
+          "description": "Session player ID for Black or null",
+          "maxLength": 64
+        },
+        "blackName": {
+          "type": "string",
+          "description": "Display name for Black or null",
+          "maxLength": 24
+        },
+        "blackElo": {
+          "type": "number",
+          "description": "Display Elo rating for Black"
+        },
+        "moves": {
+          "type": "array",
+          "description": "Ordered list of compact coordinate moves (e.g. 6,4->4,4)"
+        },
+        "turn": {
+          "type": "string",
+          "description": "Side to move (w or b)",
+          "enum": ["w", "b"],
+          "maxLength": 1
+        },
+        "whiteTimeMs": {
+          "type": "number",
+          "description": "Remaining White clock milliseconds at last sync"
+        },
+        "blackTimeMs": {
+          "type": "number",
+          "description": "Remaining Black clock milliseconds at last sync"
+        },
+        "clockAnchorMs": {
+          "type": "number",
+          "description": "Epoch milliseconds when active clock started ticking or null"
+        },
+        "resignedWinner": {
+          "type": "string",
+          "description": "Winning color if a player resigned or null",
+          "maxLength": 1
+        },
+        "timeoutWinner": {
+          "type": "string",
+          "description": "Winning color or draw if clock expired or null",
+          "maxLength": 4
+        },
+        "rematchVotes": {
+          "type": "array",
+          "description": "Array of colors voting for rematch (max 2)"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of room creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update"
+        }
+      },
+      "required": [
+        "code",
+        "creatorAuthUid",
+        "status",
+        "timeControlId",
+        "baseMs",
+        "incMs",
+        "whiteAuthUid",
+        "whitePlayerId",
+        "whiteName",
+        "whiteElo",
+        "blackAuthUid",
+        "blackPlayerId",
+        "blackName",
+        "blackElo",
+        "moves",
+        "turn",
+        "whiteTimeMs",
+        "blackTimeMs",
+        "clockAnchorMs",
+        "resignedWinner",
+        "timeoutWinner",
+        "rematchVotes",
+        "createdAt",
+        "updatedAt"
+      ]
     }
   },
   "firestore": {
@@ -173,6 +321,12 @@
         "$ref": "#/entities/gameStats"
       },
       "description": "Individual user play statistics and game timers"
+    },
+    "/chessRooms/{roomCode}": {
+      "schema": {
+        "$ref": "#/entities/chessRoom"
+      },
+      "description": "Online Chess room state addressed strictly by single-document room code"
     }
   }
 }

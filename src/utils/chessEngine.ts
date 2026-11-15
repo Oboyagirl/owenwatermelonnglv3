@@ -10,10 +10,13 @@ import type {
   ChessBot,
   OpeningBookLine
 } from './chessBots.ts';
+import { detectOpening } from './chessOpenings.ts';
+import type { DetectedOpening } from './chessOpenings.ts';
 
 export {
   CHESS_BOTS,
   UNIVERSAL_DEFENSE_LINES,
+  detectOpening,
   getBotById,
   pickBotVoiceline
 };
@@ -21,8 +24,38 @@ export type {
   BotStyle,
   BotVoicelineEvent,
   ChessBot,
+  DetectedOpening,
   OpeningBookLine
 };
+
+export type TimeControlCategory = 'untimed' | 'bullet' | 'blitz' | 'rapid';
+
+export interface TimeControlOption {
+  id: string;
+  label: string;
+  category: TimeControlCategory;
+  baseMs: number;
+  incMs: number;
+}
+
+export const TIME_CONTROLS: TimeControlOption[] = [
+  { id: 'none', label: 'No Clock', category: 'untimed', baseMs: 0, incMs: 0 },
+  { id: '1+0', label: '1 min', category: 'bullet', baseMs: 60_000, incMs: 0 },
+  { id: '1+1', label: '1 | 1', category: 'bullet', baseMs: 60_000, incMs: 1_000 },
+  { id: '2+1', label: '2 | 1', category: 'bullet', baseMs: 120_000, incMs: 1_000 },
+  { id: '3+0', label: '3 min', category: 'blitz', baseMs: 180_000, incMs: 0 },
+  { id: '3+2', label: '3 | 2', category: 'blitz', baseMs: 180_000, incMs: 2_000 },
+  { id: '5+0', label: '5 min', category: 'blitz', baseMs: 300_000, incMs: 0 },
+  { id: '5+3', label: '5 | 3', category: 'blitz', baseMs: 300_000, incMs: 3_000 },
+  { id: '10+0', label: '10 min', category: 'rapid', baseMs: 600_000, incMs: 0 },
+  { id: '15+10', label: '15 | 10', category: 'rapid', baseMs: 900_000, incMs: 10_000 },
+  { id: '30+0', label: '30 min', category: 'rapid', baseMs: 1_800_000, incMs: 0 }
+];
+
+export function getTimeControlById(id?: string | null): TimeControlOption {
+  if (!id) return TIME_CONTROLS[0];
+  return TIME_CONTROLS.find(tc => tc.id === id) || TIME_CONTROLS[0];
+}
 
 export type PieceColor = 'w' | 'b';
 export type PieceType = 'p' | 'n' | 'b' | 'r' | 'q' | 'k';
@@ -554,6 +587,31 @@ export function hasInsufficientMaterial(board: (Piece | null)[][]): boolean {
       const sqColor1 = (pieces[1].r + pieces[1].c) % 2;
       return sqColor0 === sqColor1;
     }
+  }
+  return false;
+}
+
+// Used for timeout adjudication: a player cannot win on time if they only have K, K+N, K+B, or same-color bishops
+export function hasOnlyInsufficientMaterialForSide(
+  board: (Piece | null)[][],
+  color: PieceColor
+): boolean {
+  const pieces: { type: PieceType; r: number; c: number }[] = [];
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      const p = board[r][c];
+      if (p && p.color === color && p.type !== 'k') {
+        pieces.push({ type: p.type, r, c });
+      }
+    }
+  }
+  if (pieces.length === 0) return true;
+  if (pieces.length === 1) {
+    return pieces[0].type === 'n' || pieces[0].type === 'b';
+  }
+  if (pieces.every(p => p.type === 'b')) {
+    const firstSqColor = (pieces[0].r + pieces[0].c) % 2;
+    return pieces.every(p => (p.r + p.c) % 2 === firstSqColor);
   }
   return false;
 }
@@ -1603,10 +1661,215 @@ function findMatchingBookCandidates(
   return candidates;
 }
 
+export interface AnalysisLine {
+  move: ChessMove;
+  san: string;
+  scoreCp: number; // Always from White's POV (+ = White advantage, - = Black advantage)
+  mateIn: number | null; // Positive = White mates in N moves, Negative = Black mates in N moves
+}
+
+export interface PositionAnalysis {
+  scoreCp: number; // White's POV
+  mateIn: number | null;
+  bestMove: ChessMove | null;
+  bestSan: string | null;
+  lines: AnalysisLine[];
+  depth: number;
+}
+
+export type MoveQuality =
+  | 'best'
+  | 'excellent'
+  | 'good'
+  | 'inaccuracy'
+  | 'mistake'
+  | 'blunder';
+
+function extractMatePlies(rawScoreFromMover: number): number | null {
+  if (rawScoreFromMover > 40000) {
+    return Math.max(1, 50000 - rawScoreFromMover);
+  }
+  if (rawScoreFromMover < -40000) {
+    return -Math.max(1, 50000 + rawScoreFromMover);
+  }
+  return null;
+}
+
+export function analyzePosition(
+  state: ChessState,
+  timeBudgetMs = 220
+): PositionAnalysis {
+  if (state.status === 'checkmate') {
+    const whiteWins = state.winner === 'w';
+    return {
+      scoreCp: whiteWins ? 50000 : -50000,
+      mateIn: whiteWins ? 0 : 0,
+      bestMove: null,
+      bestSan: null,
+      lines: [],
+      depth: 0
+    };
+  }
+
+  if (
+    state.status === 'stalemate' ||
+    state.status === 'draw_repetition' ||
+    state.status === 'draw_fifty_move' ||
+    state.status === 'draw_insufficient_material'
+  ) {
+    return {
+      scoreCp: 0,
+      mateIn: null,
+      bestMove: null,
+      bestSan: null,
+      lines: [],
+      depth: 0
+    };
+  }
+
+  const legalMoves = orderMoves(state.board, getLegalMoves(state));
+  if (legalMoves.length === 0) {
+    return {
+      scoreCp: 0,
+      mateIn: null,
+      bestMove: null,
+      bestSan: null,
+      lines: [],
+      depth: 0
+    };
+  }
+
+  const turn = state.turn;
+  const ctx: SearchContext = {
+    deadline: Date.now() + timeBudgetMs,
+    nodes: 0,
+    aborted: false,
+    aggressionBias: 0,
+    tt: new Map(),
+    killers: Array.from({ length: 16 }, () => [null, null] as [ChessMove | null, ChessMove | null]),
+    allowCheckExtension: true
+  };
+
+  let completedDepth = 0;
+  let lastOrdered = legalMoves;
+  let completedResults: { move: ChessMove; san: string; moverScore: number }[] = [];
+
+  for (let depth = 1; depth <= 4; depth++) {
+    ctx.aborted = false;
+    const depthResults: { move: ChessMove; san: string; moverScore: number }[] = [];
+
+    for (const move of lastOrdered) {
+      const { nextState, record } = applyMove(state, move);
+      let moverScore: number;
+
+      if (nextState.status === 'checkmate') {
+        moverScore = 49999; // Mate in 1 move (1 ply)
+      } else if (nextState.winner === 'draw') {
+        moverScore = 0;
+      } else {
+        moverScore = -negamax(
+          nextState.board,
+          nextState.turn,
+          nextState.castling,
+          nextState.enPassantTarget,
+          depth - 1,
+          1,
+          -Infinity,
+          Infinity,
+          3,
+          ctx
+        );
+      }
+
+      if (ctx.aborted) break;
+      depthResults.push({ move, san: record.san, moverScore });
+    }
+
+    if (!ctx.aborted && depthResults.length === lastOrdered.length) {
+      depthResults.sort((a, b) => b.moverScore - a.moverScore);
+      completedResults = depthResults;
+      lastOrdered = depthResults.map(r => r.move);
+      completedDepth = depth;
+      if (depthResults[0] && depthResults[0].moverScore > 45000 && depth >= 2) {
+        break;
+      }
+    } else {
+      break;
+    }
+  }
+
+  if (completedResults.length === 0) {
+    // Immediate depth-1 fallback if budget expired mid-loop
+    completedResults = legalMoves.map(move => {
+      const { nextState, record } = applyMove(state, move);
+      const rawWhite =
+        nextState.status === 'checkmate'
+          ? turn === 'w'
+            ? 49999
+            : -49999
+          : nextState.winner === 'draw'
+          ? 0
+          : evaluateBoard(nextState.board, 0);
+      const moverScore = turn === 'w' ? rawWhite : -rawWhite;
+      return { move, san: record.san, moverScore };
+    });
+    completedResults.sort((a, b) => b.moverScore - a.moverScore);
+    completedDepth = 1;
+  }
+
+  const lines: AnalysisLine[] = completedResults.slice(0, 3).map(item => {
+    const whiteCp = turn === 'w' ? item.moverScore : -item.moverScore;
+    const pliesFromMover = extractMatePlies(item.moverScore);
+    let mateIn: number | null = null;
+    if (pliesFromMover !== null) {
+      const fullMoves = Math.ceil(Math.abs(pliesFromMover) / 2);
+      const whiteMates =
+        (turn === 'w' && pliesFromMover > 0) ||
+        (turn === 'b' && pliesFromMover < 0);
+      mateIn = whiteMates ? fullMoves : -fullMoves;
+    }
+    return {
+      move: item.move,
+      san: item.san,
+      scoreCp: whiteCp,
+      mateIn
+    };
+  });
+
+  const top = lines[0];
+  return {
+    scoreCp: top ? top.scoreCp : 0,
+    mateIn: top ? top.mateIn : null,
+    bestMove: top ? top.move : null,
+    bestSan: top ? top.san : null,
+    lines,
+    depth: completedDepth
+  };
+}
+
+export function classifyMoveQuality(
+  bestCpForMover: number,
+  playedCpForMover: number,
+  isBestMove: boolean
+): MoveQuality {
+  if (isBestMove) return 'best';
+  const clampedBest = Math.max(-1500, Math.min(1500, bestCpForMover));
+  const clampedPlayed = Math.max(-1500, Math.min(1500, playedCpForMover));
+  const cpLoss = Math.max(0, clampedBest - clampedPlayed);
+
+  if (cpLoss <= 15) return 'best';
+  if (cpLoss <= 45) return 'excellent';
+  if (cpLoss <= 95) return 'good';
+  if (cpLoss <= 190) return 'inaccuracy';
+  if (cpLoss <= 360) return 'mistake';
+  return 'blunder';
+}
+
 export function chooseBotMove(
   state: ChessState,
   bot: ChessBot,
-  history: MoveRecord[] = []
+  history: MoveRecord[] = [],
+  remainingClockMs?: number
 ): BotMoveDecision {
   const legalMoves = getLegalMoves(state);
   if (legalMoves.length === 0) {
@@ -1641,7 +1904,12 @@ export function chooseBotMove(
     }
   }
 
-  const aiMove = chooseAIMove(state, bot.difficulty, bot.timeBudgetMs, {
+  const budgetMs =
+    typeof remainingClockMs === 'number' && remainingClockMs > 0
+      ? Math.min(bot.timeBudgetMs, Math.max(80, Math.floor(remainingClockMs * 0.12)))
+      : bot.timeBudgetMs;
+
+  const aiMove = chooseAIMove(state, bot.difficulty, budgetMs, {
     aggressionBias: bot.aggressionBias,
     jitter: bot.jitter,
     varietyWindow: bot.varietyWindow,

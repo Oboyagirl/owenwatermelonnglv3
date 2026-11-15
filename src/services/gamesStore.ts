@@ -68,8 +68,10 @@ export function useGamesStore() {
               key.includes('bloon') || 
               key.includes('btd') || 
               key.includes('duck') ||
+              key.includes('buckshot') ||
               src.includes('gameinclassroom') ||
               src.includes('freeonlinewebtools') ||
+              src.includes('ubghyper.github.io') ||
               src.includes('.swf') ||
               src.includes('flash-player') ||
               src.includes('homework/index.html')

@@ -67,6 +67,61 @@ service cloud.firestore {
         (!('updatedAt' in data) || data.updatedAt == null || (data.updatedAt is string && data.updatedAt.size() <= 64));
     }
 
+    function isValidRoomCode(code) {
+      return code is string && code.size() >= 4 && code.size() <= 8 && code.matches('^[A-Z0-9]+$');
+    }
+
+    function isValidChessRoom(data) {
+      return data.keys().hasAll([
+        'code', 'creatorAuthUid', 'status', 'timeControlId', 'baseMs', 'incMs',
+        'whiteAuthUid', 'whitePlayerId', 'whiteName', 'whiteElo',
+        'blackAuthUid', 'blackPlayerId', 'blackName', 'blackElo',
+        'moves', 'turn', 'whiteTimeMs', 'blackTimeMs', 'clockAnchorMs',
+        'resignedWinner', 'timeoutWinner', 'rematchVotes', 'createdAt', 'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'code', 'creatorAuthUid', 'status', 'timeControlId', 'baseMs', 'incMs',
+        'whiteAuthUid', 'whitePlayerId', 'whiteName', 'whiteElo',
+        'blackAuthUid', 'blackPlayerId', 'blackName', 'blackElo',
+        'moves', 'turn', 'whiteTimeMs', 'blackTimeMs', 'clockAnchorMs',
+        'resignedWinner', 'timeoutWinner', 'rematchVotes', 'createdAt', 'updatedAt'
+      ]) &&
+      isValidRoomCode(data.code) &&
+      data.creatorAuthUid is string && data.creatorAuthUid.size() > 0 && data.creatorAuthUid.size() <= 128 &&
+      data.status is string && data.status.size() > 0 && data.status.size() <= 16 && data.status in ['waiting', 'active', 'finished'] &&
+      data.timeControlId is string && data.timeControlId.size() > 0 && data.timeControlId.size() <= 16 &&
+      data.baseMs is int && data.baseMs >= 0 && data.baseMs <= 3600000 &&
+      data.incMs is int && data.incMs >= 0 && data.incMs <= 120000 &&
+      (data.whiteAuthUid == null || (data.whiteAuthUid is string && data.whiteAuthUid.size() > 0 && data.whiteAuthUid.size() <= 128)) &&
+      (data.whitePlayerId == null || (data.whitePlayerId is string && data.whitePlayerId.size() > 0 && data.whitePlayerId.size() <= 64)) &&
+      (data.whiteName == null || (data.whiteName is string && data.whiteName.size() > 0 && data.whiteName.size() <= 24)) &&
+      data.whiteElo is int && data.whiteElo >= 100 && data.whiteElo <= 4000 &&
+      (data.blackAuthUid == null || (data.blackAuthUid is string && data.blackAuthUid.size() > 0 && data.blackAuthUid.size() <= 128)) &&
+      (data.blackPlayerId == null || (data.blackPlayerId is string && data.blackPlayerId.size() > 0 && data.blackPlayerId.size() <= 64)) &&
+      (data.blackName == null || (data.blackName is string && data.blackName.size() > 0 && data.blackName.size() <= 24)) &&
+      data.blackElo is int && data.blackElo >= 100 && data.blackElo <= 4000 &&
+      data.moves is list && data.moves.size() <= 500 &&
+      (data.moves.size() == 0 || (data.moves[0] is string && data.moves[0].size() >= 7 && data.moves[0].size() <= 16)) &&
+      data.turn is string && data.turn.size() == 1 && data.turn in ['w', 'b'] &&
+      data.whiteTimeMs is int && data.whiteTimeMs >= 0 && data.whiteTimeMs <= 3600000 &&
+      data.blackTimeMs is int && data.blackTimeMs >= 0 && data.blackTimeMs <= 3600000 &&
+      (data.clockAnchorMs == null || (data.clockAnchorMs is int && data.clockAnchorMs > 0)) &&
+      (data.resignedWinner == null || (data.resignedWinner is string && data.resignedWinner.size() == 1 && data.resignedWinner in ['w', 'b'])) &&
+      (data.timeoutWinner == null || (data.timeoutWinner is string && data.timeoutWinner.size() >= 1 && data.timeoutWinner.size() <= 4 && data.timeoutWinner in ['w', 'b', 'draw'])) &&
+      data.rematchVotes is list && data.rematchVotes.size() <= 2 &&
+      (data.rematchVotes.size() == 0 || (data.rematchVotes[0] is string && data.rematchVotes[0].size() == 1 && data.rematchVotes[0] in ['w', 'b'])) &&
+      (data.rematchVotes.size() < 2 || (data.rematchVotes[1] is string && data.rematchVotes[1].size() == 1 && data.rematchVotes[1] in ['w', 'b'])) &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
+    }
+
+    function isChessRoomParticipant(data) {
+      return isSignedIn() && (
+        data.whiteAuthUid == request.auth.uid ||
+        data.blackAuthUid == request.auth.uid
+      );
+    }
+
     // User Profile Document
     match /users/{userId} {
       allow get: if isSignedIn() && request.auth.uid == userId;
@@ -89,6 +144,137 @@ service cloud.firestore {
         allow create, update: if isSignedIn() && request.auth.uid == userId && isValidId(gameId) && isValidGameStats(incoming());
         allow delete: if isSignedIn() && request.auth.uid == userId && isValidId(gameId);
       }
+    }
+
+    // Online Chess Rooms (addressed strictly by room code; no list queries permitted)
+    match /chessRooms/{roomCode} {
+      allow get: if isSignedIn() && isValidRoomCode(roomCode);
+
+      allow create: if isSignedIn() &&
+        isValidRoomCode(roomCode) &&
+        isValidChessRoom(incoming()) &&
+        incoming().code == roomCode &&
+        incoming().creatorAuthUid == request.auth.uid &&
+        incoming().status == 'waiting' &&
+        incoming().moves.size() == 0 &&
+        incoming().turn == 'w' &&
+        incoming().whiteTimeMs == incoming().baseMs &&
+        incoming().blackTimeMs == incoming().baseMs &&
+        incoming().clockAnchorMs == null &&
+        incoming().resignedWinner == null &&
+        incoming().timeoutWinner == null &&
+        incoming().rematchVotes.size() == 0 &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        (
+          (incoming().whiteAuthUid == request.auth.uid && incoming().blackAuthUid == null) ||
+          (incoming().blackAuthUid == request.auth.uid && incoming().whiteAuthUid == null)
+        );
+
+      allow update: if isSignedIn() &&
+        isValidRoomCode(roomCode) &&
+        isValidChessRoom(incoming()) &&
+        incoming().code == existing().code &&
+        incoming().creatorAuthUid == existing().creatorAuthUid &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().timeControlId == existing().timeControlId &&
+        incoming().baseMs == existing().baseMs &&
+        incoming().incMs == existing().incMs &&
+        incoming().updatedAt == request.time &&
+        (
+          // Action: Join Open Seat or Reconnect to Own Seat
+          (
+            existing().status != 'finished' &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'whiteAuthUid', 'whitePlayerId', 'whiteName',
+              'blackAuthUid', 'blackPlayerId', 'blackName',
+              'status', 'updatedAt'
+            ]) &&
+            (
+              (existing().whiteAuthUid == null && incoming().whiteAuthUid == request.auth.uid && incoming().blackAuthUid == existing().blackAuthUid) ||
+              (existing().blackAuthUid == null && incoming().blackAuthUid == request.auth.uid && incoming().whiteAuthUid == existing().whiteAuthUid) ||
+              (existing().whiteAuthUid == request.auth.uid && incoming().whiteAuthUid == request.auth.uid && incoming().blackAuthUid == existing().blackAuthUid) ||
+              (existing().blackAuthUid == request.auth.uid && incoming().blackAuthUid == request.auth.uid && incoming().whiteAuthUid == existing().whiteAuthUid)
+            )
+          ) ||
+          // Action: Vacate Own Seat Before First Move
+          (
+            existing().status != 'finished' &&
+            existing().moves.size() == 0 &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'whiteAuthUid', 'whitePlayerId', 'whiteName',
+              'blackAuthUid', 'blackPlayerId', 'blackName',
+              'status', 'updatedAt'
+            ]) &&
+            (
+              (existing().whiteAuthUid == request.auth.uid && incoming().whiteAuthUid == null && incoming().blackAuthUid == existing().blackAuthUid) ||
+              (existing().blackAuthUid == request.auth.uid && incoming().blackAuthUid == null && incoming().whiteAuthUid == existing().whiteAuthUid)
+            )
+          ) ||
+          // Action: Active Turn Player Makes Exactly One Move
+          (
+            existing().status != 'finished' &&
+            (
+              (existing().turn == 'w' && existing().whiteAuthUid == request.auth.uid) ||
+              (existing().turn == 'b' && existing().blackAuthUid == request.auth.uid)
+            ) &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'moves', 'turn', 'status', 'whiteTimeMs', 'blackTimeMs', 'clockAnchorMs', 'rematchVotes', 'updatedAt'
+            ]) &&
+            incoming().moves.size() == existing().moves.size() + 1 &&
+            incoming().moves[existing().moves.size()] is string &&
+            incoming().moves[existing().moves.size()].size() >= 7 &&
+            incoming().moves[existing().moves.size()].size() <= 16 &&
+            incoming().turn != existing().turn
+          ) ||
+          // Action: Participant Resigns or Claims Clock Timeout
+          (
+            existing().status != 'finished' &&
+            isChessRoomParticipant(existing()) &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'status', 'resignedWinner', 'timeoutWinner', 'clockAnchorMs', 'whiteTimeMs', 'blackTimeMs', 'updatedAt'
+            ]) &&
+            incoming().status == 'finished' &&
+            incoming().clockAnchorMs == null &&
+            (incoming().resignedWinner != null || incoming().timeoutWinner != null)
+          ) ||
+          // Action: Seated Participant Votes for Rematch (Terminal State Only)
+          (
+            existing().status == 'finished' &&
+            isChessRoomParticipant(existing()) &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['rematchVotes', 'updatedAt']) &&
+            incoming().rematchVotes.size() == existing().rematchVotes.size() + 1
+          ) ||
+          // Action: Seated Participant Executes Rematch Reset (Terminal State Only)
+          (
+            existing().status == 'finished' &&
+            isChessRoomParticipant(existing()) &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'whiteAuthUid', 'whitePlayerId', 'whiteName',
+              'blackAuthUid', 'blackPlayerId', 'blackName',
+              'moves', 'turn', 'status', 'whiteTimeMs', 'blackTimeMs',
+              'clockAnchorMs', 'resignedWinner', 'timeoutWinner', 'rematchVotes', 'updatedAt'
+            ]) &&
+            incoming().moves.size() == 0 &&
+            incoming().turn == 'w' &&
+            incoming().status in ['waiting', 'active'] &&
+            incoming().resignedWinner == null &&
+            incoming().timeoutWinner == null &&
+            incoming().rematchVotes.size() == 0 &&
+            incoming().whiteTimeMs == existing().baseMs &&
+            incoming().blackTimeMs == existing().baseMs &&
+            incoming().clockAnchorMs == null &&
+            (
+              (incoming().whiteAuthUid == existing().blackAuthUid && incoming().blackAuthUid == existing().whiteAuthUid) ||
+              (incoming().whiteAuthUid == existing().whiteAuthUid && incoming().blackAuthUid == existing().blackAuthUid)
+            )
+          )
+        );
+
+      allow delete: if isSignedIn() &&
+        isValidRoomCode(roomCode) &&
+        existing().creatorAuthUid == request.auth.uid &&
+        existing().moves.size() == 0;
     }
   }
 }
