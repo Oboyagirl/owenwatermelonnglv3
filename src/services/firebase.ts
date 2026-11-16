@@ -37,7 +37,7 @@ function createFirestoreInstance(): Firestore {
   try {
     return initializeFirestore(
       app,
-      { experimentalAutoDetectLongPolling: true },
+      { experimentalForceLongPolling: true },
       firebaseConfig.firestoreDatabaseId
     );
   } catch {
@@ -133,12 +133,17 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
 
 // CRITICAL CONSTRAINT: Test connection on app startup
 export async function testConnection(): Promise<boolean> {
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    return false;
+  }
   try {
     await getDocFromServer(doc(db, 'test', 'connection'));
     return true;
   } catch (error) {
-    if (error instanceof Error && error.message.includes('the client is offline')) {
-      console.warn("Firestore client is offline or network restricted.");
+    const code = (error as { code?: string } | null)?.code;
+    const message = error instanceof Error ? error.message : String(error || '');
+    if (code === 'unavailable' || message.includes('the client is offline')) {
+      console.warn('Firestore client is temporarily offline or network restricted.');
       return false;
     }
     // Permissions error or non-existent doc is expected for 'test/connection'
@@ -146,9 +151,18 @@ export async function testConnection(): Promise<boolean> {
   }
 }
 
-// Auto-run connection check quietly after initial app boot
+// Auto-run connection check quietly after auth/network settle on initial app boot
 if (typeof window !== 'undefined') {
-  setTimeout(() => {
-    testConnection().catch(() => {});
-  }, 200);
+  const scheduleConnectionCheck = () => {
+    void waitForAuthReady().then(() => {
+      setTimeout(() => {
+        testConnection().catch(() => {});
+      }, 300);
+    });
+  };
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    window.addEventListener('online', scheduleConnectionCheck, { once: true });
+  } else {
+    scheduleConnectionCheck();
+  }
 }
