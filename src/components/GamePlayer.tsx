@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { 
   Maximize2, 
   Minimize2, 
@@ -28,7 +28,8 @@ import {
   Volume2,
   VolumeX,
   Shuffle,
-  Mic2
+  Mic2,
+  X
 } from 'lucide-react';
 import { Game } from '../types/game';
 import { openAboutBlankGame, resolveAssetUrl } from '../services/gamesStore';
@@ -37,10 +38,10 @@ import { CloudSaveModal } from './CloudSaveModal';
 import { useAuth } from '../context/AuthContext';
 import { useMusic } from '../context/MusicContext';
 import { 
-  captureUniversalGameState, 
+  captureUniversalGameStateDetailed, 
   restoreUniversalGameState, 
   formatExactTimestamp, 
-  formatTimeAgo 
+  GameSave 
 } from '../services/cloudSaveService';
 import { SyncedLyricsView } from './SyncedLyricsView';
 
@@ -80,6 +81,7 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
   } = useMusic();
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const getContentWindow = useCallback(() => iframeRef.current?.contentWindow || null, []);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isTheater, setIsTheater] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -105,33 +107,151 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
   const [showLyrics, setShowLyrics] = useState(false);
   const [isQuickSaving, setIsQuickSaving] = useState(false);
   const [quickSaved, setQuickSaved] = useState(false);
-  const [quickSavedTime, setQuickSavedTime] = useState<string | null>(null);
+  const [quickSavedMsg, setQuickSavedMsg] = useState<string | null>(null);
+  const [saveWarningMsg, setSaveWarningMsg] = useState<string | null>(null);
+  const [saveWarningBlocked, setSaveWarningBlocked] = useState(false);
   const [isRestoringLatest, setIsRestoringLatest] = useState(false);
+  const [isApplyingRestore, setIsApplyingRestore] = useState(false);
   const [restoreNotification, setRestoreNotification] = useState<string | null>(null);
-  const { user, profile, deviceLabel, saveCurrentGame, getSavesForGame } = useAuth();
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('owen_autosave_enabled') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const { deviceLabel, saveCurrentGameWithStatus, getSavesForGame } = useAuth();
   const gameSaves = (typeof getSavesForGame === 'function' && game?.id ? getSavesForGame(game.id) : []) || [];
   const latestSave = gameSaves.length > 0 ? gameSaves[0] : null;
 
-  const handleQuickSave = async () => {
-    if (typeof saveCurrentGame !== 'function' || !game?.id) return;
-    setIsQuickSaving(true);
+  const canDirectInjectEmulatorState = (rawSaveData: string): boolean => {
     try {
+      const parsed = JSON.parse(rawSaveData);
+      if (!parsed?.emulator?.stateBase64) return false;
+      const win = iframeRef.current?.contentWindow as any;
+      return Boolean(win?.EJS_emulator?.gameManager?.loadState);
+    } catch {
+      return false;
+    }
+  };
+
+  const applyCheckpointSafely = async (save: GameSave): Promise<boolean> => {
+    if (!save?.saveData || !game?.id) return false;
+    const exactTime = formatExactTimestamp(save.updatedAt || save.createdAt);
+
+    try {
+      const parsed = JSON.parse(save.saveData);
+      const hasStorageKeys =
+        Boolean(parsed?.storage?.localStorage && Object.keys(parsed.storage.localStorage).length > 0) ||
+        Boolean(parsed?.localStorageSnapshot && Object.keys(parsed.localStorageSnapshot).length > 0) ||
+        Boolean(parsed?.storage?.sessionStorage && Object.keys(parsed.storage.sessionStorage).length > 0) ||
+        (Array.isArray(parsed?.indexedDB) && parsed.indexedDB.length > 0) ||
+        Boolean(parsed?.emulator);
+
+      if (!hasStorageKeys && (save.saveType === 'bookmark' || parsed?.bookmarkNote || parsed?.level || typeof parsed?.score === 'number')) {
+        const parts: string[] = [];
+        if (parsed?.level || save.level) parts.push(`Level: ${parsed?.level || save.level}`);
+        if (typeof parsed?.score === 'number' || typeof save.score === 'number') {
+          parts.push(`Score: ${(parsed?.score ?? save.score)?.toLocaleString()}`);
+        }
+        const detailStr = parts.length > 0 ? ` (${parts.join(' · ')})` : '';
+        setRestoreNotification(`Bookmark loaded${detailStr} — saved ${exactTime}`);
+        window.setTimeout(() => setRestoreNotification(null), 5000);
+        return true;
+      }
+    } catch {}
+
+    if (canDirectInjectEmulatorState(save.saveData)) {
       const contentWindow = iframeRef.current?.contentWindow || null;
-      const dataToSave = await captureUniversalGameState(game.id, contentWindow);
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
-      
-      await saveCurrentGame(game.id, 'slot1', {
-        title: `Quick Save at ${timeStr}`,
-        saveData: dataToSave,
-        saveType: 'universal',
-        deviceLabel
-      });
-      setQuickSaved(true);
-      setQuickSavedTime(timeStr);
-      setTimeout(() => setQuickSaved(false), 4000);
+      const ok = await restoreUniversalGameState(game.id, save.saveData, contentWindow);
+      if (ok) {
+        setRestoreNotification(`Restored exact state (${exactTime}) into running emulator!`);
+        window.setTimeout(() => setRestoreNotification(null), 4000);
+      }
+      return ok;
+    }
+
+    // Unmount iframe FIRST so old game scripts / beforeunload cannot overwrite storage during reload
+    setIsApplyingRestore(true);
+    await new Promise(resolve => window.setTimeout(resolve, 140));
+    const ok = await restoreUniversalGameState(game.id, save.saveData, null);
+    setKeyCounter(prev => prev + 1);
+    setIsApplyingRestore(false);
+
+    if (ok) {
+      setRestoreNotification(`Restored checkpoint (${exactTime})! Game reloaded with saved progress.`);
+      window.setTimeout(() => setRestoreNotification(null), 4000);
+    } else {
+      setSaveWarningBlocked(false);
+      setSaveWarningMsg('This checkpoint had no restorable game storage data.');
+      window.setTimeout(() => setSaveWarningMsg(null), 4500);
+    }
+    return ok;
+  };
+
+  const handleQuickSave = async () => {
+    if (typeof saveCurrentGameWithStatus !== 'function' || !game?.id) return;
+    setIsQuickSaving(true);
+    setSaveWarningMsg(null);
+    setSaveWarningBlocked(false);
+    try {
+      const saveFlow = async () => {
+        const contentWindow = iframeRef.current?.contentWindow || null;
+        const capture = await captureUniversalGameStateDetailed(game.id, contentWindow);
+
+        if (capture.crossOriginBlocked) {
+          setSaveWarningBlocked(true);
+          setSaveWarningMsg(
+            sameOriginMirror
+              ? 'External game blocks auto-capture. Switch to Save Mirror or save a Bookmark/Code.'
+              : 'External game blocks auto-capture. Save a Progress Bookmark or Game Code!'
+          );
+          window.setTimeout(() => {
+            setSaveWarningMsg(null);
+            setSaveWarningBlocked(false);
+          }, 9000);
+          return;
+        }
+
+        if (capture.capturedKeysCount === 0) {
+          setSaveWarningBlocked(false);
+          setSaveWarningMsg('No save data found yet — play further or use Checkpoints → Bookmark / Save Code.');
+          window.setTimeout(() => setSaveWarningMsg(null), 5000);
+          return;
+        }
+
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
+
+        const result = await saveCurrentGameWithStatus(game.id, 'slot1', {
+          title: `Quick Save at ${timeStr}`,
+          saveData: capture.saveData,
+          saveType: 'universal',
+          deviceLabel
+        });
+        setQuickSaved(true);
+        setQuickSavedMsg(
+          `Saved at ${timeStr} (${result.cloudSynced ? 'Cloud + Device' : 'Device Vault'})`
+        );
+        window.setTimeout(() => {
+          setQuickSaved(false);
+          setQuickSavedMsg(null);
+        }, 4000);
+      };
+
+      const outcome = await Promise.race([
+        saveFlow().then(() => 'done' as const),
+        new Promise<'timeout'>((resolve) => window.setTimeout(() => resolve('timeout'), 12000))
+      ]);
+
+      if (outcome === 'timeout') {
+        setSaveWarningMsg('Save timed out. Check your connection or open Checkpoints → Save Code.');
+        window.setTimeout(() => setSaveWarningMsg(null), 5000);
+      }
     } catch (e) {
-      console.error("Quick save error:", e);
+      console.warn("Quick save error:", e);
+      setSaveWarningMsg('Could not sync to cloud. Saved locally or open Checkpoints for details.');
+      window.setTimeout(() => setSaveWarningMsg(null), 4500);
     } finally {
       setIsQuickSaving(false);
     }
@@ -141,42 +261,108 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
     if (!latestSave || isRestoringLatest) return;
     setIsRestoringLatest(true);
     try {
-      const contentWindow = iframeRef.current?.contentWindow || null;
-      await restoreUniversalGameState(game.id, latestSave.saveData, contentWindow);
-      const exactTime = formatExactTimestamp(latestSave.updatedAt || latestSave.createdAt);
-
-      let hasLiveEmulatorState = false;
-      try {
-        const parsed = JSON.parse(latestSave.saveData);
-        if (parsed?.emulator?.stateBase64) {
-          hasLiveEmulatorState = true;
-        }
-      } catch (e) {}
-
-      if (hasLiveEmulatorState) {
-        setRestoreNotification(`Restored exact point in time (${exactTime})! State loaded into game.`);
-        setIsRestoringLatest(false);
-        setTimeout(() => setRestoreNotification(null), 3500);
-      } else {
-        setRestoreNotification(`Restored checkpoint from ${exactTime}! Reloading game...`);
-        setTimeout(() => {
-          handleReload();
-          setIsRestoringLatest(false);
-          setTimeout(() => setRestoreNotification(null), 3500);
-        }, 400);
-      }
+      await applyCheckpointSafely(latestSave);
     } catch (e) {
       console.error("Restore latest checkpoint error:", e);
+    } finally {
       setIsRestoringLatest(false);
     }
   };
+
+  // Sync auto-save preference changes immediately from CloudSaveModal / other tabs
+  useEffect(() => {
+    const syncAutoSavePref = () => {
+      try {
+        setAutoSaveEnabled(localStorage.getItem('owen_autosave_enabled') === 'true');
+      } catch {}
+    };
+    window.addEventListener('owen-autosave-changed', syncAutoSavePref);
+    window.addEventListener('storage', syncAutoSavePref);
+    return () => {
+      window.removeEventListener('owen-autosave-changed', syncAutoSavePref);
+      window.removeEventListener('storage', syncAutoSavePref);
+    };
+  }, []);
+
+  // Real 3-minute automatic checkpoint loop when enabled
+  useEffect(() => {
+    if (!autoSaveEnabled || !game?.id || isApplyingRestore) return;
+    const interval = window.setInterval(async () => {
+      try {
+        const contentWindow = iframeRef.current?.contentWindow || null;
+        const capture = await captureUniversalGameStateDetailed(game.id, contentWindow);
+        if (capture.crossOriginBlocked || capture.capturedKeysCount === 0) return;
+
+        const nowStr = new Date().toLocaleTimeString([], {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        });
+        const result = await saveCurrentGameWithStatus(game.id, 'auto', {
+          title: `Auto-Save (${nowStr})`,
+          saveData: capture.saveData,
+          saveType: 'universal',
+          deviceLabel
+        });
+        setQuickSavedMsg(
+          `Auto-saved at ${nowStr} (${result.cloudSynced ? 'Cloud + Device' : 'Device'})`
+        );
+        window.setTimeout(() => setQuickSavedMsg(null), 3500);
+      } catch (err) {
+        console.warn('Auto-save skipped:', err);
+      }
+    }, 3 * 60 * 1000);
+
+    return () => window.clearInterval(interval);
+  }, [autoSaveEnabled, game?.id, isApplyingRestore, deviceLabel, saveCurrentGameWithStatus]);
   const [iframeHtmlInput, setIframeHtmlInput] = useState(defaultIframeCode);
   const [activeIframeSrc, setActiveIframeSrc] = useState(safeSrc);
   const [activeCustomHtml, setActiveCustomHtml] = useState<string | undefined>(game?.customHtml);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
-  // Alternative working mirrors support
-  const mirrorsList = Array.isArray(game?.mirrors) && game.mirrors.length > 0 ? game.mirrors : [safeSrc];
+  const isGithubPages =
+    typeof window !== 'undefined' &&
+    Boolean(window.location?.hostname?.endsWith('github.io') || window.location?.protocol === 'file:');
+
+  const isSameOriginMirrorUrl = useCallback((candidateUrl: string): boolean => {
+    if (!candidateUrl || typeof window === 'undefined') return false;
+    if (candidateUrl.startsWith('/api/proxy/game')) return !isGithubPages;
+    if (!candidateUrl.startsWith('http://') && !candidateUrl.startsWith('https://')) {
+      const resolved = resolveAssetUrl(candidateUrl);
+      if (!resolved.startsWith('http://') && !resolved.startsWith('https://')) {
+        return true;
+      }
+      return resolved.startsWith(window.location.origin);
+    }
+    return candidateUrl.startsWith(window.location.origin);
+  }, [isGithubPages]);
+
+  // Alternative working mirrors support (+ automatic same-origin proxy mirror when Express server is available)
+  const mirrorsList = (() => {
+    const raw = Array.isArray(game?.mirrors) && game.mirrors.length > 0 ? game.mirrors : [safeSrc];
+    const deduped = Array.from(new Set([safeSrc, ...raw].filter(Boolean)));
+    if (
+      !isGithubPages &&
+      safeSrc &&
+      (safeSrc.startsWith('http://') || safeSrc.startsWith('https://'))
+    ) {
+      const proxyUrl = `/api/proxy/game?url=${encodeURIComponent(safeSrc)}`;
+      if (!deduped.includes(proxyUrl)) {
+        deduped.push(proxyUrl);
+      }
+    }
+    return deduped;
+  })();
+
+  const sameOriginMirror =
+    mirrorsList.find((m) => m !== activeIframeSrc && isSameOriginMirrorUrl(m)) ||
+    (!isGithubPages &&
+    activeIframeSrc &&
+    (activeIframeSrc.startsWith('http://') || activeIframeSrc.startsWith('https://')) &&
+    !activeIframeSrc.startsWith(window.location.origin)
+      ? `/api/proxy/game?url=${encodeURIComponent(activeIframeSrc)}`
+      : null);
+
   const [currentMirrorIndex, setCurrentMirrorIndex] = useState(0);
 
   const isLocalGame = !activeIframeSrc || (!activeIframeSrc.startsWith('http://') && !activeIframeSrc.startsWith('https://') && !activeIframeSrc.startsWith('data:') && !activeIframeSrc.startsWith('blob:'));
@@ -211,6 +397,8 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
     setShowIframeEditor(false);
     setSavedSuccess(false);
     setCurrentMirrorIndex(0);
+    setSaveWarningMsg(null);
+    setSaveWarningBlocked(false);
   }, [game?.id, game?.iframeSrc, game?.iframeCode, game?.customHtml]);
 
   const handleNextMirror = () => {
@@ -225,6 +413,20 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
     setActiveCustomHtml(undefined);
     setIframeHtmlInput(`<iframe class="game-iframe" id="game-area" title="${safeTitle}" src="${nextSrc}" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`);
     setKeyCounter(prev => prev + 1);
+  };
+
+  const handleSwitchToSameOriginMirror = () => {
+    if (!sameOriginMirror) return;
+    const idx = mirrorsList.indexOf(sameOriginMirror);
+    if (idx >= 0) setCurrentMirrorIndex(idx);
+    setActiveIframeSrc(sameOriginMirror);
+    setActiveCustomHtml(undefined);
+    setIframeHtmlInput(`<iframe class="game-iframe" id="game-area" title="${safeTitle}" src="${sameOriginMirror}" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`);
+    setSaveWarningMsg(null);
+    setSaveWarningBlocked(false);
+    setKeyCounter(prev => prev + 1);
+    setRestoreNotification('Switched to Save-Capable Mirror! Auto-capture saves are now unlocked.');
+    window.setTimeout(() => setRestoreNotification(null), 5000);
   };
 
   useEffect(() => {
@@ -454,7 +656,7 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
             {/* 1-Click Quick Save Button */}
             <button
               onClick={handleQuickSave}
-              disabled={isQuickSaving}
+              disabled={isQuickSaving || isApplyingRestore}
               className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer border shadow-sm active:scale-95"
               style={{
                 backgroundColor: quickSaved ? 'rgba(16, 185, 129, 0.25)' : activeTheme.bgCard,
@@ -466,12 +668,12 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
               {quickSaved ? (
                 <>
                   <Check className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Saved ({quickSavedTime})</span>
+                  <span>Saved!</span>
                 </>
               ) : (
                 <>
                   <Zap className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="hidden sm:inline">Quick Save</span>
+                  <span className="hidden sm:inline">{isQuickSaving ? 'Saving...' : 'Quick Save'}</span>
                 </>
               )}
             </button>
@@ -613,30 +815,80 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
               <span>{restoreNotification}</span>
             </div>
           )}
-          {quickSaved && (
+          {quickSavedMsg && (
             <div className="absolute top-4 z-30 px-4 py-2 rounded-xl bg-emerald-950/90 border border-emerald-400 text-emerald-200 text-xs font-bold shadow-2xl backdrop-blur-md flex items-center gap-2 animate-fadeIn">
               <Check className="w-4 h-4 text-emerald-400" />
-              <span>Checkpoint saved at {quickSavedTime}! Easy to go back anytime.</span>
+              <span>{quickSavedMsg}</span>
+            </div>
+          )}
+          {saveWarningMsg && (
+            <div className="absolute top-4 z-30 px-4 py-2.5 rounded-xl bg-amber-950/95 border border-amber-400 text-amber-100 text-xs font-bold shadow-2xl backdrop-blur-md flex flex-col sm:flex-row items-center gap-2.5 animate-fadeIn max-w-xl">
+              <div className="flex items-center gap-2">
+                <Info className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>{saveWarningMsg}</span>
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                {saveWarningBlocked && sameOriginMirror && (
+                  <button
+                    type="button"
+                    onClick={handleSwitchToSameOriginMirror}
+                    className="px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-[11px] transition-colors cursor-pointer"
+                  >
+                    Switch to Save Mirror
+                  </button>
+                )}
+                {saveWarningBlocked && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSaveWarningMsg(null);
+                      setSaveWarningBlocked(false);
+                      setShowCloudSaveModal(true);
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-amber-400/20 hover:bg-amber-400/30 border border-amber-400/40 text-amber-200 font-bold text-[11px] transition-colors cursor-pointer"
+                  >
+                    Save Bookmark / Code
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSaveWarningMsg(null);
+                    setSaveWarningBlocked(false);
+                  }}
+                  className="p-1 rounded-md text-amber-300/70 hover:text-white cursor-pointer"
+                  title="Dismiss"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
           )}
 
-          <iframe
-            key={`${game.id}-${keyCounter}`}
-            ref={iframeRef}
-            id="game-area"
-            className={`border-0 block game-iframe transition-all duration-200 ${
-              viewRatio === '16:9'
-                ? 'w-full aspect-video max-h-full max-w-full m-auto'
-                : viewRatio === 'fit'
-                ? 'w-full h-full object-contain max-h-full max-w-full'
-                : 'w-full h-full'
-            }`}
-            title={game.title}
-            src={resolvedIframeSrc}
-            srcDoc={activeCustomHtml || undefined}
-            allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope"
-            allowFullScreen
-          />
+          {isApplyingRestore ? (
+            <div className="flex flex-col items-center justify-center gap-2 text-slate-300 text-xs font-semibold">
+              <RotateCcw className="w-6 h-6 animate-spin text-sky-400" />
+              <span>Applying saved checkpoint...</span>
+            </div>
+          ) : (
+            <iframe
+              key={`${game.id}-${keyCounter}`}
+              ref={iframeRef}
+              id="game-area"
+              className={`border-0 block game-iframe transition-all duration-200 ${
+                viewRatio === '16:9'
+                  ? 'w-full aspect-video max-h-full max-w-full m-auto'
+                  : viewRatio === 'fit'
+                  ? 'w-full h-full object-contain max-h-full max-w-full'
+                  : 'w-full h-full'
+              }`}
+              title={game.title}
+              src={resolvedIframeSrc}
+              srcDoc={activeCustomHtml || undefined}
+              allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope"
+              allowFullScreen
+            />
+          )}
         </div>
       </div>
 
@@ -919,8 +1171,11 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
         isOpen={showCloudSaveModal}
         onClose={() => setShowCloudSaveModal(false)}
         onReloadGame={handleReload}
+        onRestoreSave={applyCheckpointSafely}
         theme={activeTheme}
-        contentWindow={iframeRef.current?.contentWindow || null}
+        getContentWindow={getContentWindow}
+        sameOriginMirror={sameOriginMirror}
+        onSwitchToSameOriginMirror={handleSwitchToSameOriginMirror}
       />
 
       {/* Apple Music-Style Synced Lyrics Full-Screen Overlay */}

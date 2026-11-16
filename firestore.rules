@@ -122,6 +122,93 @@ service cloud.firestore {
       );
     }
 
+    function isValidFriendCode(code) {
+      return code is string && code.size() >= 4 && code.size() <= 16 && code.matches('^[A-Z0-9\\-]+$');
+    }
+
+    function isValidChatProfile(data) {
+      return data.keys().hasAll([
+          'userId', 'displayName', 'friendCode', 'avatarId', 'discoverable', 'isOnline', 'lastSeenAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'userId', 'displayName', 'friendCode', 'avatarId', 'discoverable', 'isOnline', 'lastSeenAt', 'updatedAt'
+        ]) &&
+        data.userId is string && data.userId == request.auth.uid && isValidId(data.userId) &&
+        data.displayName is string && data.displayName.size() > 0 && data.displayName.size() <= 64 &&
+        isValidFriendCode(data.friendCode) &&
+        data.avatarId is string && data.avatarId.size() > 0 && data.avatarId.size() <= 64 &&
+        data.discoverable is bool &&
+        data.isOnline is bool &&
+        data.lastSeenAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidUserContact(data) {
+      return data.keys().hasAll(['contactUid', 'displayName', 'friendCode', 'avatarId', 'addedAt']) &&
+        data.keys().hasOnly(['contactUid', 'displayName', 'friendCode', 'avatarId', 'nickname', 'addedAt']) &&
+        data.contactUid is string && isValidId(data.contactUid) &&
+        data.displayName is string && data.displayName.size() > 0 && data.displayName.size() <= 64 &&
+        isValidFriendCode(data.friendCode) &&
+        data.avatarId is string && data.avatarId.size() > 0 && data.avatarId.size() <= 64 &&
+        (!('nickname' in data) || data.nickname == null || (data.nickname is string && data.nickname.size() <= 64)) &&
+        data.addedAt is timestamp;
+    }
+
+    function isValidChatThread(data) {
+      return data.keys().hasAll([
+          'threadId', 'userAUid', 'userBUid', 'participantUids',
+          'userAName', 'userBName', 'userAAvatarId', 'userBAvatarId',
+          'lastMessageText', 'lastMessageSenderUid', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'threadId', 'userAUid', 'userBUid', 'participantUids',
+          'userAName', 'userBName', 'userAAvatarId', 'userBAvatarId',
+          'lastMessageText', 'lastMessageSenderUid', 'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.threadId) &&
+        data.userAUid is string && isValidId(data.userAUid) &&
+        data.userBUid is string && isValidId(data.userBUid) &&
+        data.userAUid != data.userBUid &&
+        data.threadId == (data.userAUid + '_' + data.userBUid) &&
+        data.participantUids is list && data.participantUids.size() == 2 &&
+        data.participantUids[0] is string && data.participantUids[0] == data.userAUid &&
+        data.participantUids[1] is string && data.participantUids[1] == data.userBUid &&
+        data.userAName is string && data.userAName.size() > 0 && data.userAName.size() <= 64 &&
+        data.userBName is string && data.userBName.size() > 0 && data.userBName.size() <= 64 &&
+        data.userAAvatarId is string && data.userAAvatarId.size() > 0 && data.userAAvatarId.size() <= 64 &&
+        data.userBAvatarId is string && data.userBAvatarId.size() > 0 && data.userBAvatarId.size() <= 64 &&
+        data.lastMessageText is string && data.lastMessageText.size() <= 300 &&
+        (data.lastMessageSenderUid == null || (
+          data.lastMessageSenderUid is string &&
+          data.lastMessageSenderUid.size() > 0 &&
+          data.lastMessageSenderUid.size() <= 128 &&
+          data.lastMessageSenderUid in data.participantUids
+        )) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidChatMessage(data) {
+      return data.keys().hasAll([
+          'id', 'threadId', 'senderUid', 'senderName', 'senderAvatarId', 'participantUids', 'text', 'createdAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'threadId', 'senderUid', 'senderName', 'senderAvatarId', 'participantUids', 'text', 'createdAt'
+        ]) &&
+        isValidId(data.id) &&
+        isValidId(data.threadId) &&
+        data.senderUid is string && data.senderUid == request.auth.uid && isValidId(data.senderUid) &&
+        data.senderName is string && data.senderName.size() > 0 && data.senderName.size() <= 64 &&
+        data.senderAvatarId is string && data.senderAvatarId.size() > 0 && data.senderAvatarId.size() <= 64 &&
+        data.participantUids is list && data.participantUids.size() == 2 &&
+        data.participantUids[0] is string && isValidId(data.participantUids[0]) &&
+        data.participantUids[1] is string && isValidId(data.participantUids[1]) &&
+        data.participantUids[0] != data.participantUids[1] &&
+        request.auth.uid in data.participantUids &&
+        data.text is string && data.text.size() > 0 && data.text.size() <= 1000 &&
+        data.createdAt is timestamp;
+    }
+
     // User Profile Document
     match /users/{userId} {
       allow get: if isSignedIn() && request.auth.uid == userId;
@@ -143,6 +230,108 @@ service cloud.firestore {
         allow list: if isSignedIn() && request.auth.uid == userId;
         allow create, update: if isSignedIn() && request.auth.uid == userId && isValidId(gameId) && isValidGameStats(incoming());
         allow delete: if isSignedIn() && request.auth.uid == userId && isValidId(gameId);
+      }
+
+      // Added Friends / Chat Contacts Subcollection
+      match /contacts/{contactUid} {
+        allow get: if isSignedIn() && request.auth.uid == userId && isValidId(contactUid);
+        allow list: if isSignedIn() && request.auth.uid == userId;
+        allow create: if isSignedIn() &&
+          request.auth.uid == userId &&
+          isValidId(contactUid) &&
+          contactUid != request.auth.uid &&
+          isValidUserContact(incoming()) &&
+          incoming().contactUid == contactUid &&
+          incoming().addedAt == request.time &&
+          exists(/databases/$(database)/documents/chatProfiles/$(contactUid));
+        allow update: if isSignedIn() &&
+          request.auth.uid == userId &&
+          isValidId(contactUid) &&
+          isValidUserContact(incoming()) &&
+          incoming().contactUid == existing().contactUid &&
+          incoming().addedAt == existing().addedAt &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'friendCode', 'avatarId', 'nickname']);
+        allow delete: if isSignedIn() && request.auth.uid == userId && isValidId(contactUid);
+      }
+    }
+
+    // Public Non-PII Chat Directory Profiles (Discoverable Firebase Players)
+    match /chatProfiles/{userId} {
+      allow get: if isSignedIn() && isValidId(userId) && (userId == request.auth.uid || existing().discoverable == true);
+      allow list: if isSignedIn() && resource.data.discoverable == true;
+      allow create: if isSignedIn() &&
+        isValidId(userId) &&
+        request.auth.uid == userId &&
+        isValidChatProfile(incoming()) &&
+        incoming().lastSeenAt == request.time &&
+        incoming().updatedAt == request.time;
+      allow update: if isSignedIn() &&
+        isValidId(userId) &&
+        request.auth.uid == userId &&
+        isValidChatProfile(incoming()) &&
+        incoming().userId == existing().userId &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'displayName', 'friendCode', 'avatarId', 'discoverable', 'isOnline', 'lastSeenAt', 'updatedAt'
+        ]) &&
+        incoming().lastSeenAt == request.time &&
+        incoming().updatedAt == request.time;
+      allow delete: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+    }
+
+    // Direct Message Chat Threads
+    match /chatThreads/{threadId} {
+      allow get: if isSignedIn() && isValidId(threadId) && (
+        existing().userAUid == request.auth.uid ||
+        existing().userBUid == request.auth.uid
+      );
+      allow list: if isSignedIn() && request.auth.uid in resource.data.participantUids;
+      allow create: if isSignedIn() &&
+        isValidId(threadId) &&
+        isValidChatThread(incoming()) &&
+        incoming().threadId == threadId &&
+        (incoming().userAUid == request.auth.uid || incoming().userBUid == request.auth.uid) &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        exists(/databases/$(database)/documents/chatProfiles/$(incoming().userAUid)) &&
+        exists(/databases/$(database)/documents/chatProfiles/$(incoming().userBUid));
+      allow update: if isSignedIn() &&
+        isValidId(threadId) &&
+        isValidChatThread(incoming()) &&
+        (existing().userAUid == request.auth.uid || existing().userBUid == request.auth.uid) &&
+        incoming().threadId == existing().threadId &&
+        incoming().userAUid == existing().userAUid &&
+        incoming().userBUid == existing().userBUid &&
+        incoming().participantUids == existing().participantUids &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'lastMessageText', 'lastMessageSenderUid', 'userAName', 'userBName', 'userAAvatarId', 'userBAvatarId', 'updatedAt'
+        ]) &&
+        (
+          incoming().lastMessageSenderUid == null ||
+          incoming().lastMessageSenderUid == request.auth.uid ||
+          incoming().lastMessageSenderUid == existing().lastMessageSenderUid
+        );
+      allow delete: if false;
+
+      // Direct Messages Subcollection (Atomically tied to parent chatThread via getAfter/existsAfter)
+      match /messages/{messageId} {
+        allow get: if isSignedIn() && isValidId(threadId) && isValidId(messageId) && request.auth.uid in existing().participantUids;
+        allow list: if isSignedIn() && request.auth.uid in resource.data.participantUids;
+        allow create: if isSignedIn() &&
+          isValidId(threadId) &&
+          isValidId(messageId) &&
+          isValidChatMessage(incoming()) &&
+          incoming().id == messageId &&
+          incoming().threadId == threadId &&
+          incoming().createdAt == request.time &&
+          existsAfter(/databases/$(database)/documents/chatThreads/$(threadId)) &&
+          (
+            getAfter(/databases/$(database)/documents/chatThreads/$(threadId)).data.userAUid == request.auth.uid ||
+            getAfter(/databases/$(database)/documents/chatThreads/$(threadId)).data.userBUid == request.auth.uid
+          ) &&
+          incoming().participantUids == getAfter(/databases/$(database)/documents/chatThreads/$(threadId)).data.participantUids;
+        allow update, delete: if false;
       }
     }
 

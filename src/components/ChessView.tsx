@@ -86,7 +86,17 @@ interface ChessViewProps {
 
 type GameMode = 'ai' | 'pvp' | 'online';
 type PlayerSidePref = 'w' | 'b' | 'random';
-type BoardPaletteId = 'wood' | 'tournament' | 'slate';
+type BoardPaletteId =
+  | 'wood'
+  | 'tournament'
+  | 'walnut'
+  | 'slate'
+  | 'ocean'
+  | 'midnight'
+  | 'watermelon'
+  | 'rose'
+  | 'obsidian'
+  | 'amber';
 
 interface Premove {
   from: Square;
@@ -115,6 +125,9 @@ interface BoardPalette {
   coordDark: string;
 }
 
+const CHESS_PALETTE_STORAGE_KEY = 'owen_chess_board_palette';
+const CHESS_ACTIVE_MATCH_KEY = 'owen_chess_active_match_v1';
+
 const BOARD_PALETTES: BoardPalette[] = [
   {
     id: 'wood',
@@ -133,12 +146,68 @@ const BOARD_PALETTES: BoardPalette[] = [
     coordDark: '#eeeed2'
   },
   {
+    id: 'walnut',
+    label: 'Royal Walnut',
+    light: '#e6ccb2',
+    dark: '#7f5539',
+    coordLight: '#5e3c24',
+    coordDark: '#f3e5d8'
+  },
+  {
     id: 'slate',
     label: 'Cyber Slate',
     light: '#cbd5e1',
     dark: '#475569',
     coordLight: '#334155',
     coordDark: '#e2e8f0'
+  },
+  {
+    id: 'ocean',
+    label: 'Ocean Cobalt',
+    light: '#dbeafe',
+    dark: '#2563eb',
+    coordLight: '#1e40af',
+    coordDark: '#eff6ff'
+  },
+  {
+    id: 'midnight',
+    label: 'Midnight Indigo',
+    light: '#c7d2fe',
+    dark: '#3730a3',
+    coordLight: '#312e81',
+    coordDark: '#e0e7ff'
+  },
+  {
+    id: 'watermelon',
+    label: 'Watermelon',
+    light: '#fce7f3',
+    dark: '#15803d',
+    coordLight: '#166534',
+    coordDark: '#fdf2f8'
+  },
+  {
+    id: 'rose',
+    label: 'Rose Quartz',
+    light: '#fdf2f8',
+    dark: '#be185d',
+    coordLight: '#9d174d',
+    coordDark: '#fdf2f8'
+  },
+  {
+    id: 'obsidian',
+    label: 'Obsidian Gold',
+    light: '#d6d3d1',
+    dark: '#292524',
+    coordLight: '#1c1917',
+    coordDark: '#e7e5e4'
+  },
+  {
+    id: 'amber',
+    label: 'Sunset Amber',
+    light: '#fef3c7',
+    dark: '#b45309',
+    coordLight: '#92400e',
+    coordDark: '#fffbeb'
   }
 ];
 
@@ -339,13 +408,92 @@ interface HistorySnapshot {
 
 const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
+interface DragSession {
+  pointerId: number;
+  from: Square;
+  piece: Piece;
+  mode: 'move' | 'premove';
+  startX: number;
+  startY: number;
+  clientX: number;
+  clientY: number;
+  isDragging: boolean;
+  hoverSquare: Square | null;
+  squareSize: number;
+}
+
+interface SavedLocalChessMatch {
+  mode: 'ai' | 'pvp';
+  selectedBotId: string;
+  sidePref: PlayerSidePref;
+  humanColor: PieceColor;
+  timeControlId: string;
+  moves: ChessMove[];
+  resignedWinner: PieceColor | null;
+  timeoutWinner: PieceColor | 'draw' | null;
+  whiteTimeMs: number;
+  blackTimeMs: number;
+}
+
+function loadSavedLocalChessMatch(): {
+  mode: 'ai' | 'pvp';
+  selectedBotId: string;
+  sidePref: PlayerSidePref;
+  humanColor: PieceColor;
+  timeControlId: string;
+  state: ChessState;
+  history: MoveRecord[];
+  snapshots: HistorySnapshot[];
+  resignedWinner: PieceColor | null;
+  timeoutWinner: PieceColor | 'draw' | null;
+  whiteTimeMs: number;
+  blackTimeMs: number;
+} | null {
+  try {
+    const raw = localStorage.getItem(CHESS_ACTIVE_MATCH_KEY);
+    if (!raw) return null;
+    const saved = JSON.parse(raw) as SavedLocalChessMatch;
+    if (!saved || (saved.mode !== 'ai' && saved.mode !== 'pvp') || !Array.isArray(saved.moves)) {
+      return null;
+    }
+    let state = createInitialState();
+    const history: MoveRecord[] = [];
+    const snapshots: HistorySnapshot[] = [];
+    for (const m of saved.moves) {
+      snapshots.push({ state, history: [...history] });
+      const res = applyMove(state, m);
+      state = res.nextState;
+      history.push(res.record);
+    }
+    const tc = getTimeControlById(saved.timeControlId || 'none');
+    return {
+      mode: saved.mode,
+      selectedBotId: saved.selectedBotId || 'clara',
+      sidePref: saved.sidePref || 'w',
+      humanColor: saved.humanColor === 'b' ? 'b' : 'w',
+      timeControlId: tc.id,
+      state,
+      history,
+      snapshots,
+      resignedWinner: saved.resignedWinner || null,
+      timeoutWinner: saved.timeoutWinner || null,
+      whiteTimeMs: typeof saved.whiteTimeMs === 'number' ? saved.whiteTimeMs : tc.baseMs,
+      blackTimeMs: typeof saved.blackTimeMs === 'number' ? saved.blackTimeMs : tc.baseMs
+    };
+  } catch {
+    return null;
+  }
+}
+
 export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
+  const initialRestoredMatch = useMemo(() => loadSavedLocalChessMatch(), []);
+
   // Match Configuration
-  const [mode, setMode] = useState<GameMode>('ai');
-  const [selectedBotId, setSelectedBotId] = useState<string>('clara');
+  const [mode, setMode] = useState<GameMode>(() => initialRestoredMatch?.mode || 'ai');
+  const [selectedBotId, setSelectedBotId] = useState<string>(() => initialRestoredMatch?.selectedBotId || 'clara');
   const [botTierFilter, setBotTierFilter] = useState<'all' | ChessBot['difficulty']>('all');
-  const [sidePref, setSidePref] = useState<PlayerSidePref>('w');
-  const [humanColor, setHumanColor] = useState<PieceColor>('w');
+  const [sidePref, setSidePref] = useState<PlayerSidePref>(() => initialRestoredMatch?.sidePref || 'w');
+  const [humanColor, setHumanColor] = useState<PieceColor>(() => initialRestoredMatch?.humanColor || 'w');
   const [autoFlipPvp, setAutoFlipPvp] = useState(false);
 
   const selectedBot: ChessBot = useMemo(() => getBotById(selectedBotId), [selectedBotId]);
@@ -359,40 +507,59 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
 
   // Bot Personality Speech & Opening State
   const [botQuote, setBotQuote] = useState<string>(() =>
-    pickBotVoiceline(getBotById('clara'), 'gameStart')
+    pickBotVoiceline(getBotById(initialRestoredMatch?.selectedBotId || 'clara'), 'gameStart')
   );
   const [activeOpening, setActiveOpening] = useState<string | null>(null);
   const lastOpeningCommentedRef = useRef<boolean>(false);
 
   // Visual & Fullscreen Preferences
-  const [paletteId, setPaletteId] = useState<BoardPaletteId>('wood');
-  const [isFlipped, setIsFlipped] = useState(false);
+  const [paletteId, setPaletteId] = useState<BoardPaletteId>(() => {
+    try {
+      const saved = localStorage.getItem(CHESS_PALETTE_STORAGE_KEY) as BoardPaletteId | null;
+      if (saved && BOARD_PALETTES.some(p => p.id === saved)) return saved;
+    } catch {}
+    return 'wood';
+  });
+  const [isFlipped, setIsFlipped] = useState(
+    () => initialRestoredMatch?.mode === 'ai' && initialRestoredMatch?.humanColor === 'b'
+  );
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const studioRef = useRef<HTMLDivElement | null>(null);
 
   // Game State & Timeline
-  const [gameState, setGameState] = useState<ChessState>(() => createInitialState());
-  const [moveHistory, setMoveHistory] = useState<MoveRecord[]>([]);
-  const [snapshots, setSnapshots] = useState<HistorySnapshot[]>([]);
-  const [resignedWinner, setResignedWinner] = useState<PieceColor | null>(null);
-  const [timeoutWinner, setTimeoutWinner] = useState<PieceColor | 'draw' | null>(null);
+  const [gameState, setGameState] = useState<ChessState>(() => initialRestoredMatch?.state || createInitialState());
+  const [moveHistory, setMoveHistory] = useState<MoveRecord[]>(() => initialRestoredMatch?.history || []);
+  const [snapshots, setSnapshots] = useState<HistorySnapshot[]>(() => initialRestoredMatch?.snapshots || []);
+  const [resignedWinner, setResignedWinner] = useState<PieceColor | null>(
+    () => initialRestoredMatch?.resignedWinner || null
+  );
+  const [timeoutWinner, setTimeoutWinner] = useState<PieceColor | 'draw' | null>(
+    () => initialRestoredMatch?.timeoutWinner || null
+  );
   const [showEndOverlay, setShowEndOverlay] = useState(true);
 
   // Time Control / Chess Clock State
-  const [timeControlId, setTimeControlId] = useState<string>('none');
+  const [timeControlId, setTimeControlId] = useState<string>(() => initialRestoredMatch?.timeControlId || 'none');
   const [onlineTimeControlId, setOnlineTimeControlId] = useState<string | null>(null);
-  const [whiteTimeMs, setWhiteTimeMs] = useState<number>(0);
-  const [blackTimeMs, setBlackTimeMs] = useState<number>(0);
+  const [whiteTimeMs, setWhiteTimeMs] = useState<number>(() => initialRestoredMatch?.whiteTimeMs || 0);
+  const [blackTimeMs, setBlackTimeMs] = useState<number>(() => initialRestoredMatch?.blackTimeMs || 0);
   const clockAnchorRef = useRef<{
     whiteMs: number;
     blackMs: number;
     activeColor: PieceColor | null;
     anchoredAt: number;
   }>({
-    whiteMs: 0,
-    blackMs: 0,
-    activeColor: null,
+    whiteMs: initialRestoredMatch?.whiteTimeMs || 0,
+    blackMs: initialRestoredMatch?.blackTimeMs || 0,
+    activeColor:
+      initialRestoredMatch &&
+      initialRestoredMatch.history.length > 0 &&
+      !initialRestoredMatch.resignedWinner &&
+      !initialRestoredMatch.timeoutWinner &&
+      initialRestoredMatch.state.status !== 'checkmate'
+        ? initialRestoredMatch.state.turn
+        : null,
     anchoredAt: Date.now()
   });
 
@@ -405,12 +572,15 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
   const [gameReview, setGameReview] = useState<GameReviewState>(EMPTY_REVIEW);
   const reviewTokenRef = useRef<number>(0);
 
-  // Interaction & Premove State
+  // Interaction, Pointer Drag-to-Place & Premove State
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [pendingPromotion, setPendingPromotion] = useState<{ from: Square; to: Square } | null>(null);
   const [hintMove, setHintMove] = useState<ChessMove | null>(null);
   const [isAIThinking, setIsAIThinking] = useState(false);
-  const [dragFrom, setDragFrom] = useState<Square | null>(null);
+  const [dragOverlay, setDragOverlay] = useState<DragSession | null>(null);
+  const boardGridRef = useRef<HTMLDivElement | null>(null);
+  const dragSessionRef = useRef<DragSession | null>(null);
+  const suppressNextClickRef = useRef<boolean>(false);
   const [premove, setPremove] = useState<Premove | null>(null);
   const [premoveFrom, setPremoveFrom] = useState<Square | null>(null);
 
@@ -459,6 +629,45 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     }
     return getTimeControlById(timeControlId);
   }, [mode, onlineRoomCode, onlineTimeControlId, timeControlId]);
+
+  // Persist board palette choice
+  const handleSelectPalette = useCallback((nextId: BoardPaletteId) => {
+    setPaletteId(nextId);
+    try {
+      localStorage.setItem(CHESS_PALETTE_STORAGE_KEY, nextId);
+    } catch {}
+  }, []);
+
+  // Persist active local AI / PvP chess match progress automatically
+  useEffect(() => {
+    if (mode !== 'ai' && mode !== 'pvp') return;
+    try {
+      const payload: SavedLocalChessMatch = {
+        mode,
+        selectedBotId,
+        sidePref,
+        humanColor,
+        timeControlId,
+        moves: moveHistory.map(rec => rec.move),
+        resignedWinner,
+        timeoutWinner,
+        whiteTimeMs,
+        blackTimeMs
+      };
+      localStorage.setItem(CHESS_ACTIVE_MATCH_KEY, JSON.stringify(payload));
+    } catch {}
+  }, [
+    mode,
+    selectedBotId,
+    sidePref,
+    humanColor,
+    timeControlId,
+    moveHistory,
+    resignedWinner,
+    timeoutWinner,
+    whiteTimeMs,
+    blackTimeMs
+  ]);
 
   // Persist player name
   const handlePlayerNameChange = (val: string) => {
@@ -1550,7 +1759,114 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     [canPremove, playerControlledColor, gameState.board]
   );
 
+  const tryMoveToSquareRef = useRef(tryMoveToSquare);
+  tryMoveToSquareRef.current = tryMoveToSquare;
+  const tryQueuePremoveRef = useRef(tryQueuePremove);
+  tryQueuePremoveRef.current = tryQueuePremove;
+  const isFlippedRef = useRef(isFlipped);
+  isFlippedRef.current = isFlipped;
+
+  const getBoardSquareFromPoint = useCallback((clientX: number, clientY: number): Square | null => {
+    const el = boardGridRef.current;
+    if (!el) return null;
+    const rect = el.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return null;
+    if (
+      clientX < rect.left ||
+      clientX > rect.right ||
+      clientY < rect.top ||
+      clientY > rect.bottom
+    ) {
+      return null;
+    }
+    const visCol = Math.max(0, Math.min(7, Math.floor(((clientX - rect.left) / rect.width) * 8)));
+    const visRow = Math.max(0, Math.min(7, Math.floor(((clientY - rect.top) / rect.height) * 8)));
+    const flipped = isFlippedRef.current;
+    return {
+      r: flipped ? 7 - visRow : visRow,
+      c: flipped ? 7 - visCol : visCol
+    };
+  }, []);
+
+  // Unified Pointer Drag-to-Place handler (works seamlessly on iPad touch + desktop mouse/trackpad)
+  useEffect(() => {
+    const handlePointerMove = (e: PointerEvent) => {
+      const session = dragSessionRef.current;
+      if (!session || e.pointerId !== session.pointerId) return;
+
+      const dist = Math.hypot(e.clientX - session.startX, e.clientY - session.startY);
+      if (!session.isDragging && dist > 6) {
+        session.isDragging = true;
+        if (session.mode === 'move') {
+          setSelectedSquare(session.from);
+        } else {
+          setPremoveFrom(session.from);
+        }
+      }
+
+      if (!session.isDragging) return;
+      if (e.cancelable) e.preventDefault();
+
+      session.clientX = e.clientX;
+      session.clientY = e.clientY;
+      session.hoverSquare = getBoardSquareFromPoint(e.clientX, e.clientY);
+      setDragOverlay({ ...session });
+    };
+
+    const finishDrag = (e: PointerEvent, cancelled: boolean) => {
+      const session = dragSessionRef.current;
+      if (!session || e.pointerId !== session.pointerId) return;
+
+      dragSessionRef.current = null;
+      setDragOverlay(null);
+
+      if (!session.isDragging || cancelled) return;
+
+      suppressNextClickRef.current = true;
+      window.setTimeout(() => {
+        suppressNextClickRef.current = false;
+      }, 120);
+
+      const dropSq = getBoardSquareFromPoint(e.clientX, e.clientY);
+      if (dropSq && (dropSq.r !== session.from.r || dropSq.c !== session.from.c)) {
+        if (session.mode === 'move') {
+          const moved = tryMoveToSquareRef.current(session.from, dropSq);
+          if (!moved) {
+            setSelectedSquare(null);
+          }
+        } else {
+          const queued = tryQueuePremoveRef.current(session.from, dropSq);
+          if (!queued) {
+            setPremoveFrom(null);
+          }
+        }
+      }
+    };
+
+    const handlePointerUp = (e: PointerEvent) => finishDrag(e, false);
+    const handlePointerCancel = (e: PointerEvent) => finishDrag(e, true);
+    const handleWindowBlur = () => {
+      dragSessionRef.current = null;
+      setDragOverlay(null);
+    };
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: false });
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerCancel);
+    window.addEventListener('blur', handleWindowBlur);
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerCancel);
+      window.removeEventListener('blur', handleWindowBlur);
+    };
+  }, [getBoardSquareFromPoint]);
+
   const handleSquareClick = (r: number, c: number) => {
+    if (suppressNextClickRef.current) {
+      suppressNextClickRef.current = false;
+      return;
+    }
     if (pendingPromotion || isGameOver) return;
 
     const clickedPiece = gameState.board[r][c];
@@ -2053,7 +2369,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     return { title: 'Game Over', subtitle: '' };
   };
 
-  // Clean, uncluttered player strip with Elo beside name + digital Chess Clock when timed
+  // Clean, compact player strip with Elo beside name + inline captured material + Chess Clock
   const renderPlayerStrip = (color: PieceColor) => {
     const isTurn = isViewingLive && !isGameOver && gameState.turn === color;
     const isBotHere = mode === 'ai' && color === aiColor;
@@ -2072,15 +2388,15 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
 
     return (
       <div
-        className="w-full px-3 py-2 rounded-xl border flex items-center justify-between gap-2.5 transition-colors"
+        className="w-full px-2.5 py-1.5 rounded-lg border flex items-center justify-between gap-2 transition-colors"
         style={{
           backgroundColor: isTurn ? activeTheme.bgCard : activeTheme.bgSecondary,
           borderColor: isTurn ? activeTheme.borderActive : activeTheme.border
         }}
       >
-        <div className="flex items-center gap-2.5 min-w-0">
+        <div className="flex items-center gap-2 min-w-0">
           <div
-            className="w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 text-base relative"
+            className="w-7 h-7 rounded-md border flex items-center justify-center shrink-0 text-sm relative"
             style={{
               backgroundColor: isBotHere
                 ? `${selectedBot.accentColor}22`
@@ -2097,63 +2413,63 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
             {isBotHere ? (
               <span aria-hidden="true">{selectedBot.avatar}</span>
             ) : (
-              <ChessPieceSvg piece={{ color, type: 'k' }} className="w-6 h-6" />
+              <ChessPieceSvg piece={{ color, type: 'k' }} className="w-5 h-5" />
             )}
           </div>
 
-          <div className="flex flex-col min-w-0">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <span className="text-xs sm:text-sm font-bold text-white truncate">
-                {info.name}
+          <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
+            <span className="text-xs font-bold text-white truncate max-w-[140px]">
+              {info.name}
+            </span>
+            {info.elo !== null && (
+              <span
+                className="text-[11px] font-mono font-bold tabular-nums shrink-0"
+                style={{
+                  color: isBotHere ? selectedBot.accentColor : '#94a3b8'
+                }}
+              >
+                ({info.elo})
               </span>
-              {info.elo !== null && (
-                <span
-                  className="text-xs font-mono font-bold tabular-nums shrink-0"
-                  style={{
-                    color: isBotHere ? selectedBot.accentColor : '#94a3b8'
-                  }}
-                >
-                  ({info.elo})
-                </span>
-              )}
-              {inCheck && (
-                <span className="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[10px] font-extrabold shrink-0">
-                  CHECK
-                </span>
-              )}
-              {isThinkingHere && (
-                <span
-                  className="text-[11px] font-semibold shrink-0"
-                  style={{ color: selectedBot.accentColor }}
-                >
-                  thinking...
-                </span>
-              )}
-              {hasPremoveHere && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPremove(null);
-                    setPremoveFrom(null);
-                  }}
-                  className="px-1.5 py-0.5 rounded bg-rose-500/20 border border-rose-500/40 text-rose-300 text-[10px] font-bold flex items-center gap-0.5 cursor-pointer hover:bg-rose-500/30 shrink-0"
-                  title="Click to cancel premove"
-                >
-                  <span>Premove</span>
-                  <X className="w-2.5 h-2.5" />
-                </button>
-              )}
-            </div>
-
+            )}
+            {inCheck && (
+              <span className="px-1 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[9px] font-extrabold shrink-0 leading-none">
+                CHECK
+              </span>
+            )}
+            {isThinkingHere && (
+              <span
+                className="text-[10px] font-semibold shrink-0"
+                style={{ color: selectedBot.accentColor }}
+              >
+                thinking...
+              </span>
+            )}
+            {hasPremoveHere && (
+              <button
+                type="button"
+                onClick={() => {
+                  setPremove(null);
+                  setPremoveFrom(null);
+                }}
+                className="px-1.5 py-0.5 rounded bg-rose-500/20 border border-rose-500/40 text-rose-300 text-[9px] font-bold flex items-center gap-0.5 cursor-pointer hover:bg-rose-500/30 shrink-0 leading-none"
+                title="Click to cancel premove"
+              >
+                <span>Premove</span>
+                <X className="w-2.5 h-2.5" />
+              </button>
+            )}
             {capturedPieces.length > 0 && (
-              <div className="flex items-center gap-0.5 min-h-[16px] mt-0.5 flex-wrap">
-                {capturedPieces.map((cp, idx) => (
-                  <div key={`${cp.type}-${idx}`} className="w-3.5 h-3.5 -mr-0.5">
-                    <ChessPieceSvg piece={cp} className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-0.5 ml-1">
+                {capturedPieces.slice(0, 10).map((cp, idx) => (
+                  <div key={`${cp.type}-${idx}`} className="w-3 h-3 -mr-0.5">
+                    <ChessPieceSvg piece={cp} className="w-3 h-3" />
                   </div>
                 ))}
+                {capturedPieces.length > 10 && (
+                  <span className="text-[9px] text-slate-400 ml-0.5">+{capturedPieces.length - 10}</span>
+                )}
                 {advantage > 0 && (
-                  <span className="text-[11px] font-mono font-bold text-slate-300 ml-1 tabular-nums">
+                  <span className="text-[10px] font-mono font-bold text-slate-300 ml-1 tabular-nums">
                     +{advantage}
                   </span>
                 )}
@@ -2162,13 +2478,13 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           {mode === 'online' && info.connected === false && onlineRoomCode && (
             <span className="text-[10px] font-semibold text-amber-400">offline</span>
           )}
           {showClock ? (
             <div
-              className={`px-2.5 py-1 rounded-lg border font-mono text-sm font-extrabold tabular-nums flex items-center gap-1.5 transition-colors ${
+              className={`px-2 py-0.5 rounded-md border font-mono text-xs font-extrabold tabular-nums flex items-center gap-1 transition-colors ${
                 isFlagged
                   ? 'bg-rose-600/30 border-rose-500 text-rose-200'
                   : isLowTime && isClockActive
@@ -2189,12 +2505,12 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
               }}
               aria-label={`${color === 'w' ? 'White' : 'Black'} clock`}
             >
-              <Clock className="w-3.5 h-3.5 opacity-80" />
+              <Clock className="w-3 h-3 opacity-80" />
               <span>{formatClockMs(clockMs)}</span>
             </div>
           ) : (
             <span
-              className="w-2.5 h-2.5 rounded-sm transition-opacity"
+              className="w-2 h-2 rounded-sm transition-opacity"
               style={{
                 backgroundColor: isTurn
                   ? isBotHere
@@ -2222,35 +2538,38 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       ref={studioRef}
       className={
         isFullscreen
-          ? 'fixed inset-0 z-50 overflow-y-auto p-3 sm:p-5 lg:p-6 text-slate-100'
-          : 'flex-1 flex flex-col min-h-full p-3 sm:p-5 lg:p-6 text-slate-100'
+          ? 'fixed inset-0 z-50 overflow-y-auto p-2 sm:p-4 text-slate-100'
+          : 'flex-1 flex flex-col min-h-full p-2 sm:p-3 text-slate-100'
       }
       style={{ backgroundColor: activeTheme.bgPrimary }}
     >
       <div
         className={`${
-          isFullscreen ? 'max-w-7xl' : 'max-w-6xl'
-        } mx-auto w-full flex flex-col lg:flex-row gap-5 items-start`}
+          isFullscreen ? 'max-w-7xl' : 'max-w-5xl'
+        } mx-auto w-full flex flex-col lg:flex-row gap-3 items-start justify-center`}
       >
-        {/* Left Column: Simple, Focused Main Board */}
+        {/* Left Column: Compact Focused Main Board that fits viewport without zooming */}
         <div
-          className={`w-full lg:flex-1 flex flex-col items-center gap-2 mx-auto ${
-            isFullscreen ? 'max-w-[min(78vh,720px)]' : 'max-w-[610px]'
-          }`}
+          className="flex flex-col items-center gap-1.5 mx-auto lg:mx-0 shrink-0"
+          style={{
+            width: isFullscreen
+              ? `min(100%, ${analysisEnabled ? 726 : 700}px, calc(100vh - 150px))`
+              : `min(100%, ${analysisEnabled ? 536 : 510}px, calc(100vh - 224px))`
+          }}
         >
-          {/* Slim Top Utility Strip (Fullscreen & Online Code if active) */}
+          {/* Slim Top Utility Strip */}
           <div className="w-full flex items-center justify-between gap-2 px-0.5">
-            <div className="flex items-center gap-2 min-w-0">
+            <div className="flex items-center gap-1.5 min-w-0">
               {mode === 'online' && onlineRoomCode ? (
-                <span className="text-xs font-mono font-bold text-slate-300 flex items-center gap-1.5">
-                  <Globe className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
+                <span className="text-[11px] font-mono font-bold text-slate-300 flex items-center gap-1">
+                  <Globe className="w-3 h-3" style={{ color: activeTheme.accent }} />
                   Room <span className="text-white">{onlineRoomCode}</span>
                   {onlineMyColor === 'spectator' && (
                     <span className="text-amber-300">(Spectating)</span>
                   )}
                 </span>
               ) : (
-                <span className="text-xs font-semibold text-slate-400">
+                <span className="text-[11px] font-semibold text-slate-400 truncate">
                   {isGameOver
                     ? endBanner.title
                     : gameState.turn === 'w'
@@ -2260,11 +2579,11 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
               )}
             </div>
 
-            <div className="flex items-center gap-1.5 shrink-0">
+            <div className="flex items-center gap-1 shrink-0">
               <button
                 type="button"
                 onClick={() => setAnalysisEnabled(a => !a)}
-                className={`px-2.5 py-1 rounded-lg border text-[11px] font-bold cursor-pointer flex items-center gap-1 transition-colors ${
+                className={`px-2 py-1 rounded-md border text-[10px] font-bold cursor-pointer flex items-center gap-1 transition-colors ${
                   analysisEnabled ? 'text-black' : 'text-slate-300 hover:text-white hover:bg-white/5'
                 }`}
                 style={{
@@ -2273,26 +2592,26 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                 }}
                 title="Toggle Optional Engine Analysis"
               >
-                <BarChart3 className="w-3.5 h-3.5" />
-                <span>{analysisEnabled ? 'Analysis On' : 'Analyze'}</span>
+                <BarChart3 className="w-3 h-3" />
+                <span>{analysisEnabled ? 'Eval On' : 'Analyze'}</span>
               </button>
               <button
                 type="button"
                 onClick={() => setIsFlipped(f => !f)}
-                className="px-2 py-1 rounded-lg border text-[11px] font-bold text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer flex items-center gap-1"
+                className="px-2 py-1 rounded-md border text-[10px] font-bold text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer flex items-center gap-1"
                 style={{
                   backgroundColor: activeTheme.bgSecondary,
                   borderColor: activeTheme.border
                 }}
                 title="Flip Board"
               >
-                <FlipVertical2 className="w-3.5 h-3.5" />
+                <FlipVertical2 className="w-3 h-3" />
                 <span className="hidden sm:inline">Flip</span>
               </button>
               <button
                 type="button"
                 onClick={toggleFullscreen}
-                className="px-2.5 py-1 rounded-lg border text-[11px] font-bold text-slate-200 hover:text-white hover:bg-white/10 cursor-pointer flex items-center gap-1"
+                className="px-2 py-1 rounded-md border text-[10px] font-bold text-slate-200 hover:text-white hover:bg-white/10 cursor-pointer flex items-center gap-1"
                 style={{
                   backgroundColor: isFullscreen ? activeTheme.accentBadge : activeTheme.bgSecondary,
                   borderColor: isFullscreen ? activeTheme.borderActive : activeTheme.border
@@ -2301,12 +2620,12 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
               >
                 {isFullscreen ? (
                   <>
-                    <Minimize2 className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
-                    <span>Exit Fullscreen</span>
+                    <Minimize2 className="w-3 h-3" style={{ color: activeTheme.accent }} />
+                    <span>Exit</span>
                   </>
                 ) : (
                   <>
-                    <Maximize2 className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
+                    <Maximize2 className="w-3 h-3" style={{ color: activeTheme.accent }} />
                     <span>Fullscreen</span>
                   </>
                 )}
@@ -2317,10 +2636,10 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
           {renderPlayerStrip(topColor)}
 
           {/* Board Row (+ Optional Evaluation Bar) */}
-          <div className="w-full flex items-stretch gap-2">
+          <div className="w-full flex items-stretch gap-1.5">
             {analysisEnabled && (
               <div
-                className="w-6 rounded-xl border overflow-hidden shrink-0 flex flex-col justify-between relative select-none"
+                className="w-5 rounded-lg border overflow-hidden shrink-0 flex flex-col justify-between relative select-none"
                 style={{
                   backgroundColor: '#18181b',
                   borderColor: activeTheme.border
@@ -2388,7 +2707,11 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                 boxShadow: `0 20px 50px rgba(0, 0, 0, 0.55), 0 0 28px ${activeTheme.accentGlow}`
               }}
             >
-              <div className="grid grid-cols-8 grid-rows-8 w-full h-full">
+              <div
+                ref={boardGridRef}
+                className="grid grid-cols-8 grid-rows-8 w-full h-full touch-none select-none"
+                style={{ WebkitUserSelect: 'none', WebkitTouchCallout: 'none' }}
+              >
                 {rows.map((r, visualRowIdx) =>
                   cols.map((c, visualColIdx) => {
                     const isLightSquare = (r + c) % 2 === 0;
@@ -2421,6 +2744,14 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                       piece?.type === 'k' &&
                       piece.color === displayedState.inCheckColor &&
                       displayedState.status !== 'checkmate';
+                    const isDragOriginHere =
+                      dragOverlay?.isDragging &&
+                      dragOverlay.from.r === r &&
+                      dragOverlay.from.c === c;
+                    const isDragHoveredHere =
+                      dragOverlay?.isDragging &&
+                      dragOverlay.hoverSquare?.r === r &&
+                      dragOverlay.hoverSquare?.c === c;
 
                     let squareBg = isLightSquare ? palette.light : palette.dark;
                     if (isQueuedPremoveSq) {
@@ -2440,6 +2771,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                       isViewingLive &&
                       Boolean(piece) &&
                       !isGameOver &&
+                      !pendingPromotion &&
                       ((isHumanTurn && piece?.color === gameState.turn) ||
                         (canPremove && piece?.color === playerControlledColor));
 
@@ -2447,32 +2779,53 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                       <button
                         key={`${r}-${c}`}
                         type="button"
+                        draggable={false}
                         onClick={() => {
                           if (isViewingLive) handleSquareClick(r, c);
                         }}
-                        onDragOver={(e) => {
-                          if (isViewingLive && dragFrom && (isHumanTurn || canPremove)) {
-                            e.preventDefault();
-                          }
+                        onPointerDown={(e) => {
+                          if (!canDragThisPiece || !piece) return;
+                          if (e.pointerType === 'mouse' && e.button !== 0) return;
+                          const dragMode: 'move' | 'premove' =
+                            isHumanTurn && piece.color === gameState.turn ? 'move' : 'premove';
+                          const rect = boardGridRef.current?.getBoundingClientRect();
+                          const sqSize = rect && rect.width > 0 ? rect.width / 8 : 64;
+                          dragSessionRef.current = {
+                            pointerId: e.pointerId,
+                            from: { r, c },
+                            piece,
+                            mode: dragMode,
+                            startX: e.clientX,
+                            startY: e.clientY,
+                            clientX: e.clientX,
+                            clientY: e.clientY,
+                            isDragging: false,
+                            hoverSquare: { r, c },
+                            squareSize: sqSize
+                          };
                         }}
-                        onDrop={(e) => {
-                          e.preventDefault();
-                          if (!isViewingLive || !dragFrom) return;
-                          if (dragFrom.r !== r || dragFrom.c !== c) {
-                            if (isHumanTurn) {
-                              tryMoveToSquare(dragFrom, { r, c });
-                            } else if (canPremove) {
-                              tryQueuePremove(dragFrom, { r, c });
-                            }
-                          }
-                          setDragFrom(null);
-                        }}
-                        className="relative w-full h-full flex items-center justify-center focus:outline-none cursor-pointer transition-colors duration-100"
+                        className={`relative w-full h-full flex items-center justify-center focus:outline-none transition-colors duration-100 touch-none select-none ${
+                          canDragThisPiece ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'
+                        }`}
                         style={{
-                          backgroundColor: squareBg
+                          backgroundColor: squareBg,
+                          WebkitUserSelect: 'none',
+                          WebkitTouchCallout: 'none'
                         }}
                         aria-label={`${FILES[c]}${8 - r}`}
                       >
+                        {/* Drop Target Hover Highlight while dragging */}
+                        {isDragHoveredHere && (
+                          <div
+                            className="absolute inset-0 pointer-events-none border-[3px]"
+                            style={{
+                              borderColor:
+                                dragOverlay?.mode === 'premove' ? '#fb7185' : '#ffffff',
+                              backgroundColor: 'rgba(255, 255, 255, 0.16)'
+                            }}
+                          />
+                        )}
+
                         {/* Check Radial Alert */}
                         {isKingInCheckHere && (
                           <div
@@ -2533,19 +2886,11 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                         {/* Chess Piece */}
                         {piece && (
                           <div
-                            draggable={canDragThisPiece}
-                            onDragStart={() => {
-                              if (!canDragThisPiece) return;
-                              setDragFrom({ r, c });
-                              if (canPremove) {
-                                setPremoveFrom({ r, c });
-                              } else {
-                                setSelectedSquare({ r, c });
-                              }
-                            }}
-                            onDragEnd={() => setDragFrom(null)}
-                            className={`w-full h-full flex items-center justify-center transition-transform duration-150 ${
-                              isSelected || isPremoveOriginSelected
+                            draggable={false}
+                            className={`w-full h-full flex items-center justify-center transition-transform duration-150 pointer-events-none select-none ${
+                              isDragOriginHere
+                                ? 'opacity-20 scale-90'
+                                : isSelected || isPremoveOriginSelected
                                 ? 'scale-108'
                                 : isViewingLive
                                 ? 'hover:scale-105'
@@ -2745,68 +3090,189 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
           )}
 
           {renderPlayerStrip(bottomColor)}
+
+          {/* Compact Action Strip Directly Under Board */}
+          <div className="w-full grid grid-cols-5 gap-1">
+            <button
+              type="button"
+              onClick={handleUndo}
+              disabled={mode === 'online' || snapshots.length === 0 || isAIThinking}
+              className="py-1.5 px-2 rounded-lg border text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/5"
+              style={{
+                backgroundColor: activeTheme.bgSecondary,
+                borderColor: activeTheme.border
+              }}
+              title={mode === 'online' ? 'Undo unavailable online' : 'Undo Move'}
+            >
+              <Undo2 className="w-3.5 h-3.5" />
+              <span>Undo</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleHint}
+              disabled={mode === 'online' || !isHumanTurn || isGameOver}
+              className="py-1.5 px-2 rounded-lg border text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/5"
+              style={{
+                backgroundColor: activeTheme.bgSecondary,
+                borderColor: activeTheme.border
+              }}
+              title={mode === 'online' ? 'Hint unavailable online' : 'Suggest Strong Move'}
+            >
+              <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
+              <span>Hint</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsFlipped(f => !f)}
+              className="py-1.5 px-2 rounded-lg border text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer hover:bg-white/5"
+              style={{
+                backgroundColor: activeTheme.bgSecondary,
+                borderColor: activeTheme.border
+              }}
+              title="Flip Board"
+            >
+              <FlipVertical2 className="w-3.5 h-3.5" />
+              <span>Flip</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setSoundEnabled(s => !s)}
+              className="py-1.5 px-2 rounded-lg border text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer hover:bg-white/5"
+              style={{
+                backgroundColor: activeTheme.bgSecondary,
+                borderColor: activeTheme.border
+              }}
+              title={soundEnabled ? 'Mute Sounds' : 'Enable Sounds'}
+            >
+              {soundEnabled ? (
+                <Volume2 className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
+              ) : (
+                <VolumeX className="w-3.5 h-3.5 text-slate-500" />
+              )}
+              <span>{soundEnabled ? 'SFX' : 'Muted'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleResign}
+              disabled={
+                isGameOver ||
+                (mode === 'online' && (!onlineRoomCode || onlineMyColor === 'spectator'))
+              }
+              className="py-1.5 px-2 rounded-lg border text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed hover:bg-rose-500/10 text-rose-400"
+              style={{
+                backgroundColor: activeTheme.bgSecondary,
+                borderColor: activeTheme.border
+              }}
+              title="Resign Match"
+            >
+              <Flag className="w-3.5 h-3.5" />
+              <span>Resign</span>
+            </button>
+          </div>
         </div>
 
-        {/* Right Column: Match Setup, Bots / Room Code, Controls & Move History */}
+        {/* Right Column: Compact Match Setup, Opening, Clocks, Bots/Room, Themes & Move Explorer */}
         <div
-          className="w-full lg:w-88 xl:w-96 rounded-2xl border p-4 flex flex-col gap-3.5 shadow-xl"
+          className="w-full lg:w-[340px] xl:w-[360px] shrink-0 rounded-xl border p-3 flex flex-col gap-2 shadow-xl"
           style={{
             backgroundColor: activeTheme.bgCard,
             borderColor: activeTheme.border
           }}
         >
-          {/* Header */}
+          {/* Compact Header */}
           <div className="flex items-center justify-between gap-2">
-            <div>
-              <h1 className="text-lg font-extrabold text-white tracking-tight">Chess Studio</h1>
-              <p className="text-xs text-slate-400">
+            <div className="flex items-baseline gap-2 min-w-0">
+              <h1 className="text-sm font-extrabold text-white tracking-tight shrink-0">Chess Studio</h1>
+              <span className="text-[11px] text-slate-400 truncate">
                 {mode === 'ai'
                   ? `vs ${selectedBot.name} (${selectedBot.rating})`
                   : mode === 'online'
                   ? onlineRoomCode
-                    ? `Online Room · ${onlineRoomCode}`
-                    : 'Online Room Match'
-                  : 'Pass & Play · 2 Players'}
-              </p>
+                    ? `Room ${onlineRoomCode}`
+                    : 'Online Room'
+                  : 'Pass & Play'}
+              </span>
             </div>
             {mode !== 'online' && (
               <button
                 type="button"
                 onClick={() => startNewGame()}
-                className="px-3 py-2 rounded-xl text-black font-extrabold text-xs cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 shadow-md hover:opacity-95 transition-opacity"
+                className="px-2.5 py-1 rounded-lg text-black font-extrabold text-[11px] cursor-pointer flex items-center gap-1 whitespace-nowrap shrink-0 shadow-sm hover:opacity-95"
                 style={{ backgroundColor: activeTheme.accent }}
               >
-                <RotateCcw className="w-3.5 h-3.5" />
-                New Match
+                <RotateCcw className="w-3 h-3" />
+                New Game
               </button>
             )}
           </div>
 
-          {/* Live Detected Opening Card (always active on the right from move 1) */}
+          {/* 3-Mode Toggle: vs AI | Pass & Play | Room Code */}
           <div
-            className="px-3 py-2 rounded-xl border flex items-center justify-between gap-2"
+            className="grid grid-cols-3 gap-1 p-0.5 rounded-lg border"
             style={{
               backgroundColor: activeTheme.bgSecondary,
               borderColor: activeTheme.border
             }}
           >
-            <div className="flex items-center gap-2 min-w-0">
-              <BookOpen className="w-4 h-4 shrink-0" style={{ color: activeTheme.accent }} />
-              <div className="min-w-0">
-                <div className="text-xs font-extrabold text-white truncate">
-                  {detectedOpening.name}
-                </div>
-                <div className="text-[11px] text-slate-400 truncate">
-                  {detectedOpening.variation
-                    ? detectedOpening.variation
-                    : displayedHistory.length === 0
-                    ? 'Opening updates automatically from move 1'
-                    : 'Opening theory'}
-                </div>
+            <button
+              type="button"
+              onClick={() => handleModeChange('ai')}
+              className={`py-1 px-1.5 rounded-md text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-all whitespace-nowrap shrink-0 ${
+                mode === 'ai' ? 'text-black shadow-sm' : 'text-slate-300 hover:text-white'
+              }`}
+              style={{ backgroundColor: mode === 'ai' ? activeTheme.accent : undefined }}
+            >
+              <Bot className="w-3 h-3" />
+              vs AI
+            </button>
+            <button
+              type="button"
+              onClick={() => handleModeChange('pvp')}
+              className={`py-1 px-1.5 rounded-md text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-all whitespace-nowrap shrink-0 ${
+                mode === 'pvp' ? 'text-black shadow-sm' : 'text-slate-300 hover:text-white'
+              }`}
+              style={{ backgroundColor: mode === 'pvp' ? activeTheme.accent : undefined }}
+            >
+              <Users className="w-3 h-3" />
+              2P Local
+            </button>
+            <button
+              type="button"
+              onClick={() => handleModeChange('online')}
+              className={`py-1 px-1.5 rounded-md text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-all whitespace-nowrap shrink-0 ${
+                mode === 'online' ? 'text-black shadow-sm' : 'text-slate-300 hover:text-white'
+              }`}
+              style={{ backgroundColor: mode === 'online' ? activeTheme.accent : undefined }}
+            >
+              <Globe className="w-3 h-3" />
+              Room Code
+            </button>
+          </div>
+
+          {/* Live Detected Opening Card (compact single row) */}
+          <div
+            className="px-2.5 py-1.5 rounded-lg border flex items-center justify-between gap-2"
+            style={{
+              backgroundColor: activeTheme.bgSecondary,
+              borderColor: activeTheme.border
+            }}
+            title={detectedOpening.variation || detectedOpening.name}
+          >
+            <div className="flex items-center gap-1.5 min-w-0">
+              <BookOpen className="w-3.5 h-3.5 shrink-0" style={{ color: activeTheme.accent }} />
+              <div className="text-[11px] font-bold text-white truncate">
+                {detectedOpening.name}
+                {detectedOpening.variation ? (
+                  <span className="font-normal text-slate-400"> · {detectedOpening.variation}</span>
+                ) : null}
               </div>
             </div>
             <span
-              className="px-2 py-0.5 rounded-md border font-mono text-[11px] font-extrabold shrink-0 tabular-nums"
+              className="px-1.5 py-0.5 rounded border font-mono text-[10px] font-extrabold shrink-0 tabular-nums leading-none"
               style={{
                 backgroundColor: activeTheme.accentBadge,
                 borderColor: activeTheme.borderActive,
@@ -2817,80 +3283,31 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
             </span>
           </div>
 
-          {/* 3-Mode Toggle: vs AI | Pass & Play | Online Room */}
-          <div
-            className="grid grid-cols-3 gap-1 p-1 rounded-xl border"
-            style={{
-              backgroundColor: activeTheme.bgSecondary,
-              borderColor: activeTheme.border
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => handleModeChange('ai')}
-              className={`py-2 px-2 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-all whitespace-nowrap shrink-0 ${
-                mode === 'ai' ? 'text-black shadow-sm' : 'text-slate-300 hover:text-white'
-              }`}
-              style={{ backgroundColor: mode === 'ai' ? activeTheme.accent : undefined }}
-            >
-              <Bot className="w-3.5 h-3.5" />
-              vs AI
-            </button>
-            <button
-              type="button"
-              onClick={() => handleModeChange('pvp')}
-              className={`py-2 px-2 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-all whitespace-nowrap shrink-0 ${
-                mode === 'pvp' ? 'text-black shadow-sm' : 'text-slate-300 hover:text-white'
-              }`}
-              style={{ backgroundColor: mode === 'pvp' ? activeTheme.accent : undefined }}
-            >
-              <Users className="w-3.5 h-3.5" />
-              Pass &amp; Play
-            </button>
-            <button
-              type="button"
-              onClick={() => handleModeChange('online')}
-              className={`py-2 px-2 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-all whitespace-nowrap shrink-0 ${
-                mode === 'online' ? 'text-black shadow-sm' : 'text-slate-300 hover:text-white'
-              }`}
-              style={{ backgroundColor: mode === 'online' ? activeTheme.accent : undefined }}
-            >
-              <Globe className="w-3.5 h-3.5" />
-              Room Code
-            </button>
-          </div>
-
-          {/* Chess Clock / Time Control Selector */}
+          {/* Chess Clock / Time Control Bar (compact inline row) */}
           {(mode !== 'online' || !onlineRoomCode) ? (
             <div
-              className="px-3 py-2 rounded-xl border flex flex-col gap-2"
+              className="px-2 py-1.5 rounded-lg border flex items-center justify-between gap-1.5"
               style={{
                 backgroundColor: activeTheme.bgSecondary,
                 borderColor: activeTheme.border
               }}
             >
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
-                  Time Control
-                </span>
-                <select
-                  aria-label="Chess time control"
-                  value={timeControlId}
-                  onChange={e => handleTimeControlSelect(e.target.value)}
-                  className="px-2 py-1 rounded-lg border bg-black/35 text-xs font-bold text-white focus:outline-none cursor-pointer"
-                  style={{ borderColor: activeTheme.border }}
-                >
-                  {TIME_CONTROLS.map(tc => (
-                    <option key={tc.id} value={tc.id} className="bg-slate-900 text-white">
-                      {tc.id === 'none'
-                        ? 'No Clock (Unlimited)'
-                        : `${tc.label} (${tc.category[0].toUpperCase()}${tc.category.slice(1)})`}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="grid grid-cols-5 gap-1">
+              <select
+                aria-label="Chess time control"
+                value={timeControlId}
+                onChange={e => handleTimeControlSelect(e.target.value)}
+                className="px-1.5 py-0.5 rounded border bg-black/35 text-[11px] font-bold text-white focus:outline-none cursor-pointer max-w-[118px] truncate"
+                style={{ borderColor: activeTheme.border }}
+              >
+                {TIME_CONTROLS.map(tc => (
+                  <option key={tc.id} value={tc.id} className="bg-slate-900 text-white">
+                    {tc.id === 'none'
+                      ? 'No Clock'
+                      : `${tc.label} (${tc.category[0].toUpperCase()}${tc.category.slice(1)})`}
+                  </option>
+                ))}
+              </select>
+              <div className="grid grid-cols-5 gap-1 flex-1">
                 {(['none', '1+0', '3+2', '5+0', '10+0'] as const).map(presetId => {
                   const preset = getTimeControlById(presetId);
                   const active = timeControlId === preset.id;
@@ -2899,7 +3316,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                       key={preset.id}
                       type="button"
                       onClick={() => handleTimeControlSelect(preset.id)}
-                      className={`py-1 px-1 rounded-lg border text-[10px] font-bold cursor-pointer truncate transition-colors ${
+                      className={`py-0.5 px-1 rounded border text-[10px] font-bold cursor-pointer truncate transition-colors ${
                         active ? 'text-black' : 'text-slate-300 hover:text-white'
                       }`}
                       style={{
@@ -2907,7 +3324,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                         borderColor: active ? activeTheme.accent : activeTheme.border
                       }}
                     >
-                      {preset.label}
+                      {preset.id === 'none' ? '∞' : preset.label}
                     </button>
                   );
                 })}
@@ -2915,14 +3332,14 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
             </div>
           ) : (
             <div
-              className="px-3 py-1.5 rounded-xl border flex items-center justify-between text-xs"
+              className="px-2.5 py-1 rounded-lg border flex items-center justify-between text-[11px]"
               style={{
                 backgroundColor: activeTheme.bgSecondary,
                 borderColor: activeTheme.border
               }}
             >
-              <span className="text-slate-400 flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
+              <span className="text-slate-400 flex items-center gap-1">
+                <Clock className="w-3 h-3" style={{ color: activeTheme.accent }} />
                 Room Clock
               </span>
               <span className="font-mono font-bold text-white">{effectiveTimeControl.label}</span>
@@ -2931,17 +3348,17 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
 
           {/* Mode-Specific Panel */}
           {mode === 'ai' ? (
-            <div className="flex flex-col gap-3">
-              {/* Compact Bot Quote Card inside sidebar */}
+            <div className="flex flex-col gap-1.5">
+              {/* Compact Bot Quote Row */}
               <div
-                className="px-3 py-2.5 rounded-xl border flex items-start gap-2.5"
+                className="px-2.5 py-1.5 rounded-lg border flex items-center gap-2"
                 style={{
                   backgroundColor: activeTheme.bgSecondary,
                   borderColor: activeTheme.border
                 }}
               >
                 <div
-                  className="w-8 h-8 rounded-lg border flex items-center justify-center text-base shrink-0 mt-0.5"
+                  className="w-7 h-7 rounded-md border flex items-center justify-center text-sm shrink-0"
                   style={{
                     backgroundColor: `${selectedBot.accentColor}20`,
                     borderColor: `${selectedBot.accentColor}55`
@@ -2950,51 +3367,27 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                   <span aria-hidden="true">{selectedBot.avatar}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2 text-[11px]">
+                  <div className="flex items-center justify-between gap-1 text-[10px]">
                     <span className="font-bold truncate" style={{ color: selectedBot.accentColor }}>
                       {selectedBot.name} ({selectedBot.rating})
                     </span>
-                    <span className="truncate font-mono text-slate-400 text-[10px] max-w-[46%]">
-                      {activeOpening ? `Book: ${activeOpening}` : selectedBot.title}
+                    <span className="truncate font-mono text-slate-400 max-w-[48%]">
+                      {activeOpening ? activeOpening : selectedBot.title}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-200 mt-0.5 leading-snug">
+                  <p className="text-[11px] text-slate-200 leading-tight truncate" title={botQuote}>
                     &ldquo;{botQuote}&rdquo;
                   </p>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-bold text-slate-300">
-                    Choose Bot ({CHESS_BOTS.length})
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const pool = filteredBots.filter(b => b.id !== selectedBot.id);
-                      const targetPool = pool.length > 0 ? pool : CHESS_BOTS;
-                      const randomBot = targetPool[Math.floor(Math.random() * targetPool.length)];
-                      handleSelectBot(randomBot);
-                    }}
-                    className="px-2 py-1 rounded-lg border text-[11px] font-bold text-slate-200 hover:bg-white/10 cursor-pointer flex items-center gap-1 whitespace-nowrap shrink-0"
-                    style={{
-                      backgroundColor: activeTheme.bgSecondary,
-                      borderColor: activeTheme.border
-                    }}
-                    title="Pick Random Bot"
-                  >
-                    <Shuffle className="w-3 h-3" style={{ color: activeTheme.accent }} />
-                    Random
-                  </button>
-                </div>
-
-                {/* Tier Filter */}
-                <div className="grid grid-cols-5 gap-1">
+              {/* Filter Tiers + Random + Play As on a tight bar */}
+              <div className="flex items-center gap-1">
+                <div className="grid grid-cols-5 gap-0.5 flex-1">
                   {(
                     [
                       { id: 'all', label: 'All' },
-                      { id: 'easy', label: 'Beginner' },
+                      { id: 'easy', label: 'Beg' },
                       { id: 'medium', label: 'Club' },
                       { id: 'hard', label: 'Master' },
                       { id: 'expert', label: 'GM' }
@@ -3006,7 +3399,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                         key={tier.id}
                         type="button"
                         onClick={() => setBotTierFilter(tier.id)}
-                        className={`py-1 px-1.5 rounded-lg border text-[10px] font-bold cursor-pointer whitespace-nowrap truncate transition-colors ${
+                        className={`py-1 px-1 rounded border text-[10px] font-bold cursor-pointer whitespace-nowrap truncate transition-colors ${
                           active ? 'text-black' : 'text-slate-400 hover:text-white'
                         }`}
                         style={{
@@ -3019,66 +3412,29 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                     );
                   })}
                 </div>
-
-                <div className="max-h-56 overflow-y-auto pr-1 flex flex-col gap-1.5">
-                  {filteredBots.map(bot => {
-                    const active = bot.id === selectedBot.id;
-                    return (
-                      <button
-                        key={bot.id}
-                        type="button"
-                        onClick={() => handleSelectBot(bot)}
-                        className={`w-full px-3 py-2 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-2.5 ${
-                          active ? 'text-white shadow-sm' : 'text-slate-300 hover:bg-white/5'
-                        }`}
-                        style={{
-                          backgroundColor: active
-                            ? activeTheme.accentBadge
-                            : activeTheme.bgSecondary,
-                          borderColor: active ? bot.accentColor : activeTheme.border
-                        }}
-                      >
-                        <div
-                          className="w-8 h-8 rounded-lg border flex items-center justify-center text-base shrink-0"
-                          style={{
-                            backgroundColor: `${bot.accentColor}22`,
-                            borderColor: `${bot.accentColor}55`
-                          }}
-                        >
-                          <span aria-hidden="true">{bot.avatar}</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5 min-w-0">
-                            <span className="text-xs font-extrabold truncate">{bot.name}</span>
-                            <span
-                              className="text-[11px] font-mono font-bold tabular-nums shrink-0"
-                              style={{ color: bot.accentColor }}
-                            >
-                              ({bot.rating})
-                            </span>
-                          </div>
-                          <div className="text-[11px] text-slate-400 truncate">
-                            {DIFFICULTY_LABELS[bot.difficulty]} · {bot.signatureOpening}
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <p className="text-[11px] text-slate-400 leading-relaxed pt-0.5">
-                  {selectedBot.bio}
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-bold text-slate-300">Play As</span>
-                <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const pool = filteredBots.filter(b => b.id !== selectedBot.id);
+                    const targetPool = pool.length > 0 ? pool : CHESS_BOTS;
+                    const randomBot = targetPool[Math.floor(Math.random() * targetPool.length)];
+                    handleSelectBot(randomBot);
+                  }}
+                  className="px-1.5 py-1 rounded border text-[10px] font-bold text-slate-200 hover:bg-white/10 cursor-pointer flex items-center gap-0.5 shrink-0"
+                  style={{
+                    backgroundColor: activeTheme.bgSecondary,
+                    borderColor: activeTheme.border
+                  }}
+                  title="Pick Random Bot"
+                >
+                  <Shuffle className="w-3 h-3" style={{ color: activeTheme.accent }} />
+                </button>
+                <div className="flex items-center gap-0.5 shrink-0">
                   {(
                     [
-                      { id: 'w', label: 'White' },
-                      { id: 'b', label: 'Black' },
-                      { id: 'random', label: 'Random' }
+                      { id: 'w', label: 'W' },
+                      { id: 'b', label: 'B' },
+                      { id: 'random', label: '?' }
                     ] as { id: PlayerSidePref; label: string }[]
                   ).map(opt => {
                     const active = sidePref === opt.id;
@@ -3087,7 +3443,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                         key={opt.id}
                         type="button"
                         onClick={() => handleSidePrefChange(opt.id)}
-                        className={`px-2.5 py-1.5 rounded-lg border text-xs font-bold cursor-pointer whitespace-nowrap shrink-0 transition-all ${
+                        className={`w-6 py-1 rounded border text-[10px] font-bold cursor-pointer transition-all ${
                           active ? 'text-black' : 'text-slate-300 hover:text-white'
                         }`}
                         style={{
@@ -3096,6 +3452,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                             : activeTheme.bgSecondary,
                           borderColor: active ? activeTheme.accent : activeTheme.border
                         }}
+                        title={`Play as ${opt.id === 'w' ? 'White' : opt.id === 'b' ? 'Black' : 'Random'}`}
                       >
                         {opt.label}
                       </button>
@@ -3103,16 +3460,61 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                   })}
                 </div>
               </div>
+
+              {/* Compact Bot List */}
+              <div
+                className={`${
+                  analysisEnabled ? 'h-24' : 'h-32'
+                } overflow-y-auto pr-0.5 flex flex-col gap-1`}
+              >
+                {filteredBots.map(bot => {
+                  const active = bot.id === selectedBot.id;
+                  return (
+                    <button
+                      key={bot.id}
+                      type="button"
+                      onClick={() => handleSelectBot(bot)}
+                      className={`w-full px-2 py-1 rounded-lg border text-left transition-all cursor-pointer flex items-center gap-2 ${
+                        active ? 'text-white shadow-sm' : 'text-slate-300 hover:bg-white/5'
+                      }`}
+                      style={{
+                        backgroundColor: active
+                          ? activeTheme.accentBadge
+                          : activeTheme.bgSecondary,
+                        borderColor: active ? bot.accentColor : activeTheme.border
+                      }}
+                    >
+                      <div
+                        className="w-6 h-6 rounded border flex items-center justify-center text-xs shrink-0"
+                        style={{
+                          backgroundColor: `${bot.accentColor}22`,
+                          borderColor: `${bot.accentColor}55`
+                        }}
+                      >
+                        <span aria-hidden="true">{bot.avatar}</span>
+                      </div>
+                      <div className="flex-1 min-w-0 flex items-center justify-between gap-1.5">
+                        <span className="text-[11px] font-extrabold truncate">{bot.name}</span>
+                        <span
+                          className="text-[10px] font-mono font-bold tabular-nums shrink-0"
+                          style={{ color: bot.accentColor }}
+                        >
+                          {bot.rating} · {DIFFICULTY_LABELS[bot.difficulty]}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           ) : mode === 'online' ? (
-            <div className="flex flex-col gap-3">
-              {/* Nickname input */}
+            <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <label
                   htmlFor="chess-player-name"
-                  className="text-xs font-bold text-slate-300 shrink-0"
+                  className="text-[11px] font-bold text-slate-300 shrink-0"
                 >
-                  Your Name
+                  Name
                 </label>
                 <input
                   id="chess-player-name"
@@ -3121,20 +3523,20 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                   value={playerName}
                   onChange={e => handlePlayerNameChange(e.target.value)}
                   placeholder="Player"
-                  className="flex-1 px-2.5 py-1.5 rounded-lg border bg-black/30 text-xs text-white focus:outline-none"
+                  className="flex-1 px-2 py-1 rounded-md border bg-black/30 text-xs text-white focus:outline-none"
                   style={{ borderColor: activeTheme.border }}
                 />
               </div>
 
               {onlineError && (
-                <div className="px-3 py-2 rounded-xl border border-rose-500/40 bg-rose-500/15 text-xs text-rose-200 flex flex-col gap-2">
+                <div className="px-2.5 py-1.5 rounded-lg border border-rose-500/40 bg-rose-500/15 text-[11px] text-rose-200 flex flex-col gap-1.5">
                   <span>{onlineError}</span>
                   {onlineAuthNeeded && (
                     <button
                       type="button"
                       onClick={handleGoogleSignInForOnline}
                       disabled={onlineSigningIn}
-                      className="w-full py-2 px-3 rounded-lg text-black font-extrabold text-xs cursor-pointer hover:opacity-95 disabled:opacity-60"
+                      className="w-full py-1.5 px-2.5 rounded-md text-black font-extrabold text-[11px] cursor-pointer hover:opacity-95 disabled:opacity-60"
                       style={{ backgroundColor: activeTheme.accent }}
                     >
                       {onlineSigningIn ? 'Signing in...' : 'Sign in with Google'}
@@ -3145,14 +3547,14 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
 
               {!onlineRoomCode ? (
                 <div
-                  className="p-3 rounded-xl border flex flex-col gap-3"
+                  className="p-2.5 rounded-lg border flex flex-col gap-2"
                   style={{
                     backgroundColor: activeTheme.bgSecondary,
                     borderColor: activeTheme.border
                   }}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs font-bold text-slate-200">Host Side</span>
+                    <span className="text-[11px] font-bold text-slate-200">Host Side</span>
                     <div className="flex items-center gap-1">
                       {(
                         [
@@ -3167,7 +3569,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                             key={opt.id}
                             type="button"
                             onClick={() => setSidePref(opt.id)}
-                            className={`px-2 py-1 rounded-lg border text-[11px] font-bold cursor-pointer ${
+                            className={`px-2 py-0.5 rounded border text-[10px] font-bold cursor-pointer ${
                               active ? 'text-black' : 'text-slate-300 hover:text-white'
                             }`}
                             style={{
@@ -3186,13 +3588,13 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                     type="button"
                     onClick={handleCreateRoom}
                     disabled={wsStatus === 'connecting'}
-                    className="w-full py-2.5 px-3 rounded-xl text-black font-extrabold text-xs cursor-pointer shadow-md hover:opacity-95 disabled:opacity-60"
+                    className="w-full py-1.5 px-3 rounded-lg text-black font-extrabold text-xs cursor-pointer shadow-sm hover:opacity-95 disabled:opacity-60"
                     style={{ backgroundColor: activeTheme.accent }}
                   >
                     {wsStatus === 'connecting' ? 'Connecting...' : 'Create Room Code'}
                   </button>
 
-                  <div className="flex items-center gap-2 pt-1 border-t border-white/10">
+                  <div className="flex items-center gap-1.5 pt-1 border-t border-white/10">
                     <input
                       type="text"
                       maxLength={8}
@@ -3202,14 +3604,14 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                         if (e.key === 'Enter') handleJoinRoom();
                       }}
                       placeholder="Enter Room Code"
-                      className="flex-1 px-2.5 py-2 rounded-lg border bg-black/30 text-xs font-mono font-bold tracking-widest uppercase text-white focus:outline-none"
+                      className="flex-1 px-2 py-1.5 rounded-md border bg-black/30 text-xs font-mono font-bold tracking-widest uppercase text-white focus:outline-none"
                       style={{ borderColor: activeTheme.border }}
                     />
                     <button
                       type="button"
                       onClick={() => handleJoinRoom()}
                       disabled={wsStatus === 'connecting' || !joinCodeInput.trim()}
-                      className="px-3.5 py-2 rounded-lg border text-xs font-extrabold text-white hover:bg-white/10 cursor-pointer disabled:opacity-40 shrink-0"
+                      className="px-3 py-1.5 rounded-md border text-xs font-extrabold text-white hover:bg-white/10 cursor-pointer disabled:opacity-40 shrink-0"
                       style={{ borderColor: activeTheme.borderActive }}
                     >
                       Join
@@ -3218,7 +3620,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                 </div>
               ) : (
                 <div
-                  className="p-3 rounded-xl border flex flex-col gap-2.5"
+                  className="p-2.5 rounded-lg border flex flex-col gap-2"
                   style={{
                     backgroundColor: activeTheme.bgSecondary,
                     borderColor: activeTheme.borderActive
@@ -3226,44 +3628,44 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div>
-                      <div className="text-[11px] text-slate-400">Share Room Code</div>
-                      <div className="text-xl font-mono font-extrabold tracking-widest text-white select-all">
+                      <div className="text-[10px] text-slate-400">Room Code</div>
+                      <div className="text-lg font-mono font-extrabold tracking-widest text-white select-all">
                         {onlineRoomCode}
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1">
                       <button
                         type="button"
                         onClick={() => handleCopyRoom('code')}
-                        className="px-2.5 py-1.5 rounded-lg border text-[11px] font-bold text-slate-200 hover:bg-white/10 cursor-pointer flex items-center gap-1"
+                        className="px-2 py-1 rounded border text-[10px] font-bold text-slate-200 hover:bg-white/10 cursor-pointer flex items-center gap-1"
                         style={{ borderColor: activeTheme.border }}
                         title="Copy Room Code"
                       >
                         {copiedType === 'code' ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          <Check className="w-3 h-3 text-emerald-400" />
                         ) : (
-                          <Copy className="w-3.5 h-3.5" />
+                          <Copy className="w-3 h-3" />
                         )}
                         <span>{copiedType === 'code' ? 'Copied' : 'Code'}</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => handleCopyRoom('link')}
-                        className="px-2.5 py-1.5 rounded-lg border text-[11px] font-bold text-slate-200 hover:bg-white/10 cursor-pointer flex items-center gap-1"
+                        className="px-2 py-1 rounded border text-[10px] font-bold text-slate-200 hover:bg-white/10 cursor-pointer flex items-center gap-1"
                         style={{ borderColor: activeTheme.border }}
                         title="Copy Direct Invite Link"
                       >
                         {copiedType === 'link' ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          <Check className="w-3 h-3 text-emerald-400" />
                         ) : (
-                          <Link2 className="w-3.5 h-3.5" />
+                          <Link2 className="w-3 h-3" />
                         )}
                         <span>{copiedType === 'link' ? 'Copied' : 'Link'}</span>
                       </button>
                     </div>
                   </div>
 
-                  <div className="text-[11px] text-slate-300 flex items-center justify-between pt-1 border-t border-white/10">
+                  <div className="text-[10px] text-slate-300 flex items-center justify-between pt-1 border-t border-white/10">
                     <span>
                       {onlinePlayers.w && onlinePlayers.b
                         ? 'Both players connected'
@@ -3283,15 +3685,15 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
             </div>
           ) : (
             <div
-              className="flex items-center justify-between px-3 py-2.5 rounded-xl border"
+              className="flex items-center justify-between px-2.5 py-2 rounded-lg border"
               style={{
                 backgroundColor: activeTheme.bgSecondary,
                 borderColor: activeTheme.border
               }}
             >
               <div className="flex flex-col">
-                <span className="text-xs font-bold text-white">Auto-Flip Board</span>
-                <span className="text-[11px] text-slate-400">
+                <span className="text-[11px] font-bold text-white">Auto-Flip Board</span>
+                <span className="text-[10px] text-slate-400">
                   Rotate after each turn for pass-and-play
                 </span>
               </div>
@@ -3302,7 +3704,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                   setAutoFlipPvp(next);
                   if (next) setIsFlipped(gameState.turn === 'b');
                 }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer whitespace-nowrap shrink-0 transition-colors ${
+                className={`px-2.5 py-1 rounded text-[11px] font-bold cursor-pointer whitespace-nowrap shrink-0 transition-colors ${
                   autoFlipPvp ? 'text-black' : 'text-slate-300 bg-white/10'
                 }`}
                 style={{ backgroundColor: autoFlipPvp ? activeTheme.accent : undefined }}
@@ -3312,137 +3714,47 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
             </div>
           )}
 
-          {/* Board Theme Picker */}
+          {/* Compact Single-Row Board Theme Swatches */}
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-              <Palette className="w-3.5 h-3.5 text-slate-400" />
-              Board Style
+            <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1 shrink-0">
+              <Palette className="w-3 h-3" />
+              {palette.label.split(' ')[0]}
             </span>
-            <div className="flex items-center gap-1.5">
+            <div className="grid grid-cols-10 gap-1 flex-1">
               {BOARD_PALETTES.map(bp => {
                 const active = paletteId === bp.id;
                 return (
                   <button
                     key={bp.id}
                     type="button"
-                    onClick={() => setPaletteId(bp.id)}
-                    className={`px-2 py-1 rounded-lg border text-[11px] font-bold flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
-                      active ? 'text-white' : 'text-slate-400 hover:text-white'
+                    onClick={() => handleSelectPalette(bp.id)}
+                    className={`h-5 rounded border cursor-pointer transition-transform ${
+                      active ? 'scale-110 ring-1 ring-white' : 'opacity-80 hover:opacity-100'
                     }`}
                     style={{
-                      backgroundColor: active ? activeTheme.accentBadge : activeTheme.bgSecondary,
-                      borderColor: active ? activeTheme.accent : activeTheme.border
+                      background: `linear-gradient(135deg, ${bp.light} 50%, ${bp.dark} 50%)`,
+                      borderColor: active ? activeTheme.accent : 'rgba(0,0,0,0.35)'
                     }}
                     title={bp.label}
-                  >
-                    <span
-                      className="w-3 h-3 rounded-sm border border-black/30 shrink-0"
-                      style={{
-                        background: `linear-gradient(135deg, ${bp.light} 50%, ${bp.dark} 50%)`
-                      }}
-                    />
-                    <span>{bp.label.split(' ')[0]}</span>
-                  </button>
+                    aria-label={bp.label}
+                  />
                 );
               })}
             </div>
           </div>
 
-          {/* Action Toolbar */}
-          <div className="grid grid-cols-5 gap-1.5">
-            <button
-              type="button"
-              onClick={handleUndo}
-              disabled={mode === 'online' || snapshots.length === 0 || isAIThinking}
-              className="py-2 px-2 rounded-xl border text-xs font-bold flex flex-col items-center justify-center gap-1 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/5"
-              style={{
-                backgroundColor: activeTheme.bgSecondary,
-                borderColor: activeTheme.border
-              }}
-              title={mode === 'online' ? 'Undo unavailable online' : 'Undo Move'}
-            >
-              <Undo2 className="w-4 h-4" />
-              <span className="text-[10px]">Undo</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleHint}
-              disabled={mode === 'online' || !isHumanTurn || isGameOver}
-              className="py-2 px-2 rounded-xl border text-xs font-bold flex flex-col items-center justify-center gap-1 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/5"
-              style={{
-                backgroundColor: activeTheme.bgSecondary,
-                borderColor: activeTheme.border
-              }}
-              title={mode === 'online' ? 'Hint unavailable online' : 'Suggest Strong Move'}
-            >
-              <Lightbulb className="w-4 h-4 text-amber-400" />
-              <span className="text-[10px]">Hint</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsFlipped(f => !f)}
-              className="py-2 px-2 rounded-xl border text-xs font-bold flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-white/5"
-              style={{
-                backgroundColor: activeTheme.bgSecondary,
-                borderColor: activeTheme.border
-              }}
-              title="Flip Board"
-            >
-              <FlipVertical2 className="w-4 h-4" />
-              <span className="text-[10px]">Flip</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setSoundEnabled(s => !s)}
-              className="py-2 px-2 rounded-xl border text-xs font-bold flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-white/5"
-              style={{
-                backgroundColor: activeTheme.bgSecondary,
-                borderColor: activeTheme.border
-              }}
-              title={soundEnabled ? 'Mute Sounds' : 'Enable Sounds'}
-            >
-              {soundEnabled ? (
-                <Volume2 className="w-4 h-4" style={{ color: activeTheme.accent }} />
-              ) : (
-                <VolumeX className="w-4 h-4 text-slate-500" />
-              )}
-              <span className="text-[10px]">{soundEnabled ? 'Sound' : 'Muted'}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleResign}
-              disabled={
-                isGameOver ||
-                (mode === 'online' && (!onlineRoomCode || onlineMyColor === 'spectator'))
-              }
-              className="py-2 px-2 rounded-xl border text-xs font-bold flex flex-col items-center justify-center gap-1 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed hover:bg-rose-500/10 text-rose-400"
-              style={{
-                backgroundColor: activeTheme.bgSecondary,
-                borderColor: activeTheme.border
-              }}
-              title="Resign Match"
-            >
-              <Flag className="w-4 h-4" />
-              <span className="text-[10px]">Resign</span>
-            </button>
-          </div>
-
           {/* Game Status Strip when overlay hidden or active */}
           {isGameOver && !showEndOverlay && (
             <div
-              className="px-3 py-2.5 rounded-xl border flex items-center justify-between gap-2"
+              className="px-2.5 py-1.5 rounded-lg border flex items-center justify-between gap-2"
               style={{
                 backgroundColor: activeTheme.accentBadge,
                 borderColor: activeTheme.borderActive
               }}
             >
               <div className="min-w-0">
-                <div className="text-xs font-extrabold text-white truncate">{endBanner.title}</div>
-                <div className="text-[11px] text-slate-300 truncate">{endBanner.subtitle}</div>
+                <div className="text-[11px] font-extrabold text-white truncate">{endBanner.title}</div>
+                <div className="text-[10px] text-slate-300 truncate">{endBanner.subtitle}</div>
               </div>
               {mode === 'online' ? (
                 onlineMyColor !== 'spectator' && (
@@ -3450,7 +3762,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                     type="button"
                     onClick={() => startNewGame('online')}
                     disabled={hasVotedRematch}
-                    className="px-3 py-1.5 rounded-lg text-black text-xs font-extrabold cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-60"
+                    className="px-2.5 py-1 rounded text-black text-[11px] font-extrabold cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-60"
                     style={{ backgroundColor: activeTheme.accent }}
                   >
                     {hasVotedRematch
@@ -3462,7 +3774,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                 <button
                   type="button"
                   onClick={() => startNewGame()}
-                  className="px-3 py-1.5 rounded-lg text-black text-xs font-extrabold cursor-pointer whitespace-nowrap shrink-0"
+                  className="px-2.5 py-1 rounded text-black text-[11px] font-extrabold cursor-pointer whitespace-nowrap shrink-0"
                   style={{ backgroundColor: activeTheme.accent }}
                 >
                   Rematch
@@ -3474,28 +3786,28 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
           {/* Optional Analysis Panel (only visible when Analysis toggle is On) */}
           {analysisEnabled && (
             <div
-              className="p-3 rounded-xl border flex flex-col gap-2.5"
+              className="p-2 rounded-lg border flex flex-col gap-1.5"
               style={{
                 backgroundColor: activeTheme.bgSecondary,
                 borderColor: activeTheme.borderActive
               }}
             >
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 min-w-0">
-                  <Activity className="w-4 h-4 shrink-0" style={{ color: activeTheme.accent }} />
-                  <span className="text-xs font-extrabold text-white">Engine Analysis</span>
-                  <span className="px-1.5 py-0.5 rounded bg-black/35 font-mono text-[11px] font-extrabold text-white tabular-nums">
+              <div className="flex items-center justify-between gap-1.5">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <Activity className="w-3.5 h-3.5 shrink-0" style={{ color: activeTheme.accent }} />
+                  <span className="text-[11px] font-extrabold text-white">Eval</span>
+                  <span className="px-1.5 py-0.5 rounded bg-black/35 font-mono text-[10px] font-extrabold text-white tabular-nums">
                     {isAnalyzingPos || !positionAnalysis
                       ? '...'
                       : formatEvalScore(positionAnalysis.scoreCp, positionAnalysis.mateIn)}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1">
                   <button
                     type="button"
                     onClick={() => setShowBestArrow(v => !v)}
-                    className={`px-2 py-1 rounded-lg border text-[10px] font-bold cursor-pointer ${
+                    className={`px-1.5 py-0.5 rounded border text-[10px] font-bold cursor-pointer ${
                       showBestArrow ? 'text-black' : 'text-slate-300 hover:text-white'
                     }`}
                     style={{
@@ -3503,28 +3815,28 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                       borderColor: showBestArrow ? activeTheme.accent : activeTheme.border
                     }}
                   >
-                    Arrow {showBestArrow ? 'On' : 'Off'}
+                    Arrow
                   </button>
                   <button
                     type="button"
                     onClick={runFullGameReview}
                     disabled={moveHistory.length === 0 || gameReview.status === 'running'}
-                    className="px-2 py-1 rounded-lg border text-[10px] font-extrabold text-white hover:bg-white/10 cursor-pointer disabled:opacity-40"
+                    className="px-1.5 py-0.5 rounded border text-[10px] font-extrabold text-white hover:bg-white/10 cursor-pointer disabled:opacity-40"
                     style={{ borderColor: activeTheme.borderActive }}
                   >
                     {gameReview.status === 'running'
                       ? `${gameReview.progress}/${gameReview.total}`
-                      : 'Review Game'}
+                      : 'Review'}
                   </button>
                 </div>
               </div>
 
               {positionAnalysis && positionAnalysis.lines.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-1">
                   {positionAnalysis.lines.map((line: AnalysisLine, idx: number) => (
                     <div
                       key={`${line.san}-${idx}`}
-                      className="px-2 py-1 rounded-lg border bg-black/25 font-mono text-[11px] flex items-center gap-1.5 tabular-nums"
+                      className="px-1.5 py-0.5 rounded border bg-black/25 font-mono text-[10px] flex items-center gap-1 tabular-nums"
                       style={{ borderColor: idx === 0 ? activeTheme.borderActive : activeTheme.border }}
                     >
                       <span className="text-slate-400">#{idx + 1}</span>
@@ -3544,15 +3856,15 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
 
               {gameReview.status === 'done' &&
                 (gameReview.whiteAccuracy !== null || gameReview.blackAccuracy !== null) && (
-                  <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/10 text-[11px]">
-                    <div className="flex items-center justify-between px-2 py-1 rounded-lg bg-white/5">
-                      <span className="text-slate-300 font-semibold">White Accuracy</span>
+                  <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-white/10 text-[10px]">
+                    <div className="flex items-center justify-between px-1.5 py-0.5 rounded bg-white/5">
+                      <span className="text-slate-300 font-semibold">White Acc</span>
                       <span className="font-mono font-extrabold text-white tabular-nums">
                         {gameReview.whiteAccuracy ?? '—'}%
                       </span>
                     </div>
-                    <div className="flex items-center justify-between px-2 py-1 rounded-lg bg-white/5">
-                      <span className="text-slate-300 font-semibold">Black Accuracy</span>
+                    <div className="flex items-center justify-between px-1.5 py-0.5 rounded bg-white/5">
+                      <span className="text-slate-300 font-semibold">Black Acc</span>
                       <span className="font-mono font-extrabold text-white tabular-nums">
                         {gameReview.blackAccuracy ?? '—'}%
                       </span>
@@ -3562,35 +3874,35 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
             </div>
           )}
 
-          {/* Move History Log & Explorer */}
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center justify-between text-xs text-slate-400 gap-2">
-              <span className="font-bold text-slate-300 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
-                Move History
+          {/* Compact Move History Log & Explorer */}
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center justify-between text-[11px] text-slate-400 gap-1.5">
+              <span className="font-bold text-slate-300 flex items-center gap-1">
+                <Sparkles className="w-3 h-3" style={{ color: activeTheme.accent }} />
+                Moves
               </span>
 
               {moveHistory.length > 0 && (
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-0.5">
                   <button
                     type="button"
                     onClick={() => setViewPly(0)}
                     disabled={displayedPly === 0}
-                    className="p-1 rounded border text-slate-300 hover:text-white disabled:opacity-30 cursor-pointer"
+                    className="p-0.5 rounded border text-slate-300 hover:text-white disabled:opacity-30 cursor-pointer"
                     style={{ borderColor: activeTheme.border }}
                     title="Start position"
                   >
-                    <ChevronFirst className="w-3.5 h-3.5" />
+                    <ChevronFirst className="w-3 h-3" />
                   </button>
                   <button
                     type="button"
                     onClick={() => setViewPly(Math.max(0, displayedPly - 1))}
                     disabled={displayedPly === 0}
-                    className="p-1 rounded border text-slate-300 hover:text-white disabled:opacity-30 cursor-pointer"
+                    className="p-0.5 rounded border text-slate-300 hover:text-white disabled:opacity-30 cursor-pointer"
                     style={{ borderColor: activeTheme.border }}
                     title="Previous move"
                   >
-                    <ChevronLeft className="w-3.5 h-3.5" />
+                    <ChevronLeft className="w-3 h-3" />
                   </button>
                   <button
                     type="button"
@@ -3599,44 +3911,46 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                       setViewPly(next >= moveHistory.length ? null : next);
                     }}
                     disabled={isViewingLive}
-                    className="p-1 rounded border text-slate-300 hover:text-white disabled:opacity-30 cursor-pointer"
+                    className="p-0.5 rounded border text-slate-300 hover:text-white disabled:opacity-30 cursor-pointer"
                     style={{ borderColor: activeTheme.border }}
                     title="Next move"
                   >
-                    <ChevronRight className="w-3.5 h-3.5" />
+                    <ChevronRight className="w-3 h-3" />
                   </button>
                   <button
                     type="button"
                     onClick={() => setViewPly(null)}
                     disabled={isViewingLive}
-                    className="p-1 rounded border text-slate-300 hover:text-white disabled:opacity-30 cursor-pointer"
+                    className="p-0.5 rounded border text-slate-300 hover:text-white disabled:opacity-30 cursor-pointer"
                     style={{ borderColor: activeTheme.border }}
                     title="Live position"
                   >
-                    <ChevronLast className="w-3.5 h-3.5" />
+                    <ChevronLast className="w-3 h-3" />
                   </button>
                 </div>
               )}
 
-              <span className="font-mono tabular-nums text-[11px]">
+              <span className="font-mono tabular-nums text-[10px]">
                 {moveHistory.length} {moveHistory.length === 1 ? 'ply' : 'plies'}
               </span>
             </div>
 
             <div
               ref={moveListRef}
-              className="h-44 overflow-y-auto rounded-xl border p-2 font-mono text-xs tabular-nums"
+              className={`${
+                analysisEnabled ? 'h-24' : 'h-28'
+              } overflow-y-auto rounded-lg border p-1.5 font-mono text-[11px] tabular-nums`}
               style={{
                 backgroundColor: activeTheme.bgSecondary,
                 borderColor: activeTheme.border
               }}
             >
               {pairedMoves.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-slate-500 font-sans text-xs text-center px-4">
-                  Make a move on the board to start the game. Click your piece on opponent&apos;s turn to premove.
+                <div className="h-full flex items-center justify-center text-slate-500 font-sans text-[11px] text-center px-3">
+                  Drag or tap pieces to play. Tap your piece on opponent&apos;s turn to premove.
                 </div>
               ) : (
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-0.5">
                   {pairedMoves.map(pair => {
                     const whitePly = (pair.moveNumber - 1) * 2 + 1;
                     const blackPly = whitePly + 1;
@@ -3647,7 +3961,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                     return (
                       <div
                         key={pair.moveNumber}
-                        className="grid grid-cols-[2.2rem_1fr_1fr] items-center px-1.5 py-0.5 rounded-lg"
+                        className="grid grid-cols-[1.8rem_1fr_1fr] items-center px-1 py-0.5 rounded"
                       >
                         <span className="text-slate-500">{pair.moveNumber}.</span>
                         <button
@@ -3655,7 +3969,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                           onClick={() =>
                             setViewPly(whitePly >= moveHistory.length ? null : whitePly)
                           }
-                          className={`text-left px-1.5 py-0.5 rounded cursor-pointer flex items-center justify-between gap-1 font-semibold hover:bg-white/10 ${
+                          className={`text-left px-1 py-0.5 rounded cursor-pointer flex items-center justify-between gap-1 font-semibold hover:bg-white/10 ${
                             isWhiteSelected ? 'bg-white/10 text-white' : 'text-slate-200'
                           }`}
                           style={{
@@ -3665,7 +3979,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                           <span>{pair.white?.san}</span>
                           {whiteQual && (
                             <span
-                              className="text-[10px] font-extrabold"
+                              className="text-[9px] font-extrabold"
                               style={{ color: QUALITY_META[whiteQual].color }}
                               title={QUALITY_META[whiteQual].label}
                             >
@@ -3679,7 +3993,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                             onClick={() =>
                               setViewPly(blackPly >= moveHistory.length ? null : blackPly)
                             }
-                            className={`text-left px-1.5 py-0.5 rounded cursor-pointer flex items-center justify-between gap-1 font-semibold hover:bg-white/10 ${
+                            className={`text-left px-1 py-0.5 rounded cursor-pointer flex items-center justify-between gap-1 font-semibold hover:bg-white/10 ${
                               isBlackSelected ? 'bg-white/10 text-white' : 'text-slate-300'
                             }`}
                             style={{
@@ -3689,7 +4003,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                             <span>{pair.black.san}</span>
                             {blackQual && (
                               <span
-                                className="text-[10px] font-extrabold"
+                                className="text-[9px] font-extrabold"
                                 style={{ color: QUALITY_META[blackQual].color }}
                                 title={QUALITY_META[blackQual].label}
                               >
@@ -3709,6 +4023,24 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
           </div>
         </div>
       </div>
+
+      {/* Floating Dragged Piece Overlay (rendered outside overflow-hidden board for unrestricted touch/mouse drag) */}
+      {dragOverlay?.isDragging && (
+        <div
+          className="fixed pointer-events-none z-[90] flex items-center justify-center"
+          style={{
+            left: dragOverlay.clientX,
+            top: dragOverlay.clientY,
+            width: dragOverlay.squareSize,
+            height: dragOverlay.squareSize,
+            transform: 'translate(-50%, -58%) scale(1.16)',
+            filter: 'drop-shadow(0 12px 18px rgba(0, 0, 0, 0.55))'
+          }}
+          aria-hidden="true"
+        >
+          <ChessPieceSvg piece={dragOverlay.piece} className="w-[88%] h-[88%]" />
+        </div>
+      )}
     </div>
   );
 };

@@ -301,6 +301,241 @@
         "createdAt",
         "updatedAt"
       ]
+    },
+    "chatProfile": {
+      "title": "Public Chat Profile",
+      "description": "Non-PII public chat identity for discovering and adding logged-in Firebase users",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID",
+          "maxLength": 128
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Public gamer display name",
+          "maxLength": 64
+        },
+        "friendCode": {
+          "type": "string",
+          "description": "Short uppercase friend code derived from user ID",
+          "minLength": 4,
+          "maxLength": 16,
+          "pattern": "^[A-Z0-9\\-]+$"
+        },
+        "avatarId": {
+          "type": "string",
+          "description": "Avatar preset identifier",
+          "maxLength": 64
+        },
+        "discoverable": {
+          "type": "boolean",
+          "description": "Whether this user appears in the logged-in user directory"
+        },
+        "isOnline": {
+          "type": "boolean",
+          "description": "Active online presence flag"
+        },
+        "lastSeenAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last heartbeat"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update"
+        }
+      },
+      "required": [
+        "userId",
+        "displayName",
+        "friendCode",
+        "avatarId",
+        "discoverable",
+        "isOnline",
+        "lastSeenAt",
+        "updatedAt"
+      ]
+    },
+    "userContact": {
+      "title": "User Friend Contact",
+      "description": "Friend added by a user for quick messaging",
+      "type": "object",
+      "properties": {
+        "contactUid": {
+          "type": "string",
+          "description": "Target friend Firebase Auth UID",
+          "maxLength": 128
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Cached friend display name",
+          "maxLength": 64
+        },
+        "friendCode": {
+          "type": "string",
+          "description": "Cached friend code",
+          "minLength": 4,
+          "maxLength": 16,
+          "pattern": "^[A-Z0-9\\-]+$"
+        },
+        "avatarId": {
+          "type": "string",
+          "description": "Cached friend avatar ID",
+          "maxLength": 64
+        },
+        "nickname": {
+          "type": "string",
+          "description": "Optional custom nickname",
+          "maxLength": 64
+        },
+        "addedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when friend was added"
+        }
+      },
+      "required": ["contactUid", "displayName", "friendCode", "avatarId", "addedAt"]
+    },
+    "chatThread": {
+      "title": "Direct Message Chat Thread",
+      "description": "1-on-1 chat thread between two Firebase-authenticated users",
+      "type": "object",
+      "properties": {
+        "threadId": {
+          "type": "string",
+          "description": "Canonical sorted UID pair thread ID (userAUid_userBUid)",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "userAUid": {
+          "type": "string",
+          "description": "Lexicographically smaller participant UID",
+          "maxLength": 128
+        },
+        "userBUid": {
+          "type": "string",
+          "description": "Lexicographically larger participant UID",
+          "maxLength": 128
+        },
+        "participantUids": {
+          "type": "array",
+          "description": "Bounded two-element array [userAUid, userBUid]"
+        },
+        "userAName": {
+          "type": "string",
+          "description": "Display name for userA",
+          "maxLength": 64
+        },
+        "userBName": {
+          "type": "string",
+          "description": "Display name for userB",
+          "maxLength": 64
+        },
+        "userAAvatarId": {
+          "type": "string",
+          "description": "Avatar ID for userA",
+          "maxLength": 64
+        },
+        "userBAvatarId": {
+          "type": "string",
+          "description": "Avatar ID for userB",
+          "maxLength": 64
+        },
+        "lastMessageText": {
+          "type": "string",
+          "description": "Preview of last sent message",
+          "maxLength": 300
+        },
+        "lastMessageSenderUid": {
+          "type": "string",
+          "description": "UID of last message sender or null",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of thread creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update"
+        }
+      },
+      "required": [
+        "threadId",
+        "userAUid",
+        "userBUid",
+        "participantUids",
+        "userAName",
+        "userBName",
+        "userAAvatarId",
+        "userBAvatarId",
+        "lastMessageText",
+        "lastMessageSenderUid",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "chatMessage": {
+      "title": "Direct Message",
+      "description": "Individual message inside a direct message thread",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Message document ID",
+          "maxLength": 128
+        },
+        "threadId": {
+          "type": "string",
+          "description": "Parent chat thread ID",
+          "maxLength": 128
+        },
+        "senderUid": {
+          "type": "string",
+          "description": "Sender Firebase Auth UID",
+          "maxLength": 128
+        },
+        "senderName": {
+          "type": "string",
+          "description": "Sender display name",
+          "maxLength": 64
+        },
+        "senderAvatarId": {
+          "type": "string",
+          "description": "Sender avatar ID",
+          "maxLength": 64
+        },
+        "participantUids": {
+          "type": "array",
+          "description": "Bounded two-element array matching parent thread participants"
+        },
+        "text": {
+          "type": "string",
+          "description": "Message body text",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of message creation"
+        }
+      },
+      "required": [
+        "id",
+        "threadId",
+        "senderUid",
+        "senderName",
+        "senderAvatarId",
+        "participantUids",
+        "text",
+        "createdAt"
+      ]
     }
   },
   "firestore": {
@@ -321,6 +556,30 @@
         "$ref": "#/entities/gameStats"
       },
       "description": "Individual user play statistics and game timers"
+    },
+    "/users/{userId}/contacts/{contactUid}": {
+      "schema": {
+        "$ref": "#/entities/userContact"
+      },
+      "description": "Friend contacts added by the user for real-time Firebase chat"
+    },
+    "/chatProfiles/{userId}": {
+      "schema": {
+        "$ref": "#/entities/chatProfile"
+      },
+      "description": "Public non-PII chat directory profiles for logged-in Firebase users"
+    },
+    "/chatThreads/{threadId}": {
+      "schema": {
+        "$ref": "#/entities/chatThread"
+      },
+      "description": "1-on-1 direct message conversation metadata"
+    },
+    "/chatThreads/{threadId}/messages/{messageId}": {
+      "schema": {
+        "$ref": "#/entities/chatMessage"
+      },
+      "description": "Messages belonging to a direct message conversation"
     },
     "/chessRooms/{roomCode}": {
       "schema": {

@@ -16,7 +16,8 @@ import {
   Play,
   Pause,
   SkipForward,
-  Music
+  Music,
+  MessageCircle
 } from 'lucide-react';
 import { ThemeConfig } from '../services/themeStore';
 import { useAuth } from '../context/AuthContext';
@@ -39,6 +40,9 @@ interface HeaderProps {
   onOpenCloakerModal?: () => void;
   onOpenAccountModal?: () => void;
   onOpenThemeModal?: () => void;
+  onToggleChatBox?: () => void;
+  isChatOpen?: boolean;
+  onlineChatCount?: number;
   onToggleMobileSidebar?: () => void;
   activeTheme?: ThemeConfig;
   siteSettings?: any;
@@ -57,6 +61,9 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenCloakerModal,
   onOpenAccountModal,
   onOpenThemeModal,
+  onToggleChatBox,
+  isChatOpen,
+  onlineChatCount = 0,
   onToggleMobileSidebar,
   activeTheme
 }) => {
@@ -225,6 +232,28 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
         </div>
+
+        {/* Firebase Friends Chatbox Toggle */}
+        {onToggleChatBox && (
+          <button
+            onClick={onToggleChatBox}
+            className="p-2 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold relative"
+            style={{
+              backgroundColor: isChatOpen ? (activeTheme?.accentBadge || 'rgba(16, 185, 129, 0.2)') : 'rgba(255, 255, 255, 0.05)',
+              borderColor: isChatOpen ? accentColor : borderColor,
+              color: isChatOpen ? accentColor : 'rgb(203, 213, 225)'
+            }}
+            title="Open Firebase Friends & Chatbox"
+          >
+            <MessageCircle className="w-4 h-4" />
+            <span className="hidden lg:inline">Chat</span>
+            {onlineChatCount > 0 && (
+              <span className="px-1.5 py-0.2 rounded-full bg-emerald-500 text-black text-[10px] font-extrabold leading-tight">
+                {onlineChatCount}
+              </span>
+            )}
+          </button>
+        )}
 
         {/* Theme Modal Shortcut */}
         {onOpenThemeModal && (

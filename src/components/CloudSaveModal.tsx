@@ -22,19 +22,23 @@ import {
   Info,
   Copy,
   FileText,
-  Key
+  Key,
+  Bookmark,
+  Server
 } from "lucide-react";
 import { Game } from "../types/game";
 import { ThemeConfig, THEMES } from "../services/themeStore";
 import { useAuth } from "../context/AuthContext";
 import { 
-  captureUniversalGameState, 
+  captureUniversalGameStateDetailed, 
   restoreUniversalGameState, 
   formatExactTimestamp, 
   formatTimeAgo, 
   formatSaveBytes,
   createCodeSavePayload,
   createFileSavePayload,
+  createBookmarkSavePayload,
+  isWindowCrossOriginBlocked,
   GameSave 
 } from "../services/cloudSaveService";
 
@@ -43,8 +47,11 @@ interface CloudSaveModalProps {
   onClose: () => void;
   game?: Game;
   onReloadGame?: () => void;
+  onRestoreSave?: (save: GameSave) => Promise<boolean>;
   theme?: ThemeConfig;
-  contentWindow?: Window | null;
+  getContentWindow?: () => Window | null;
+  sameOriginMirror?: string | null;
+  onSwitchToSameOriginMirror?: () => void;
 }
 
 export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
@@ -52,19 +59,24 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
   onClose,
   game,
   onReloadGame,
+  onRestoreSave,
   theme = THEMES.original,
-  contentWindow
+  getContentWindow,
+  sameOriginMirror,
+  onSwitchToSameOriginMirror
 }) => {
-  const { user, profile, deviceLabel, isGuest, loginGoogle, saveCurrentGame, deleteSave, getSavesForGame } = useAuth();
+  const { user, profile, deviceLabel, isGuest, isCloudSynced, authError, clearAuthError, loginGoogle, saveCurrentGameWithStatus, deleteSave, getSavesForGame } = useAuth();
   
   const [currentLiveTime, setCurrentLiveTime] = useState(new Date());
   const [selectedSlot, setSelectedSlot] = useState<string>("new_checkpoint");
   const [customCheckpointTitle, setCustomCheckpointTitle] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccessMsg, setSaveSuccessMsg] = useState<string | null>(null);
+  const [saveErrorMsg, setSaveErrorMsg] = useState<string | null>(null);
   const [saveMode, setSaveMode] = useState<'snapshot' | 'code' | 'file'>('snapshot');
   const [manualCodeInput, setManualCodeInput] = useState<string>('');
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const batteryFileInputRef = useRef<HTMLInputElement>(null);
   
   const [isRestoring, setIsRestoring] = useState(false);
@@ -73,6 +85,8 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
   
   const [editingSaveId, setEditingSaveId] = useState<string | null>(null);
   const [editingTitleText, setEditingTitleText] = useState("");
+  const [bookmarkLevel, setBookmarkLevel] = useState<string>("");
+  const [bookmarkScore, setBookmarkScore] = useState<string>("");
   
   const [autoSaveEnabled, setAutoSaveEnabled] = useState<boolean>(() => {
     try {
@@ -96,14 +110,21 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
     if (isOpen) {
       const timeStr = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
       setCustomCheckpointTitle(`Checkpoint at ${timeStr}`);
+      setBookmarkLevel("");
+      setBookmarkScore("");
       setSaveSuccessMsg(null);
+      setSaveErrorMsg(null);
       setRestoreSuccessMsg(null);
+      setConfirmDeleteId(null);
+      clearAuthError();
     }
-  }, [isOpen, game?.id]);
+  }, [isOpen, game?.id, clearAuthError]);
 
   if (!isOpen || !game) return null;
 
   const gameSaves = getSavesForGame(game.id);
+  const currentContentWindow = getContentWindow ? getContentWindow() : null;
+  const isCrossOriginExternal = isWindowCrossOriginBlocked(currentContentWindow);
 
   const formattedLiveClock = currentLiveTime.toLocaleTimeString([], {
     hour: 'numeric',
@@ -118,44 +139,113 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
     day: 'numeric'
   });
 
-  // Handle capturing an exact checkpoint right now
+  // Handle capturing an exact checkpoint (or saving a Progress Bookmark on cross-origin games)
   const handleCaptureCheckpoint = async () => {
     setIsSaving(true);
     setSaveSuccessMsg(null);
+    setSaveErrorMsg(null);
     setRestoreSuccessMsg(null);
 
     try {
-      const capturedStateStr = await captureUniversalGameState(game.id, contentWindow);
-      
-      const exactTimeStr = formatExactTimestamp(new Date().toISOString());
-      const titleToUse = customCheckpointTitle.trim() || `Checkpoint (${exactTimeStr})`;
-      
-      // Determine slot key (either new snapshot or existing slot1..slot5)
-      let slotKey = selectedSlot;
-      if (selectedSlot === "new_checkpoint") {
-        // e.g. cp_1793883036
-        slotKey = `cp_${Date.now()}`;
+      const runSave = async () => {
+        const contentWindow = getContentWindow ? getContentWindow() : null;
+        const capture = await captureUniversalGameStateDetailed(game.id, contentWindow);
+        const exactTimeStr = formatExactTimestamp(new Date().toISOString());
+
+        let slotKey = selectedSlot;
+        if (selectedSlot === "new_checkpoint") {
+          slotKey = `cp_${Date.now()}`;
+        }
+
+        if (capture.crossOriginBlocked) {
+          const parsedScore = bookmarkScore.trim() ? Number(bookmarkScore.trim()) : undefined;
+          const cleanScore = parsedScore !== undefined && Number.isFinite(parsedScore) ? parsedScore : undefined;
+          const levelVal = bookmarkLevel.trim() || undefined;
+          const labelToUse = customCheckpointTitle.trim() || (levelVal ? `${levelVal} Bookmark` : `Bookmark (${exactTimeStr})`);
+          const bookmarkPayload = createBookmarkSavePayload(game.id, {
+            note: labelToUse,
+            level: levelVal,
+            score: cleanScore,
+            mirrorUrl: game.iframeSrc
+          });
+
+          const result = await saveCurrentGameWithStatus(game.id, slotKey, {
+            title: labelToUse,
+            saveData: bookmarkPayload,
+            saveType: "bookmark",
+            level: levelVal,
+            score: cleanScore,
+            deviceLabel
+          });
+
+          setSaveSuccessMsg(
+            result.cloudSynced
+              ? `Saved Progress Bookmark at ${exactTimeStr} to Cloud + Device Vault!`
+              : `Saved Progress Bookmark at ${exactTimeStr} to Device Vault! ${result.cloudError || 'Sign in with Google to sync across devices.'}`
+          );
+
+          const nextTimeStr = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
+          setCustomCheckpointTitle(`Checkpoint at ${nextTimeStr}`);
+          setBookmarkLevel("");
+          setBookmarkScore("");
+          setSelectedSlot("new_checkpoint");
+
+          setTimeout(() => {
+            setSaveSuccessMsg(null);
+          }, 5000);
+          return;
+        }
+
+        if (capture.capturedKeysCount === 0) {
+          setSaveErrorMsg(
+            "No in-game save data found yet. Play until an in-game checkpoint saves, or paste a Save Code in the Save Code tab!"
+          );
+          return;
+        }
+
+        const titleToUse = customCheckpointTitle.trim() || `Checkpoint (${exactTimeStr})`;
+
+        const result = await saveCurrentGameWithStatus(game.id, slotKey, {
+          title: titleToUse,
+          saveData: capture.saveData,
+          saveType: "universal",
+          deviceLabel
+        });
+
+        setSaveSuccessMsg(
+          result.cloudSynced
+            ? `Saved checkpoint (${capture.capturedKeysCount} keys) at ${exactTimeStr} to Cloud + Device Vault!`
+            : `Saved checkpoint (${capture.capturedKeysCount} keys) at ${exactTimeStr} to Device Vault! ${result.cloudError || 'Sign in with Google to sync across devices.'}`
+        );
+
+        const nextTimeStr = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
+        setCustomCheckpointTitle(`Checkpoint at ${nextTimeStr}`);
+        setSelectedSlot("new_checkpoint");
+
+        setTimeout(() => {
+          setSaveSuccessMsg(null);
+        }, 5000);
+      };
+
+      const outcome = await Promise.race([
+        runSave().then(() => 'done' as const),
+        new Promise<'timeout'>((resolve) => window.setTimeout(() => resolve('timeout'), 12000))
+      ]);
+
+      if (outcome === 'timeout') {
+        setSaveErrorMsg("Save took too long and timed out. Try again or use the Save Code tab.");
       }
-
-      const savedResult = await saveCurrentGame(game.id, slotKey, {
-        title: titleToUse,
-        saveData: capturedStateStr,
-        saveType: "universal",
-        deviceLabel
-      });
-
-      setSaveSuccessMsg(`Saved checkpoint at ${exactTimeStr} to Cloud & Device Vault!`);
-      
-      // Reset input title for next save
-      const nextTimeStr = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
-      setCustomCheckpointTitle(`Checkpoint at ${nextTimeStr}`);
-      setSelectedSlot("new_checkpoint");
-
-      setTimeout(() => {
-        setSaveSuccessMsg(null);
-      }, 5000);
     } catch (err) {
-      console.error("Failed to capture checkpoint:", err);
+      console.warn("Failed to capture checkpoint:", err);
+      const rawMsg = err instanceof Error ? err.message : "Could not save checkpoint.";
+      let friendlyMsg = rawMsg;
+      if (rawMsg.startsWith('{')) {
+        try {
+          const parsedErr = JSON.parse(rawMsg);
+          friendlyMsg = parsedErr?.error || "Cloud sync failed due to permissions. Check your Google sign-in.";
+        } catch {}
+      }
+      setSaveErrorMsg(friendlyMsg);
     } finally {
       setIsSaving(false);
     }
@@ -165,53 +255,69 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
   const handleRestoreCheckpoint = async (save: GameSave) => {
     setIsRestoring(true);
     setRestoredSaveId(save.id);
+    setSaveErrorMsg(null);
     setRestoreSuccessMsg(null);
 
     try {
-      const restored = await restoreUniversalGameState(game.id, save.saveData, contentWindow);
       const exactTime = formatExactTimestamp(save.updatedAt || save.createdAt);
 
+      if (onRestoreSave) {
+        const ok = await onRestoreSave(save);
+        if (ok) {
+          setRestoreSuccessMsg(`Restored checkpoint from ${exactTime}!`);
+          setTimeout(() => {
+            setIsRestoring(false);
+            setRestoredSaveId(null);
+            onClose();
+          }, 700);
+        } else {
+          setSaveErrorMsg("This checkpoint did not contain restorable storage data.");
+          setIsRestoring(false);
+          setRestoredSaveId(null);
+        }
+        return;
+      }
+
+      const contentWindow = getContentWindow ? getContentWindow() : null;
+      await restoreUniversalGameState(game.id, save.saveData, contentWindow);
       let hasLiveEmulatorState = false;
       try {
         const parsed = JSON.parse(save.saveData);
         if (parsed?.emulator?.stateBase64) {
           hasLiveEmulatorState = true;
         }
-      } catch (e) {}
+      } catch {}
 
       if (hasLiveEmulatorState) {
         setRestoreSuccessMsg(`Restored exact point in time (${exactTime})! State loaded into game.`);
         setIsRestoring(false);
         setRestoredSaveId(null);
-        setTimeout(() => {
-          onClose();
-        }, 1200);
+        setTimeout(() => onClose(), 1000);
       } else {
-        setRestoreSuccessMsg(`Restored to checkpoint from ${exactTime}! Reloading game...`);
-        // Reload game iframe to apply the restored storage state
+        setRestoreSuccessMsg(`Restored checkpoint from ${exactTime}! Reloading game...`);
         setTimeout(() => {
-          if (onReloadGame) {
-            onReloadGame();
-          }
+          if (onReloadGame) onReloadGame();
           setIsRestoring(false);
           setRestoredSaveId(null);
-          setTimeout(() => {
-            onClose();
-          }, 1200);
-        }, 600);
+          setTimeout(() => onClose(), 800);
+        }, 400);
       }
     } catch (err) {
       console.error("Failed to restore checkpoint:", err);
+      setSaveErrorMsg("Failed to restore checkpoint.");
       setIsRestoring(false);
       setRestoredSaveId(null);
     }
   };
 
-  // Handle deleting a checkpoint
+  // Handle deleting a checkpoint (inline confirmation instead of window.confirm)
   const handleDeleteCheckpoint = async (save: GameSave) => {
-    if (window.confirm(`Delete checkpoint "${save.title || save.slot}"? This cannot be undone.`)) {
-      await deleteSave(game.id, save.slot);
+    if (confirmDeleteId !== save.id) {
+      setConfirmDeleteId(save.id);
+      return;
     }
+    setConfirmDeleteId(null);
+    await deleteSave(game.id, save.slot);
   };
 
   // Handle renaming a checkpoint
@@ -222,7 +328,7 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
 
   const handleSaveRename = async (save: GameSave) => {
     if (editingTitleText.trim()) {
-      await saveCurrentGame(game.id, save.slot, {
+      await saveCurrentGameWithStatus(game.id, save.slot, {
         title: editingTitleText.trim(),
         saveData: save.saveData,
         saveType: save.saveType,
@@ -254,23 +360,30 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
   const handleImportSaveFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setSaveErrorMsg(null);
     const reader = new FileReader();
     reader.onload = async (ev) => {
       try {
         const parsed = JSON.parse(ev.target?.result as string);
         if (parsed && parsed.saveData) {
           const importedTitle = parsed.title ? `Imported: ${parsed.title}` : `Imported Checkpoint (${formatExactTimestamp(new Date().toISOString())})`;
-          await saveCurrentGame(game.id, `cp_${Date.now()}`, {
+          const result = await saveCurrentGameWithStatus(game.id, `cp_${Date.now()}`, {
             title: importedTitle,
             saveData: parsed.saveData,
             saveType: parsed.saveType || "universal",
             deviceLabel: parsed.deviceLabel || "Imported File"
           });
-          setSaveSuccessMsg("Successfully imported and saved checkpoint to Cloud!");
+          setSaveSuccessMsg(
+            result.cloudSynced
+              ? "Successfully imported checkpoint to Cloud + Device Vault!"
+              : "Successfully imported checkpoint to Device Vault!"
+          );
           setTimeout(() => setSaveSuccessMsg(null), 4000);
+        } else {
+          setSaveErrorMsg("Invalid checkpoint JSON file (missing saveData).");
         }
-      } catch (err) {
-        alert("Invalid checkpoint JSON file.");
+      } catch {
+        setSaveErrorMsg("Invalid checkpoint JSON file.");
       }
     };
     reader.readAsText(file);
@@ -280,26 +393,48 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
   const handleSaveCodeCheckpoint = async () => {
     if (!manualCodeInput.trim()) return;
     setIsSaving(true);
+    setSaveErrorMsg(null);
     try {
-      const payloadStr = createCodeSavePayload(game.id, manualCodeInput.trim());
-      const exactTimeStr = formatExactTimestamp(new Date().toISOString());
-      const timeOnly = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
-      const titleToUse = customCheckpointTitle.trim() || `Code Save at ${timeOnly}`;
-      const slotKey = selectedSlot === "new_checkpoint" ? `code_${Date.now()}` : selectedSlot;
+      const runSave = async () => {
+        const payloadStr = createCodeSavePayload(game.id, manualCodeInput.trim());
+        const exactTimeStr = formatExactTimestamp(new Date().toISOString());
+        const timeOnly = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
+        const titleToUse = customCheckpointTitle.trim() || `Code Save at ${timeOnly}`;
+        const slotKey = selectedSlot === "new_checkpoint" ? `code_${Date.now()}` : selectedSlot;
 
-      await saveCurrentGame(game.id, slotKey, {
-        title: titleToUse,
-        saveData: payloadStr,
-        saveType: "manual_code",
-        deviceLabel
-      });
+        const result = await saveCurrentGameWithStatus(game.id, slotKey, {
+          title: titleToUse,
+          saveData: payloadStr,
+          saveType: "manual_code",
+          deviceLabel
+        });
 
-      setSaveSuccessMsg(`Saved game code checkpoint at ${exactTimeStr}!`);
-      setManualCodeInput('');
-      setSelectedSlot("new_checkpoint");
-      setTimeout(() => setSaveSuccessMsg(null), 4000);
+        setSaveSuccessMsg(
+          `Saved game code checkpoint at ${exactTimeStr} (${result.cloudSynced ? 'Cloud + Device' : 'Device Vault'})!`
+        );
+        setManualCodeInput('');
+        setSelectedSlot("new_checkpoint");
+        setTimeout(() => setSaveSuccessMsg(null), 4000);
+      };
+
+      const outcome = await Promise.race([
+        runSave().then(() => 'done' as const),
+        new Promise<'timeout'>((resolve) => window.setTimeout(() => resolve('timeout'), 12000))
+      ]);
+      if (outcome === 'timeout') {
+        setSaveErrorMsg("Saving code timed out. Please try again.");
+      }
     } catch (e) {
-      console.error(e);
+      console.warn(e);
+      const rawMsg = e instanceof Error ? e.message : "Failed to save code checkpoint.";
+      let friendlyMsg = rawMsg;
+      if (rawMsg.startsWith('{')) {
+        try {
+          const parsedErr = JSON.parse(rawMsg);
+          friendlyMsg = parsedErr?.error || "Cloud sync failed due to permissions.";
+        } catch {}
+      }
+      setSaveErrorMsg(friendlyMsg);
     } finally {
       setIsSaving(false);
     }
@@ -308,6 +443,7 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
   const handleUploadBatteryFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setSaveErrorMsg(null);
     const reader = new FileReader();
     reader.onload = async (ev) => {
       try {
@@ -317,17 +453,19 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
         const payloadStr = createFileSavePayload(game.id, file.name, base64);
         const titleToUse = `File: ${file.name} (${exactTimeStr})`;
 
-        await saveCurrentGame(game.id, `file_${Date.now()}`, {
+        const savedRes = await saveCurrentGameWithStatus(game.id, `file_${Date.now()}`, {
           title: titleToUse,
           saveData: payloadStr,
           saveType: "battery_file",
           deviceLabel
         });
 
-        setSaveSuccessMsg(`Uploaded and saved "${file.name}" to Cloud Checkpoints!`);
+        setSaveSuccessMsg(
+          `Uploaded "${file.name}" to ${savedRes.cloudSynced ? 'Cloud + Device Checkpoints' : 'Device Checkpoints'}!`
+        );
         setTimeout(() => setSaveSuccessMsg(null), 4000);
       } catch (err) {
-        alert("Failed to upload save file.");
+        setSaveErrorMsg(err instanceof Error ? err.message : "Failed to upload save file.");
       }
     };
     reader.readAsDataURL(file);
@@ -373,6 +511,7 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
       const next = !prev;
       try {
         localStorage.setItem("owen_autosave_enabled", String(next));
+        window.dispatchEvent(new Event("owen-autosave-changed"));
       } catch {}
       return next;
     });
@@ -433,15 +572,17 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
 
           <div className="flex items-center gap-2">
             {/* Account Status Badge */}
-            {!isGuest && user ? (
+            {isCloudSynced && !isGuest && user ? (
               <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border bg-emerald-500/10 border-emerald-500/20 text-emerald-400">
                 <ShieldCheck className="w-3.5 h-3.5" />
-                <span className="truncate max-w-[120px]">{user.email || profile?.displayName}</span>
+                <span className="truncate max-w-[140px]">Cloud Sync: {user.email || profile?.displayName}</span>
               </div>
             ) : (
               <button
-                onClick={loginGoogle}
-                className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all cursor-pointer bg-white/5 hover:bg-white/10 text-slate-300 border-white/10"
+                onClick={() => {
+                  void loginGoogle().catch(() => {});
+                }}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all cursor-pointer bg-white/5 hover:bg-white/10 text-slate-200 border-white/15"
                 title="Sign in with Google to sync saves across school and home devices"
               >
                 <span>Google Sign-In</span>
@@ -462,6 +603,13 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
         <div className="p-5 overflow-y-auto flex flex-col gap-6 flex-1">
 
           {/* Feedback alerts */}
+          {(saveErrorMsg || authError) && (
+            <div className="flex items-center gap-2.5 p-3 rounded-xl bg-amber-500/15 border border-amber-400/40 text-amber-200 text-xs font-medium animate-fadeIn">
+              <AlertCircle className="w-4 h-4 shrink-0 text-amber-400" />
+              <span>{saveErrorMsg || authError}</span>
+            </div>
+          )}
+
           {saveSuccessMsg && (
             <div className="flex items-center gap-2.5 p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-medium animate-fadeIn">
               <Check className="w-4 h-4 shrink-0 text-emerald-400" />
@@ -541,6 +689,43 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
 
             {saveMode === 'snapshot' && (
               <div className="flex flex-col gap-3">
+                {isCrossOriginExternal && (
+                  <div className="p-3.5 rounded-xl border border-sky-400/30 bg-sky-500/10 flex flex-col gap-2.5">
+                    <div className="flex items-start gap-2.5 text-xs text-sky-100">
+                      <Info className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <div className="font-bold text-white">External Game Host Detected</div>
+                        <p className="text-[11px] text-slate-300 mt-0.5 leading-relaxed">
+                          Browser security blocks reading memory from external game websites directly. You can switch to a save-capable mirror or log your progress as a Cloud Bookmark below.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {sameOriginMirror && onSwitchToSameOriginMirror && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onSwitchToSameOriginMirror();
+                            onClose();
+                          }}
+                          className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-[11px] flex items-center gap-1.5 cursor-pointer transition-colors"
+                        >
+                          <Server className="w-3.5 h-3.5" />
+                          <span>Switch to Save-Capable Mirror & Reload</span>
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setSaveMode('code')}
+                        className="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 text-amber-300 font-bold text-[11px] flex items-center gap-1.5 cursor-pointer transition-colors"
+                      >
+                        <Key className="w-3.5 h-3.5" />
+                        <span>Use In-Game Save Code</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="sm:col-span-2 flex flex-col gap-1.5">
                     <label className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
@@ -575,6 +760,31 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
                     </select>
                   </div>
                 </div>
+
+                {isCrossOriginExternal && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[11px] font-medium text-slate-300">Level / Stage (Optional):</label>
+                      <input
+                        type="text"
+                        value={bookmarkLevel}
+                        onChange={(e) => setBookmarkLevel(e.target.value)}
+                        placeholder="e.g. World 3 - Level 8"
+                        className="w-full px-3 py-1.5 text-xs bg-black/40 border border-white/15 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 transition-colors"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[11px] font-medium text-slate-300">Score / Coins (Optional):</label>
+                      <input
+                        type="number"
+                        value={bookmarkScore}
+                        onChange={(e) => setBookmarkScore(e.target.value)}
+                        placeholder="e.g. 12500"
+                        className="w-full px-3 py-1.5 text-xs bg-black/40 border border-white/15 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 transition-colors"
+                      />
+                    </div>
+                  </div>
+                )}
 
                 {/* Quick Area Tags */}
                 <div className="flex items-center gap-1.5 flex-wrap pt-1">
@@ -613,7 +823,12 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
                     {isSaving ? (
                       <>
                         <RotateCcw className="w-4 h-4 animate-spin" />
-                        <span>Capturing Exact State...</span>
+                        <span>{isCrossOriginExternal ? 'Saving Bookmark...' : 'Capturing Exact State...'}</span>
+                      </>
+                    ) : isCrossOriginExternal ? (
+                      <>
+                        <Bookmark className="w-4 h-4" />
+                        <span>Save Progress Bookmark</span>
                       </>
                     ) : (
                       <>
@@ -764,6 +979,9 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
                   const manualCodeVal = parsedPayload?.manualCode;
                   const hasBatteryFile = parsedPayload && (parsedPayload.type === 'battery_file' || parsedPayload.saveFileBase64);
                   const fileNameVal = parsedPayload?.saveFileName;
+                  const hasBookmark = save.saveType === 'bookmark' || Boolean(parsedPayload?.bookmarkNote);
+                  const levelVal = save.level || parsedPayload?.level;
+                  const scoreVal = typeof save.score === 'number' ? save.score : parsedPayload?.score;
 
                   return (
                     <div
@@ -792,6 +1010,12 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
                             {save.slot === 'slot1' ? 'Slot 1 (Quick)' : save.slot.startsWith('code_') ? 'Code Save' : save.slot.startsWith('file_') ? 'File Save' : save.slot.startsWith('cp_') ? 'Snapshot' : save.slot.toUpperCase()}
                           </span>
 
+                          {hasBookmark && (
+                            <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/40 flex items-center gap-1">
+                              <Bookmark className="w-2.5 h-2.5" /> Bookmark
+                            </span>
+                          )}
+
                           {hasManualCode && (
                             <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1">
                               <Key className="w-2.5 h-2.5" /> Save Code
@@ -801,6 +1025,18 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
                           {hasBatteryFile && (
                             <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/40 flex items-center gap-1">
                               <FileText className="w-2.5 h-2.5" /> Battery File
+                            </span>
+                          )}
+
+                          {levelVal && (
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                              Lv: {levelVal}
+                            </span>
+                          )}
+
+                          {typeof scoreVal === 'number' && (
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-mono">
+                              Score: {scoreVal.toLocaleString()}
                             </span>
                           )}
 
@@ -948,10 +1184,15 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
                         {/* Delete Checkpoint */}
                         <button
                           onClick={() => handleDeleteCheckpoint(save)}
-                          className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors border border-transparent hover:border-rose-500/20 cursor-pointer"
-                          title="Delete checkpoint"
+                          className={`p-2 rounded-xl transition-colors border cursor-pointer flex items-center gap-1 text-xs font-bold ${
+                            confirmDeleteId === save.id
+                              ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                              : 'text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border-transparent hover:border-rose-500/20'
+                          }`}
+                          title={confirmDeleteId === save.id ? "Click again to confirm delete" : "Delete checkpoint"}
                         >
                           <Trash2 className="w-4 h-4" />
+                          {confirmDeleteId === save.id && <span>Confirm</span>}
                         </button>
                       </div>
                     </div>

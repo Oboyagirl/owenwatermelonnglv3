@@ -41,23 +41,21 @@ const CURATED_GAMES: Game[] = [
     thumbnail: "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?w=600&auto=format&fit=crop&q=80",
     banner: "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?w=1200&auto=format&fit=crop&q=80",
     mirrors: [
-      "https://diep.io",
+      "games/diep-io.html",
       "https://ilancosman.github.io/diepio-clone/",
-      "https://priswall.github.io/diepio-clone/",
-      "/api/proxy/game?url=https://diep.io",
-      "games/diep-io.html"
+      "https://priswall.github.io/diepio-clone/"
     ],
     tags: ["Diep.io", "Tank", "Multiplayer", "Shooter", "IO Games", "Action", "Trending", "Unblocked"],
     rating: 5.0,
     plays: 489000,
     author: "Matheus Valadares",
     featured: true,
-    iframeSrc: "https://diep.io",
-    iframeCode: `<iframe class="game-iframe" id="game-area" title="Diep.io" src="https://diep.io" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
+    iframeSrc: "games/diep-io.html",
+    iframeCode: `<iframe class="game-iframe" id="game-area" title="Diep.io" src="games/diep-io.html" allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope" allowfullscreen=""></iframe>`,
     controls: [
       { key: "WASD / Arrow Keys", action: "Move Tank" },
-      { key: "Mouse Move & Left Click", action: "Aim & Shoot" },
-      { key: "1 - 8 Keys", action: "Upgrade Stats" },
+      { key: "Mouse Move & Left Click", action: "Aim & Shoot (Right-Click: Repel / Zoom)" },
+      { key: "1 - 8 Keys (or M + 1-8)", action: "Upgrade Stats (Hold M to Max)" },
       { key: "E / C", action: "Toggle Auto-Fire / Auto-Spin" }
     ]
   },
@@ -1274,9 +1272,9 @@ export const URL_OVERRIDES: Record<string, string> = {
   "7zeb-agariolite": "https://7zeb.github.io/homework/agariolite.html",
   "strongdog-agario": "https://7zeb.github.io/homework/agariolite.html",
   "potatoes-io-games": "https://7zeb.github.io/homework/agariolite.html",
-  "diep-io": "https://diep.io",
-  "diepio": "https://diep.io",
-  "potatoes-diep-io": "https://diep.io",
+  "diep-io": "games/diep-io.html",
+  "diepio": "games/diep-io.html",
+  "potatoes-diep-io": "games/diep-io.html",
   "slither-io": "https://freeonlinewebtools.github.io/gamelist3.github.io/slitherio/",
   "slitherio": "https://freeonlinewebtools.github.io/gamelist3.github.io/slitherio/",
   "potatoes-slither-io": "https://freeonlinewebtools.github.io/gamelist3.github.io/slitherio/",

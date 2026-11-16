@@ -69,6 +69,8 @@ export function useGamesStore() {
               key.includes('btd') || 
               key.includes('duck') ||
               key.includes('buckshot') ||
+              key.includes('diep') ||
+              src.includes('diep.io') ||
               src.includes('gameinclassroom') ||
               src.includes('freeonlinewebtools') ||
               src.includes('ubghyper.github.io') ||

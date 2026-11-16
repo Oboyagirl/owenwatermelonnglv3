@@ -41,7 +41,10 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
     profile, 
     saves, 
     deviceLabel, 
-    isGuest, 
+    isGuest,
+    isCloudSynced,
+    authError,
+    clearAuthError,
     loginGoogle, 
     loginGuest, 
     logout, 
@@ -82,8 +85,21 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setIsUpdating(true);
+    clearAuthError();
+    try {
+      await loginGoogle();
+    } catch {
+      // authError is set in AuthContext for UI display
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   const handleCreateGuest = async () => {
     setIsUpdating(true);
+    clearAuthError();
     try {
       await loginGuest(guestNameInput);
       setGuestNameInput('');
@@ -135,6 +151,18 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
 
         {/* Content */}
         <div className="p-6 overflow-y-auto space-y-6">
+          {authError && (
+            <div className="p-3 rounded-xl bg-amber-500/15 border border-amber-400/40 text-amber-200 text-xs font-medium flex items-center justify-between gap-2">
+              <span>{authError}</span>
+              <button
+                onClick={clearAuthError}
+                className="text-amber-300 hover:text-white cursor-pointer shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
           {/* User Status Card */}
           {user ? (
             <div 
@@ -191,16 +219,27 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                     )}
                     <div className="flex flex-wrap items-center gap-2 mt-1">
                       <span className="text-xs text-slate-400">
-                        {user.email || (isGuest ? 'Guest Gamer Profile' : 'Synced Account')}
+                        {user.email || (isGuest ? 'Device Profile (Guest)' : 'Synced Account')}
                       </span>
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                        {saves.length} Cloud Saves Active
+                        {saves.length} {isCloudSynced && !isGuest ? 'Cloud + Device Saves' : 'Device Vault Saves'}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  {isGuest && (
+                    <button
+                      onClick={handleGoogleSignIn}
+                      disabled={isUpdating}
+                      className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+                      style={{ backgroundColor: theme.accent, color: theme.accentText }}
+                    >
+                      <LogIn className="w-3.5 h-3.5" />
+                      <span>Link Google Sync</span>
+                    </button>
+                  )}
                   <button
                     onClick={() => logout()}
                     className="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 transition-all cursor-pointer flex items-center gap-1.5"
@@ -251,12 +290,13 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
                 <button
-                  onClick={loginGoogle}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+                  onClick={handleGoogleSignIn}
+                  disabled={isUpdating}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   style={{ backgroundColor: theme.accent, color: theme.accentText }}
                 >
                   <LogIn className="w-4 h-4" />
-                  <span>Sign In with Google</span>
+                  <span>{isUpdating ? 'Signing In...' : 'Sign In with Google'}</span>
                 </button>
 
                 <div className="flex items-center gap-2 w-full sm:w-auto">

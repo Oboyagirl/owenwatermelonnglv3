@@ -12,6 +12,7 @@ import { Sidebar, TabItem } from './components/Sidebar';
 import { PasscodeGate, PASSCODE_STORAGE_KEY } from './components/PasscodeGate';
 import { HomeDashboard } from './components/HomeDashboard';
 import { FloatingMusicPlayer } from './components/FloatingMusicPlayer';
+import { ChatBoxWidget } from './components/ChatBoxWidget';
 import { useGamesStore } from './services/gamesStore';
 import { useSiteSettingsStore } from './services/siteSettingsStore';
 import { useThemeStore } from './services/themeStore';
@@ -206,6 +207,8 @@ export default function App() {
   const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   const [isCloakerOpen, setIsCloakerOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [onlineChatCount, setOnlineChatCount] = useState(0);
   const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(false);
 
   // Passcode Gate (owenpan2244)
@@ -272,13 +275,23 @@ export default function App() {
   // Global Panic Key Listener (Esc)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !selectedGame && !isThemeModalOpen && !isAccountModalOpen) {
+      if (e.key !== 'Escape') return;
+      const activeEl = document.activeElement as HTMLElement | null;
+      const tag = (activeEl?.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || activeEl?.isContentEditable) {
+        return;
+      }
+      if (isChatOpen) {
+        setIsChatOpen(false);
+        return;
+      }
+      if (!selectedGame && !isThemeModalOpen && !isAccountModalOpen && !isCloakerOpen) {
         triggerPanic();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedGame, isThemeModalOpen, isAccountModalOpen]);
+  }, [selectedGame, isThemeModalOpen, isAccountModalOpen, isCloakerOpen, isChatOpen]);
 
   // Tab Switching & Mutation
   const handleSelectSpace = (space: SpaceType) => {
@@ -787,6 +800,9 @@ export default function App() {
           onOpenCloakerModal={() => setIsCloakerOpen(true)}
           onOpenAccountModal={() => setIsAccountModalOpen(true)}
           onOpenThemeModal={() => setIsThemeModalOpen(true)}
+          onToggleChatBox={() => setIsChatOpen(prev => !prev)}
+          isChatOpen={isChatOpen}
+          onlineChatCount={onlineChatCount}
           onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
           activeTheme={activeTheme}
           siteSettings={siteSettings}
@@ -881,6 +897,15 @@ export default function App() {
         activeSpace={activeSpace}
         isGameActive={Boolean(selectedGame)}
         onOpenMusicSpace={() => handleSelectSpace('music')}
+      />
+
+      {/* Persistent Bottom-Left Firebase Friends & Chatbox */}
+      <ChatBoxWidget
+        isOpen={isChatOpen}
+        onToggle={() => setIsChatOpen(prev => !prev)}
+        onClose={() => setIsChatOpen(false)}
+        activeTheme={activeTheme}
+        onOnlineCountChange={setOnlineChatCount}
       />
     </div>
   );

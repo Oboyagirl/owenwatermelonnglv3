@@ -107,8 +107,7 @@ export const GameCard: React.FC<GameCardProps> = ({
             referrerPolicy="no-referrer"
             loading={priority ? 'eager' : 'lazy'}
             decoding="async"
-            // @ts-expect-error fetchPriority is a valid standard modern attribute
-            fetchpriority={priority ? 'high' : 'auto'}
+            fetchPriority={priority ? 'high' : 'auto'}
             className={`w-full h-full object-cover transition-all duration-300 group-hover:scale-105 ${
               isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
             }`}

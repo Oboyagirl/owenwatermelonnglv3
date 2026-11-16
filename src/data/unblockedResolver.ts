@@ -261,16 +261,14 @@ export function resolveGameSource(
     };
   }
 
-  // Diep.io (Real official game + verified clones & school proxy)
+  // Diep.io (Unblocked authentic local engine + clone fallbacks)
   if (safeId === 'diep-io' || safeId === 'diepio' || safeTitle.toLowerCase().includes('diep.io') || safeTitle.toLowerCase().includes('diep io')) {
     return {
-      src: 'https://diep.io',
+      src: 'games/diep-io.html',
       mirrors: [
-        'https://diep.io',
+        'games/diep-io.html',
         'https://ilancosman.github.io/diepio-clone/',
-        'https://priswall.github.io/diepio-clone/',
-        "https://diep.io",
-        'games/diep-io.html'
+        'https://priswall.github.io/diepio-clone/'
       ]
     };
   }
