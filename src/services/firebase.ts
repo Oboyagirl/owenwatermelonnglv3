@@ -1,12 +1,19 @@
 import { initializeApp } from 'firebase/app';
-import { 
-  getAuth, 
-  GoogleAuthProvider, 
-  signInWithPopup, 
+import {
+  Auth,
+  getAuth,
+  initializeAuth,
+  indexedDBLocalPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
+  browserPopupRedirectResolver,
+  setPersistence,
+  GoogleAuthProvider,
+  signInWithPopup,
   signInAnonymously,
-  signOut, 
+  signOut,
   onAuthStateChanged,
-  User 
+  User
 } from 'firebase/auth';
 import { 
   getFirestore,
@@ -38,10 +45,43 @@ function createFirestoreInstance(): Firestore {
   }
 }
 
+function createAuthInstance(): Auth {
+  try {
+    return initializeAuth(app, {
+      persistence: [
+        indexedDBLocalPersistence,
+        browserLocalPersistence,
+        browserSessionPersistence
+      ],
+      popupRedirectResolver: browserPopupRedirectResolver
+    });
+  } catch {
+    return getAuth(app);
+  }
+}
+
 // CRITICAL: Must use firestoreDatabaseId specified in firebase-applet-config.json
 export const db = createFirestoreInstance();
-export const auth = getAuth(app);
+export const auth = createAuthInstance();
 export const googleProvider = new GoogleAuthProvider();
+
+export async function waitForAuthReady(): Promise<User | null> {
+  try {
+    await auth.authStateReady();
+  } catch {}
+  return auth.currentUser;
+}
+
+export async function ensureAuthPersistence(): Promise<void> {
+  try {
+    await setPersistence(auth, indexedDBLocalPersistence);
+  } catch {
+    try {
+      await setPersistence(auth, browserLocalPersistence);
+    } catch {}
+  }
+  await waitForAuthReady();
+}
 
 // Error Handling Infrastructure conforming to FirestoreErrorInfo
 export enum OperationType {

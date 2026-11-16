@@ -65,7 +65,7 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
   sameOriginMirror,
   onSwitchToSameOriginMirror
 }) => {
-  const { user, profile, deviceLabel, isGuest, isCloudSynced, authError, clearAuthError, loginGoogle, saveCurrentGameWithStatus, deleteSave, getSavesForGame } = useAuth();
+  const { user, profile, deviceLabel, isAuthReady, isGuest, isCloudSynced, authError, clearAuthError, loginGoogle, saveCurrentGameWithStatus, deleteSave, getSavesForGame } = useAuth();
   
   const [currentLiveTime, setCurrentLiveTime] = useState(new Date());
   const [selectedSlot, setSelectedSlot] = useState<string>("new_checkpoint");
@@ -572,7 +572,11 @@ export const CloudSaveModal: React.FC<CloudSaveModalProps> = ({
 
           <div className="flex items-center gap-2">
             {/* Account Status Badge */}
-            {isCloudSynced && !isGuest && user ? (
+            {!isAuthReady ? (
+              <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border bg-white/5 border-white/10 text-slate-300">
+                <span>Restoring session...</span>
+              </div>
+            ) : isCloudSynced && !isGuest && user ? (
               <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border bg-emerald-500/10 border-emerald-500/20 text-emerald-400">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 <span className="truncate max-w-[140px]">Cloud Sync: {user.email || profile?.displayName}</span>

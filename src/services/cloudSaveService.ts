@@ -14,7 +14,7 @@ import {
   deleteDoc,
   onSnapshot
 } from 'firebase/firestore';
-import { auth, db, googleProvider, handleFirestoreError, OperationType } from './firebase';
+import { auth, db, googleProvider, ensureAuthPersistence, handleFirestoreError, OperationType } from './firebase';
 
 export interface UserProfile {
   userId: string;
@@ -340,6 +340,72 @@ export interface AppUser {
 }
 
 const GUEST_STORAGE_KEY = 'owen_local_guest_session';
+const SESSION_MODE_KEY = 'owen_session_mode';
+const REMEMBERED_ACCOUNT_KEY = 'owen_remembered_account';
+
+export type RememberedSessionMode = 'google' | 'guest' | 'signed_out';
+
+export interface RememberedAccount {
+  uid: string;
+  displayName: string | null;
+  email: string | null;
+  photoURL: string | null;
+  avatarId?: string;
+  isAnonymous: boolean;
+  lastSignedInAt: string;
+}
+
+export function markRememberedLogin(user: AppUser, avatarId?: string): void {
+  if (typeof window === 'undefined' || !window.localStorage || !user?.uid) return;
+  try {
+    const mode: RememberedSessionMode = user.isAnonymous ? 'guest' : 'google';
+    localStorage.setItem(SESSION_MODE_KEY, mode);
+    const prevRaw = localStorage.getItem(REMEMBERED_ACCOUNT_KEY);
+    let prevAvatar: string | undefined;
+    if (prevRaw) {
+      try {
+        prevAvatar = (JSON.parse(prevRaw) as RememberedAccount).avatarId;
+      } catch {}
+    }
+    const payload: RememberedAccount = {
+      uid: user.uid,
+      displayName: user.displayName,
+      email: user.email,
+      photoURL: user.photoURL,
+      avatarId: avatarId || prevAvatar || 'melon_classic',
+      isAnonymous: Boolean(user.isAnonymous),
+      lastSignedInAt: new Date().toISOString()
+    };
+    localStorage.setItem(REMEMBERED_ACCOUNT_KEY, JSON.stringify(payload));
+  } catch {}
+}
+
+export function getRememberedLogin(): {
+  mode: RememberedSessionMode | null;
+  account: RememberedAccount | null;
+} {
+  if (typeof window === 'undefined' || !window.localStorage) {
+    return { mode: null, account: null };
+  }
+  try {
+    const rawMode = localStorage.getItem(SESSION_MODE_KEY) as RememberedSessionMode | null;
+    const rawAcc = localStorage.getItem(REMEMBERED_ACCOUNT_KEY);
+    const account = rawAcc ? (JSON.parse(rawAcc) as RememberedAccount) : null;
+    const mode: RememberedSessionMode | null =
+      rawMode === 'google' || rawMode === 'guest' || rawMode === 'signed_out' ? rawMode : null;
+    return { mode, account };
+  } catch {
+    return { mode: null, account: null };
+  }
+}
+
+export function clearRememberedLogin(): void {
+  if (typeof window === 'undefined' || !window.localStorage) return;
+  try {
+    localStorage.setItem(SESSION_MODE_KEY, 'signed_out');
+    localStorage.removeItem(REMEMBERED_ACCOUNT_KEY);
+  } catch {}
+}
 
 export function getOrCreateLocalGuest(customName?: string): AppUser {
   if (typeof window === 'undefined' || !window.localStorage) {
@@ -382,6 +448,20 @@ export function getOrCreateLocalGuest(customName?: string): AppUser {
 
 export async function loginWithGoogle(): Promise<AppUser> {
   try {
+    await ensureAuthPersistence();
+    if (auth.currentUser && !auth.currentUser.isAnonymous) {
+      const existingUser: AppUser = {
+        uid: auth.currentUser.uid,
+        displayName: auth.currentUser.displayName,
+        email: auth.currentUser.email,
+        photoURL: auth.currentUser.photoURL,
+        isAnonymous: false
+      };
+      const prof = await syncInitialProfile(existingUser);
+      markRememberedLogin(existingUser, prof.avatarId);
+      return existingUser;
+    }
+
     const cred = await signInWithPopup(auth, googleProvider);
     const appUser: AppUser = {
       uid: cred.user.uid,
@@ -390,7 +470,8 @@ export async function loginWithGoogle(): Promise<AppUser> {
       photoURL: cred.user.photoURL,
       isAnonymous: false
     };
-    await syncInitialProfile(appUser);
+    const prof = await syncInitialProfile(appUser);
+    markRememberedLogin(appUser, prof.avatarId);
     return appUser;
   } catch (err) {
     console.error("Google sign-in error:", err);
@@ -400,7 +481,23 @@ export async function loginWithGoogle(): Promise<AppUser> {
 
 export async function loginAsGuest(customName?: string): Promise<AppUser> {
   // Try Firebase anonymous login, and if project has admin-only restriction, fallback to local guest session
+  await ensureAuthPersistence();
   try {
+    const activeFbUser = auth.currentUser;
+    if (activeFbUser) {
+      const existingName = customName?.trim() || activeFbUser.displayName || `Player_${activeFbUser.uid.slice(0, 5)}`;
+      const appUser: AppUser = {
+        uid: activeFbUser.uid,
+        displayName: existingName,
+        email: activeFbUser.email,
+        photoURL: activeFbUser.photoURL,
+        isAnonymous: activeFbUser.isAnonymous
+      };
+      const prof = await syncInitialProfile(appUser, existingName);
+      markRememberedLogin(appUser, prof.avatarId);
+      return appUser;
+    }
+
     const cred = await signInAnonymously(auth);
     const generatedName = customName?.trim() || `Player_${Math.floor(1000 + Math.random() * 9000)}`;
     const appUser: AppUser = {
@@ -410,17 +507,20 @@ export async function loginAsGuest(customName?: string): Promise<AppUser> {
       photoURL: null,
       isAnonymous: true
     };
-    await syncInitialProfile(appUser, generatedName);
+    const prof = await syncInitialProfile(appUser, generatedName);
+    markRememberedLogin(appUser, prof.avatarId);
     return appUser;
   } catch (err: any) {
     console.warn("Using instant local guest session (Firebase anonymous auth bypassed):", err?.message || err);
     const localGuest = getOrCreateLocalGuest(customName);
-    await syncInitialProfile(localGuest, customName);
+    const prof = await syncInitialProfile(localGuest, customName);
+    markRememberedLogin(localGuest, prof.avatarId);
     return localGuest;
   }
 }
 
 export async function logoutUser(): Promise<void> {
+  clearRememberedLogin();
   try {
     if (auth.currentUser) {
       await signOut(auth);

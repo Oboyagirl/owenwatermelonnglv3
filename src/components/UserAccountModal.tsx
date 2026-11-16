@@ -41,8 +41,11 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
     profile, 
     saves, 
     deviceLabel, 
+    isAuthReady,
     isGuest,
     isCloudSynced,
+    hasRememberedSession,
+    rememberedAccount,
     authError,
     clearAuthError,
     loginGoogle, 
@@ -60,6 +63,7 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
 
   if (!isOpen) return null;
 
+  const isLoggedIn = Boolean(user || (profile && hasRememberedSession));
   const currentAvatar = AVATAR_PRESETS.find(a => a.id === (profile?.avatarId || 'melon_classic')) || AVATAR_PRESETS[0];
 
   const handleStartEditName = () => {
@@ -80,7 +84,7 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
 
   const handleSelectAvatar = async (avatarId: string) => {
     setSelectedAvatar(avatarId);
-    if (user) {
+    if (isLoggedIn) {
       await updateGamerProfile({ avatarId });
     }
   };
@@ -164,7 +168,18 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
           )}
 
           {/* User Status Card */}
-          {user ? (
+          {!isAuthReady && !isLoggedIn ? (
+            <div 
+              className="p-6 rounded-2xl border text-center space-y-2"
+              style={{ backgroundColor: theme.bgCard, borderColor: theme.border }}
+            >
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto text-2xl animate-pulse border border-emerald-500/30">
+                🍉
+              </div>
+              <p className="text-sm font-bold text-white">Restoring your session...</p>
+              <p className="text-xs text-slate-400">Checking your saved login automatically.</p>
+            </div>
+          ) : isLoggedIn ? (
             <div 
               className="p-5 rounded-2xl border relative overflow-hidden"
               style={{ backgroundColor: theme.bgCard, borderColor: theme.border }}
@@ -206,7 +221,7 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                     ) : (
                       <div className="flex items-center gap-2">
                         <h4 className="text-base font-bold text-white">
-                          {profile?.displayName || user.displayName || 'Player'}
+                          {profile?.displayName || user?.displayName || rememberedAccount?.displayName || 'Player'}
                         </h4>
                         <button
                           onClick={handleStartEditName}
@@ -219,17 +234,20 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                     )}
                     <div className="flex flex-wrap items-center gap-2 mt-1">
                       <span className="text-xs text-slate-400">
-                        {user.email || (isGuest ? 'Device Profile (Guest)' : 'Synced Account')}
+                        {user?.email || rememberedAccount?.email || (isGuest ? 'Device Profile (Guest)' : 'Synced Account')}
                       </span>
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                         {saves.length} {isCloudSynced && !isGuest ? 'Cloud + Device Saves' : 'Device Vault Saves'}
+                      </span>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-sky-500/15 text-sky-300 border border-sky-500/25">
+                        Auto Stay Signed In
                       </span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
-                  {isGuest && (
+                  {(isGuest || !isCloudSynced) && (
                     <button
                       onClick={handleGoogleSignIn}
                       disabled={isUpdating}
@@ -237,7 +255,7 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                       style={{ backgroundColor: theme.accent, color: theme.accentText }}
                     >
                       <LogIn className="w-3.5 h-3.5" />
-                      <span>Link Google Sync</span>
+                      <span>{isGuest ? 'Link Google Sync' : 'Reconnect Google Sync'}</span>
                     </button>
                   )}
                   <button

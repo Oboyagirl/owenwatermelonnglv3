@@ -21,9 +21,9 @@ import {
   PinOff
 } from 'lucide-react';
 import { signInAnonymously } from 'firebase/auth';
-import { auth } from '../services/firebase';
+import { auth, ensureAuthPersistence } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
-import { AVATAR_PRESETS } from '../services/cloudSaveService';
+import { AVATAR_PRESETS, markRememberedLogin } from '../services/cloudSaveService';
 import { ThemeConfig, THEMES } from '../services/themeStore';
 import {
   ChatMessage,
@@ -103,7 +103,7 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
       setIsBarHidden(false);
     }
   }, [isOpen]);
-  const { user, profile, loginGoogle, authError, clearAuthError } = useAuth();
+  const { user, profile, isAuthReady, loginGoogle, authError, clearAuthError } = useAuth();
   const isFirebaseConnected = Boolean(user?.uid && auth.currentUser && auth.currentUser.uid === user.uid);
 
   const myUid = isFirebaseConnected ? user!.uid : '';
@@ -392,7 +392,19 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
     clearAuthError();
     setIsSigningInGuest(true);
     try {
-      await signInAnonymously(auth);
+      await ensureAuthPersistence();
+      if (!auth.currentUser) {
+        const cred = await signInAnonymously(auth);
+        if (cred.user) {
+          markRememberedLogin({
+            uid: cred.user.uid,
+            displayName: profile?.displayName || cred.user.displayName,
+            email: null,
+            photoURL: null,
+            isAnonymous: true
+          });
+        }
+      }
     } catch (err: any) {
       const code = err?.code || '';
       if (code === 'auth/admin-restricted-operation' || code === 'auth/operation-not-allowed') {
@@ -452,6 +464,8 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
             <span className="text-[10px] text-slate-400 leading-tight">
               {isFirebaseConnected
                 ? `${onlinePeersCount} online · ${contacts.length} friends`
+                : !isAuthReady
+                ? 'Restoring session...'
                 : 'Sign in to chat'}
             </span>
           </div>
@@ -599,7 +613,18 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
       )}
 
       {/* Main Content */}
-      {!isFirebaseConnected ? (
+      {!isFirebaseConnected && !isAuthReady ? (
+        <div className="flex-1 p-5 flex flex-col items-center justify-center text-center gap-3">
+          <div
+            className="w-12 h-12 rounded-2xl border flex items-center justify-center animate-pulse"
+            style={{ backgroundColor: bgCard, borderColor: accentColor }}
+          >
+            <Users className="w-6 h-6" style={{ color: accentColor }} />
+          </div>
+          <p className="text-xs font-bold text-white">Restoring your session...</p>
+          <p className="text-[11px] text-slate-400">Keeping you signed in automatically.</p>
+        </div>
+      ) : !isFirebaseConnected ? (
         <div className="flex-1 p-5 flex flex-col items-center justify-center text-center gap-4">
           <div
             className="w-14 h-14 rounded-2xl border flex items-center justify-center"
@@ -610,7 +635,7 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
           <div className="max-w-xs">
             <h3 className="text-sm font-extrabold text-white">Connect Firebase Chat</h3>
             <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
-              Sign in with Firebase to see other logged-in players across GitHub Pages and desktop/iPad, add friends, and chat in real time.
+              Sign in once to see other logged-in players across GitHub Pages and desktop/iPad, add friends, and chat in real time — you&apos;ll stay signed in automatically.
             </p>
           </div>
           <div className="w-full max-w-xs flex flex-col gap-2">

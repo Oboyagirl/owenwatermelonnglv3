@@ -1,10 +1,12 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { User, onAuthStateChanged, signInAnonymously, signOut } from 'firebase/auth';
-import { auth } from '../services/firebase';
+import { auth, ensureAuthPersistence, waitForAuthReady } from '../services/firebase';
 import {
   UserProfile,
   GameSave,
   SaveSlotResult,
+  RememberedAccount,
+  RememberedSessionMode,
   saveGameSlotWithStatus,
   deleteGameSlot,
   subscribeToUserGameSaves,
@@ -15,7 +17,10 @@ import {
   syncInitialProfile,
   updateUserProfile,
   getUserProfile,
-  migrateLocalGuestSavesToUser
+  migrateLocalGuestSavesToUser,
+  markRememberedLogin,
+  getRememberedLogin,
+  clearRememberedLogin
 } from '../services/cloudSaveService';
 import {
   syncMyChatProfile,
@@ -27,8 +32,12 @@ interface AuthContextType {
   profile: UserProfile | null;
   saves: GameSave[];
   deviceLabel: string;
+  isAuthReady: boolean;
   isGuest: boolean;
   isCloudSynced: boolean;
+  hasRememberedSession: boolean;
+  rememberedMode: RememberedSessionMode | null;
+  rememberedAccount: RememberedAccount | null;
   authError: string | null;
   clearAuthError: () => void;
   loginGoogle: () => Promise<void>;
@@ -68,18 +77,31 @@ function formatAuthErrorMessage(err: unknown): string {
 }
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => auth.currentUser);
+  const [isAuthReady, setIsAuthReady] = useState<boolean>(() => Boolean(auth.currentUser));
   const [authError, setAuthError] = useState<string | null>(null);
+  const [rememberedState, setRememberedState] = useState(() => getRememberedLogin());
   const [profile, setProfile] = useState<UserProfile | null>(() => {
     try {
       const saved = localStorage.getItem('owen_gamer_profile');
-      return saved ? JSON.parse(saved) : null;
+      if (saved) return JSON.parse(saved);
+      const { mode, account } = getRememberedLogin();
+      if (mode && mode !== 'signed_out' && account?.uid) {
+        return {
+          userId: account.uid,
+          displayName: account.displayName || 'Player',
+          photoURL: account.photoURL || '',
+          avatarId: account.avatarId || 'melon_classic'
+        };
+      }
+      return null;
     } catch {
       return null;
     }
   });
 
   const [deviceLabel] = useState<string>(() => detectDeviceLabel());
+  const autoGuestRestoreAttemptedRef = useRef(false);
 
   const currentUserId = user?.uid || profile?.userId || getOrCreateLocalGuest().uid;
 
@@ -87,53 +109,130 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return getLocalBackups(currentUserId);
   });
 
-  // Track Firebase Auth State & synchronize remote profile + guest saves
+  // Track Firebase Auth State & synchronize remote profile + persistent session continuity
   useEffect(() => {
     let active = true;
-    try {
-      const unsubscribe = onAuthStateChanged(auth, async (u) => {
+    let unsubscribe = () => {};
+
+    const syncSignedInUser = async (u: User) => {
+      const guestSessionUid = getOrCreateLocalGuest().uid;
+      const prevRemembered = getRememberedLogin();
+      setUser(u);
+
+      try {
+        if (!u.isAnonymous && guestSessionUid && guestSessionUid !== u.uid) {
+          await migrateLocalGuestSavesToUser(guestSessionUid, u.uid);
+        }
+        if (prevRemembered.account?.uid && prevRemembered.account.uid !== u.uid) {
+          await migrateLocalGuestSavesToUser(prevRemembered.account.uid, u.uid);
+        }
+        const syncedProf = await syncInitialProfile({
+          uid: u.uid,
+          displayName: u.displayName || prevRemembered.account?.displayName || null,
+          email: u.email,
+          photoURL: u.photoURL,
+          isAnonymous: u.isAnonymous
+        });
+        markRememberedLogin(
+          {
+            uid: u.uid,
+            displayName: syncedProf.displayName || u.displayName,
+            email: u.email,
+            photoURL: u.photoURL || syncedProf.photoURL || null,
+            isAnonymous: u.isAnonymous
+          },
+          syncedProf.avatarId
+        );
         if (!active) return;
-        const guestSessionUid = getOrCreateLocalGuest().uid;
-        setUser(u);
+        setRememberedState(getRememberedLogin());
+        setProfile(syncedProf);
+        try {
+          localStorage.setItem('owen_gamer_profile', JSON.stringify(syncedProf));
+        } catch {}
+      } catch (e) {
+        console.warn('Auth profile sync warning:', e);
+      }
+    };
+
+    const bootstrapAuth = async () => {
+      await waitForAuthReady();
+      if (!active) return;
+
+      unsubscribe = onAuthStateChanged(auth, async (u) => {
+        if (!active) return;
 
         if (u) {
+          await syncSignedInUser(u);
+          if (active) setIsAuthReady(true);
+          return;
+        }
+
+        // Wait until Firebase finishes restoring persisted state before handling null
+        await waitForAuthReady();
+        if (!active) return;
+        if (auth.currentUser) {
+          await syncSignedInUser(auth.currentUser);
+          if (active) setIsAuthReady(true);
+          return;
+        }
+
+        setUser(null);
+        const remembered = getRememberedLogin();
+        const guestSessionUid = getOrCreateLocalGuest().uid;
+        let existingLocal: UserProfile | null = null;
+        try {
+          const cached = localStorage.getItem('owen_gamer_profile');
+          if (cached) existingLocal = JSON.parse(cached) as UserProfile;
+        } catch {}
+        if (!existingLocal) {
+          existingLocal = await getUserProfile(guestSessionUid);
+        }
+        if (!active) return;
+
+        const shouldAutoRestoreGuest =
+          remembered.mode === 'guest' ||
+          (remembered.mode !== 'signed_out' && Boolean(existingLocal) && remembered.mode !== 'google');
+
+        if (shouldAutoRestoreGuest && !autoGuestRestoreAttemptedRef.current) {
+          autoGuestRestoreAttemptedRef.current = true;
           try {
-            if (!u.isAnonymous && guestSessionUid && guestSessionUid !== u.uid) {
-              await migrateLocalGuestSavesToUser(guestSessionUid, u.uid);
-            }
-            const syncedProf = await syncInitialProfile({
-              uid: u.uid,
-              displayName: u.displayName,
-              email: u.email,
-              photoURL: u.photoURL,
-              isAnonymous: u.isAnonymous
-            });
+            await ensureAuthPersistence();
+            const res = await signInAnonymously(auth);
             if (!active) return;
-            setProfile(syncedProf);
-            try {
-              localStorage.setItem('owen_gamer_profile', JSON.stringify(syncedProf));
-            } catch {}
-          } catch (e) {
-            console.warn('Auth profile sync warning:', e);
-          }
-        } else {
-          const existingLocal = await getUserProfile(guestSessionUid);
-          if (!active) return;
-          if (existingLocal) {
-            setProfile(existingLocal);
+            if (res.user) {
+              if (existingLocal?.userId && existingLocal.userId !== res.user.uid) {
+                await migrateLocalGuestSavesToUser(existingLocal.userId, res.user.uid);
+              }
+              await syncSignedInUser(res.user);
+              if (active) setIsAuthReady(true);
+              return;
+            }
+          } catch {
+            // Anonymous auth disabled or offline — keep local guest profile seamlessly
           }
         }
+
+        if (existingLocal && remembered.mode !== 'signed_out') {
+          setProfile(existingLocal);
+        } else if (remembered.mode === 'google' && remembered.account) {
+          setProfile({
+            userId: remembered.account.uid,
+            displayName: remembered.account.displayName || 'Player',
+            photoURL: remembered.account.photoURL || '',
+            avatarId: remembered.account.avatarId || 'melon_classic'
+          });
+        }
+
+        if (active) setIsAuthReady(true);
       });
-      return () => {
-        active = false;
-        unsubscribe();
-      };
-    } catch (e) {
-      console.warn('Auth state listener warning:', e);
-      return () => {
-        active = false;
-      };
-    }
+    };
+
+    void bootstrapAuth();
+
+    return () => {
+      active = false;
+      unsubscribe();
+    };
   }, []);
 
   // Subscribe to real-time Cloud Saves (IndexedDB + Firestore when signed in)
@@ -192,13 +291,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginGoogle = async () => {
     setAuthError(null);
-    const guestBeforeLogin = getOrCreateLocalGuest().uid;
+    const guestBeforeLogin = profile?.userId || getOrCreateLocalGuest().uid;
     try {
       const appUser = await firebaseLoginWithGoogle();
       if (guestBeforeLogin && guestBeforeLogin !== appUser.uid) {
         await migrateLocalGuestSavesToUser(guestBeforeLogin, appUser.uid);
       }
       const syncedProf = await syncInitialProfile(appUser);
+      markRememberedLogin(appUser, syncedProf.avatarId);
+      setRememberedState(getRememberedLogin());
       setProfile(syncedProf);
       try {
         localStorage.setItem('owen_gamer_profile', JSON.stringify(syncedProf));
@@ -214,13 +315,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loginGuest = async (name: string = 'Guest Player') => {
     setAuthError(null);
     const cleanName = (name || '').trim() || 'Guest Player';
+    await ensureAuthPersistence();
     try {
-      const res = await signInAnonymously(auth);
-      setUser(res.user);
-      const guestProf = await updateUserProfile(res.user.uid, {
+      const existingFbUser = auth.currentUser;
+      const targetUser = existingFbUser || (await signInAnonymously(auth)).user;
+      setUser(targetUser);
+      const guestProf = await updateUserProfile(targetUser.uid, {
         displayName: cleanName,
-        avatarId: 'melon_classic'
+        avatarId: profile?.avatarId || 'melon_classic'
       });
+      markRememberedLogin(
+        {
+          uid: targetUser.uid,
+          displayName: cleanName,
+          email: targetUser.email,
+          photoURL: targetUser.photoURL,
+          isAnonymous: targetUser.isAnonymous
+        },
+        guestProf.avatarId
+      );
+      setRememberedState(getRememberedLogin());
       setProfile(guestProf);
       try {
         localStorage.setItem('owen_gamer_profile', JSON.stringify(guestProf));
@@ -229,8 +343,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const localGuest = getOrCreateLocalGuest(cleanName);
       const guestProf = await updateUserProfile(localGuest.uid, {
         displayName: cleanName,
-        avatarId: 'melon_classic'
+        avatarId: profile?.avatarId || 'melon_classic'
       });
+      markRememberedLogin(localGuest, guestProf.avatarId);
+      setRememberedState(getRememberedLogin());
       setProfile(guestProf);
       try {
         localStorage.setItem('owen_gamer_profile', JSON.stringify(guestProf));
@@ -240,6 +356,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     setAuthError(null);
+    clearRememberedLogin();
+    setRememberedState(getRememberedLogin());
     if (user?.uid && auth.currentUser?.uid === user.uid) {
       await setMyChatOffline(user.uid);
     }
@@ -250,6 +368,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setProfile(null);
     try {
       localStorage.removeItem('owen_gamer_profile');
+      localStorage.removeItem('owen_local_guest_session');
     } catch {}
   };
 
@@ -260,6 +379,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       localStorage.setItem('owen_gamer_profile', JSON.stringify(savedProfile));
     } catch {}
+    if (user) {
+      markRememberedLogin(
+        {
+          uid: user.uid,
+          displayName: savedProfile.displayName,
+          email: user.email,
+          photoURL: savedProfile.photoURL || user.photoURL || null,
+          isAnonymous: user.isAnonymous
+        },
+        savedProfile.avatarId
+      );
+      setRememberedState(getRememberedLogin());
+    }
     if (user?.uid && auth.currentUser?.uid === user.uid) {
       void syncMyChatProfile({
         uid: user.uid,
@@ -337,7 +469,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, [activeUserId]);
 
-  const isGuest = !user || user.isAnonymous;
+  const hasRememberedSession = Boolean(
+    user ||
+      (rememberedState.mode !== 'signed_out' && (rememberedState.mode === 'google' || rememberedState.mode === 'guest' || profile))
+  );
+  const isGuest = user ? user.isAnonymous : rememberedState.mode !== 'google';
   const isCloudSynced = Boolean(user && auth.currentUser && auth.currentUser.uid === user.uid);
 
   return (
@@ -347,8 +483,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         profile,
         saves,
         deviceLabel,
+        isAuthReady,
         isGuest,
         isCloudSynced,
+        hasRememberedSession,
+        rememberedMode: rememberedState.mode,
+        rememberedAccount: rememberedState.account,
         authError,
         clearAuthError,
         loginGoogle,
@@ -374,8 +514,12 @@ export const useAuth = (): AuthContextType => {
       profile: { userId: 'guest', displayName: 'Gamer', avatarId: 'melon_classic' },
       saves: [],
       deviceLabel: 'School Device',
+      isAuthReady: true,
       isGuest: true,
       isCloudSynced: false,
+      hasRememberedSession: false,
+      rememberedMode: null,
+      rememberedAccount: null,
       authError: null,
       clearAuthError: () => {},
       loginGoogle: async () => {},

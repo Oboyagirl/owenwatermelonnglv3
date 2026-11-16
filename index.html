@@ -50,7 +50,7 @@
         <span id="preloader-status" style="font-size: 11px; color: #64748b; margin-top: 12px; font-family: monospace;">Loading catalog...</span>
         <div id="preloader-troubleshoot" style="display: none; margin-top: 16px;">
           <p style="font-size: 12px; color: #f59e0b; margin: 0 0 10px 0;">Loading taking longer than usual?</p>
-          <button onclick="try { localStorage.clear(); sessionStorage.clear(); if ('caches' in window) { caches.keys().then(function(names){ names.forEach(function(n){ caches.delete(n); }); }); } if (navigator.serviceWorker) { navigator.serviceWorker.getRegistrations().then(function(regs){ regs.forEach(function(r){ r.unregister(); }); }); } } catch(e){} window.location.reload();" style="padding: 8px 16px; background-color: #10b981; color: #042f1f; font-weight: 700; font-size: 12px; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(16,185,129,0.3);">
+          <button onclick="try { sessionStorage.clear(); if ('caches' in window) { caches.keys().then(function(names){ names.forEach(function(n){ caches.delete(n); }); }); } if (navigator.serviceWorker) { navigator.serviceWorker.getRegistrations().then(function(regs){ regs.forEach(function(r){ r.unregister(); }); }); } } catch(e){} window.location.reload();" style="padding: 8px 16px; background-color: #10b981; color: #042f1f; font-weight: 700; font-size: 12px; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(16,185,129,0.3);">
             Reset Cache & Reload
           </button>
         </div>

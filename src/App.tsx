@@ -16,6 +16,7 @@ import { ChatBoxWidget } from './components/ChatBoxWidget';
 import { useGamesStore } from './services/gamesStore';
 import { useSiteSettingsStore } from './services/siteSettingsStore';
 import { useThemeStore } from './services/themeStore';
+import { useAuth } from './context/AuthContext';
 import { Game } from './types/game';
 import { triggerPanic } from './data/cloakPresets';
 
@@ -160,6 +161,7 @@ export default function App() {
     updateCustomTheme, 
     resetCustomTheme 
   } = useThemeStore();
+  const { user, hasRememberedSession } = useAuth();
 
   // Root background and theme variables setup
   useEffect(() => {
@@ -242,20 +244,36 @@ export default function App() {
   const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
     try {
       return localStorage.getItem(PASSCODE_STORAGE_KEY) === 'unlocked' ||
+             localStorage.getItem('owen_watermelon_v3_unlocked') === 'unlocked' ||
              sessionStorage.getItem(PASSCODE_STORAGE_KEY) === 'unlocked';
     } catch {
       return false;
     }
   });
 
+  useEffect(() => {
+    if (!user && !hasRememberedSession) return;
+    try {
+      if (localStorage.getItem('owen_site_explicitly_locked') === 'true') return;
+      localStorage.setItem(PASSCODE_STORAGE_KEY, 'unlocked');
+      setIsUnlocked(true);
+    } catch {}
+  }, [user, hasRememberedSession]);
+
   const handleUnlockSite = () => {
+    try {
+      localStorage.removeItem('owen_site_explicitly_locked');
+      localStorage.setItem(PASSCODE_STORAGE_KEY, 'unlocked');
+    } catch {}
     setIsUnlocked(true);
     setShowWelcomeAnimation(true);
   };
 
   const handleLockSite = () => {
     try {
+      localStorage.setItem('owen_site_explicitly_locked', 'true');
       localStorage.removeItem(PASSCODE_STORAGE_KEY);
+      localStorage.removeItem('owen_watermelon_v3_unlocked');
       sessionStorage.removeItem(PASSCODE_STORAGE_KEY);
     } catch {}
     setIsUnlocked(false);

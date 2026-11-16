@@ -11,10 +11,13 @@ import { signInAnonymously, signInWithPopup } from 'firebase/auth';
 import {
   auth,
   db,
+  ensureAuthPersistence,
   googleProvider,
   handleFirestoreError,
-  OperationType
+  OperationType,
+  waitForAuthReady
 } from './firebase';
+import { markRememberedLogin } from './cloudSaveService';
 import {
   applyMove,
   createInitialState,
@@ -322,12 +325,26 @@ function isPermissionDeniedError(err: unknown): boolean {
  * ChessAuthRequiredError if Firebase requires explicit Google sign-in.
  */
 export async function ensureChessFirebaseUid(): Promise<string> {
+  await waitForAuthReady();
   if (auth.currentUser?.uid) {
     return auth.currentUser.uid;
   }
   try {
+    await ensureAuthPersistence();
+    if (auth.currentUser?.uid) {
+      return auth.currentUser.uid;
+    }
     const cred = await signInAnonymously(auth);
-    if (cred.user?.uid) return cred.user.uid;
+    if (cred.user?.uid) {
+      markRememberedLogin({
+        uid: cred.user.uid,
+        displayName: cred.user.displayName,
+        email: cred.user.email,
+        photoURL: cred.user.photoURL,
+        isAnonymous: true
+      });
+      return cred.user.uid;
+    }
   } catch {
     // Anonymous Auth may be disabled in Firebase Console; fall through to prompt Google Sign-In
   }
@@ -338,7 +355,18 @@ export async function ensureChessFirebaseUid(): Promise<string> {
 
 export async function signInGoogleForChess(): Promise<string> {
   try {
+    await ensureAuthPersistence();
+    if (auth.currentUser && !auth.currentUser.isAnonymous) {
+      return auth.currentUser.uid;
+    }
     const cred = await signInWithPopup(auth, googleProvider);
+    markRememberedLogin({
+      uid: cred.user.uid,
+      displayName: cred.user.displayName,
+      email: cred.user.email,
+      photoURL: cred.user.photoURL,
+      isAnonymous: false
+    });
     return cred.user.uid;
   } catch (err: unknown) {
     const code = (err as { code?: string })?.code || '';
