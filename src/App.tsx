@@ -28,6 +28,7 @@ const WelcomeAnimation = lazy(() => import('./components/WelcomeAnimation').then
 const AppsView = lazy(() => import('./components/AppsView').then(m => ({ default: m.AppsView })));
 const MusicView = lazy(() => import('./components/MusicView').then(m => ({ default: m.MusicView })));
 const ChessView = lazy(() => import('./components/ChessView').then(m => ({ default: m.ChessView })));
+const MultiplayerArcadeView = lazy(() => import('./components/MultiplayerArcadeView').then(m => ({ default: m.MultiplayerArcadeView })));
 import { Heart, Gamepad2, ExternalLink, RotateCcw, Search, Sparkles, Flame, Globe, Bot, X, Shuffle } from 'lucide-react';
 
 export function isOwenWatermelonOG(game: Game): boolean {
@@ -139,7 +140,7 @@ const APP_CATEGORIES = [
   'Casual'
 ];
 
-type SpaceType = 'home' | 'games' | 'apps' | 'music' | 'chess' | 'tools' | 'saved';
+type SpaceType = 'home' | 'games' | 'apps' | 'music' | 'chess' | 'rooms' | 'tools' | 'saved';
 
 export default function App() {
   const {
@@ -187,6 +188,7 @@ export default function App() {
     { id: 'tab_home', title: 'Home', spaceType: 'home', icon: '🏠' },
     { id: 'tab_games', title: 'Games', spaceType: 'games', icon: '🎮' },
     { id: 'tab_chess', title: 'Chess', spaceType: 'chess', icon: '♟️' },
+    { id: 'tab_rooms', title: 'Rooms', spaceType: 'rooms', icon: '🕹️' },
     { id: 'tab_apps', title: 'Apps', spaceType: 'apps', icon: '📱' },
     { id: 'tab_music', title: 'Music', spaceType: 'music', icon: '🎵' }
   ]);
@@ -194,6 +196,7 @@ export default function App() {
     try {
       const params = new URLSearchParams(window.location.search);
       if (params.get('chessRoom')) return 'tab_chess';
+      if (params.get('arcadeRoom')) return 'tab_rooms';
     } catch {}
     return 'tab_home';
   });
@@ -351,6 +354,7 @@ export default function App() {
         apps: '📱',
         music: '🎵',
         chess: '♟️',
+        rooms: '🕹️',
         tools: '🛠️',
         saved: '💾'
       };
@@ -360,6 +364,7 @@ export default function App() {
         apps: 'Apps',
         music: 'Music',
         chess: 'Chess',
+        rooms: 'Rooms',
         tools: 'Tab Cloaker',
         saved: 'Cloud Saves'
       };
@@ -555,6 +560,14 @@ export default function App() {
       return (
         <Suspense fallback={<div className="flex-1 flex items-center justify-center p-8 text-xs text-slate-400">Loading Chess Studio...</div>}>
           <ChessView activeTheme={activeTheme} />
+        </Suspense>
+      );
+    }
+
+    if (space === 'rooms') {
+      return (
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center p-8 text-xs text-slate-400">Loading Multiplayer Rooms...</div>}>
+          <MultiplayerArcadeView activeTheme={activeTheme} />
         </Suspense>
       );
     }

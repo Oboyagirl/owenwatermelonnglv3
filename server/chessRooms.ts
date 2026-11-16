@@ -287,7 +287,7 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
       wss.handleUpgrade(req, socket, head, ws => {
         wss.emit('connection', ws, req);
       });
-    } else {
+    } else if (pathname !== '/ws/arcade') {
       socket.destroy();
     }
   });

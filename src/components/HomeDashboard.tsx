@@ -18,7 +18,7 @@ import { resolveAssetUrl } from '../services/gamesStore';
 import { ThemeConfig } from '../services/themeStore';
 
 interface HomeDashboardProps {
-  onNavigateTab: (tab: 'home' | 'games' | 'apps' | 'music' | 'chess' | 'tools' | 'saved') => void;
+  onNavigateTab: (tab: 'home' | 'games' | 'apps' | 'music' | 'chess' | 'rooms' | 'tools' | 'saved') => void;
   onSelectGame: (game: Game) => void;
   featuredGames: Game[];
   trendingGames: Game[];
@@ -160,7 +160,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
         </div>
 
         {/* Quick Spaces Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4">
           <button
             onClick={() => onNavigateTab('games')}
             className="group p-4 md:p-5 rounded-2xl border transition-all duration-300 flex flex-col items-center text-center gap-2.5 cursor-pointer shadow-lg hover:-translate-y-1"
@@ -211,6 +211,21 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             </div>
             <span className="text-xs md:text-sm font-bold text-white group-hover:text-sky-300">Chess</span>
             <span className="text-[10px] text-slate-400">AI & 2-Player</span>
+          </button>
+
+          <button
+            onClick={() => onNavigateTab('rooms')}
+            className="group p-4 md:p-5 rounded-2xl border transition-all duration-300 flex flex-col items-center text-center gap-2.5 cursor-pointer shadow-lg hover:-translate-y-1"
+            style={{
+              backgroundColor: cardBg,
+              borderColor: border
+            }}
+          >
+            <div className="w-12 h-12 rounded-2xl bg-pink-500/20 text-pink-300 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+              🕹️
+            </div>
+            <span className="text-xs md:text-sm font-bold text-white group-hover:text-pink-300">Rooms</span>
+            <span className="text-[10px] text-slate-400">8 Room Games</span>
           </button>
 
           <button

@@ -122,6 +122,51 @@ service cloud.firestore {
       );
     }
 
+    function isValidArcadeRoom(data) {
+      return data.keys().hasAll([
+        'code', 'gameType', 'creatorAuthUid', 'status',
+        'p1AuthUid', 'p1PlayerId', 'p1Name',
+        'p2AuthUid', 'p2PlayerId', 'p2Name',
+        'moves', 'turn', 'winner', 'resignedWinner', 'rematchVotes',
+        'createdAt', 'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'code', 'gameType', 'creatorAuthUid', 'status',
+        'p1AuthUid', 'p1PlayerId', 'p1Name',
+        'p2AuthUid', 'p2PlayerId', 'p2Name',
+        'moves', 'turn', 'winner', 'resignedWinner', 'rematchVotes',
+        'createdAt', 'updatedAt'
+      ]) &&
+      isValidRoomCode(data.code) &&
+      data.gameType is string && data.gameType.size() > 0 && data.gameType.size() <= 32 &&
+      data.gameType in ['connect4', 'checkers', 'reversi', 'dots-and-boxes', 'gomoku', 'ultimate-ttt', 'mancala', 'tictactoe'] &&
+      data.creatorAuthUid is string && data.creatorAuthUid.size() > 0 && data.creatorAuthUid.size() <= 128 &&
+      data.status is string && data.status.size() > 0 && data.status.size() <= 16 && data.status in ['waiting', 'active', 'finished'] &&
+      (data.p1AuthUid == null || (data.p1AuthUid is string && data.p1AuthUid.size() > 0 && data.p1AuthUid.size() <= 128)) &&
+      (data.p1PlayerId == null || (data.p1PlayerId is string && data.p1PlayerId.size() > 0 && data.p1PlayerId.size() <= 64)) &&
+      (data.p1Name == null || (data.p1Name is string && data.p1Name.size() > 0 && data.p1Name.size() <= 24)) &&
+      (data.p2AuthUid == null || (data.p2AuthUid is string && data.p2AuthUid.size() > 0 && data.p2AuthUid.size() <= 128)) &&
+      (data.p2PlayerId == null || (data.p2PlayerId is string && data.p2PlayerId.size() > 0 && data.p2PlayerId.size() <= 64)) &&
+      (data.p2Name == null || (data.p2Name is string && data.p2Name.size() > 0 && data.p2Name.size() <= 24)) &&
+      data.moves is list && data.moves.size() <= 600 &&
+      (data.moves.size() == 0 || (data.moves[0] is string && data.moves[0].size() >= 1 && data.moves[0].size() <= 32)) &&
+      data.turn is string && data.turn.size() == 2 && data.turn in ['p1', 'p2'] &&
+      (data.winner == null || (data.winner is string && data.winner.size() >= 2 && data.winner.size() <= 4 && data.winner in ['p1', 'p2', 'draw'])) &&
+      (data.resignedWinner == null || (data.resignedWinner is string && data.resignedWinner.size() == 2 && data.resignedWinner in ['p1', 'p2'])) &&
+      data.rematchVotes is list && data.rematchVotes.size() <= 2 &&
+      (data.rematchVotes.size() == 0 || (data.rematchVotes[0] is string && data.rematchVotes[0].size() == 2 && data.rematchVotes[0] in ['p1', 'p2'])) &&
+      (data.rematchVotes.size() < 2 || (data.rematchVotes[1] is string && data.rematchVotes[1].size() == 2 && data.rematchVotes[1] in ['p1', 'p2'])) &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
+    }
+
+    function isArcadeRoomParticipant(data) {
+      return isSignedIn() && (
+        data.p1AuthUid == request.auth.uid ||
+        data.p2AuthUid == request.auth.uid
+      );
+    }
+
     function isValidFriendCode(code) {
       return code is string && code.size() >= 4 && code.size() <= 16 && code.matches('^[A-Z0-9\\-]+$');
     }
@@ -471,6 +516,126 @@ service cloud.firestore {
             (
               (incoming().whiteAuthUid == existing().blackAuthUid && incoming().blackAuthUid == existing().whiteAuthUid) ||
               (incoming().whiteAuthUid == existing().whiteAuthUid && incoming().blackAuthUid == existing().blackAuthUid)
+            )
+          )
+        );
+
+      allow delete: if isSignedIn() &&
+        isValidRoomCode(roomCode) &&
+        existing().creatorAuthUid == request.auth.uid &&
+        existing().moves.size() == 0;
+    }
+
+    // Online Multiplayer Arcade Rooms (addressed strictly by room code; no list queries permitted)
+    match /arcadeRooms/{roomCode} {
+      allow get: if isSignedIn() && isValidRoomCode(roomCode);
+
+      allow create: if isSignedIn() &&
+        isValidRoomCode(roomCode) &&
+        isValidArcadeRoom(incoming()) &&
+        incoming().code == roomCode &&
+        incoming().creatorAuthUid == request.auth.uid &&
+        incoming().status == 'waiting' &&
+        incoming().moves.size() == 0 &&
+        incoming().turn == 'p1' &&
+        incoming().winner == null &&
+        incoming().resignedWinner == null &&
+        incoming().rematchVotes.size() == 0 &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        (
+          (incoming().p1AuthUid == request.auth.uid && incoming().p2AuthUid == null) ||
+          (incoming().p2AuthUid == request.auth.uid && incoming().p1AuthUid == null)
+        );
+
+      allow update: if isSignedIn() &&
+        isValidRoomCode(roomCode) &&
+        isValidArcadeRoom(incoming()) &&
+        incoming().code == existing().code &&
+        incoming().gameType == existing().gameType &&
+        incoming().creatorAuthUid == existing().creatorAuthUid &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        (
+          // Action: Join Open Seat or Reconnect to Own Seat
+          (
+            existing().status != 'finished' &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'p1AuthUid', 'p1PlayerId', 'p1Name',
+              'p2AuthUid', 'p2PlayerId', 'p2Name',
+              'status', 'updatedAt'
+            ]) &&
+            (
+              (existing().p1AuthUid == null && incoming().p1AuthUid == request.auth.uid && incoming().p2AuthUid == existing().p2AuthUid) ||
+              (existing().p2AuthUid == null && incoming().p2AuthUid == request.auth.uid && incoming().p1AuthUid == existing().p1AuthUid) ||
+              (existing().p1AuthUid == request.auth.uid && incoming().p1AuthUid == request.auth.uid && incoming().p2AuthUid == existing().p2AuthUid) ||
+              (existing().p2AuthUid == request.auth.uid && incoming().p2AuthUid == request.auth.uid && incoming().p1AuthUid == existing().p1AuthUid)
+            )
+          ) ||
+          // Action: Vacate Own Seat Before First Move
+          (
+            existing().status != 'finished' &&
+            existing().moves.size() == 0 &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'p1AuthUid', 'p1PlayerId', 'p1Name',
+              'p2AuthUid', 'p2PlayerId', 'p2Name',
+              'status', 'updatedAt'
+            ]) &&
+            (
+              (existing().p1AuthUid == request.auth.uid && incoming().p1AuthUid == null && incoming().p2AuthUid == existing().p2AuthUid) ||
+              (existing().p2AuthUid == request.auth.uid && incoming().p2AuthUid == null && incoming().p1AuthUid == existing().p1AuthUid)
+            )
+          ) ||
+          // Action: Active Turn Player Makes Exactly One Move
+          (
+            existing().status != 'finished' &&
+            (
+              (existing().turn == 'p1' && existing().p1AuthUid == request.auth.uid) ||
+              (existing().turn == 'p2' && existing().p2AuthUid == request.auth.uid)
+            ) &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'moves', 'turn', 'status', 'winner', 'rematchVotes', 'updatedAt'
+            ]) &&
+            incoming().moves.size() == existing().moves.size() + 1 &&
+            incoming().moves[existing().moves.size()] is string &&
+            incoming().moves[existing().moves.size()].size() >= 1 &&
+            incoming().moves[existing().moves.size()].size() <= 32
+          ) ||
+          // Action: Participant Resigns
+          (
+            existing().status != 'finished' &&
+            isArcadeRoomParticipant(existing()) &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'status', 'resignedWinner', 'updatedAt'
+            ]) &&
+            incoming().status == 'finished' &&
+            incoming().resignedWinner != null
+          ) ||
+          // Action: Seated Participant Votes for Rematch (Terminal State Only)
+          (
+            existing().status == 'finished' &&
+            isArcadeRoomParticipant(existing()) &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['rematchVotes', 'updatedAt']) &&
+            incoming().rematchVotes.size() == existing().rematchVotes.size() + 1
+          ) ||
+          // Action: Seated Participant Executes Rematch Reset (Terminal State Only)
+          (
+            existing().status == 'finished' &&
+            isArcadeRoomParticipant(existing()) &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'p1AuthUid', 'p1PlayerId', 'p1Name',
+              'p2AuthUid', 'p2PlayerId', 'p2Name',
+              'moves', 'turn', 'status', 'winner', 'resignedWinner', 'rematchVotes', 'updatedAt'
+            ]) &&
+            incoming().moves.size() == 0 &&
+            incoming().turn == 'p1' &&
+            incoming().status in ['waiting', 'active'] &&
+            incoming().winner == null &&
+            incoming().resignedWinner == null &&
+            incoming().rematchVotes.size() == 0 &&
+            (
+              (incoming().p1AuthUid == existing().p2AuthUid && incoming().p2AuthUid == existing().p1AuthUid) ||
+              (incoming().p1AuthUid == existing().p1AuthUid && incoming().p2AuthUid == existing().p2AuthUid)
             )
           )
         );

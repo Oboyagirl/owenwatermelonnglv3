@@ -11,6 +11,7 @@ import { promisify } from 'util';
 import { Readable } from 'node:stream';
 import { GoogleGenAI } from '@google/genai';
 import { attachChessRoomServer } from './server/chessRooms.ts';
+import { attachArcadeRoomServer } from './server/arcadeRooms.ts';
 
 const execFileAsync = promisify(execFile);
 
@@ -855,6 +856,7 @@ Example format:
 
   const httpServer = http.createServer(app);
   attachChessRoomServer(httpServer, app);
+  attachArcadeRoomServer(httpServer, app);
 
   const isDev = process.env.npm_lifecycle_event === 'dev' || 
                 process.env.NODE_ENV === 'development' || 

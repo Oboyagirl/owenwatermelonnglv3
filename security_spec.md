@@ -161,3 +161,13 @@
 11. **Post-Finish State Mutation (Terminal Lock Bypass)**: `{ "path": "/chessRooms/ABC234", "auth": { "uid": "whiteUid" }, "update": { "resignedWinner": "w" } }` when `existing.status == "finished"` -> `PERMISSION_DENIED`
 12. **Time Control Tampering After Create**: `{ "path": "/chessRooms/ABC234", "auth": { "uid": "whiteUid" }, "update": { "baseMs": 1000 } }` -> `PERMISSION_DENIED`
 
+---
+
+## 4. Arcade Rooms (`/arcadeRooms/{roomCode}`) Security Invariants
+
+1. **No Room Enumeration (`allow list: if false`)**: Unlisted collection queries are forbidden; rooms require knowing the exact 4–8 uppercase alphanumeric `roomCode`.
+2. **Valid Game Type Whitelist**: `gameType` must be one of `connect4`, `checkers`, `reversi`, `dots-and-boxes`, `gomoku`, `ultimate-ttt`, `mancala`, `tictactoe` and cannot change after room creation.
+3. **Seat & Creator Integrity**: On create, `creatorAuthUid == request.auth.uid`, exactly one seat holds `request.auth.uid`, `moves` is empty, `turn == 'p1'`, `winner == null`, and `createdAt == request.time && updatedAt == request.time`.
+4. **Action-Isolated Updates**: Updates isolate `affectedKeys` across `Join/Reconnect`, `Vacate`, `Move` (+1 move only by active turn UID, allowing multi-turn chains such as Checkers double jumps, Mancala store landings, Dots & Boxes completions, and Reversi auto-passes), `Resign`, `RematchVote`, and `RematchReset`.
+5. **Terminal Lock**: Once `status == 'finished'`, gameplay moves, joins, and resignations are locked out; only seated participants may vote for or reset a rematch.
+

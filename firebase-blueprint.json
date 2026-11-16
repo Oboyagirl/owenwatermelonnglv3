@@ -536,6 +536,129 @@
         "text",
         "createdAt"
       ]
+    },
+    "arcadeRoom": {
+      "title": "Multiplayer Arcade Room",
+      "description": "Zero-delay multiplayer room synchronized via Firestore for 8 room-code games",
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Unique 4-8 character uppercase room code",
+          "minLength": 4,
+          "maxLength": 8,
+          "pattern": "^[A-Z0-9]+$"
+        },
+        "gameType": {
+          "type": "string",
+          "description": "Multiplayer arcade game identifier",
+          "enum": [
+            "connect4",
+            "checkers",
+            "reversi",
+            "dots-and-boxes",
+            "gomoku",
+            "ultimate-ttt",
+            "mancala",
+            "tictactoe"
+          ],
+          "maxLength": 32
+        },
+        "creatorAuthUid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the room creator",
+          "maxLength": 128
+        },
+        "status": {
+          "type": "string",
+          "description": "Room lifecycle state",
+          "enum": ["waiting", "active", "finished"],
+          "maxLength": 16
+        },
+        "p1AuthUid": {
+          "type": "string",
+          "description": "Firebase Auth UID seated as Player 1 or null",
+          "maxLength": 128
+        },
+        "p1PlayerId": {
+          "type": "string",
+          "description": "Session player ID for Player 1 or null",
+          "maxLength": 64
+        },
+        "p1Name": {
+          "type": "string",
+          "description": "Display name for Player 1 or null",
+          "maxLength": 24
+        },
+        "p2AuthUid": {
+          "type": "string",
+          "description": "Firebase Auth UID seated as Player 2 or null",
+          "maxLength": 128
+        },
+        "p2PlayerId": {
+          "type": "string",
+          "description": "Session player ID for Player 2 or null",
+          "maxLength": 64
+        },
+        "p2Name": {
+          "type": "string",
+          "description": "Display name for Player 2 or null",
+          "maxLength": 24
+        },
+        "moves": {
+          "type": "array",
+          "description": "Ordered list of compact game action tokens"
+        },
+        "turn": {
+          "type": "string",
+          "description": "Active player to act (p1 or p2)",
+          "enum": ["p1", "p2"],
+          "maxLength": 2
+        },
+        "winner": {
+          "type": "string",
+          "description": "Natural outcome winner (p1, p2, draw) or null",
+          "maxLength": 4
+        },
+        "resignedWinner": {
+          "type": "string",
+          "description": "Winner by resignation (p1 or p2) or null",
+          "maxLength": 2
+        },
+        "rematchVotes": {
+          "type": "array",
+          "description": "Array of players voting for rematch (max 2)"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of room creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update"
+        }
+      },
+      "required": [
+        "code",
+        "gameType",
+        "creatorAuthUid",
+        "status",
+        "p1AuthUid",
+        "p1PlayerId",
+        "p1Name",
+        "p2AuthUid",
+        "p2PlayerId",
+        "p2Name",
+        "moves",
+        "turn",
+        "winner",
+        "resignedWinner",
+        "rematchVotes",
+        "createdAt",
+        "updatedAt"
+      ]
     }
   },
   "firestore": {
@@ -586,6 +709,12 @@
         "$ref": "#/entities/chessRoom"
       },
       "description": "Online Chess room state addressed strictly by single-document room code"
+    },
+    "/arcadeRooms/{roomCode}": {
+      "schema": {
+        "$ref": "#/entities/arcadeRoom"
+      },
+      "description": "Online Multiplayer Arcade room state addressed strictly by single-document room code"
     }
   }
 }
