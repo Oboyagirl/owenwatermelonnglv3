@@ -878,9 +878,25 @@ Example format:
     });
   } else {
     const vite = await createViteServer({
+      plugins: [
+        {
+          name: 'disable-vite-client-ws-when-hmr-off',
+          apply: 'serve',
+          enforce: 'post',
+          transform(code, id) {
+            if (id.replace(/\\/g, '/').endsWith('/vite/dist/client/client.mjs')) {
+              return code.replace(
+                'transport.connect(createHMRHandler(handleMessage));',
+                '// transport.connect disabled when HMR/WS are off'
+              );
+            }
+          },
+        },
+      ],
       server: {
         middlewareMode: true,
         hmr: false,
+        ws: false,
       },
       appType: 'spa',
     });

@@ -4,7 +4,8 @@ import {
   onSnapshot,
   runTransaction,
   serverTimestamp,
-  Unsubscribe
+  Unsubscribe,
+  updateDoc
 } from 'firebase/firestore';
 import { signInAnonymously, signInWithPopup } from 'firebase/auth';
 import {
@@ -128,19 +129,78 @@ export function parseEncodedChessMove(
   };
 }
 
-export function decodeAndReplayMoves(rawMoves: unknown): {
+interface CachedRoomReplay {
+  moves: string[];
+  state: ChessState;
+  history: MoveRecord[];
+}
+
+const roomReplayCache = new Map<string, CachedRoomReplay>();
+const latestRoomDocCache = new Map<string, FirestoreChessRoomDoc>();
+
+export function clearChessRoomCache(code?: string) {
+  if (code) {
+    const clean = sanitizeRoomCode(code);
+    roomReplayCache.delete(clean);
+    latestRoomDocCache.delete(clean);
+  } else {
+    roomReplayCache.clear();
+    latestRoomDocCache.clear();
+  }
+}
+
+export function decodeAndReplayMoves(
+  rawMoves: unknown,
+  roomCode?: string
+): {
   state: ChessState;
   history: MoveRecord[];
 } {
-  let state = createInitialState();
-  const history: MoveRecord[] = [];
-  if (!Array.isArray(rawMoves)) {
-    return { state, history };
+  if (!Array.isArray(rawMoves) || rawMoves.length === 0) {
+    const fresh = { state: createInitialState(), history: [] as MoveRecord[] };
+    if (roomCode) {
+      roomReplayCache.set(roomCode, { moves: [], state: fresh.state, history: [] });
+    }
+    return fresh;
   }
 
+  const moves: string[] = [];
   for (const item of rawMoves) {
     if (typeof item !== 'string') break;
-    const parsed = parseEncodedChessMove(item);
+    moves.push(item);
+  }
+
+  const cached = roomCode ? roomReplayCache.get(roomCode) : undefined;
+  let state: ChessState;
+  let history: MoveRecord[];
+  let startIndex = 0;
+
+  if (cached && cached.moves.length <= moves.length) {
+    let prefixMatch = true;
+    for (let i = 0; i < cached.moves.length; i++) {
+      if (cached.moves[i] !== moves[i]) {
+        prefixMatch = false;
+        break;
+      }
+    }
+    if (prefixMatch) {
+      if (cached.moves.length === moves.length) {
+        return { state: cached.state, history: cached.history };
+      }
+      state = cached.state;
+      history = cached.history.slice();
+      startIndex = cached.moves.length;
+    } else {
+      state = createInitialState();
+      history = [];
+    }
+  } else {
+    state = createInitialState();
+    history = [];
+  }
+
+  for (let i = startIndex; i < moves.length; i++) {
+    const parsed = parseEncodedChessMove(moves[i]);
     if (!parsed) break;
     const legal = getLegalMoves(state, parsed.from).find(
       m =>
@@ -152,6 +212,14 @@ export function decodeAndReplayMoves(rawMoves: unknown): {
     const res = applyMove(state, legal);
     state = res.nextState;
     history.push(res.record);
+  }
+
+  if (roomCode) {
+    roomReplayCache.set(roomCode, {
+      moves: moves.slice(0, history.length),
+      state,
+      history
+    });
   }
 
   return { state, history };
@@ -173,7 +241,7 @@ export function roomDocToViewPayload(
   currentAuthUid: string,
   playerId: string
 ): ChessRoomViewPayload {
-  const { state, history } = decodeAndReplayMoves(docData.moves);
+  const { state, history } = decodeAndReplayMoves(docData.moves, docData.code);
 
   let myColor: PieceColor | 'spectator' = 'spectator';
   if (docData.whiteAuthUid === currentAuthUid || (docData.whitePlayerId && docData.whitePlayerId === playerId)) {
@@ -454,6 +522,8 @@ export async function joinFirestoreChessRoom(params: {
       return data;
     });
 
+    latestRoomDocCache.set(cleanCode, finalDoc);
+
     return {
       code: cleanCode,
       uid,
@@ -482,10 +552,12 @@ export function subscribeFirestoreChessRoom(params: {
     roomRef,
     (snapshot) => {
       if (!snapshot.exists()) {
+        clearChessRoomCache(cleanCode);
         params.onError(new Error(`Room "${cleanCode}" was closed or does not exist.`));
         return;
       }
       const data = snapshot.data() as FirestoreChessRoomDoc;
+      latestRoomDocCache.set(cleanCode, data);
       params.onSync(roomDocToViewPayload(data, params.uid, params.playerId));
     },
     (err) => {
@@ -502,6 +574,151 @@ export function subscribeFirestoreChessRoom(params: {
   );
 }
 
+function computeMoveUpdatePayload(
+  data: FirestoreChessRoomDoc,
+  uid: string,
+  move: ChessMove,
+  expectedMoveIndex: number,
+  roomCode: string
+):
+  | { kind: 'noop' }
+  | { kind: 'update'; fields: Record<string, unknown>; nextDoc: FirestoreChessRoomDoc } {
+  const replayed = decodeAndReplayMoves(data.moves, roomCode);
+
+  if (replayed.history.length !== expectedMoveIndex) {
+    return { kind: 'noop' };
+  }
+  if (isRoomDocGameOver(data, replayed.state)) {
+    return { kind: 'noop' };
+  }
+
+  const activeUid = replayed.state.turn === 'w' ? data.whiteAuthUid : data.blackAuthUid;
+  if (activeUid !== uid) {
+    throw new Error('Not your turn.');
+  }
+
+  const now = Math.round(Date.now());
+  let whiteTimeMs = Math.max(0, Math.round(data.whiteTimeMs));
+  let blackTimeMs = Math.max(0, Math.round(data.blackTimeMs));
+  const wasClockRunning =
+    data.baseMs > 0 && replayed.history.length >= 1 && data.clockAnchorMs !== null;
+
+  if (wasClockRunning && data.clockAnchorMs !== null) {
+    const elapsed = Math.max(0, now - data.clockAnchorMs);
+    if (replayed.state.turn === 'w') {
+      whiteTimeMs = Math.max(0, whiteTimeMs - elapsed);
+      if (whiteTimeMs <= 0) {
+        const winner: PieceColor | 'draw' = hasOnlyInsufficientMaterialForSide(
+          replayed.state.board,
+          'b'
+        )
+          ? 'draw'
+          : 'b';
+        const fields = {
+          status: 'finished' as const,
+          timeoutWinner: winner,
+          whiteTimeMs: 0,
+          blackTimeMs,
+          clockAnchorMs: null,
+          updatedAt: serverTimestamp()
+        };
+        return {
+          kind: 'update',
+          fields,
+          nextDoc: { ...data, ...fields }
+        };
+      }
+    } else {
+      blackTimeMs = Math.max(0, blackTimeMs - elapsed);
+      if (blackTimeMs <= 0) {
+        const winner: PieceColor | 'draw' = hasOnlyInsufficientMaterialForSide(
+          replayed.state.board,
+          'w'
+        )
+          ? 'draw'
+          : 'w';
+        const fields = {
+          status: 'finished' as const,
+          timeoutWinner: winner,
+          whiteTimeMs,
+          blackTimeMs: 0,
+          clockAnchorMs: null,
+          updatedAt: serverTimestamp()
+        };
+        return {
+          kind: 'update',
+          fields,
+          nextDoc: { ...data, ...fields }
+        };
+      }
+    }
+  }
+
+  const legal = getLegalMoves(replayed.state).find(
+    m =>
+      m.from.r === move.from.r &&
+      m.from.c === move.from.c &&
+      m.to.r === move.to.r &&
+      m.to.c === move.to.c &&
+      (m.promotion ? m.promotion === move.promotion : true)
+  );
+  if (!legal) {
+    throw new Error('Illegal move rejected.');
+  }
+
+  const moverColor = replayed.state.turn;
+  const { nextState } = applyMove(replayed.state, legal);
+  const nextMoves = [...data.moves, encodeChessMove(legal)];
+  const gameEndedNow =
+    nextState.status === 'checkmate' ||
+    nextState.status === 'stalemate' ||
+    nextState.status.startsWith('draw_');
+
+  let nextAnchorMs: number | null = null;
+  if (data.baseMs > 0) {
+    if (wasClockRunning && data.incMs > 0) {
+      if (moverColor === 'w') {
+        whiteTimeMs = Math.min(3600000, whiteTimeMs + Math.round(data.incMs));
+      } else {
+        blackTimeMs = Math.min(3600000, blackTimeMs + Math.round(data.incMs));
+      }
+    }
+    nextAnchorMs = gameEndedNow ? null : now;
+  }
+
+  const nextStatus: FirestoreChessRoomDoc['status'] = gameEndedNow
+    ? 'finished'
+    : data.whiteAuthUid && data.blackAuthUid
+    ? 'active'
+    : 'waiting';
+
+  const fields = {
+    moves: nextMoves,
+    turn: nextState.turn,
+    status: nextStatus,
+    whiteTimeMs,
+    blackTimeMs,
+    clockAnchorMs: nextAnchorMs,
+    rematchVotes: [] as PieceColor[],
+    updatedAt: serverTimestamp()
+  };
+
+  return {
+    kind: 'update',
+    fields,
+    nextDoc: {
+      ...data,
+      moves: nextMoves,
+      turn: nextState.turn,
+      status: nextStatus,
+      whiteTimeMs,
+      blackTimeMs,
+      clockAnchorMs: nextAnchorMs,
+      rematchVotes: []
+    }
+  };
+}
+
 export async function sendFirestoreChessMove(params: {
   code: string;
   move: ChessMove;
@@ -512,125 +729,53 @@ export async function sendFirestoreChessMove(params: {
   const roomRef = doc(db, CHESS_ROOMS_COLLECTION, cleanCode);
   const path = `${CHESS_ROOMS_COLLECTION}/${cleanCode}`;
 
+  // Fast single-RPC path: use cached live room snapshot + direct updateDoc
+  // (avoids 2 extra BeginTransaction + BatchGet round-trips per move while Firestore rules enforce turn & move count)
+  const cachedDoc = latestRoomDocCache.get(cleanCode);
+  if (cachedDoc && cachedDoc.moves.length === params.expectedMoveIndex) {
+    const computed = computeMoveUpdatePayload(
+      cachedDoc,
+      uid,
+      params.move,
+      params.expectedMoveIndex,
+      cleanCode
+    );
+    if (computed.kind === 'noop') return;
+
+    try {
+      await updateDoc(roomRef, computed.fields);
+      latestRoomDocCache.set(cleanCode, computed.nextDoc);
+      return;
+    } catch {
+      // Fall back to authoritative transaction if cache was stale or contended
+    }
+  }
+
   try {
+    let committedDoc: FirestoreChessRoomDoc | null = null;
     await runTransaction(db, async (tx) => {
       const snap = await tx.get(roomRef);
       if (!snap.exists()) {
         throw new Error('Room session expired or missing.');
       }
       const data = snap.data() as FirestoreChessRoomDoc;
-      const replayed = decodeAndReplayMoves(data.moves);
-
-      if (replayed.history.length !== params.expectedMoveIndex) {
-        return;
-      }
-      if (isRoomDocGameOver(data, replayed.state)) {
-        return;
-      }
-
-      const activeUid = replayed.state.turn === 'w' ? data.whiteAuthUid : data.blackAuthUid;
-      if (activeUid !== uid) {
-        throw new Error('Not your turn.');
-      }
-
-      const now = Math.round(Date.now());
-      let whiteTimeMs = Math.max(0, Math.round(data.whiteTimeMs));
-      let blackTimeMs = Math.max(0, Math.round(data.blackTimeMs));
-      const wasClockRunning =
-        data.baseMs > 0 && replayed.history.length >= 1 && data.clockAnchorMs !== null;
-
-      if (wasClockRunning && data.clockAnchorMs !== null) {
-        const elapsed = Math.max(0, now - data.clockAnchorMs);
-        if (replayed.state.turn === 'w') {
-          whiteTimeMs = Math.max(0, whiteTimeMs - elapsed);
-          if (whiteTimeMs <= 0) {
-            const winner: PieceColor | 'draw' = hasOnlyInsufficientMaterialForSide(
-              replayed.state.board,
-              'b'
-            )
-              ? 'draw'
-              : 'b';
-            tx.update(roomRef, {
-              status: 'finished',
-              timeoutWinner: winner,
-              whiteTimeMs: 0,
-              blackTimeMs,
-              clockAnchorMs: null,
-              updatedAt: serverTimestamp()
-            });
-            return;
-          }
-        } else {
-          blackTimeMs = Math.max(0, blackTimeMs - elapsed);
-          if (blackTimeMs <= 0) {
-            const winner: PieceColor | 'draw' = hasOnlyInsufficientMaterialForSide(
-              replayed.state.board,
-              'w'
-            )
-              ? 'draw'
-              : 'w';
-            tx.update(roomRef, {
-              status: 'finished',
-              timeoutWinner: winner,
-              whiteTimeMs,
-              blackTimeMs: 0,
-              clockAnchorMs: null,
-              updatedAt: serverTimestamp()
-            });
-            return;
-          }
-        }
-      }
-
-      const legal = getLegalMoves(replayed.state).find(
-        m =>
-          m.from.r === params.move.from.r &&
-          m.from.c === params.move.from.c &&
-          m.to.r === params.move.to.r &&
-          m.to.c === params.move.to.c &&
-          (m.promotion ? m.promotion === params.move.promotion : true)
+      const computed = computeMoveUpdatePayload(
+        data,
+        uid,
+        params.move,
+        params.expectedMoveIndex,
+        cleanCode
       );
-      if (!legal) {
-        throw new Error('Illegal move rejected.');
+      if (computed.kind === 'noop') {
+        committedDoc = data;
+        return;
       }
-
-      const moverColor = replayed.state.turn;
-      const { nextState } = applyMove(replayed.state, legal);
-      const nextMoves = [...data.moves, encodeChessMove(legal)];
-      const gameEndedNow =
-        nextState.status === 'checkmate' ||
-        nextState.status === 'stalemate' ||
-        nextState.status.startsWith('draw_');
-
-      let nextAnchorMs: number | null = null;
-      if (data.baseMs > 0) {
-        if (wasClockRunning && data.incMs > 0) {
-          if (moverColor === 'w') {
-            whiteTimeMs = Math.min(3600000, whiteTimeMs + Math.round(data.incMs));
-          } else {
-            blackTimeMs = Math.min(3600000, blackTimeMs + Math.round(data.incMs));
-          }
-        }
-        nextAnchorMs = gameEndedNow ? null : now;
-      }
-
-      const nextStatus: FirestoreChessRoomDoc['status'] = gameEndedNow
-        ? 'finished'
-        : data.whiteAuthUid && data.blackAuthUid
-        ? 'active'
-        : 'waiting';
-
-      tx.update(roomRef, {
-        moves: nextMoves,
-        turn: nextState.turn,
-        status: nextStatus,
-        whiteTimeMs,
-        blackTimeMs,
-        clockAnchorMs: nextAnchorMs,
-        rematchVotes: [],
-        updatedAt: serverTimestamp()
-      });
+      tx.update(roomRef, computed.fields);
+      committedDoc = computed.nextDoc;
     });
+    if (committedDoc) {
+      latestRoomDocCache.set(cleanCode, committedDoc);
+    }
   } catch (err) {
     if (isPermissionDeniedError(err)) {
       handleFirestoreError(err, OperationType.UPDATE, path);

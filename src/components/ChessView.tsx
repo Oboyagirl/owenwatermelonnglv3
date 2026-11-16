@@ -615,6 +615,18 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
   const timeoutClaimedPlyRef = useRef<number>(-1);
   const lastOnlineHistoryLenRef = useRef<number>(0);
   const lastOnlineRoomRef = useRef<string | null>(null);
+  const pendingOnlineMoveRef = useRef<{
+    code: string;
+    expectedMoveIndex: number;
+    rollbackState: ChessState;
+    rollbackHistory: MoveRecord[];
+    rollbackClockAnchor: {
+      whiteMs: number;
+      blackMs: number;
+      activeColor: PieceColor | null;
+      anchoredAt: number;
+    };
+  } | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const moveListRef = useRef<HTMLDivElement | null>(null);
 
@@ -860,10 +872,32 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
 
       const nextHistory: MoveRecord[] = Array.isArray(msg.history) ? msg.history : [];
       const nextState: ChessState = msg.state;
+      const endedByEvent =
+        Boolean(msg.resignedWinner) ||
+        Boolean(msg.timeoutWinner || msg.clock?.timeoutWinner);
+
+      const pending = pendingOnlineMoveRef.current;
+      if (pending && pending.code === msg.code) {
+        if (!endedByEvent && nextHistory.length < pending.expectedMoveIndex + 1) {
+          // Ignore stale pre-move snapshot while our optimistic move is in flight
+          setOnlineMyColor(msg.myColor || 'spectator');
+          setOnlinePlayers(msg.players || { w: null, b: null });
+          setOnlineRematchVotes(Array.isArray(msg.rematchVotes) ? msg.rematchVotes : []);
+          return;
+        }
+        pendingOnlineMoveRef.current = null;
+      }
+
       const prevRoom = lastOnlineRoomRef.current;
       const prevLen = lastOnlineHistoryLenRef.current;
 
       const roomChanged = prevRoom !== msg.code;
+      const boardChanged =
+        roomChanged ||
+        nextHistory.length !== prevLen ||
+        (nextHistory.length === 0 && prevLen > 0) ||
+        endedByEvent;
+
       lastOnlineRoomRef.current = msg.code;
       lastOnlineHistoryLenRef.current = nextHistory.length;
 
@@ -873,15 +907,17 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       setOnlineRematchVotes(Array.isArray(msg.rematchVotes) ? msg.rematchVotes : []);
       setGameState(nextState);
       setMoveHistory(nextHistory);
-      setSnapshots([]);
-      setViewPly(null);
-      reviewTokenRef.current += 1;
-      setGameReview(EMPTY_REVIEW);
+      if (boardChanged) {
+        setSnapshots([]);
+        setViewPly(null);
+        reviewTokenRef.current += 1;
+        setGameReview(EMPTY_REVIEW);
+        setSelectedSquare(null);
+        setPendingPromotion(null);
+        setHintMove(null);
+      }
       setResignedWinner(msg.resignedWinner || null);
       setTimeoutWinner(msg.timeoutWinner || msg.clock?.timeoutWinner || null);
-      setSelectedSquare(null);
-      setPendingPromotion(null);
-      setHintMove(null);
       setIsAIThinking(false);
 
       if (msg.clock) {
@@ -906,8 +942,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
         setPremoveFrom(null);
       } else {
         const ended =
-          Boolean(msg.resignedWinner) ||
-          Boolean(msg.timeoutWinner || msg.clock?.timeoutWinner) ||
+          endedByEvent ||
           nextState.status === 'checkmate' ||
           nextState.status === 'stalemate' ||
           nextState.status.startsWith('draw_');
@@ -920,7 +955,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
           setPremoveFrom(null);
         } else if (
           ended &&
-          (nextHistory.length > prevLen || msg.resignedWinner || msg.timeoutWinner)
+          (nextHistory.length > prevLen || endedByEvent)
         ) {
           setShowEndOverlay(true);
           playSound('gameover');
@@ -965,6 +1000,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     setOnlineError(null);
     setOnlineAuthNeeded(false);
     setWsStatus('connecting');
+    pendingOnlineMoveRef.current = null;
     closeWebSocket();
     closeFirestoreRoom();
     activeTransportRef.current = 'firestore';
@@ -1005,6 +1041,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       setOnlineError(null);
       setOnlineAuthNeeded(false);
       setWsStatus('connecting');
+      pendingOnlineMoveRef.current = null;
       closeWebSocket();
       closeFirestoreRoom();
       activeTransportRef.current = 'firestore';
@@ -1106,6 +1143,16 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
         if (!msg || typeof msg.type !== 'string') return;
 
         if (msg.type === 'room:error') {
+          const pending = pendingOnlineMoveRef.current;
+          if (pending) {
+            pendingOnlineMoveRef.current = null;
+            lastOnlineHistoryLenRef.current = pending.rollbackHistory.length;
+            setGameState(pending.rollbackState);
+            setMoveHistory(pending.rollbackHistory);
+            clockAnchorRef.current = { ...pending.rollbackClockAnchor };
+            setWhiteTimeMs(pending.rollbackClockAnchor.whiteMs);
+            setBlackTimeMs(pending.rollbackClockAnchor.blackMs);
+          }
           setOnlineError(String(msg.message || 'Room error occurred.'));
           return;
         }
@@ -1265,6 +1312,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       }
     }
     closeFirestoreRoom();
+    pendingOnlineMoveRef.current = null;
     lastOnlineRoomRef.current = null;
     lastOnlineHistoryLenRef.current = 0;
     timeoutClaimedPlyRef.current = -1;
@@ -1304,6 +1352,16 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
           move,
           expectedMoveIndex
         }).catch(err => {
+          const pending = pendingOnlineMoveRef.current;
+          if (pending && pending.code === onlineRoomCode && pending.expectedMoveIndex === expectedMoveIndex) {
+            pendingOnlineMoveRef.current = null;
+            lastOnlineHistoryLenRef.current = pending.rollbackHistory.length;
+            setGameState(pending.rollbackState);
+            setMoveHistory(pending.rollbackHistory);
+            clockAnchorRef.current = { ...pending.rollbackClockAnchor };
+            setWhiteTimeMs(pending.rollbackClockAnchor.whiteMs);
+            setBlackTimeMs(pending.rollbackClockAnchor.blackMs);
+          }
           setOnlineError(err instanceof Error ? err.message : 'Failed to send move.');
         });
         return;
@@ -1412,11 +1470,72 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
   const commitMove = useCallback(
     (move: ChessMove, decisionMeta?: BotMoveDecision) => {
       if (mode === 'online') {
-        sendWsMove(move, moveHistory.length);
+        const expectedMoveIndex = moveHistory.length;
+        const rollbackClockAnchor = { ...clockAnchorRef.current };
+        const { nextState, record } = applyMove(gameState, move);
+        const gameEndedNow =
+          nextState.status === 'checkmate' ||
+          nextState.status === 'stalemate' ||
+          nextState.status.startsWith('draw_');
+
+        if (onlineRoomCode) {
+          pendingOnlineMoveRef.current = {
+            code: onlineRoomCode,
+            expectedMoveIndex,
+            rollbackState: gameState,
+            rollbackHistory: moveHistory,
+            rollbackClockAnchor
+          };
+          lastOnlineHistoryLenRef.current = expectedMoveIndex + 1;
+        }
+
+        // Optimistic immediate UI + clock + audio update (0ms local latency)
+        setGameState(nextState);
+        setMoveHistory(prev => [...prev, record]);
         setSelectedSquare(null);
         setPendingPromotion(null);
         setHintMove(null);
         setViewPly(null);
+        setShowEndOverlay(true);
+
+        if (effectiveTimeControl.baseMs > 0) {
+          const moverColor = gameState.turn;
+          const now = Date.now();
+          const wasRunning =
+            expectedMoveIndex >= 1 && clockAnchorRef.current.activeColor === moverColor;
+          let wMs = clockAnchorRef.current.whiteMs;
+          let bMs = clockAnchorRef.current.blackMs;
+          if (wasRunning) {
+            const elapsed = Math.max(0, now - clockAnchorRef.current.anchoredAt);
+            if (moverColor === 'w') {
+              wMs = Math.max(0, wMs - elapsed) + effectiveTimeControl.incMs;
+            } else {
+              bMs = Math.max(0, bMs - elapsed) + effectiveTimeControl.incMs;
+            }
+          }
+          clockAnchorRef.current = {
+            whiteMs: wMs,
+            blackMs: bMs,
+            activeColor: gameEndedNow ? null : nextState.turn,
+            anchoredAt: now
+          };
+          setWhiteTimeMs(wMs);
+          setBlackTimeMs(bMs);
+        }
+
+        if (gameEndedNow) {
+          playSound('gameover');
+        } else if (nextState.status === 'check') {
+          playSound('check');
+        } else if (move.isCastle) {
+          playSound('castle');
+        } else if (move.isCapture) {
+          playSound('capture');
+        } else {
+          playSound('move');
+        }
+
+        sendWsMove(move, expectedMoveIndex);
         return;
       }
 
@@ -1527,6 +1646,8 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       humanColor,
       selectedBot,
       timeControlId,
+      effectiveTimeControl,
+      onlineRoomCode,
       autoFlipPvp,
       playSound,
       speakAsBot,
@@ -1689,13 +1810,15 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     const chosen =
       candidates.find(m => m.promotion === 'q') || candidates[0];
 
+    if (mode === 'online') {
+      // Zero-delay optimistic execution in online multiplayer
+      commitMove(chosen);
+      return;
+    }
+
     const execTimer = window.setTimeout(() => {
-      if (mode === 'online') {
-        sendWsMove(chosen, moveHistory.length);
-      } else {
-        commitMove(chosen);
-      }
-    }, 65);
+      commitMove(chosen);
+    }, 35);
 
     return () => window.clearTimeout(execTimer);
   }, [
@@ -1704,9 +1827,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     playerControlledColor,
     gameState,
     mode,
-    moveHistory.length,
-    commitMove,
-    sendWsMove
+    commitMove
   ]);
 
   // Clear stale premove if game ends
