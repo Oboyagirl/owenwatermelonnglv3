@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Block Blast! - Unblocked</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: radial-gradient(circle at 50% 15%, #1e293b 0%, #0b1120 75%);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: #f8fafc;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    touch-action: none;
+  }
+  #app {
+    width: 100%; height: 100%; max-width: 520px;
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+    padding: 10px 14px 12px;
+  }
+  #header {
+    width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    background: rgba(15, 23, 42, 0.72); border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 14px; padding: 8px 14px;
+  }
+  .score-box { display: flex; flex-direction: column; }
+  .score-label { font-size: 10px; font-weight: 800; letter-spacing: 0.08em; color: #94a3b8; text-transform: uppercase; }
+  .score-val { font-size: 22px; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .score-val.best { color: #fbbf24; }
+  .title-pill {
+    font-size: 16px; font-weight: 900; letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #38bdf8, #818cf8);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  #btn-restart {
+    background: #334155; color: #f8fafc; border: 1px solid #475569;
+    padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer;
+  }
+  #btn-restart:hover { background: #475569; }
+  canvas#board {
+    display: block; touch-action: none;
+  }
+  #combo-float {
+    position: fixed; top: 18%; left: 50%; transform: translate(-50%, 0) scale(0.8);
+    font-size: 28px; font-weight: 900; color: #fde047;
+    text-shadow: 0 4px 18px rgba(0,0,0,0.75);
+    pointer-events: none; opacity: 0; transition: 0.25s; z-index: 20;
+  }
+  #combo-float.show { opacity: 1; transform: translate(-50%, -14px) scale(1.08); }
+  #gameover {
+    position: fixed; inset: 0; background: rgba(9, 13, 25, 0.86); backdrop-filter: blur(6px);
+    display: none; align-items: center; justify-content: center; z-index: 30; padding: 20px;
+  }
+  #gameover.show { display: flex; }
+  .go-card {
+    background: #131c31; border: 2px solid #38bdf8; border-radius: 20px;
+    padding: 28px 26px; max-width: 340px; width: 100%; text-align: center;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.65);
+  }
+  .go-card h2 { font-size: 26px; font-weight: 900; margin-bottom: 6px; color: #fff; }
+  .go-card p { font-size: 14px; color: #94a3b8; margin-bottom: 18px; }
+  .go-btn {
+    width: 100%; padding: 13px; border-radius: 12px; border: 0;
+    background: linear-gradient(135deg, #22c55e, #10b981);
+    color: #fff; font-weight: 900; font-size: 16px; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div id="app">
+    <div id="header">
+      <div class="score-box">
+        <span class="score-label">Score</span>
+        <span class="score-val" id="score-el">0</span>
+      </div>
+      <div class="title-pill">BLOCK BLAST!</div>
+      <div class="score-box" style="align-items:flex-end">
+        <span class="score-label">Best</span>
+        <span class="score-val best" id="best-el">0</span>
+      </div>
+      <button id="btn-restart" type="button">New</button>
+    </div>
+    <canvas id="board"></canvas>
+    <div style="font-size:11px;color:#94a3b8;font-weight:700;">Drag blocks onto the 8×8 grid · Clear full rows or columns for combos!</div>
+  </div>
+  <div id="combo-float"></div>
+  <div id="gameover">
+    <div class="go-card">
+      <h2>No Moves Left!</h2>
+      <p id="go-summary">Score: 0 · Best: 0</p>
+      <button class="go-btn" id="btn-play-again">Play Again</button>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const GRID = 8;
+  const SAVE_KEY = 'block_blast_unblocked_v1';
+  const COLORS = [
+    ['#f43f5e', '#fb7185', '#be123c'], // Rose
+    ['#f59e0b', '#fbbf24', '#b45309'], // Amber
+    ['#10b981', '#34d399', '#047857'], // Emerald
+    ['#0ea5e9', '#38bdf8', '#0369a1'], // Sky
+    ['#8b5cf6', '#a78bfa', '#5b21b6'], // Violet
+    ['#ec4899', '#f472b6', '#9d174d']  // Pink
+  ];
+  const SHAPES = [
+    [[1]],
+    [[1,1]], [[1],[1]],
+    [[1,1,1]], [[1],[1],[1]],
+    [[1,1,1,1]], [[1],[1],[1],[1]],
+    [[1,1,1,1,1]], [[1],[1],[1],[1],[1]],
+    [[1,1],[1,1]],
+    [[1,1,1],[1,1,1],[1,1,1]],
+    [[1,1],[1,0]], [[1,1],[0,1]], [[1,0],[1,1]], [[0,1],[1,1]],
+    [[1,1,1],[1,0,0]], [[1,1,1],[0,0,1]], [[1,0,0],[1,1,1]], [[0,0,1],[1,1,1]],
+    [[1,1,1],[0,1,0]], [[0,1,0],[1,1,1]], [[1,0],[1,1],[1,0]], [[0,1],[1,1],[0,1]],
+    [[1,1,0],[0,1,1]], [[0,1,1],[1,1,0]]
+  ];
+
+  let audioCtx = null;
+  function chime(freq, dur = 0.12, type = 'sine', vol = 0.14) {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = type; o.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      g.gain.setValueAtTime(vol, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+      o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + dur);
+    } catch {}
+  }
+
+  let board = Array.from({ length: GRID }, () => Array(GRID).fill(null));
+  let tray = [null, null, null];
+  let score = 0;
+  let best = 0;
+  let combo = 0;
+  let particles = [];
+  let flashLines = [];
+  let drag = null;
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(SAVE_KEY) || '{}');
+    if (Number.isFinite(saved.best)) best = saved.best;
+    if (Array.isArray(saved.board) && saved.board.length === GRID) {
+      board = saved.board;
+      score = Number.isFinite(saved.score) ? saved.score : 0;
+      tray = Array.isArray(saved.tray) && saved.tray.length === 3 ? saved.tray : [null, null, null];
+    }
+  } catch {}
+
+  function persist() {
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify({ board, tray, score, best })); } catch {}
+  }
+
+  function makePiece() {
+    const shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+    const colorIdx = Math.floor(Math.random() * COLORS.length);
+    return { shape, colorIdx };
+  }
+
+  function refillTrayIfEmpty() {
+    if (tray.every(p => p === null)) {
+      tray = [makePiece(), makePiece(), makePiece()];
+      // Guarantee at least one piece fits
+      if (!tray.some(p => canPlaceAnywhere(p))) {
+        tray[0] = { shape: [[1, 1]], colorIdx: Math.floor(Math.random() * COLORS.length) };
+        if (!canPlaceAnywhere(tray[0])) tray[0] = { shape: [[1]], colorIdx: 0 };
+      }
+    }
+  }
+
+  function canPlace(piece, gx, gy) {
+    if (!piece) return false;
+    const h = piece.shape.length, w = piece.shape[0].length;
+    if (gx < 0 || gy < 0 || gx + w > GRID || gy + h > GRID) return false;
+    for (let r = 0; r < h; r++) {
+      for (let c = 0; c < w; c++) {
+        if (piece.shape[r][c] && board[gy + r][gx + c] !== null) return false;
+      }
+    }
+    return true;
+  }
+
+  function canPlaceAnywhere(piece) {
+    if (!piece) return false;
+    for (let y = 0; y < GRID; y++) for (let x = 0; x < GRID; x++) {
+      if (canPlace(piece, x, y)) return true;
+    }
+    return false;
+  }
+
+  function checkGameOver() {
+    const alive = tray.filter(Boolean);
+    if (alive.length > 0 && !alive.some(p => canPlaceAnywhere(p))) {
+      document.getElementById('go-summary').textContent = `Score: ${score.toLocaleString()} · Best: ${best.toLocaleString()}`;
+      document.getElementById('gameover').classList.add('show');
+    }
+  }
+
+  function updateHud() {
+    document.getElementById('score-el').textContent = score.toLocaleString();
+    document.getElementById('best-el').textContent = best.toLocaleString();
+  }
+
+  function showCombo(text) {
+    const el = document.getElementById('combo-float');
+    el.textContent = text;
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 950);
+  }
+
+  function placePiece(trayIdx, gx, gy) {
+    const piece = tray[trayIdx];
+    let cells = 0;
+    for (let r = 0; r < piece.shape.length; r++) {
+      for (let c = 0; c < piece.shape[0].length; c++) {
+        if (piece.shape[r][c]) {
+          board[gy + r][gx + c] = piece.colorIdx;
+          cells++;
+        }
+      }
+    }
+    tray[trayIdx] = null;
+    score += cells * 10;
+    chime(330, 0.08, 'triangle', 0.13);
+
+    // Check line clears
+    const fullRows = [], fullCols = [];
+    for (let r = 0; r < GRID; r++) if (board[r].every(v => v !== null)) fullRows.push(r);
+    for (let c = 0; c < GRID; c++) if (board.every(row => row[c] !== null)) fullCols.push(c);
+
+    const cleared = fullRows.length + fullCols.length;
+    if (cleared > 0) {
+      combo++;
+      const bonus = cleared * 120 * combo + (cleared > 1 ? cleared * 80 : 0);
+      score += bonus;
+      fullRows.forEach(r => {
+        flashLines.push({ type: 'row', idx: r, life: 0.28 });
+        for (let c = 0; c < GRID; c++) {
+          spawnBurst(c, r, board[r][c]);
+          board[r][c] = null;
+        }
+      });
+      fullCols.forEach(c => {
+        flashLines.push({ type: 'col', idx: c, life: 0.28 });
+        for (let r = 0; r < GRID; r++) {
+          if (board[r][c] !== null) {
+            spawnBurst(c, r, board[r][c]);
+            board[r][c] = null;
+          }
+        }
+      });
+      chime(440 + combo * 90, 0.22, 'sine', 0.18);
+      if (combo > 1 || cleared > 1) {
+        showCombo(combo > 1 ? `COMBO x${combo}! +${bonus}` : `${cleared} LINES! +${bonus}`);
+      }
+    } else {
+      combo = 0;
+    }
+
+    if (score > best) best = score;
+    refillTrayIfEmpty();
+    updateHud();
+    persist();
+    checkGameOver();
+  }
+
+  const canvas = document.getElementById('board');
+  const ctx = canvas.getContext('2d');
+  let layout = { W: 440, H: 580, bx: 20, by: 10, cell: 50, trayY: 440, trayCell: 22 };
+
+  function resize() {
+    const app = document.getElementById('app');
+    const maxW = Math.min(480, app.clientWidth - 16);
+    const maxH = Math.max(400, window.innerHeight - 108);
+    const cell = Math.floor(Math.min((maxW - 24) / GRID, (maxH * 0.72) / GRID));
+    const boardPx = cell * GRID;
+    const W = Math.max(boardPx + 24, maxW);
+    const H = boardPx + Math.max(125, Math.floor(cell * 2.8));
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    layout = {
+      W, H, cell,
+      bx: (W - boardPx) / 2,
+      by: 8,
+      trayY: 8 + boardPx + 18,
+      trayCell: Math.min(24, Math.floor(cell * 0.46))
+    };
+  }
+
+  function spawnBurst(gx, gy, colorIdx) {
+    const col = COLORS[colorIdx || 0][0];
+    const x = layout.bx + (gx + 0.5) * layout.cell;
+    const y = layout.by + (gy + 0.5) * layout.cell;
+    for (let i = 0; i < 6; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const s = 60 + Math.random() * 140;
+      particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: 0.38, color: col });
+    }
+  }
+
+  function drawGemBlock(x, y, size, colorIdx, alpha = 1) {
+    const [base, light, dark] = COLORS[colorIdx];
+    const r = Math.max(4, size * 0.14);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = base;
+    roundRect(x + 1.5, y + 1.5, size - 3, size - 3, r);
+    ctx.fill();
+    ctx.fillStyle = light;
+    ctx.fillRect(x + 4, y + 3.5, size - 8, Math.max(3, size * 0.16));
+    ctx.fillStyle = dark;
+    ctx.fillRect(x + 4, y + size - Math.max(5, size * 0.16), size - 8, Math.max(3, size * 0.12));
+    ctx.restore();
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function render(now) {
+    const dt = Math.min(0.05, (now - (render._last || now)) / 1000);
+    render._last = now;
+
+    ctx.clearRect(0, 0, layout.W, layout.H);
+    const boardPx = layout.cell * GRID;
+
+    // Recessed board frame
+    ctx.fillStyle = '#0f172a';
+    roundRect(layout.bx - 8, layout.by - 8, boardPx + 16, boardPx + 16, 14);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(148, 163, 184, 0.25)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Grid cells
+    for (let r = 0; r < GRID; r++) {
+      for (let c = 0; c < GRID; c++) {
+        const x = layout.bx + c * layout.cell;
+        const y = layout.by + r * layout.cell;
+        ctx.fillStyle = '#1b263e';
+        roundRect(x + 2, y + 2, layout.cell - 4, layout.cell - 4, 5);
+        ctx.fill();
+        if (board[r][c] !== null) {
+          drawGemBlock(x, y, layout.cell, board[r][c]);
+        }
+      }
+    }
+
+    // Hover snap preview + clear line glow
+    if (drag && drag.snapOk) {
+      const p = tray[drag.idx];
+      // Highlight rows/cols that would clear
+      const simBoard = board.map(r => r.slice());
+      for (let r = 0; r < p.shape.length; r++) for (let c = 0; c < p.shape[0].length; c++) {
+        if (p.shape[r][c]) simBoard[drag.gy + r][drag.gx + c] = p.colorIdx;
+      }
+      ctx.fillStyle = 'rgba(250, 204, 21, 0.22)';
+      for (let r = 0; r < GRID; r++) if (simBoard[r].every(v => v !== null)) {
+        ctx.fillRect(layout.bx, layout.by + r * layout.cell, boardPx, layout.cell);
+      }
+      for (let c = 0; c < GRID; c++) if (simBoard.every(row => row[c] !== null)) {
+        ctx.fillRect(layout.bx + c * layout.cell, layout.by, layout.cell, boardPx);
+      }
+      for (let r = 0; r < p.shape.length; r++) for (let c = 0; c < p.shape[0].length; c++) {
+        if (p.shape[r][c]) {
+          drawGemBlock(layout.bx + (drag.gx + c) * layout.cell, layout.by + (drag.gy + r) * layout.cell, layout.cell, p.colorIdx, 0.42);
+        }
+      }
+    }
+
+    // Tray slots
+    const slotW = layout.W / 3;
+    for (let i = 0; i < 3; i++) {
+      if (drag && drag.idx === i) continue;
+      const p = tray[i];
+      if (!p) continue;
+      const cx = slotW * (i + 0.5);
+      const cy = layout.trayY + layout.trayCell * 2.4;
+      const pw = p.shape[0].length * layout.trayCell;
+      const ph = p.shape.length * layout.trayCell;
+      const fit = canPlaceAnywhere(p);
+      for (let r = 0; r < p.shape.length; r++) for (let c = 0; c < p.shape[0].length; c++) {
+        if (p.shape[r][c]) {
+          drawGemBlock(cx - pw / 2 + c * layout.trayCell, cy - ph / 2 + r * layout.trayCell, layout.trayCell, p.colorIdx, fit ? 1 : 0.35);
+        }
+      }
+    }
+
+    // Active floating dragged piece
+    if (drag) {
+      const p = tray[drag.idx];
+      const pw = p.shape[0].length * layout.cell;
+      const ph = p.shape.length * layout.cell;
+      for (let r = 0; r < p.shape.length; r++) for (let c = 0; c < p.shape[0].length; c++) {
+        if (p.shape[r][c]) {
+          drawGemBlock(drag.x - pw / 2 + c * layout.cell, drag.y - ph / 2 + r * layout.cell, layout.cell, p.colorIdx, 0.92);
+        }
+      }
+    }
+
+    // Flash cleared lines & particles
+    flashLines = flashLines.filter(f => (f.life -= dt) > 0);
+    for (const f of flashLines) {
+      ctx.fillStyle = `rgba(255, 255, 255, ${f.life / 0.28 * 0.5})`;
+      if (f.type === 'row') ctx.fillRect(layout.bx, layout.by + f.idx * layout.cell, boardPx, layout.cell);
+      else ctx.fillRect(layout.bx + f.idx * layout.cell, layout.by, layout.cell, boardPx);
+    }
+    particles = particles.filter(p => (p.life -= dt) > 0);
+    for (const pt of particles) {
+      pt.x += pt.vx * dt; pt.y += pt.vy * dt;
+      ctx.globalAlpha = Math.max(0, pt.life / 0.38);
+      ctx.fillStyle = pt.color;
+      ctx.fillRect(pt.x - 4, pt.y - 4, 8, 8);
+    }
+    ctx.globalAlpha = 1;
+
+    requestAnimationFrame(render);
+  }
+
+  function pointerPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+
+  canvas.addEventListener('pointerdown', (e) => {
+    const pos = pointerPos(e);
+    if (pos.y < layout.trayY - 10) return;
+    const slotW = layout.W / 3;
+    const idx = Math.min(2, Math.max(0, Math.floor(pos.x / slotW)));
+    if (!tray[idx]) return;
+    const touchOffset = e.pointerType === 'touch' ? 56 : 16;
+    drag = { idx, x: pos.x, y: pos.y - touchOffset, touchOffset, gx: -1, gy: -1, snapOk: false };
+    canvas.setPointerCapture(e.pointerId);
+    updateSnap();
+  });
+
+  function updateSnap() {
+    if (!drag) return;
+    const p = tray[drag.idx];
+    const pw = p.shape[0].length * layout.cell;
+    const ph = p.shape.length * layout.cell;
+    const topLeftX = drag.x - pw / 2;
+    const topLeftY = drag.y - ph / 2;
+    const gx = Math.round((topLeftX - layout.bx) / layout.cell);
+    const gy = Math.round((topLeftY - layout.by) / layout.cell);
+    drag.gx = gx; drag.gy = gy;
+    drag.snapOk = canPlace(p, gx, gy);
+  }
+
+  canvas.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const pos = pointerPos(e);
+    drag.x = pos.x;
+    drag.y = pos.y - drag.touchOffset;
+    updateSnap();
+  });
+
+  function releaseDrag() {
+    if (!drag) return;
+    if (drag.snapOk) placePiece(drag.idx, drag.gx, drag.gy);
+    drag = null;
+  }
+  canvas.addEventListener('pointerup', releaseDrag);
+  canvas.addEventListener('pointercancel', () => { drag = null; });
+
+  function newGame() {
+    board = Array.from({ length: GRID }, () => Array(GRID).fill(null));
+    tray = [null, null, null];
+    score = 0; combo = 0;
+    refillTrayIfEmpty();
+    document.getElementById('gameover').classList.remove('show');
+    updateHud();
+    persist();
+  }
+
+  document.getElementById('btn-restart').onclick = newGame;
+  document.getElementById('btn-play-again').onclick = newGame;
+  window.addEventListener('resize', resize);
+
+  refillTrayIfEmpty();
+  updateHud();
+  resize();
+  requestAnimationFrame(render);
+})();
+</script>
+</body>
+</html>

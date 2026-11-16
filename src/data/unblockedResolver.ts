@@ -25,7 +25,10 @@ const ACADEMICS_MAP: Record<string, string> = {
   "stickmanclimb": "https://gameinclassroom.github.io/stickman-climb-2/",
   "stickmanclimb2": "https://gameinclassroom.github.io/stickman-climb-2/",
   "peopleplayground": "https://7zeb.github.io/homework/melonplayground.html",
-  "blockblast": "https://freeonlinewebtools.github.io/blockblastunblockedgames.github.io/",
+  "blockblast": "games/block-blast.html",
+  "magictiles3": "games/magic-tiles-3.html",
+  "speedstars": "games/speed-stars.html",
+  "turbostars": "games/turbo-stars.html",
   "ovo": "https://7zeb.github.io/homework/ovo2.html",
   "eaglercraft": "https://7zeb.github.io/homework/mc1_8.html",
   "eaglercraft188": "https://7zeb.github.io/homework/mc1_8.html",
@@ -41,9 +44,10 @@ const ACADEMICS_MAP: Record<string, string> = {
   "vex6": "https://gameinclassroom.github.io/vex-6/",
   "vex7": "https://7zeb.github.io/homework/vex7.html",
   "vex8": "https://7zeb.github.io/homework/vex8.html",
-  "worldshardestgame": "https://freeonlinewebtools.github.io/gamelist3.github.io/Worlds-Hardest-Game/",
-  "worldshardestgame2": "https://freeonlinewebtools.github.io/gamelist3.github.io/Worlds-Hardest-Game-2/",
-  "worldshardestgame3": "https://freeonlinewebtools.github.io/gamelist3.github.io/Worlds-Hardest-Game-3/",
+  "worldshardestgame": "games/worlds-hardest-game.html?edition=1",
+  "worldshardestgame2": "games/worlds-hardest-game.html?edition=2",
+  "worldshardestgame3": "games/worlds-hardest-game.html?edition=3",
+  "worldshardestgame4": "games/worlds-hardest-game.html?edition=4",
   "fruitninja": "games/fruit-ninja.html",
   "mario": "https://7zeb.github.io/homework/mario-game/index.html",
   "supermario": "https://7zeb.github.io/homework/mario-game/index.html",
@@ -51,7 +55,7 @@ const ACADEMICS_MAP: Record<string, string> = {
   "supermario64": "https://7zeb.github.io/homework/sm64/",
   "supermariobros": "https://7zeb.github.io/homework/mario-game/index.html",
   "blackjack": "https://flyingsully.github.io/GameList.github.io/Blackjack/",
-  "happywheels": "https://gameinclassroom.github.io/happy-wheels/",
+  "happywheels": "games/happy-wheels.html",
   "dumbwaystodie": "games/dumb-ways-to-die.html",
   "hooproyale": "https://ubghyper.github.io/GameList.github.io/Hoop-Royale/",
   "asmallworldcup": "games/a-small-world-cup.html",
@@ -126,6 +130,11 @@ const PRESERVED_LOCAL_GAMES = new Set([
   "games/duck-life-4.html",
   "games/duck-life-5.html",
   "games/buckshot-roulette.html",
+  "games/worlds-hardest-game.html",
+  "games/block-blast.html",
+  "games/magic-tiles-3.html",
+  "games/speed-stars.html",
+  "games/turbo-stars.html",
   "games/sawyer-for-sawyer.html",
   "games/a-small-world-cup.html"
 ]);
@@ -271,6 +280,76 @@ export function resolveGameSource(
         'https://priswall.github.io/diepio-clone/'
       ]
     };
+  }
+
+  // Happy Wheels (100% Unblocked Local Physics Runner + proxied external mirror)
+  if (safeId.includes('happy-wheel') || safeId.includes('happywheel') || safeTitle.toLowerCase().includes('happy wheel')) {
+    return {
+      src: 'games/happy-wheels.html',
+      mirrors: [
+        'games/happy-wheels.html',
+        'https://gameinclassroom.github.io/happy-wheels/'
+      ]
+    };
+  }
+
+  // Block Blast (100% Unblocked Local HTML5 8x8 Puzzle + Unity mirror)
+  if (safeId.includes('block-blast') || safeId.includes('blockblast') || safeTitle.toLowerCase().includes('block blast')) {
+    return {
+      src: 'games/block-blast.html',
+      mirrors: [
+        'games/block-blast.html',
+        'https://ubghyper.github.io/GameList.github.io/Block-Blast/'
+      ]
+    };
+  }
+
+  // Magic Tiles 3 (100% Unblocked Local HTML5 Piano Rhythm + mirror)
+  if (safeId.includes('magic-tile') || safeId.includes('magictile') || safeTitle.toLowerCase().includes('magic tile')) {
+    return {
+      src: 'games/magic-tiles-3.html',
+      mirrors: [
+        'games/magic-tiles-3.html',
+        'https://freeonlinewebtools.github.io/gamelist7.github.io/Magic-Tiles-3/'
+      ]
+    };
+  }
+
+  // Speed Stars (100% Unblocked Local HTML5 Sprint Track + mirror)
+  if (safeId.includes('speed-star') || safeId.includes('speedstar') || safeTitle.toLowerCase().includes('speed star')) {
+    return {
+      src: 'games/speed-stars.html',
+      mirrors: [
+        'games/speed-stars.html',
+        'https://freeonlinewebtools.github.io/gamelist6.github.io/Speed-Stars/'
+      ]
+    };
+  }
+
+  // Turbo Stars (100% Unblocked Local HTML5 Half-Pipe Racer + mirror)
+  if (safeId.includes('turbo-star') || safeId.includes('turbostar') || safeTitle.toLowerCase().includes('turbo star')) {
+    return {
+      src: 'games/turbo-stars.html',
+      mirrors: [
+        'games/turbo-stars.html',
+        'https://freeonlinewebtools.github.io/gamelist4.github.io/Turbo-Stars/'
+      ]
+    };
+  }
+
+  // The World's Hardest Game Series (Editions 1, 2, 3, 4 - Unblocked Local HTML5 + Ruffle SWF Mirrors)
+  if (safeId.includes('worlds-hardest') || safeId.includes('worldshardest') || safeTitle.toLowerCase().includes("world's hardest") || safeTitle.toLowerCase().includes('worlds hardest')) {
+    const lowerT = safeTitle.toLowerCase();
+    const ed = (safeId.includes('4') || lowerT.includes('4')) ? 4
+      : (safeId.includes('3') || lowerT.includes('3')) ? 3
+      : (safeId.includes('2') || lowerT.includes('2')) ? 2
+      : 1;
+    const localUrl = `games/worlds-hardest-game.html?edition=${ed}`;
+    const whgMirrors = [localUrl];
+    if (ed === 1) whgMirrors.push('games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Worlds-Hardest-Game/Worlds-Hardest-Game.swf&title=The+World%27s+Hardest+Game');
+    if (ed === 3) whgMirrors.push('games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Worlds-Hardest-Game-3/Worlds-Hardest-Game-3.swf&title=The+World%27s+Hardest+Game+3');
+    if (ed === 4) whgMirrors.push('games/flash-player.html?swf=https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Worlds-Hardest-Game-4/Worlds-Hardest-Game-4.swf&title=The+World%27s+Hardest+Game+4');
+    return { src: localUrl, mirrors: whgMirrors };
   }
 
   // Agar.io (Real Agar.io engine + bots, mass, split mechanics & proxy)
@@ -881,12 +960,16 @@ export function resolveGameSource(
     };
   }
 
-  // If preserved local game (or flash player wrapper with query), keep as-is
-  if (PRESERVED_LOCAL_GAMES.has(safeSrc) || safeSrc.startsWith("games/flash-player.html")) {
+  // If preserved local game (or flash/WHG player wrapper with query), keep as-is
+  if (
+    PRESERVED_LOCAL_GAMES.has(safeSrc) ||
+    safeSrc.startsWith("games/flash-player.html") ||
+    safeSrc.startsWith("games/worlds-hardest-game.html")
+  ) {
     return { src: safeSrc, mirrors: [safeSrc, ...safeMirrors.filter(m => m !== safeSrc)] };
   }
 
-  // 1. Direct explicit fix map check (handles clash and all 86 reported issues)
+  // 1. Direct explicit fix map check (handles broken 404s, SWF upgrades, and local overrides)
   if (fixMap[safeId]) {
     const fixedUrl = fixMap[safeId];
     return { src: fixedUrl, mirrors: [fixedUrl, ...safeMirrors.filter(m => m !== fixedUrl)] };
@@ -898,25 +981,32 @@ export function resolveGameSource(
 
   if (fixMap[cleanTitle] || fixMap[cleanId] || fixMap[cleanSlug]) {
     const fixedUrl = fixMap[cleanTitle] || fixMap[cleanId] || fixMap[cleanSlug];
-    return { src: fixedUrl, mirrors: [fixedUrl, ...mirrors.filter(m => m !== fixedUrl)] };
+    return { src: fixedUrl, mirrors: [fixedUrl, ...safeMirrors.filter(m => m !== fixedUrl)] };
   }
 
-  // Check if primary is blocked or unreliable (contains ubg keyword, pages.dev, gamedistribution, or broken games/)
-  const isBlocked = 
-    currentSrc.includes('ubghyper') ||
-    currentSrc.includes('.pages.dev') ||
-    currentSrc.includes('gamedistribution.com') ||
-    currentSrc.includes('blobby-boi') ||
-    currentSrc.includes('stroongdog') ||
-    currentSrc.includes('strongdog') ||
-    (currentSrc.startsWith('games/') && !PRESERVED_LOCAL_GAMES.has(currentSrc)) ||
-    currentSrc === '';
+  const isDead7zebMasterLoader =
+    safeSrc.includes('7zeb.github.io/homework/speedstars.html') ||
+    safeSrc.includes('7zeb.github.io/homework/crazy-taxi');
 
-  let resolvedSrc = currentSrc;
+  // Check if primary is blocked or unreliable (ubghyper, pages.dev, freeonlinewebtools portals/jqrg, dead paths)
+  const isBlocked =
+    safeSrc.includes('ubghyper') ||
+    safeSrc.includes('.pages.dev') ||
+    safeSrc.includes('gamedistribution.com') ||
+    safeSrc.includes('blobby-boi') ||
+    safeSrc.includes('stroongdog') ||
+    safeSrc.includes('strongdog') ||
+    safeSrc.includes('blockblastunblockedgames') ||
+    isDead7zebMasterLoader ||
+    (safeSrc.startsWith('games/') && !PRESERVED_LOCAL_GAMES.has(safeSrc)) ||
+    safeSrc === '';
 
-  // 1. Prioritize verified 7zeb unblocked endpoints FIRST if matched
-  if (sMap[cleanTitle] || sMap[cleanId] || sMap[cleanSlug]) {
-    resolvedSrc = sMap[cleanTitle] || sMap[cleanId] || sMap[cleanSlug];
+  let resolvedSrc = safeSrc;
+
+  // 1. Prioritize verified 7zeb unblocked endpoints FIRST if matched (excluding known 404/broken master-loader stubs)
+  const szMatch = sMap[cleanTitle] || sMap[cleanId] || sMap[cleanSlug];
+  if (szMatch && !szMatch.includes('speedstars.html') && !szMatch.includes('crazy-taxi')) {
+    resolvedSrc = szMatch;
   } else if (isBlocked) {
     if (gicMap[cleanTitle] || gicMap[cleanId] || gicMap[cleanSlug]) {
       resolvedSrc = gicMap[cleanTitle] || gicMap[cleanId] || gicMap[cleanSlug];
@@ -925,16 +1015,16 @@ export function resolveGameSource(
     } else if (ACADEMICS_MAP[cleanTitle] || ACADEMICS_MAP[cleanId] || ACADEMICS_MAP[cleanSlug]) {
       resolvedSrc = ACADEMICS_MAP[cleanTitle] || ACADEMICS_MAP[cleanId] || ACADEMICS_MAP[cleanSlug];
     } else if (FLYINGSULLY_GAMES.has(cleanTitle) || FLYINGSULLY_GAMES.has(cleanId) || FLYINGSULLY_GAMES.has(cleanSlug)) {
-      resolvedSrc = `https://flyingsully.github.io/GameList.github.io/${title.replace(/ /g, '-')}/`;
+      resolvedSrc = `https://flyingsully.github.io/GameList.github.io/${safeTitle.replace(/ /g, '-')}/`;
     } else {
-      const cleanMirror = mirrors.find(m => 
-        (m.includes('7zeb.github.io') || 
+      const cleanMirror = safeMirrors.find(m =>
+        (m.includes('7zeb.github.io') ||
          m.includes('gameinclassroom.github.io') ||
          m.includes('freeonlinewebtools.github.io') ||
-         m.includes('academics-study.github.io') || 
-         m.includes('javaspence.github.io') || 
-         m.includes('henshmi.github.io') || 
-         m.includes('joe-the-chicken.github.io') || 
+         m.includes('academics-study.github.io') ||
+         m.includes('javaspence.github.io') ||
+         m.includes('henshmi.github.io') ||
+         m.includes('joe-the-chicken.github.io') ||
          m.includes('flyingsully.github.io')) &&
         !m.includes('ubghyper') &&
         !m.includes('index.html')
@@ -945,28 +1035,39 @@ export function resolveGameSource(
     }
   }
 
-  // Construct clean prioritized mirrors list (with automatic unblocked server proxy fallback)
+  // Construct clean prioritized mirrors list (with automatic unblocked server proxy when Express backend is present)
   const validMirrors = [
     resolvedSrc,
-    ...mirrors.filter(m => m !== resolvedSrc && 
-      !m.includes('blobby-boi') && 
+    ...safeMirrors.filter(m => m !== resolvedSrc &&
+      !m.includes('blobby-boi') &&
       !m.includes('gamedistribution.com') &&
       m !== 'games/paper-io-2/index.html' &&
       m !== 'games/retro-bowl/index.html'
     )
   ];
 
-  // If the primary source is an external HTTP(S) URL, add the universal school-filter proxy mirror
+  // Auto-prefer upgraded same-origin proxy FIRST on Express servers for commonly school-blocked or jqrg/githack/.br/pages.dev hosts
+  const isStatic = typeof window !== 'undefined' && Boolean(window.location?.hostname?.endsWith('github.io') || window.location?.protocol === 'file:');
+  const needsSchoolOrSdkProxy =
+    resolvedSrc.includes('freeonlinewebtools.github.io') ||
+    resolvedSrc.includes('ubghyper.github.io') ||
+    resolvedSrc.includes('.pages.dev');
+
+  let finalSrc = resolvedSrc;
   if (resolvedSrc.startsWith('http://') || resolvedSrc.startsWith('https://')) {
-    const isStatic = typeof window !== 'undefined' && Boolean(window.location?.hostname?.endsWith('github.io') || window.location?.protocol === 'file:');
-    const proxyMirror = !isStatic && resolvedSrc.startsWith('http') ? `/api/proxy/game?url=${encodeURIComponent(resolvedSrc)}` : resolvedSrc;
-    if (!validMirrors.includes(proxyMirror)) {
+    const proxyMirror = !isStatic ? `/api/proxy/game?url=${encodeURIComponent(resolvedSrc)}` : resolvedSrc;
+    if (!isStatic && needsSchoolOrSdkProxy) {
+      finalSrc = proxyMirror;
+      if (!validMirrors.includes(proxyMirror)) {
+        validMirrors.unshift(proxyMirror);
+      }
+    } else if (!validMirrors.includes(proxyMirror)) {
       validMirrors.push(proxyMirror);
     }
   }
 
   return {
-    src: resolvedSrc,
+    src: finalSrc,
     mirrors: validMirrors
   };
 }

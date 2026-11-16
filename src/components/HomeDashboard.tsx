@@ -14,6 +14,7 @@ import {
   Cloud
 } from 'lucide-react';
 import { Game } from '../types/game';
+import { resolveAssetUrl } from '../services/gamesStore';
 import { ThemeConfig } from '../services/themeStore';
 
 interface HomeDashboardProps {
@@ -288,8 +289,9 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
 
               <div className="relative aspect-[16/10] rounded-2xl overflow-hidden my-2 bg-slate-900">
                 <img
-                  src={spotlightGame.thumbnail}
+                  src={resolveAssetUrl(spotlightGame.banner || spotlightGame.thumbnail)}
                   alt={spotlightGame.title}
+                  referrerPolicy="no-referrer"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
@@ -342,8 +344,9 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
                 >
                   <div className="aspect-video rounded-lg overflow-hidden bg-slate-900 relative">
                     <img 
-                      src={g.thumbnail} 
+                      src={resolveAssetUrl(g.thumbnail)} 
                       alt={g.title} 
+                      referrerPolicy="no-referrer"
                       loading="eager"
                       decoding="async"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform" 

@@ -63,6 +63,21 @@ export function useGamesStore() {
         const parsed = JSON.parse(cached);
         if (parsed && typeof parsed === 'object') {
           for (const key of Object.keys(parsed)) {
+            const entry = parsed[key];
+            if (entry && typeof entry === 'object') {
+              if (
+                typeof entry.thumbnail === 'string' &&
+                /unsplash|picsum|placeholder|raw\.githubusercontent\.com|thumb\.png|data:image\/svg/i.test(entry.thumbnail)
+              ) {
+                delete entry.thumbnail;
+              }
+              if (
+                typeof entry.banner === 'string' &&
+                /unsplash|picsum|placeholder|raw\.githubusercontent\.com|thumb\.png|data:image\/svg/i.test(entry.banner)
+              ) {
+                delete entry.banner;
+              }
+            }
             const src = parsed[key]?.iframeSrc || '';
             if (
               key.includes('bloon') || 
@@ -70,7 +85,14 @@ export function useGamesStore() {
               key.includes('duck') ||
               key.includes('buckshot') ||
               key.includes('diep') ||
+              key.includes('happy') ||
+              key.includes('magic-tile') ||
+              key.includes('speed-star') ||
+              key.includes('block-blast') ||
+              key.includes('turbo-star') ||
+              key.includes('hardest') ||
               src.includes('diep.io') ||
+              src.includes('.pages.dev') ||
               src.includes('gameinclassroom') ||
               src.includes('freeonlinewebtools') ||
               src.includes('ubghyper.github.io') ||

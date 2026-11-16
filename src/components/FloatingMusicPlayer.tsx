@@ -27,13 +27,15 @@ interface FloatingMusicPlayerProps {
   activeSpace: string;
   isGameActive: boolean;
   onOpenMusicSpace: () => void;
+  onDockChange?: (dock: { side: 'right' | 'left'; topClearancePx: number }) => void;
 }
 
 export const FloatingMusicPlayer: React.FC<FloatingMusicPlayerProps> = ({
   activeTheme,
   activeSpace,
   isGameActive,
-  onOpenMusicSpace
+  onOpenMusicSpace,
+  onDockChange
 }) => {
   const {
     currentTrack,
@@ -62,9 +64,34 @@ export const FloatingMusicPlayer: React.FC<FloatingMusicPlayerProps> = ({
 
   const [position, setPosition] = useState<'right' | 'left'>('right');
   const [showLyrics, setShowLyrics] = useState(false);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  const isVisible = activeSpace !== 'music' && isMiniPlayerOpen && Boolean(currentTrack);
+
+  React.useEffect(() => {
+    if (!onDockChange) return;
+    const baseBottom = isGameActive ? 16 : 20;
+    if (!isVisible) {
+      onDockChange({ side: position, topClearancePx: baseBottom });
+      return;
+    }
+
+    const report = () => {
+      const h = containerRef.current?.offsetHeight || (isMiniPlayerCollapsed ? 50 : 350);
+      onDockChange({ side: position, topClearancePx: baseBottom + h + 12 });
+    };
+
+    report();
+    const el = containerRef.current;
+    if (el && typeof ResizeObserver !== 'undefined') {
+      const ro = new ResizeObserver(report);
+      ro.observe(el);
+      return () => ro.disconnect();
+    }
+  }, [isVisible, position, isMiniPlayerCollapsed, isGameActive, onDockChange]);
 
   // Hide floating player if user is actively in full Music Studio view
-  if (activeSpace === 'music' || !isMiniPlayerOpen || !currentTrack) {
+  if (!isVisible) {
     return null;
   }
 
@@ -89,7 +116,8 @@ export const FloatingMusicPlayer: React.FC<FloatingMusicPlayerProps> = ({
 
   return (
     <div 
-      className={`fixed z-50 transition-all duration-300 pointer-events-auto ${
+      ref={containerRef}
+      className={`fixed z-40 transition-all duration-300 pointer-events-auto ${
         position === 'right' ? 'right-4 sm:right-6' : 'left-4 sm:left-6'
       } ${
         isGameActive ? 'bottom-4' : 'bottom-5'
@@ -115,7 +143,7 @@ export const FloatingMusicPlayer: React.FC<FloatingMusicPlayerProps> = ({
               className={`w-full h-full object-cover ${isPlaying ? 'animate-spin' : ''}`}
               style={{ animationDuration: '6s' }}
               onError={(e) => {
-                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=60';
+                (e.target as HTMLImageElement).style.display = 'none';
               }}
             />
             <div className="absolute inset-0 bg-black/20" />
@@ -235,7 +263,7 @@ export const FloatingMusicPlayer: React.FC<FloatingMusicPlayerProps> = ({
                 alt={currentTrack.title}
                 className={`w-full h-full object-cover transition-transform duration-500 ${isPlaying ? 'scale-105' : ''}`}
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=60';
+                  (e.target as HTMLImageElement).style.display = 'none';
                 }}
               />
               <div className="absolute inset-0 bg-black/20" />

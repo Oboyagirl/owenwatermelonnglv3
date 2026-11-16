@@ -14,7 +14,11 @@ import {
   Trash2,
   LogIn,
   Sparkles,
-  AlertCircle
+  AlertCircle,
+  ChevronDown,
+  ChevronUp,
+  Pin,
+  PinOff
 } from 'lucide-react';
 import { signInAnonymously } from 'firebase/auth';
 import { auth } from '../services/firebase';
@@ -50,6 +54,9 @@ interface ChatBoxWidgetProps {
   onClose: () => void;
   activeTheme?: ThemeConfig;
   onOnlineCountChange?: (count: number) => void;
+  musicDock?: { side: 'right' | 'left'; topClearancePx: number };
+  isPinnedOpen?: boolean;
+  onTogglePinOpen?: () => void;
 }
 
 interface PartnerTarget {
@@ -63,13 +70,39 @@ function getAvatarPreset(avatarId?: string | null) {
   return AVATAR_PRESETS.find((a) => a.id === avatarId) || AVATAR_PRESETS[0];
 }
 
+function formatFriendlyChatError(raw?: string | null): string | null {
+  if (!raw) return null;
+  const trimmed = raw.trim();
+  if (trimmed.startsWith('{')) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      const errMsg = typeof parsed?.error === 'string' ? parsed.error : '';
+      if (errMsg.toLowerCase().includes('missing or insufficient permissions')) {
+        return 'Chat permissions denied — please refresh or sign out and back in.';
+      }
+      if (errMsg) return errMsg;
+    } catch {}
+  }
+  return trimmed;
+}
+
 export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
   isOpen,
   onToggle,
   onClose,
   activeTheme = THEMES.original,
-  onOnlineCountChange
+  onOnlineCountChange,
+  musicDock = { side: 'right', topClearancePx: 84 },
+  isPinnedOpen = false,
+  onTogglePinOpen
 }) => {
+  const [isBarHidden, setIsBarHidden] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsBarHidden(false);
+    }
+  }, [isOpen]);
   const { user, profile, loginGoogle, authError, clearAuthError } = useAuth();
   const isFirebaseConnected = Boolean(user?.uid && auth.currentUser && auth.currentUser.uid === user.uid);
 
@@ -381,34 +414,57 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
   const activePartnerLiveProfile = activePartner ? directoryByUid.get(activePartner.userId) : undefined;
   const isActivePartnerOnline = activePartnerLiveProfile ? isProfileOnlineNow(activePartnerLiveProfile) : false;
 
+  const sideClass = musicDock.side === 'left' ? 'left-4 sm:left-6' : 'right-4 sm:right-6';
+  const bottomOffsetPx = Math.max(16, musicDock.topClearancePx);
+  const friendlyError = formatFriendlyChatError(chatError || authError);
+
   if (!isOpen) {
+    if (isBarHidden) {
+      return null;
+    }
     return (
-      <div className="fixed left-3 sm:left-5 bottom-3 sm:bottom-5 z-40">
+      <div
+        className={`fixed ${sideClass} z-40 transition-all duration-300 flex items-center gap-1.5`}
+        style={{ bottom: `${bottomOffsetPx}px` }}
+      >
         <button
           type="button"
           onClick={onToggle}
-          className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl border shadow-2xl backdrop-blur-xl transition-all hover:scale-105 active:scale-95 cursor-pointer"
+          className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl border shadow-2xl backdrop-blur-xl transition-all hover:scale-[1.03] active:scale-95 cursor-pointer"
           style={{
             backgroundColor: bgHeader,
             borderColor: accentColor,
             boxShadow: `0 10px 30px rgba(0, 0, 0, 0.5)`
           }}
-          title="Open Firebase Friends & Real-Time Chatbox"
+          title="Expand Firebase Friends & Chatbox"
         >
           <div className="relative">
-            <MessageCircle className="w-5 h-5" style={{ color: accentColor }} />
+            <MessageCircle className="w-4 h-4" style={{ color: accentColor }} />
             {isFirebaseConnected && (
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#0b1528]" />
+              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400 border border-[#0b1528]" />
             )}
           </div>
           <div className="flex flex-col items-start text-left">
-            <span className="text-xs font-extrabold text-white leading-tight">Chatbox</span>
+            <span className="text-xs font-extrabold text-white leading-tight flex items-center gap-1.5">
+              <span>Chatbox</span>
+              {isPinnedOpen && <Pin className="w-2.5 h-2.5 text-emerald-300" />}
+            </span>
             <span className="text-[10px] text-slate-400 leading-tight">
               {isFirebaseConnected
                 ? `${onlinePeersCount} online · ${contacts.length} friends`
                 : 'Sign in to chat'}
             </span>
           </div>
+          <ChevronUp className="w-3.5 h-3.5 text-slate-400 ml-1" />
+        </button>
+        <button
+          type="button"
+          onClick={() => setIsBarHidden(true)}
+          className="p-1.5 rounded-xl border text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer backdrop-blur-xl"
+          style={{ backgroundColor: bgHeader, borderColor }}
+          title="Hide floating chatbox bar (reopen from top header)"
+        >
+          <X className="w-3.5 h-3.5" />
         </button>
       </div>
     );
@@ -416,15 +472,17 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
 
   return (
     <div
-      className="fixed left-3 sm:left-5 bottom-3 sm:bottom-5 z-50 w-[calc(100vw-1.5rem)] sm:w-[410px] h-[540px] max-h-[82vh] rounded-2xl border shadow-2xl flex flex-col overflow-hidden backdrop-blur-xl animate-fadeIn"
+      className={`fixed ${sideClass} z-50 w-[calc(100vw-2rem)] sm:w-[390px] h-[480px] rounded-2xl border shadow-2xl flex flex-col overflow-hidden backdrop-blur-xl animate-fadeIn transition-all duration-300`}
       style={{
+        bottom: `${bottomOffsetPx}px`,
+        maxHeight: `calc(100vh - ${bottomOffsetPx + 16}px)`,
         backgroundColor: bgPrimary,
-        borderColor
+        borderColor: isPinnedOpen ? accentColor : borderColor
       }}
     >
       {/* Top Header */}
       <div
-        className="px-4 py-3 border-b flex items-center justify-between gap-2 shrink-0"
+        className="px-3.5 py-2.5 border-b flex items-center justify-between gap-2 shrink-0"
         style={{ backgroundColor: bgHeader, borderColor }}
       >
         <div className="flex items-center gap-2.5 min-w-0">
@@ -439,7 +497,7 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-extrabold text-white truncate max-w-[140px]">
+              <span className="text-xs font-extrabold text-white truncate max-w-[130px]">
                 {isFirebaseConnected ? myDisplayName : 'Firebase Chatbox'}
               </span>
               {isFirebaseConnected && (
@@ -478,22 +536,48 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
               <span className="hidden sm:inline">{discoverable ? 'Visible' : 'Hidden'}</span>
             </button>
           )}
+          {onTogglePinOpen && (
+            <button
+              type="button"
+              onClick={onTogglePinOpen}
+              className={`px-2 py-1 rounded-lg border text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-colors ${
+                isPinnedOpen
+                  ? 'bg-sky-500/20 border-sky-400/40 text-sky-200'
+                  : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
+              }`}
+              title={isPinnedOpen ? 'Keeping chatbox open across tabs & Esc (Click to unkeep)' : 'Keep chatbox open while browsing or gaming'}
+            >
+              {isPinnedOpen ? <Pin className="w-3 h-3" /> : <PinOff className="w-3 h-3" />}
+              <span>{isPinnedOpen ? 'Kept' : 'Keep'}</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={onClose}
             className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-            title="Minimize Chatbox"
+            title="Minimize chatbox"
           >
-            <X className="w-4 h-4" />
+            <ChevronDown className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setIsBarHidden(true);
+              onClose();
+            }}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/10 transition-colors cursor-pointer"
+            title="Hide chatbox (reopen anytime from header)"
+          >
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
       {/* Feedback banners */}
-      {(chatError || authError) && (
+      {friendlyError && (
         <div className="mx-3 mt-2.5 px-3 py-2 rounded-xl bg-rose-500/15 border border-rose-400/30 text-rose-200 text-[11px] flex items-start gap-2 shrink-0">
           <AlertCircle className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
-          <span className="flex-1">{chatError || authError}</span>
+          <span className="flex-1 break-words">{friendlyError}</span>
           <button
             type="button"
             onClick={() => {

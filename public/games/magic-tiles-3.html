@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Magic Tiles 3 - Unblocked</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: #0f172a;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: #f8fafc;
+    display: flex; align-items: center; justify-content: center;
+    touch-action: none;
+  }
+  #shell {
+    position: relative; width: 100%; max-width: 460px; height: 100%;
+    background: linear-gradient(180deg, #e0ecff 0%, #f5f3ff 65%, #e2e8f0 100%);
+    box-shadow: 0 0 60px rgba(0,0,0,0.65);
+    overflow: hidden;
+  }
+  canvas#stage { display: block; width: 100%; height: 100%; touch-action: none; }
+  #hud {
+    position: absolute; top: 10px; left: 12px; right: 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    pointer-events: none; z-index: 10;
+  }
+  .score-main {
+    font-size: 32px; font-weight: 900; color: #0f172a;
+    text-shadow: 0 2px 0 rgba(255,255,255,0.85);
+    font-variant-numeric: tabular-nums;
+  }
+  #shell.fever .score-main { color: #ffffff; text-shadow: 0 2px 10px rgba(56,189,248,0.8); }
+  .hud-right { display: flex; align-items: center; gap: 6px; pointer-events: auto; }
+  .pill {
+    background: rgba(15, 23, 42, 0.8); color: #fff;
+    padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 800;
+    backdrop-filter: blur(4px);
+  }
+  #btn-songs {
+    border: 1px solid rgba(255,255,255,0.25); cursor: pointer;
+  }
+  #judge {
+    position: absolute; top: 14%; left: 50%; transform: translateX(-50%);
+    font-size: 20px; font-weight: 900; letter-spacing: 0.04em;
+    color: #0284c7; text-shadow: 0 2px 8px rgba(255,255,255,0.9);
+    opacity: 0; transition: opacity 0.16s; pointer-events: none; z-index: 11;
+  }
+  #shell.fever #judge { color: #fde047; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+  #judge.show { opacity: 1; }
+
+  #menu {
+    position: absolute; inset: 0; z-index: 25;
+    background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(8px);
+    display: flex; flex-direction: column; padding: 20px 18px; overflow-y: auto;
+  }
+  #menu.hidden { display: none; }
+  .menu-head { text-align: center; margin-bottom: 14px; }
+  .menu-head h1 { font-size: 26px; font-weight: 900; letter-spacing: -0.02em; color: #fff; }
+  .menu-head p { font-size: 12px; color: #94a3b8; margin-top: 3px; }
+  .song-list { display: flex; flex-direction: column; gap: 9px; margin-bottom: 14px; }
+  .song-card {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    background: #1e293b; border: 1.5px solid #334155; border-radius: 14px;
+    padding: 12px 14px; cursor: pointer; transition: 0.15s; text-align: left;
+  }
+  .song-card:hover { border-color: #38bdf8; background: #26354d; }
+  .song-title { font-size: 15px; font-weight: 800; color: #fff; }
+  .song-sub { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+  .song-best { font-size: 12px; font-weight: 800; color: #fbbf24; text-align: right; white-space: nowrap; }
+  .keys-hint {
+    margin-top: auto; text-align: center; font-size: 11px; color: #94a3b8;
+    background: rgba(30,41,59,0.7); border-radius: 10px; padding: 8px 10px;
+  }
+
+  #gameover {
+    position: absolute; inset: 0; z-index: 30;
+    background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(6px);
+    display: none; align-items: center; justify-content: center; padding: 20px;
+  }
+  #gameover.show { display: flex; }
+  .go-card {
+    background: #1e293b; border: 2px solid #38bdf8; border-radius: 18px;
+    padding: 24px; width: 100%; max-width: 330px; text-align: center;
+  }
+  .go-card h2 { font-size: 24px; font-weight: 900; margin-bottom: 6px; }
+  .go-stats { font-size: 14px; color: #cbd5e1; margin-bottom: 16px; line-height: 1.6; }
+  .go-actions { display: flex; gap: 8px; }
+  .btn { flex: 1; padding: 12px; border-radius: 10px; border: 0; font-weight: 900; font-size: 14px; cursor: pointer; }
+  .btn-primary { background: linear-gradient(135deg, #0ea5e9, #6366f1); color: #fff; }
+  .btn-sec { background: #334155; color: #e2e8f0; }
+</style>
+</head>
+<body>
+  <div id="shell">
+    <canvas id="stage"></canvas>
+    <div id="hud">
+      <div class="score-main" id="score-el">0</div>
+      <div class="hud-right">
+        <span class="pill" id="stars-el">★ 0</span>
+        <span class="pill" id="speed-el">1.0x</span>
+        <button class="pill" id="btn-songs" type="button">Songs</button>
+      </div>
+    </div>
+    <div id="judge"></div>
+
+    <div id="menu">
+      <div class="menu-head">
+        <h1>MAGIC TILES 3</h1>
+        <p>Tap black tiles to the beat · Hold blue sliders · Don't tap white space!</p>
+      </div>
+      <div class="song-list" id="song-list"></div>
+      <div class="keys-hint">Desktop Keys: <b>D · F · J · K</b> (or <b>1 2 3 4</b>) &nbsp;|&nbsp; iPad / Mouse: Tap any lane</div>
+    </div>
+
+    <div id="gameover">
+      <div class="go-card">
+        <h2 id="go-title">Song Ended!</h2>
+        <div class="go-stats" id="go-stats"></div>
+        <div class="go-actions">
+          <button class="btn btn-sec" id="btn-menu">Songs</button>
+          <button class="btn btn-primary" id="btn-retry">Play Again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const SAVE_KEY = 'magic_tiles_3_unblocked_v1';
+  let bestScores = {};
+  try { bestScores = JSON.parse(localStorage.getItem(SAVE_KEY) || '{}') || {}; } catch {}
+  function persist() {
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(bestScores)); } catch {}
+  }
+
+  // MIDI Note frequencies helper
+  const NOTE = {};
+  const NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  for (let m = 36; m <= 96; m++) {
+    const name = NAMES[m % 12] + (Math.floor(m / 12) - 1);
+    NOTE[name] = 440 * Math.pow(2, (m - 69) / 12);
+  }
+
+  // Polyphonic Piano Synthesizer
+  let actx = null;
+  function playPiano(noteName, dur = 0.42, gainVal = 0.24) {
+    try {
+      if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === 'suspended') actx.resume();
+      const freq = NOTE[noteName] || 440;
+      const now = actx.currentTime;
+      const master = actx.createGain();
+      master.gain.setValueAtTime(0.001, now);
+      master.gain.linearRampToValueAtTime(gainVal, now + 0.012);
+      master.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+      const o1 = actx.createOscillator();
+      o1.type = 'triangle';
+      o1.frequency.setValueAtTime(freq, now);
+
+      const o2 = actx.createOscillator();
+      o2.type = 'sine';
+      o2.frequency.setValueAtTime(freq * 2, now);
+      const g2 = actx.createGain();
+      g2.gain.setValueAtTime(0.32, now);
+
+      o1.connect(master);
+      o2.connect(g2); g2.connect(master);
+      master.connect(actx.destination);
+      o1.start(now); o2.start(now);
+      o1.stop(now + dur + 0.02); o2.stop(now + dur + 0.02);
+    } catch {}
+  }
+
+  function playMiss() {
+    try {
+      if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = 'sawtooth'; o.frequency.setValueAtTime(110, actx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(55, actx.currentTime + 0.28);
+      g.gain.setValueAtTime(0.22, actx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.3);
+      o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime + 0.3);
+    } catch {}
+  }
+
+  // Songs: each entry = noteName or [noteName, holdUnits]
+  const SONGS = [
+    {
+      id: 'fur-elise',
+      title: 'Für Elise',
+      artist: 'Beethoven · Classic',
+      baseBpm: 126,
+      notes: [
+        'E5','D#5','E5','D#5','E5','B4','D5','C5',['A4',2],
+        'C4','E4','A4',['B4',2],'E4','G#4','B4',['C5',2],
+        'E4','E5','D#5','E5','D#5','E5','B4','D5','C5',['A4',2],
+        'C4','E4','A4',['B4',2],'E4','C5','B4',['A4',2],
+        'B4','C5','D5',['E5',2],'G4','F5','E5',['D5',2],
+        'F4','E5','D5',['C5',2],'E4','D5','C5',['B4',2]
+      ]
+    },
+    {
+      id: 'canon-d',
+      title: 'Canon in D',
+      artist: 'Pachelbel · Harmonic',
+      baseBpm: 132,
+      notes: [
+        ['F#5',2],['E5',2],['D5',2],['C#5',2],['B4',2],['A4',2],['B4',2],['C#5',2],
+        'D5','F#5','A5','G5','F#5','D5','F#5','E5',
+        'D5','B4','D5','A5','G5','B5','A5','G5',
+        'F#5','D5','E5','C#5','D5','F#5','A5','A4',
+        'B4','G4','A4','F#4','D4','D5','D5','C#5'
+      ]
+    },
+    {
+      id: 'ode-to-joy',
+      title: 'Ode to Joy',
+      artist: 'Beethoven · Easy Flow',
+      baseBpm: 120,
+      notes: [
+        'E5','E5','F5','G5','G5','F5','E5','D5','C5','C5','D5','E5',['E5',2],'D5',['D5',2],
+        'E5','E5','F5','G5','G5','F5','E5','D5','C5','C5','D5','E5',['D5',2],'C5',['C5',2],
+        'D5','D5','E5','C5','D5','E5','F5','E5','C5','D5','E5','F5','E5','D5','C5','D5',['G4',2]
+      ]
+    },
+    {
+      id: 'turkish-march',
+      title: 'Turkish March',
+      artist: 'Mozart · Fast',
+      baseBpm: 150,
+      notes: [
+        'B4','A4','G#4','A4',['C5',2],'D5','C5','B4','C5',['E5',2],
+        'F5','E5','D#5','E5','B5','A5','G#5','A5','B5','A5','G#5','A5',['C6',2],
+        'A5','C6','B5','A5','G5','A5','B5','A5','G5','A5','B5','A5','G5','F#5',['E5',2]
+      ]
+    },
+    {
+      id: 'moonlight',
+      title: 'Moonlight Rush',
+      artist: 'Arcade Remix · Tricky',
+      baseBpm: 158,
+      notes: [
+        'G#4','C#5','E5','G#4','C#5','E5','G#4','C#5','E5','G#4','C#5','E5',
+        'A4','C#5','E5','A4','C#5','E5','A4','D5','F#5','A4','D5','F#5',
+        'G#4','B#4','F#5','G#4','C#5','E5','G#4','C#5','D#5','F#4','B#4','D#5',['C#5',2]
+      ]
+    },
+    {
+      id: 'cyber-symphony',
+      title: 'Cyber Symphony',
+      artist: 'Watermelon Synth · Expert',
+      baseBpm: 168,
+      notes: [
+        'A4','E5','A5','E5','C5','E5','A5','E5','D5','F5','A5','F5','E5','G#5','B5','G#5',
+        'A5','B5','C6','B5','A5','G5','F5','E5','D5','E5','F5','D5','E5','C5','B4','E4',
+        ['A4',2],['E5',2],['A5',2],'G#5','A5','B5','C6','D6','E6'
+      ]
+    }
+  ];
+
+  const shell = document.getElementById('shell');
+  const canvas = document.getElementById('stage');
+  const ctx = canvas.getContext('2d');
+  const menu = document.getElementById('menu');
+  const gameover = document.getElementById('gameover');
+  const judgeEl = document.getElementById('judge');
+
+  let W = 420, H = 720, laneW = 105;
+  function resize() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = shell.clientWidth;
+    H = shell.clientHeight;
+    laneW = W / 4;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  let currentSong = SONGS[0];
+  let running = false;
+  let started = false;
+  let score = 0;
+  let notesCleared = 0;
+  let wave = 1;
+  let speedMult = 1.0;
+  let scrollPxPerSec = 310;
+  let tiles = [];
+  let nextNoteCursor = 0;
+  let nextSpawnY = 0;
+  let lastLane = -1;
+  let bursts = [];
+  let missFlash = null;
+  let activeHolds = new Map(); // lane -> tile
+
+  function tileHeightBase() { return Math.max(115, Math.floor(H * 0.18)); }
+
+  function buildQueueAhead() {
+    const unitH = tileHeightBase();
+    while (nextSpawnY > -H * 1.4) {
+      const item = currentSong.notes[nextNoteCursor % currentSong.notes.length];
+      nextNoteCursor++;
+      const noteName = Array.isArray(item) ? item[0] : item;
+      const holdMult = Array.isArray(item) ? item[1] : 1;
+      const h = unitH * holdMult;
+      let lane = Math.floor(Math.random() * 4);
+      if (lane === lastLane) lane = (lane + 1 + Math.floor(Math.random() * 3)) % 4;
+      lastLane = lane;
+      const y = nextSpawnY - h;
+      tiles.push({
+        lane, y, h,
+        note: noteName,
+        isHold: holdMult > 1,
+        holdMult,
+        hit: false,
+        holding: false,
+        holdFill: 0
+      });
+      nextSpawnY = y;
+    }
+  }
+
+  function startSong(song) {
+    currentSong = song;
+    menu.classList.add('hidden');
+    gameover.classList.remove('show');
+    shell.classList.remove('fever');
+    score = 0;
+    notesCleared = 0;
+    wave = 1;
+    speedMult = 1.0;
+    scrollPxPerSec = (song.baseBpm / 120) * 305;
+    tiles = [];
+    bursts = [];
+    missFlash = null;
+    activeHolds.clear();
+    nextNoteCursor = 0;
+    nextSpawnY = H * 0.62;
+    buildQueueAhead();
+    // Mark first tile as START
+    if (tiles[0]) tiles[0].isStart = true;
+    started = false;
+    running = true;
+    updateHud();
+  }
+
+  function showJudge(txt) {
+    judgeEl.textContent = txt;
+    judgeEl.classList.add('show');
+    clearTimeout(judgeEl._t);
+    judgeEl._t = setTimeout(() => judgeEl.classList.remove('show'), 450);
+  }
+
+  function updateHud() {
+    document.getElementById('score-el').textContent = score.toLocaleString();
+    const stars = notesCleared >= 90 ? '★★★' : notesCleared >= 55 ? '★★' : notesCleared >= 25 ? '★' : '☆';
+    const crowns = wave > 1 ? ` 👑${wave - 1}` : '';
+    document.getElementById('stars-el').textContent = stars + crowns;
+    document.getElementById('speed-el').textContent = speedMult.toFixed(1) + 'x';
+    shell.classList.toggle('fever', wave >= 2);
+  }
+
+  function endGame(reason) {
+    running = false;
+    playMiss();
+    const prev = bestScores[currentSong.id] || 0;
+    if (score > prev) {
+      bestScores[currentSong.id] = score;
+      persist();
+    }
+    document.getElementById('go-title').textContent = reason;
+    document.getElementById('go-stats').innerHTML =
+      `<b>${currentSong.title}</b><br>Score: <b>${score.toLocaleString()}</b> · Best: <b>${Math.max(score, prev).toLocaleString()}</b><br>Tempo Reached: <b>${speedMult.toFixed(2)}x</b>`;
+    setTimeout(() => gameover.classList.add('show'), 360);
+    renderSongList();
+  }
+
+  function pressLane(lane, tapY) {
+    if (!running) return;
+    // Find lowest unhit tile in this lane intersecting tapY (or closest lowest tile)
+    let candidate = null;
+    for (const t of tiles) {
+      if (t.hit || t.lane !== lane) continue;
+      if (tapY === null || (tapY >= t.y - 36 && tapY <= t.y + t.h + 44)) {
+        if (!candidate || t.y > candidate.y) candidate = t;
+      }
+    }
+    // Also allow tapping lowest unhit tile anywhere inside the lower 75% hit zone for keyboard
+    if (!candidate && tapY === null) {
+      const lowest = tiles.filter(t => !t.hit && t.y + t.h > 40).sort((a, b) => b.y - a.y)[0];
+      if (lowest && lowest.lane === lane) candidate = lowest;
+    }
+
+    if (!candidate) {
+      if (started) {
+        missFlash = { lane, y: tapY ?? H * 0.72, life: 0.45 };
+        endGame('Wrong Key!');
+      }
+      return;
+    }
+
+    if (!started) started = true;
+    candidate.hit = true;
+    if (candidate.isHold) {
+      candidate.holding = true;
+      activeHolds.set(lane, candidate);
+    }
+    notesCleared++;
+    const bonus = candidate.isHold ? 3 : 2;
+    score += bonus;
+    playPiano(candidate.note, candidate.isHold ? 0.62 : 0.42, 0.25);
+
+    const cy = candidate.y + candidate.h * 0.55;
+    if (cy > H * 0.52 && cy < H * 0.88) showJudge('PERFECT');
+    else showJudge('GREAT');
+
+    bursts.push({ x: (lane + 0.5) * laneW, y: candidate.y + candidate.h * 0.5, r: 10, life: 0.28 });
+
+    // Accelerate smoothly per song lap
+    const lap = Math.floor(notesCleared / Math.max(24, currentSong.notes.length)) + 1;
+    if (lap > wave) {
+      wave = lap;
+      speedMult = Math.min(2.2, 1 + (wave - 1) * 0.16);
+      showJudge(`SPEED UP! ${speedMult.toFixed(1)}x`);
+    } else {
+      speedMult = Math.min(2.2, speedMult + 0.004);
+    }
+    updateHud();
+  }
+
+  function releaseLane(lane) {
+    const t = activeHolds.get(lane);
+    if (t) {
+      t.holding = false;
+      activeHolds.delete(lane);
+    }
+  }
+
+  function step(dt) {
+    if (!running) return;
+    if (started) {
+      const dy = scrollPxPerSec * speedMult * dt;
+      nextSpawnY += dy;
+      for (const t of tiles) {
+        t.y += dy;
+        if (t.holding) {
+          t.holdFill = Math.min(1, t.holdFill + dt * 2.2);
+          score += Math.round(dt * 12);
+        }
+        if (!t.hit && t.y > H + 12) {
+          missFlash = { lane: t.lane, y: H - 50, life: 0.45 };
+          endGame('Missed a Tile!');
+          return;
+        }
+      }
+      tiles = tiles.filter(t => t.y < H + 300);
+      buildQueueAhead();
+    }
+    bursts = bursts.filter(b => (b.life -= dt) > 0);
+    bursts.forEach(b => { b.r += 160 * dt; });
+    if (missFlash) {
+      missFlash.life -= dt;
+      if (missFlash.life <= 0) missFlash = null;
+    }
+    if (started) document.getElementById('score-el').textContent = score.toLocaleString();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Background gradient
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    if (wave >= 2) {
+      grad.addColorStop(0, '#0f172a');
+      grad.addColorStop(0.6, '#1e1b4b');
+      grad.addColorStop(1, '#312e81');
+    } else {
+      grad.addColorStop(0, '#dbeafe');
+      grad.addColorStop(0.6, '#f5f3ff');
+      grad.addColorStop(1, '#e0f2fe');
+    }
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Lane dividers
+    ctx.strokeStyle = wave >= 2 ? 'rgba(255,255,255,0.14)' : 'rgba(15,23,42,0.12)';
+    ctx.lineWidth = 1.5;
+    for (let i = 1; i < 4; i++) {
+      ctx.beginPath();
+      ctx.moveTo(i * laneW, 0);
+      ctx.lineTo(i * laneW, H);
+      ctx.stroke();
+    }
+
+    // Key hit line guide
+    ctx.strokeStyle = wave >= 2 ? 'rgba(56,189,248,0.35)' : 'rgba(14,165,233,0.28)';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, H * 0.78); ctx.lineTo(W, H * 0.78); ctx.stroke();
+
+    // Tiles
+    for (const t of tiles) {
+      const x = t.lane * laneW + 3;
+      const w = laneW - 6;
+      if (t.hit) {
+        ctx.fillStyle = t.holding ? 'rgba(56, 189, 248, 0.55)' : (wave >= 2 ? 'rgba(148,163,184,0.22)' : 'rgba(148,163,184,0.38)');
+        ctx.fillRect(x, t.y, w, t.h);
+        continue;
+      }
+      if (t.isHold) {
+        const g = ctx.createLinearGradient(x, t.y, x, t.y + t.h);
+        g.addColorStop(0, '#0284c7');
+        g.addColorStop(1, '#1e3a8a');
+        ctx.fillStyle = g;
+      } else {
+        ctx.fillStyle = '#090d16';
+      }
+      ctx.fillRect(x, t.y, w, t.h);
+      ctx.strokeStyle = t.isHold ? '#38bdf8' : 'rgba(255,255,255,0.18)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x, t.y, w, t.h);
+
+      if (t.isStart) {
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = '900 18px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillText('START', x + w / 2, t.y + t.h / 2 + 6);
+      } else if (t.isHold) {
+        ctx.fillStyle = '#bae6fd';
+        ctx.beginPath();
+        ctx.arc(x + w / 2, t.y + t.h - 24, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillRect(x + w / 2 - 3, t.y + 16, 6, Math.max(10, t.h - 46));
+      }
+    }
+
+    // Tap bursts
+    for (const b of bursts) {
+      ctx.save();
+      ctx.globalAlpha = b.life / 0.28;
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.stroke();
+      ctx.restore();
+    }
+
+    // Miss red flash
+    if (missFlash) {
+      ctx.fillStyle = `rgba(239, 68, 68, ${missFlash.life * 1.4})`;
+      ctx.fillRect(missFlash.lane * laneW, Math.max(0, missFlash.y - 60), laneW, 120);
+    }
+
+    // Subtle key letters at bottom
+    const labels = ['D', 'F', 'J', 'K'];
+    ctx.font = '800 12px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = wave >= 2 ? 'rgba(255,255,255,0.35)' : 'rgba(15,23,42,0.32)';
+    for (let i = 0; i < 4; i++) ctx.fillText(labels[i], (i + 0.5) * laneW, H - 14);
+  }
+
+  let last = performance.now();
+  function loop(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    step(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  const pointerLaneMap = new Map();
+  canvas.addEventListener('pointerdown', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const lane = Math.min(3, Math.max(0, Math.floor(x / laneW)));
+    pointerLaneMap.set(e.pointerId, lane);
+    pressLane(lane, y);
+  });
+  const endPointer = (e) => {
+    const lane = pointerLaneMap.get(e.pointerId);
+    if (lane !== undefined) {
+      releaseLane(lane);
+      pointerLaneMap.delete(e.pointerId);
+    }
+  };
+  canvas.addEventListener('pointerup', endPointer);
+  canvas.addEventListener('pointercancel', endPointer);
+
+  const keyLanes = { KeyD: 0, Digit1: 0, ArrowLeft: 0, KeyF: 1, Digit2: 1, ArrowDown: 1, KeyJ: 2, Digit3: 2, ArrowUp: 2, KeyK: 3, Digit4: 3, ArrowRight: 3 };
+  const heldKeys = new Set();
+  window.addEventListener('keydown', (e) => {
+    if (heldKeys.has(e.code)) return;
+    if (keyLanes[e.code] !== undefined) {
+      e.preventDefault();
+      heldKeys.add(e.code);
+      pressLane(keyLanes[e.code], null);
+    }
+  });
+  window.addEventListener('keyup', (e) => {
+    heldKeys.delete(e.code);
+    if (keyLanes[e.code] !== undefined) releaseLane(keyLanes[e.code]);
+  });
+
+  function renderSongList() {
+    const el = document.getElementById('song-list');
+    el.innerHTML = '';
+    SONGS.forEach(s => {
+      const card = document.createElement('button');
+      card.className = 'song-card';
+      const b = bestScores[s.id] || 0;
+      card.innerHTML = `
+        <div>
+          <div class="song-title">${s.title}</div>
+          <div class="song-sub">${s.artist} · ${s.baseBpm} BPM</div>
+        </div>
+        <div class="song-best">${b > 0 ? 'Best: ' + b : 'Play ▶'}</div>
+      `;
+      card.onclick = () => startSong(s);
+      el.appendChild(card);
+    });
+  }
+
+  document.getElementById('btn-songs').onclick = () => {
+    running = false;
+    renderSongList();
+    menu.classList.remove('hidden');
+  };
+  document.getElementById('btn-menu').onclick = () => {
+    gameover.classList.remove('show');
+    renderSongList();
+    menu.classList.remove('hidden');
+  };
+  document.getElementById('btn-retry').onclick = () => startSong(currentSong);
+  window.addEventListener('resize', resize);
+
+  resize();
+  renderSongList();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

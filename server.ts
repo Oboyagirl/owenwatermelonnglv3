@@ -55,8 +55,8 @@ async function startServer() {
 
 
 
-  // Universal School-Unblocked Game Proxy - Proxies any external game (Duck Life, Bloons TD, etc.)
-  // Bypasses Securly / GoGuardian / firewall blocks by serving through Google Cloud Run with rewritten base headers
+  // Universal School-Unblocked Game Proxy - Proxies any external game (Unity, HTML5, Duck Life, Bloons TD, etc.)
+  // Bypasses Securly / GoGuardian blocks, strips broken root-relative jqrg/ad scripts, shims Poki/ytgame SDKs, and fixes GitHub Pages .br Brotli headers
   app.get('/api/proxy/game', async (req, res) => {
     let targetUrl = req.query.url as string;
     if (!targetUrl) return res.status(400).send('Missing url parameter');
@@ -71,7 +71,7 @@ async function startServer() {
           'Accept': '*/*'
         },
         redirect: 'follow',
-        signal: AbortSignal.timeout(15000)
+        signal: AbortSignal.timeout(20000)
       });
 
       res.setHeader('Access-Control-Allow-Origin', '*');
@@ -79,23 +79,116 @@ async function startServer() {
       res.removeHeader('X-Frame-Options');
       res.removeHeader('Content-Security-Policy');
 
-      const contentType = upstreamRes.headers.get('content-type') || '';
+      const finalUrl = upstreamRes.url || targetUrl;
+      const cleanPath = finalUrl.split('?')[0].toLowerCase();
+      let contentType = upstreamRes.headers.get('content-type') || '';
+
+      if (cleanPath.endsWith('.js') || cleanPath.endsWith('.js.br') || cleanPath.endsWith('.js.gz')) {
+        contentType = 'application/javascript; charset=utf-8';
+      } else if (cleanPath.endsWith('.wasm') || cleanPath.endsWith('.wasm.br') || cleanPath.endsWith('.wasm.gz')) {
+        contentType = 'application/wasm';
+      } else if (cleanPath.endsWith('.json')) {
+        contentType = 'application/json; charset=utf-8';
+      } else if (cleanPath.endsWith('.css')) {
+        contentType = 'text/css; charset=utf-8';
+      }
+
       res.setHeader('Content-Type', contentType || 'text/html; charset=utf-8');
 
       if (contentType.includes('text/html')) {
         let html = await upstreamRes.text();
-        const baseHref = targetUrl.endsWith('/') ? targetUrl : targetUrl.substring(0, targetUrl.lastIndexOf('/') + 1);
+        const baseHref = finalUrl.endsWith('/') ? finalUrl : finalUrl.substring(0, finalUrl.lastIndexOf('/') + 1);
         const baseTag = `<base href="${baseHref}">`;
+
+        // Strip CSP meta tags, Google Ads / adSense / wrong-ref telemetry, and broken root-relative jqrg/gg-detect scripts
         html = html.replace(/<meta[^>]*http-equiv=["']?Content-Security-Policy["']?[^>]*>/gi, '');
+        html = html.replace(/<script[^>]*src=["'][^"']*(?:jqrg-|gg-detect\.js|adSense\.js|pagead2\.googlesyndication|googletagmanager\.com)[^"']*["'][^>]*>\s*<\/script>/gi, '');
+        // Rewrite blocked rawcdn.githack.com URLs to CORS-safe cdn.jsdelivr.net
+        html = html.replace(/https?:\/\/rawcdn\.githack\.com\/([^/"']+)\/([^/"']+)\/([^/"']+)\//gi, 'https://cdn.jsdelivr.net/gh/$1/$2@$3/');
+
+        // Shim Poki / ytgame SDKs & proxy .br Unity files seamlessly through same-origin /api/proxy/game
+        const sdkShim = `<script>
+(function(){
+  try {
+    if (!window.ytgame) {
+      window.ytgame = {
+        SDK_VERSION: '1.0',
+        IN_PLAYABLES_ENV: false,
+        game: { firstFrameReady: function(){}, gameReady: function(){}, saveData: function(){ return Promise.resolve(); }, loadData: function(){ return Promise.resolve(''); } },
+        engagement: { sendScore: function(){ return Promise.resolve(); } },
+        system: { isAudioEnabled: function(){ return true; }, onAudioEnabledChange: function(){}, onPause: function(){}, onResume: function(){}, getLanguage: function(){ return Promise.resolve('en'); } }
+      };
+    }
+    if (!window.PokiSDK) {
+      window.PokiSDK = {
+        init: function(){ return Promise.resolve(); },
+        gameLoadingStart: function(){},
+        gameLoadingFinished: function(){},
+        gameplayStart: function(){},
+        gameplayStop: function(){},
+        commercialBreak: function(){ return Promise.resolve(); },
+        rewardedBreak: function(){ return Promise.resolve(true); },
+        setDebug: function(){}
+      };
+    }
+    var shouldProxy = function(abs) {
+      return (
+        (/\\.(br|unityweb)(\\?|$)/i.test(abs) && abs.indexOf('/api/proxy/game') === -1) ||
+        abs.indexOf('rawcdn.githack.com') !== -1 ||
+        abs.indexOf('pages.dev') !== -1 ||
+        abs.indexOf('ubghyper.github.io') !== -1 ||
+        abs.indexOf('freeonlinewebtools.github.io') !== -1
+      );
+    };
+    var origFetch = window.fetch;
+    if (origFetch) {
+      window.fetch = function(input, init) {
+        var urlStr = typeof input === 'string' ? input : (input && input.url ? input.url : '');
+        try {
+          var abs = new URL(urlStr, ${JSON.stringify(baseHref)}).href;
+          if (shouldProxy(abs)) {
+            return origFetch('/api/proxy/game?url=' + encodeURIComponent(abs), init);
+          }
+        } catch(e) {}
+        return origFetch(input, init);
+      };
+    }
+    if (window.XMLHttpRequest && window.XMLHttpRequest.prototype) {
+      var origXhrOpen = window.XMLHttpRequest.prototype.open;
+      window.XMLHttpRequest.prototype.open = function(method, url) {
+        try {
+          var abs = new URL(String(url), ${JSON.stringify(baseHref)}).href;
+          if (shouldProxy(abs)) {
+            var args = Array.prototype.slice.call(arguments);
+            args[1] = '/api/proxy/game?url=' + encodeURIComponent(abs);
+            return origXhrOpen.apply(this, args);
+          }
+        } catch(e) {}
+        return origXhrOpen.apply(this, arguments);
+      };
+    }
+  } catch(e) {}
+})();
+</script>`;
+
+        const headInjection = `${baseTag}\n${sdkShim}`;
         if (/<head[^>]*>/i.test(html)) {
-          html = html.replace(/(<head[^>]*>)/i, `$1\n${baseTag}`);
+          html = html.replace(/(<head[^>]*>)/i, `$1\n${headInjection}`);
         } else {
-          html = baseTag + html;
+          html = headInjection + html;
         }
-        return res.send(html);
+        return res.status(upstreamRes.status).send(html);
       } else {
-        const arrayBuf = await upstreamRes.arrayBuffer();
-        return res.send(Buffer.from(arrayBuf));
+        let buf = Buffer.from(await upstreamRes.arrayBuffer());
+        // Fix GitHub Pages serving Unity .br files with wrong Content-Encoding
+        if (cleanPath.endsWith('.br') && buf.length > 0) {
+          try {
+            buf = zlib.brotliDecompressSync(buf);
+          } catch {
+            // Already decompressed or uncompressed; return as-is
+          }
+        }
+        return res.status(upstreamRes.status).send(buf);
       }
     } catch (err: any) {
       console.warn('Game proxy error:', targetUrl, err.message);
@@ -167,8 +260,8 @@ async function startServer() {
     });
   });
 
-  // Dedicated SWF Proxy - Streams Flash games with guaranteed application/x-shockwave-flash MIME and CORS
-  app.get('/api/swf', (req, res) => {
+  // Dedicated SWF Proxy - Streams Flash games with guaranteed application/x-shockwave-flash MIME, CORS, and >20MB raw.githubusercontent fallback
+  app.get('/api/swf', async (req, res) => {
     let targetUrl = req.query.url as string;
     if (!targetUrl) {
       return res.status(400).send('Missing url parameter');
@@ -178,41 +271,42 @@ async function startServer() {
       targetUrl = 'https://' + targetUrl;
     }
 
-    try {
-      const parsed = new URL(targetUrl);
-      const isHttps = parsed.protocol === 'https:';
-      const client = isHttps ? https : http;
+    const candidates = [targetUrl];
+    if (targetUrl.includes('cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/')) {
+      const tail = targetUrl.split('cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/')[1];
+      candidates.push(`https://raw.githubusercontent.com/UBGHyper/GameList.github.io/main/${tail}`);
+      candidates.push(`https://ubghyper.github.io/GameList.github.io/${tail}`);
+    } else if (targetUrl.includes('ubghyper.github.io/GameList.github.io/')) {
+      const tail = targetUrl.split('ubghyper.github.io/GameList.github.io/')[1];
+      candidates.push(`https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/${tail}`);
+      candidates.push(`https://raw.githubusercontent.com/UBGHyper/GameList.github.io/main/${tail}`);
+    }
 
-      const proxyReq = client.get(targetUrl, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-          'Accept': '*/*'
-        }
-      }, (proxyRes) => {
-        if (proxyRes.statusCode && proxyRes.statusCode >= 300 && proxyRes.statusCode < 400 && proxyRes.headers.location) {
-          const redirectUrl = new URL(proxyRes.headers.location, targetUrl).href;
-          return res.redirect(`/api/swf?url=${encodeURIComponent(redirectUrl)}`);
-        }
+    for (const candidate of candidates) {
+      try {
+        const upstream = await fetch(candidate, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            'Accept': '*/*'
+          },
+          redirect: 'follow',
+          signal: AbortSignal.timeout(25000)
+        });
+        if (!upstream.ok) continue;
 
+        const buf = Buffer.from(await upstream.arrayBuffer());
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
         res.setHeader('Content-Type', 'application/x-shockwave-flash');
         res.setHeader('Cache-Control', 'public, max-age=604800');
-
-        if (proxyRes.headers['content-length']) {
-          res.setHeader('Content-Length', proxyRes.headers['content-length']);
-        }
-
-        res.status(proxyRes.statusCode || 200);
-        proxyRes.pipe(res);
-      });
-
-      proxyReq.on('error', (err) => {
-        res.status(502).send('SWF Proxy error: ' + err.message);
-      });
-    } catch (err: any) {
-      res.status(400).send('Invalid SWF URL: ' + err.message);
+        res.setHeader('Content-Length', String(buf.length));
+        return res.status(200).send(buf);
+      } catch {
+        // try next fallback URL
+      }
     }
+
+    return res.status(502).send('SWF Proxy error: could not fetch SWF from any mirror');
   });
 
   // Serve static games directly with relaxed framing headers

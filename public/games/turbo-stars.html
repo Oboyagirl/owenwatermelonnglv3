@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Turbo Stars - Unblocked</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: #0b1026;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: #fff;
+    display: flex; flex-direction: column;
+    touch-action: none;
+  }
+  #topbar {
+    height: 44px; flex-shrink: 0;
+    background: #070b1a; border-bottom: 1px solid #1e293b;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 12px; gap: 8px;
+  }
+  .hud { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 12px; }
+  .pill {
+    background: #17203d; border: 1px solid #334155; padding: 4px 10px; border-radius: 7px;
+    font-variant-numeric: tabular-nums;
+  }
+  .pill.coins { color: #fde047; }
+  .pill.pos { color: #38bdf8; }
+  .btn-sm {
+    background: #1e293b; color: #cbd5e1; border: 1px solid #3b4b68;
+    padding: 4px 9px; border-radius: 7px; font-size: 11px; font-weight: 700; cursor: pointer;
+  }
+  .btn-sm:hover { color: #fff; border-color: #38bdf8; }
+  #arena { flex: 1; position: relative; overflow: hidden; }
+  canvas#view { display: block; width: 100%; height: 100%; touch-action: none; }
+  #mirror-wrap { position: absolute; inset: 0; display: none; background: #000; z-index: 25; }
+  #mirror-wrap.active { display: block; }
+  #mirror-frame { width: 100%; height: 100%; border: 0; }
+
+  #overlay {
+    position: absolute; inset: 0; z-index: 20;
+    background: rgba(8, 12, 30, 0.85); backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center; padding: 18px;
+  }
+  #overlay.hidden { display: none; }
+  .card {
+    background: #121a35; border: 2px solid #38bdf8; border-radius: 18px;
+    padding: 22px 24px; max-width: 390px; width: 100%; text-align: center;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.65);
+  }
+  .card h1 { font-size: 26px; font-weight: 900; color: #38bdf8; margin-bottom: 6px; letter-spacing: -0.02em; }
+  .card p { font-size: 13px; color: #cbd5e1; line-height: 1.45; margin-bottom: 14px; }
+  .board-shop { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 14px; }
+  .board-item {
+    background: #1a2549; border: 1.5px solid #334155; border-radius: 10px;
+    padding: 8px; cursor: pointer; font-size: 11px; font-weight: 800; color: #e2e8f0;
+  }
+  .board-item.selected { border-color: #fde047; background: #263566; }
+  .play-btn {
+    width: 100%; padding: 12px; border-radius: 11px; border: 0;
+    background: linear-gradient(135deg, #0ea5e9, #6366f1); color: #fff;
+    font-weight: 900; font-size: 15px; cursor: pointer;
+  }
+  #jump-btn {
+    position: fixed; bottom: 16px; right: 16px; z-index: 15;
+    width: 82px; height: 54px; border-radius: 14px;
+    border: 2px solid rgba(255,255,255,0.35); background: rgba(14, 165, 233, 0.72);
+    color: #fff; font-weight: 900; font-size: 12px; cursor: pointer; backdrop-filter: blur(4px);
+  }
+</style>
+</head>
+<body>
+  <div id="topbar">
+    <div class="hud">
+      <span class="pill pos" id="hud-pos">POS: 1/4</span>
+      <span class="pill" id="hud-stage">STAGE 1</span>
+      <span class="pill coins" id="hud-coins">COINS: 0</span>
+    </div>
+    <div class="hud">
+      <button class="btn-sm" id="btn-shop">Boards</button>
+      <button class="btn-sm" id="btn-mirror">⇄ Mirror</button>
+    </div>
+  </div>
+
+  <div id="arena">
+    <canvas id="view"></canvas>
+    <button id="jump-btn" type="button">HOP [SPACE]</button>
+    <div id="mirror-wrap"><iframe id="mirror-frame" allow="autoplay; fullscreen; gamepad"></iframe></div>
+    <div id="overlay">
+      <div class="card">
+        <h1 id="ov-title">TURBO STARS</h1>
+        <p id="ov-desc">Steer left/right up the half-pipe walls! Hit yellow Turbo Pads, jump off ramps for 360 tricks, and beat your rivals to the finish!</p>
+        <div class="board-shop" id="board-shop"></div>
+        <button class="play-btn" id="btn-play">RACE STAGE 1 ▶</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const SAVE_KEY = 'turbo_stars_unblocked_v1';
+  const BOARDS = [
+    { id: 'volt', name: 'Neon Volt', cost: 0, color: '#38bdf8', trim: '#fde047' },
+    { id: 'crimson', name: 'Turbo Flare', cost: 40, color: '#f43f5e', trim: '#fbbf24' },
+    { id: 'emerald', name: 'Hyper Viper', cost: 90, color: '#10b981', trim: '#a7f3d0' },
+    { id: 'galaxy', name: 'Galaxy Comet', cost: 160, color: '#a855f7', trim: '#f472b6' }
+  ];
+
+  let save = { stage: 1, coins: 0, unlocked: ['volt'], equipped: 'volt' };
+  try {
+    const p = JSON.parse(localStorage.getItem(SAVE_KEY) || '{}');
+    if (Number.isFinite(p.stage)) save.stage = p.stage;
+    if (Number.isFinite(p.coins)) save.coins = p.coins;
+    if (Array.isArray(p.unlocked)) save.unlocked = p.unlocked;
+    if (p.equipped) save.equipped = p.equipped;
+  } catch {}
+  function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch {} }
+
+  let actx = null;
+  function sfx(freq, dur = 0.1, type = 'sine', vol = 0.14, slide = 0) {
+    try {
+      if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === 'suspended') actx.resume();
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = type; o.frequency.setValueAtTime(freq, actx.currentTime);
+      if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, freq + slide), actx.currentTime + dur);
+      g.gain.setValueAtTime(vol, actx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + dur);
+      o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime + dur);
+    } catch {}
+  }
+
+  const canvas = document.getElementById('view');
+  const ctx = canvas.getContext('2d');
+  let W = 800, H = 500;
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = rect.width; H = rect.height;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  let running = false;
+  let stageLen = 1400;
+  let player = { z: 0, lane: 0, speed: 32, y: 0, vy: 0, spin: 0, boost: 0, shield: 0, stun: 0 };
+  let rivals = [];
+  let objects = []; // { z, lane (-1..1), kind: 'coin'|'boost'|'ramp'|'hazard'|'shield', hit }
+  let keys = { left: false, right: false };
+  let dragSteer = null;
+
+  function buildStage(stageNum) {
+    stageLen = 1200 + stageNum * 260;
+    player = { z: 0, lane: 0, speed: 34, y: 0, vy: 0, spin: 0, boost: 0, shield: 0, stun: 0 };
+    const baseSpd = 35 + Math.min(18, stageNum * 2.2);
+    rivals = [
+      { name: 'Racer Red', color: '#f43f5e', z: 12, lane: -0.45, speed: baseSpd + 3.5, targetLane: -0.45 },
+      { name: 'Racer Gold', color: '#fbbf24', z: 18, lane: 0.45, speed: baseSpd + 1.5, targetLane: 0.45 },
+      { name: 'Racer Violet', color: '#c084fc', z: 8, lane: 0.15, speed: baseSpd - 1.2, targetLane: 0.15 }
+    ];
+    objects = [];
+    for (let z = 65; z < stageLen - 60; z += 34) {
+      const r = Math.random();
+      if (r < 0.34) {
+        const arcLane = Math.sin(z * 0.04) * 0.65;
+        objects.push({ z, lane: arcLane, kind: 'coin', hit: false });
+        objects.push({ z: z + 10, lane: arcLane, kind: 'coin', hit: false });
+      } else if (r < 0.50) {
+        objects.push({ z, lane: (Math.random() - 0.5) * 1.35, kind: 'boost', hit: false });
+      } else if (r < 0.63) {
+        objects.push({ z, lane: (Math.random() - 0.5) * 1.1, kind: 'ramp', hit: false });
+      } else if (r < 0.90) {
+        objects.push({ z, lane: (Math.random() - 0.5) * 1.45, kind: 'hazard', hit: false });
+      } else {
+        objects.push({ z, lane: (Math.random() - 0.5) * 1.2, kind: 'shield', hit: false });
+      }
+    }
+    updateHud();
+  }
+
+  function updateHud() {
+    const pos = 1 + rivals.filter(r => r.z > player.z).length;
+    document.getElementById('hud-pos').textContent = `POS: ${pos}/4`;
+    document.getElementById('hud-stage').textContent = `STAGE ${save.stage}`;
+    document.getElementById('hud-coins').textContent = `COINS: ${save.coins}`;
+  }
+
+  function renderShop() {
+    const el = document.getElementById('board-shop');
+    el.innerHTML = '';
+    BOARDS.forEach(b => {
+      const own = save.unlocked.includes(b.id);
+      const eq = save.equipped === b.id;
+      const btn = document.createElement('button');
+      btn.className = 'board-item' + (eq ? ' selected' : '');
+      btn.innerHTML = `<span style="color:${b.color}">■</span> ${b.name}<br><span style="color:${own ? '#86efac' : '#fde047'}">${eq ? 'EQUIPPED' : own ? 'Equip' : b.cost + ' Coins'}</span>`;
+      btn.onclick = () => {
+        if (own) { save.equipped = b.id; persist(); renderShop(); }
+        else if (save.coins >= b.cost) {
+          save.coins -= b.cost; save.unlocked.push(b.id); save.equipped = b.id;
+          sfx(660, 0.16, 'triangle', 0.18, 220);
+          persist(); renderShop(); updateHud();
+        } else {
+          sfx(140, 0.12, 'sawtooth', 0.12);
+        }
+      };
+      el.appendChild(btn);
+    });
+    document.getElementById('btn-play').textContent = `RACE STAGE ${save.stage} ▶`;
+  }
+
+  function hop() {
+    if (!running || player.y > 0.05) return;
+    player.vy = 11.5;
+    player.spin = 0.01;
+    sfx(400, 0.12, 'sine', 0.14, 180);
+  }
+
+  function step(dt) {
+    if (!running) return;
+    if (player.stun > 0) player.stun -= dt;
+    if (player.boost > 0) player.boost -= dt;
+    if (player.shield > 0) player.shield -= dt;
+
+    // Steering across -0.9..0.9 pipe angle
+    let steer = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
+    if (dragSteer !== null) steer = Math.max(-1, Math.min(1, dragSteer));
+    player.lane = Math.max(-0.92, Math.min(0.92, player.lane + steer * dt * 1.85));
+
+    // Gravity toward center of U-pipe when not actively steering
+    if (Math.abs(steer) < 0.08 && player.y <= 0.05) {
+      player.lane *= (1 - dt * 0.65);
+    }
+
+    const targetSpd = player.stun > 0 ? 18 : player.boost > 0 ? 66 : 44 + Math.min(14, save.stage * 1.4);
+    player.speed += (targetSpd - player.speed) * Math.min(1, dt * 3.5);
+    player.z += player.speed * dt;
+
+    if (player.y > 0 || player.vy !== 0) {
+      player.y += player.vy * dt;
+      player.vy -= 28 * dt;
+      player.spin += dt * 9;
+      if (player.y <= 0) {
+        if (player.spin > Math.PI * 1.5) {
+          player.boost = Math.max(player.boost, 1.35);
+          save.coins += 3;
+          sfx(720, 0.15, 'triangle', 0.16, 200);
+        }
+        player.y = 0; player.vy = 0; player.spin = 0;
+      }
+    }
+
+    // Object collisions
+    for (const o of objects) {
+      if (o.hit) continue;
+      if (Math.abs(o.z - player.z) < 5.5 && Math.abs(o.lane - player.lane) < 0.25) {
+        if (o.kind === 'coin' && player.y < 1.8) {
+          o.hit = true; save.coins += 2;
+          sfx(880, 0.08, 'sine', 0.13, 240);
+        } else if (o.kind === 'boost' && player.y < 0.8) {
+          o.hit = true; player.boost = 1.9;
+          sfx(520, 0.18, 'sawtooth', 0.14, 340);
+        } else if (o.kind === 'ramp' && player.y < 0.8) {
+          o.hit = true; player.vy = 15.5; player.spin = 0.1;
+          sfx(380, 0.18, 'triangle', 0.16, 260);
+        } else if (o.kind === 'shield') {
+          o.hit = true; player.shield = 6.0;
+          sfx(600, 0.15, 'sine', 0.15, 220);
+        } else if (o.kind === 'hazard' && player.y < 1.2) {
+          o.hit = true;
+          if (player.shield > 0) {
+            player.shield = 0;
+            sfx(320, 0.14, 'triangle', 0.15, -140);
+          } else {
+            player.stun = 0.7;
+            player.speed *= 0.45;
+            sfx(130, 0.2, 'sawtooth', 0.18, -70);
+          }
+        }
+      }
+    }
+
+    // Rivals AI
+    for (const r of rivals) {
+      r.z += r.speed * dt;
+      if (Math.random() < dt * 1.5) r.targetLane = (Math.random() - 0.5) * 1.4;
+      r.lane += (r.targetLane - r.lane) * dt * 2;
+    }
+
+    updateHud();
+
+    if (player.z >= stageLen) {
+      running = false;
+      const place = 1 + rivals.filter(r => r.z > stageLen).length;
+      const reward = (5 - place) * 15;
+      save.coins += reward;
+      if (place <= 2) save.stage++;
+      persist();
+      sfx(660, 0.25, 'triangle', 0.18, 220);
+      document.getElementById('ov-title').textContent = place === 1 ? '1ST PLACE! 🏆' : `FINISHED #${place}`;
+      document.getElementById('ov-desc').textContent = `Earned +${reward} Coins! ` + (place <= 2 ? `Unlocked Stage ${save.stage}!` : 'Finish top 2 to advance!');
+      renderShop();
+      document.getElementById('overlay').classList.remove('hidden');
+    }
+  }
+
+  function project(lane, dist, yOff = 0) {
+    const horizon = H * 0.27;
+    const scale = 14 / Math.max(2.5, dist);
+    const pipeAngle = lane * 1.05;
+    const radius = W * 0.42;
+    const xPipe = Math.sin(pipeAngle) * radius;
+    const yPipe = Math.cos(pipeAngle) * (H * 0.25) - yOff * 42;
+    const sx = W * 0.5 + xPipe * scale;
+    const sy = horizon + (H * 0.44 + yPipe) * scale * 0.48;
+    return { sx, sy, scale };
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    // Synth Sunset Sky
+    const sky = ctx.createLinearGradient(0, 0, 0, H * 0.35);
+    sky.addColorStop(0, '#090d24'); sky.addColorStop(0.65, '#31105f'); sky.addColorStop(1, '#f43f5e');
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H * 0.35);
+
+    // Lower void
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, H * 0.32, W, H * 0.68);
+
+    // Draw Half-Pipe Ribs from far (dist 120) to near (dist 4)
+    const ribStep = 8;
+    const startRib = Math.floor(player.z / ribStep) * ribStep;
+    for (let z = startRib + 130; z >= startRib; z -= ribStep) {
+      const d1 = z - player.z;
+      const d2 = z + ribStep - player.z;
+      if (d2 < 3) continue;
+      const idx = Math.floor(z / ribStep);
+      const isFinish = z >= stageLen && z < stageLen + 20;
+      const strips = 10;
+      for (let s = 0; s < strips; s++) {
+        const lA = -1 + (s / strips) * 2;
+        const lB = -1 + ((s + 1) / strips) * 2;
+        const p1 = project(lA, Math.max(3, d1));
+        const p2 = project(lB, Math.max(3, d1));
+        const p3 = project(lB, Math.max(3, d2));
+        const p4 = project(lA, Math.max(3, d2));
+        ctx.beginPath();
+        ctx.moveTo(p1.sx, p1.sy); ctx.lineTo(p2.sx, p2.sy);
+        ctx.lineTo(p3.sx, p3.sy); ctx.lineTo(p4.sx, p4.sy);
+        ctx.closePath();
+        if (isFinish) {
+          ctx.fillStyle = (s + idx) % 2 === 0 ? '#ffffff' : '#090d16';
+        } else {
+          ctx.fillStyle = (idx % 2 === 0) ? (s % 2 === 0 ? '#1e293b' : '#25334d') : (s % 2 === 0 ? '#283754' : '#1b263d');
+        }
+        ctx.fill();
+      }
+    }
+
+    // Collect renderables sorted far -> near
+    const items = [];
+    for (const o of objects) {
+      if (o.hit) continue;
+      const dz = o.z - player.z;
+      if (dz > 2 && dz < 125) items.push({ kind: o.kind, lane: o.lane, dz, y: 0 });
+    }
+    for (const r of rivals) {
+      const dz = r.z - player.z;
+      if (dz > 2 && dz < 125) items.push({ kind: 'rival', lane: r.lane, dz, y: 0, color: r.color });
+    }
+    items.sort((a, b) => b.dz - a.dz);
+
+    for (const it of items) {
+      const p = project(it.lane, it.dz, it.y);
+      const sz = Math.max(4, p.scale * 16);
+      if (it.kind === 'coin') {
+        ctx.beginPath(); ctx.arc(p.sx, p.sy - sz * 0.4, sz * 0.42, 0, Math.PI * 2);
+        ctx.fillStyle = '#fde047'; ctx.fill();
+        ctx.lineWidth = 2; ctx.strokeStyle = '#ca8a04'; ctx.stroke();
+      } else if (it.kind === 'boost') {
+        ctx.fillStyle = '#facc15';
+        ctx.beginPath();
+        ctx.moveTo(p.sx, p.sy - sz * 0.7);
+        ctx.lineTo(p.sx - sz * 0.7, p.sy + sz * 0.1);
+        ctx.lineTo(p.sx + sz * 0.7, p.sy + sz * 0.1);
+        ctx.closePath(); ctx.fill();
+      } else if (it.kind === 'ramp') {
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillRect(p.sx - sz * 0.85, p.sy - sz * 0.45, sz * 1.7, sz * 0.45);
+        ctx.fillStyle = '#bae6fd';
+        ctx.fillRect(p.sx - sz * 0.85, p.sy - sz * 0.55, sz * 1.7, sz * 0.12);
+      } else if (it.kind === 'shield') {
+        ctx.beginPath(); ctx.arc(p.sx, p.sy - sz * 0.45, sz * 0.48, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.45)'; ctx.fill();
+        ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2.5; ctx.stroke();
+      } else if (it.kind === 'hazard') {
+        ctx.fillStyle = '#ef4444';
+        ctx.fillRect(p.sx - sz * 0.55, p.sy - sz * 0.85, sz * 1.1, sz * 0.85);
+        ctx.strokeStyle = '#fecaca'; ctx.lineWidth = 2;
+        ctx.strokeRect(p.sx - sz * 0.55, p.sy - sz * 0.85, sz * 1.1, sz * 0.85);
+      } else if (it.kind === 'rival') {
+        ctx.fillStyle = it.color;
+        ctx.beginPath(); ctx.arc(p.sx, p.sy - sz * 0.8, sz * 0.45, 0, Math.PI * 2); ctx.fill();
+        ctx.fillRect(p.sx - sz * 0.5, p.sy - sz * 0.2, sz, sz * 0.22);
+      }
+    }
+
+    // Player Skateboarder/Hoverboard
+    const bCfg = BOARDS.find(b => b.id === save.equipped) || BOARDS[0];
+    const pp = project(player.lane, 11, player.y);
+    ctx.save();
+    ctx.translate(pp.sx, pp.sy);
+    ctx.rotate(player.lane * 0.35 + player.spin);
+    // Board deck
+    ctx.fillStyle = bCfg.color;
+    ctx.fillRect(-34, -6, 68, 12);
+    ctx.fillStyle = bCfg.trim;
+    ctx.fillRect(-26, -3, 52, 6);
+    // Rider body
+    ctx.fillStyle = '#f8fafc';
+    ctx.beginPath(); ctx.arc(0, -34, 11, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = bCfg.trim;
+    ctx.fillRect(-10, -23, 20, 17);
+    if (player.shield > 0) {
+      ctx.beginPath(); ctx.arc(0, -18, 42, 0, Math.PI * 2);
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 3; ctx.stroke();
+    }
+    ctx.restore();
+
+    // Boost speed lines
+    if (player.boost > 0) {
+      ctx.strokeStyle = 'rgba(250, 204, 21, 0.35)';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 8; i++) {
+        const y = Math.random() * H;
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W * 0.14, y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(W, y); ctx.lineTo(W * 0.86, y); ctx.stroke();
+      }
+    }
+  }
+
+  let last = performance.now();
+  function loop(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    step(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
+    if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
+    if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') { e.preventDefault(); hop(); }
+  });
+  window.addEventListener('keyup', (e) => {
+    if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
+    if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
+  });
+
+  canvas.addEventListener('pointerdown', (e) => {
+    const nx = (e.clientX / W) * 2 - 1;
+    dragSteer = nx * 1.4;
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    if (e.buttons || e.pointerType === 'touch') {
+      dragSteer = ((e.clientX / W) * 2 - 1) * 1.4;
+    }
+  });
+  window.addEventListener('pointerup', () => { dragSteer = null; });
+  document.getElementById('jump-btn').onclick = hop;
+
+  document.getElementById('btn-play').onclick = () => {
+    buildStage(save.stage);
+    document.getElementById('overlay').classList.add('hidden');
+    running = true;
+  };
+  document.getElementById('btn-shop').onclick = () => {
+    running = false;
+    renderShop();
+    document.getElementById('overlay').classList.remove('hidden');
+  };
+
+  const mWrap = document.getElementById('mirror-wrap');
+  const mFrame = document.getElementById('mirror-frame');
+  let mirrorOn = false;
+  document.getElementById('btn-mirror').onclick = (e) => {
+    mirrorOn = !mirrorOn;
+    if (mirrorOn) {
+      const target = 'https://freeonlinewebtools.github.io/gamelist4.github.io/Turbo-Stars/';
+      const isStatic = window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:';
+      mFrame.src = isStatic ? target : `/api/proxy/game?url=${encodeURIComponent(target)}`;
+      mWrap.classList.add('active');
+      e.target.textContent = 'HTML5 Mode';
+      running = false;
+    } else {
+      mFrame.src = 'about:blank';
+      mWrap.classList.remove('active');
+      e.target.textContent = '⇄ Mirror';
+    }
+  };
+
+  window.addEventListener('resize', resize);
+  resize();
+  buildStage(save.stage);
+  renderShop();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

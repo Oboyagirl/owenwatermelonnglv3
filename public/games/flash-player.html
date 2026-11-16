@@ -117,7 +117,7 @@
       width: 78px;
       font-size: 12px;
     }
-    /* Completely suppress Ruffle warnings, modals, and panic popups */
+    /* Suppress Ruffle dialogs & panic popups */
     ruffle-player::part(message-overlay),
     #message-overlay,
     .message-overlay,
@@ -135,6 +135,9 @@
   </style>
 
   <script>
+    const localRuffleBase = new URL('../ruffle/', window.location.href).href;
+    const cdnRuffleBase = "https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/";
+
     window.RufflePlayer = window.RufflePlayer || {};
     window.RufflePlayer.config = {
       letterbox: "on",
@@ -153,17 +156,17 @@
       forceScale: true,
       wmode: "opaque",
       preferredRenderer: "webgl",
-      publicPath: "https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/"
+      publicPath: localRuffleBase
     };
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/ruffle.js" onerror="loadFallbackRuffle()"></script>
-  <script>
-    function loadFallbackRuffle() {
+
+    function loadCdnRuffleFallback() {
+      window.RufflePlayer.config.publicPath = cdnRuffleBase;
       const s = document.createElement("script");
-      s.src = "/ruffle/ruffle.js";
+      s.src = cdnRuffleBase + "ruffle.js";
       document.head.appendChild(s);
     }
   </script>
+  <script src="../ruffle/ruffle.js" onerror="loadCdnRuffleFallback()"></script>
 </head>
 <body>
   <div id="player-container">
@@ -191,6 +194,7 @@
   <script>
     const params = new URLSearchParams(window.location.search);
     const rawSwf = params.get('swf');
+    const altSwf = params.get('alt');
     const title = params.get('title') || 'Arcade Game';
     document.title = title;
 
@@ -206,7 +210,6 @@
       if (loadingBadge) loadingBadge.style.display = 'none';
     }
 
-    // Optional on-screen virtual keys for iPad / touchscreen devices
     const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     if (!isTouchDevice) {
       touchToggle.style.opacity = '0.55';
@@ -246,6 +249,60 @@
       btn.addEventListener('mouseleave', release);
     });
 
+    function buildSwfCandidates(primary, alt) {
+      const list = [];
+      const add = (u) => { if (u && !list.includes(u)) list.push(u); };
+      const isStaticHost = window.location.hostname.endsWith('github.io') ||
+                           window.location.protocol === 'file:' ||
+                           (!window.location.port && window.location.hostname !== 'localhost');
+
+      const expandMirrors = (url) => {
+        if (!url) return [];
+        const out = [];
+        // Expand UBGHyper / jsDelivr / raw.githubusercontent equivalents
+        if (url.includes('ubghyper.github.io/GameList.github.io/')) {
+          const tail = url.split('ubghyper.github.io/GameList.github.io/')[1];
+          out.push('https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/' + tail);
+          out.push('https://raw.githubusercontent.com/UBGHyper/GameList.github.io/main/' + tail);
+          out.push(url);
+        } else if (url.includes('cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/')) {
+          const tail = url.split('cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/')[1];
+          out.push(url);
+          out.push('https://raw.githubusercontent.com/UBGHyper/GameList.github.io/main/' + tail);
+          out.push('https://ubghyper.github.io/GameList.github.io/' + tail);
+        } else if (url.includes('raw.githubusercontent.com/UBGHyper/GameList.github.io/main/')) {
+          const tail = url.split('raw.githubusercontent.com/UBGHyper/GameList.github.io/main/')[1];
+          out.push(url);
+          out.push('https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/' + tail);
+          out.push('https://ubghyper.github.io/GameList.github.io/' + tail);
+        } else {
+          out.push(url);
+        }
+        return out;
+      };
+
+      const expanded = [...expandMirrors(primary), ...expandMirrors(alt)];
+      for (const u of expanded) {
+        const isCorsFriendly = u.includes('cdn.jsdelivr.net') || u.includes('raw.githubusercontent.com') || !u.startsWith('http');
+        if (!isStaticHost && u.startsWith('http') && !u.startsWith(window.location.origin)) {
+          const proxied = '/api/swf?url=' + encodeURIComponent(u);
+          if (u.includes('ubghyper.github.io')) {
+            add(proxied);
+            add(u);
+          } else if (isCorsFriendly) {
+            add(u);
+            add(proxied);
+          } else {
+            add(proxied);
+            add(u);
+          }
+        } else {
+          add(u);
+        }
+      }
+      return list;
+    }
+
     if (rawSwf) {
       loadingText.textContent = 'Loading ' + title + '...';
 
@@ -271,48 +328,30 @@
 
           setTimeout(hideOverlay, 7000);
 
-          const isCorsCdn = rawSwf.includes('cdn.jsdelivr.net');
-          const isStaticHost = window.location.hostname.endsWith('github.io') ||
-                               window.location.protocol === 'file:' ||
-                               (!window.location.port && window.location.hostname !== 'localhost');
+          const candidates = buildSwfCandidates(rawSwf, altSwf);
+          let attempt = 0;
 
-          let primaryUrl = rawSwf;
-          // Prefer direct CDN load when hosted on CORS-friendly jsDelivr, with /api/swf proxy as automatic fallback (and vice versa)
-          let fallbackUrl = rawSwf;
-          if (!isStaticHost && (rawSwf.startsWith('http://') || rawSwf.startsWith('https://')) && !rawSwf.startsWith(window.location.origin)) {
-            const proxied = '/api/swf?url=' + encodeURIComponent(rawSwf);
-            if (isCorsCdn) {
-              primaryUrl = rawSwf;
-              fallbackUrl = proxied;
-            } else {
-              primaryUrl = proxied;
-              fallbackUrl = rawSwf;
+          function tryNext() {
+            if (attempt >= candidates.length) {
+              hideOverlay();
+              return;
             }
+            const candidate = candidates[attempt++];
+            playerInstance.load({
+              url: candidate,
+              base: swfBase,
+              parameters: "",
+              autoplay: "auto",
+              backgroundColor: "#000000"
+            }).then(() => {
+              setTimeout(hideOverlay, 150);
+            }).catch(() => {
+              tryNext();
+            });
           }
 
-          playerInstance.load({
-            url: primaryUrl,
-            base: swfBase,
-            parameters: "",
-            autoplay: "auto",
-            backgroundColor: "#000000"
-          }).then(() => {
-            setTimeout(hideOverlay, 150);
-          }).catch(() => {
-            if (fallbackUrl !== primaryUrl) {
-              playerInstance.load({
-                url: fallbackUrl,
-                base: swfBase,
-                parameters: "",
-                autoplay: "auto",
-                backgroundColor: "#000000"
-              }).finally(hideOverlay);
-            } else {
-              hideOverlay();
-            }
-          });
+          tryNext();
 
-          // Continuously silence any Ruffle shadowRoot dialogs
           suppressInterval = setInterval(() => {
             if (playerInstance && playerInstance.shadowRoot) {
               const modal = playerInstance.shadowRoot.querySelector('#message-overlay') ||

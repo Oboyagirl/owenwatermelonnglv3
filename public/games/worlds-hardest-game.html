@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>The World's Hardest Game - Unblocked</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: #141428;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: #fff;
+    display: flex; flex-direction: column;
+    touch-action: none;
+  }
+  #topbar {
+    height: 44px; flex-shrink: 0;
+    background: #0b0b18;
+    border-bottom: 2px solid #2b2b55;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 12px; gap: 8px;
+  }
+  .hud-group { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 13px; }
+  .pill {
+    background: #1d1d3b; border: 1px solid #3c3c72;
+    padding: 4px 10px; border-radius: 7px; font-variant-numeric: tabular-nums;
+  }
+  .pill.deaths { color: #ff6b6b; }
+  .pill.level { color: #a5b4fc; }
+  .pill.coins { color: #fde047; }
+  .tabs { display: flex; align-items: center; gap: 4px; }
+  .tab-btn {
+    background: #1d1d3b; color: #cbd5e1; border: 1px solid #3b3b6d;
+    padding: 4px 9px; border-radius: 6px; font-size: 11px; font-weight: 700;
+    cursor: pointer; transition: 0.15s;
+  }
+  .tab-btn:hover { background: #2d2d59; color: #fff; }
+  .tab-btn.active { background: #4f46e5; border-color: #818cf8; color: #fff; }
+  .action-btn {
+    background: #1e293b; color: #e2e8f0; border: 1px solid #475569;
+    padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer;
+  }
+  .action-btn:hover { background: #334155; }
+  .action-btn.flash-on { background: #b45309; border-color: #f59e0b; color: #fff; }
+
+  #stage-wrap {
+    flex: 1; position: relative;
+    display: flex; align-items: center; justify-content: center;
+    background: #b8b7ff;
+    overflow: hidden;
+  }
+  canvas#game {
+    display: block;
+    max-width: 100%; max-height: 100%;
+    box-shadow: 0 18px 50px rgba(10, 10, 40, 0.35);
+    image-rendering: crisp-edges;
+  }
+  #flash-wrap {
+    position: absolute; inset: 0; display: none; background: #000; z-index: 15;
+  }
+  #flash-wrap.active { display: block; }
+  #flash-frame { width: 100%; height: 100%; border: 0; display: block; }
+
+  #overlay {
+    position: absolute; inset: 0; z-index: 20;
+    background: rgba(15, 16, 40, 0.84);
+    backdrop-filter: blur(5px);
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  #overlay.hidden { display: none; }
+  .card {
+    background: #181a38; border: 2px solid #6366f1;
+    border-radius: 16px; padding: 24px 28px; max-width: 440px; width: 100%;
+    text-align: center; box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+  }
+  .card h1 { font-size: 24px; font-weight: 900; margin-bottom: 6px; color: #fff; letter-spacing: -0.02em; }
+  .card p { font-size: 13px; color: #cbd5e1; line-height: 1.5; margin-bottom: 16px; }
+  .lvl-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 16px;
+  }
+  .lvl-pick {
+    padding: 8px 4px; border-radius: 8px; border: 1px solid #3f4277;
+    background: #22254d; color: #e2e8f0; font-weight: 800; font-size: 12px; cursor: pointer;
+  }
+  .lvl-pick:hover { background: #313670; border-color: #818cf8; }
+  .lvl-pick.current { background: #4f46e5; border-color: #a5b4fc; color: #fff; }
+  .lvl-pick.beaten { border-color: #22c55e; color: #86efac; }
+  .play-btn {
+    width: 100%; padding: 12px; border-radius: 10px; border: 0;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff; font-weight: 900; font-size: 15px; cursor: pointer;
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.35);
+  }
+  .play-btn:hover { filter: brightness(1.08); }
+
+  /* iPad Virtual D-Pad */
+  #touch-dpad {
+    position: fixed; bottom: 14px; left: 14px; z-index: 25;
+    display: none;
+    grid-template-columns: repeat(3, 48px); grid-template-rows: repeat(3, 48px);
+    gap: 5px;
+  }
+  #touch-dpad.visible { display: grid; }
+  .dkey {
+    background: rgba(15, 23, 42, 0.72); border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 12px; color: #fff; font-size: 18px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(4px); touch-action: none;
+  }
+  .dkey:active, .dkey.pressed { background: rgba(79, 70, 229, 0.85); border-color: #a5b4fc; }
+  #banner-msg {
+    position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.88); border: 1px solid #818cf8;
+    padding: 6px 16px; border-radius: 999px; font-size: 13px; font-weight: 800;
+    pointer-events: none; opacity: 0; transition: opacity 0.25s; z-index: 12;
+  }
+  #banner-msg.show { opacity: 1; }
+  @media (max-width: 720px) {
+    .tabs { display: none; }
+    #topbar { padding: 0 8px; }
+    .hud-group { gap: 5px; font-size: 11px; }
+    .pill { padding: 3px 6px; }
+  }
+</style>
+</head>
+<body>
+  <div id="topbar">
+    <div class="hud-group">
+      <span class="pill level" id="hud-level">LVL 1 / 12</span>
+      <span class="pill deaths" id="hud-deaths">DEATHS: 0</span>
+      <span class="pill coins" id="hud-coins">COINS: 0/0</span>
+    </div>
+    <div class="tabs" id="edition-tabs">
+      <button class="tab-btn active" data-ed="1">WHG 1</button>
+      <button class="tab-btn" data-ed="2">WHG 2</button>
+      <button class="tab-btn" data-ed="3">WHG 3</button>
+      <button class="tab-btn" data-ed="4">WHG 4</button>
+    </div>
+    <div class="hud-group">
+      <button class="action-btn" id="btn-levels">Levels</button>
+      <button class="action-btn" id="btn-mute">Sound: ON</button>
+      <button class="action-btn" id="btn-dpad">Pad</button>
+      <button class="action-btn" id="btn-flash" title="Try Original Flash SWF via Ruffle">Flash SWF</button>
+    </div>
+  </div>
+
+  <div id="stage-wrap">
+    <canvas id="game" width="800" height="520"></canvas>
+    <div id="banner-msg"></div>
+    <div id="flash-wrap"><iframe id="flash-frame" allow="autoplay; fullscreen"></iframe></div>
+    <div id="overlay">
+      <div class="card">
+        <h1 id="ov-title">THE WORLD'S HARDEST GAME</h1>
+        <p id="ov-desc">Guide the red square into the green goal zone. Collect every yellow coin on the map first. Don't touch the blue balls!</p>
+        <div class="lvl-grid" id="lvl-grid"></div>
+        <button class="play-btn" id="btn-start">PLAY LEVEL 1</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="touch-dpad">
+    <div></div><button class="dkey" data-dir="up">▲</button><div></div>
+    <button class="dkey" data-dir="left">◀</button><div></div><button class="dkey" data-dir="right">▶</button>
+    <div></div><button class="dkey" data-dir="down">▼</button><div></div>
+  </div>
+
+<script>
+(() => {
+  const params = new URLSearchParams(window.location.search);
+  const startEd = Math.min(4, Math.max(1, Number(params.get('edition') || '1') || 1));
+
+  const SAVE_KEY = 'whg_unblocked_save_v1';
+  let saveState = { levelIdx: (startEd - 1) * 3, deaths: 0, beaten: [] };
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (raw) {
+      const p = JSON.parse(raw);
+      saveState = {
+        levelIdx: Number.isFinite(p.levelIdx) ? p.levelIdx : (startEd - 1) * 3,
+        deaths: Number.isFinite(p.deaths) ? p.deaths : 0,
+        beaten: Array.isArray(p.beaten) ? p.beaten : []
+      };
+    }
+    if (params.has('edition')) {
+      saveState.levelIdx = (startEd - 1) * 3;
+    }
+  } catch {}
+  function persist() {
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(saveState)); } catch {}
+  }
+
+  // Web Audio Synth
+  let audioCtx = null;
+  let muted = false;
+  function tone(freq, dur, type = 'triangle', vol = 0.14, slide = 0) {
+    if (muted) return;
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      if (slide) osc.frequency.exponentialRampToValueAtTime(Math.max(40, freq + slide), audioCtx.currentTime + dur);
+      gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(); osc.stop(audioCtx.currentTime + dur);
+    } catch {}
+  }
+
+  // Coordinate system: 20x13 grid of 40px tiles = 800x520
+  const TILE = 40;
+  const COLS = 20;
+  const ROWS = 13;
+
+  // Build clean tile grid levels (0=wall, 1=floor, 2=start/safe, 3=goal/safe, 4=mid checkpoint)
+  function blankGrid() { return Array.from({ length: ROWS }, () => Array(COLS).fill(0)); }
+  function fillRect(g, c1, r1, c2, r2, val) {
+    for (let r = r1; r <= r2; r++) for (let c = c1; c <= c2; c++) {
+      if (r >= 0 && r < ROWS && c >= 0 && c < COLS) g[r][c] = val;
+    }
+  }
+
+  // Orb types:
+  // { type:'patrol', x1, y1, x2, y2, speed, phase } (tile coords center e.g. 5.5)
+  // { type:'orbit', cx, cy, r, angSpeed, phase }
+  // { type:'bounce', x, y, vx, vy }
+  const LEVELS = [
+    // WHG 1
+    (() => {
+      const g = blankGrid();
+      fillRect(g, 1, 3, 3, 9, 2);
+      fillRect(g, 4, 4, 15, 8, 1);
+      fillRect(g, 16, 3, 18, 9, 3);
+      const orbs = [];
+      for (let i = 0; i < 4; i++) {
+        orbs.push({ type: 'patrol', x1: 5 + i * 3, y1: 4.5, x2: 5 + i * 3, y2: 8.5, speed: 2.1, phase: i % 2 ? 0 : Math.PI });
+        orbs.push({ type: 'patrol', x1: 6.5 + i * 3, y1: 4.5, x2: 6.5 + i * 3, y2: 8.5, speed: 2.1, phase: i % 2 ? Math.PI : 0 });
+      }
+      return { ed: 1, name: 'The Original Gauntlet', grid: g, spawn: [2, 6], coins: [[10, 6.5]], orbs };
+    })(),
+    (() => {
+      const g = blankGrid();
+      fillRect(g, 1, 5, 3, 7, 2);
+      fillRect(g, 4, 2, 15, 10, 1);
+      fillRect(g, 16, 5, 18, 7, 3);
+      fillRect(g, 8, 5, 11, 7, 0);
+      const orbs = [];
+      for (let r = 0; r < 6; r++) {
+        orbs.push({ type: 'patrol', x1: 4.5, y1: 2.5 + r * 1.55, x2: 15.5, y2: 2.5 + r * 1.55, speed: 1.55, phase: r * 1.05 });
+      }
+      return { ed: 1, name: 'Twin Corridors', grid: g, spawn: [2, 6], coins: [[10, 3.5], [10, 9.5]], orbs };
+    })(),
+    (() => {
+      const g = blankGrid();
+      fillRect(g, 1, 2, 3, 4, 2);
+      fillRect(g, 4, 2, 15, 10, 1);
+      fillRect(g, 7, 5, 12, 7, 0);
+      fillRect(g, 16, 8, 18, 10, 3);
+      const orbs = [];
+      for (let i = 0; i < 6; i++) {
+        orbs.push({ type: 'orbit', cx: 10, cy: 6.5, r: 3.1, angSpeed: 1.85, phase: (i * Math.PI * 2) / 6 });
+        orbs.push({ type: 'orbit', cx: 10, cy: 6.5, r: 4.4, angSpeed: -1.45, phase: (i * Math.PI * 2) / 6 });
+      }
+      return { ed: 1, name: 'The Orbit Ring', grid: g, spawn: [2, 3], coins: [[5.5, 9], [14.5, 4]], orbs };
+    })(),
+    // WHG 2
+    (() => {
+      const g = blankGrid();
+      fillRect(g, 1, 5, 3, 7, 2);
+      fillRect(g, 4, 1, 15, 11, 1);
+      fillRect(g, 16, 5, 18, 7, 3);
+      const orbs = [];
+      for (let arm = 0; arm < 4; arm++) {
+        for (let d = 1; d <= 4; d++) {
+          orbs.push({ type: 'orbit', cx: 10, cy: 6.5, r: d * 1.12, angSpeed: 1.45, phase: (arm * Math.PI) / 2 });
+        }
+      }
+      return { ed: 2, name: 'Pinwheel Cross', grid: g, spawn: [2, 6], coins: [[6, 3], [14, 3], [6, 10], [14, 10]], orbs };
+    })(),
+    (() => {
+      const g = blankGrid();
+      fillRect(g, 1, 8, 3, 10, 2);
+      fillRect(g, 4, 2, 8, 10, 1);
+      fillRect(g, 9, 5, 10, 7, 4);
+      fillRect(g, 11, 2, 15, 10, 1);
+      fillRect(g, 16, 2, 18, 4, 3);
+      const orbs = [
+        { type: 'bounce', x: 6, y: 4, vx: 3.2, vy: 2.8 },
+        { type: 'bounce', x: 7, y: 9, vx: -3.2, vy: 2.9 },
+        { type: 'bounce', x: 13, y: 4, vx: 3.5, vy: -3.1 },
+        { type: 'bounce', x: 14, y: 9, vx: -3.4, vy: -2.9 },
+        { type: 'patrol', x1: 4.5, y1: 6.5, x2: 8.5, y2: 6.5, speed: 2.4, phase: 0 },
+        { type: 'patrol', x1: 11.5, y1: 6.5, x2: 15.5, y2: 6.5, speed: 2.4, phase: Math.PI }
+      ];
+      return { ed: 2, name: 'Diagonal Ricochet', grid: g, spawn: [2, 9], coins: [[6.5, 3.5], [13.5, 9.5]], orbs };
+    })(),
+    (() => {
+      const g = blankGrid();
+      fillRect(g, 1, 2, 3, 10, 2);
+      fillRect(g, 4, 2, 15, 10, 1);
+      fillRect(g, 16, 2, 18, 10, 3);
+      const orbs = [];
+      for (let i = 0; i < 6; i++) {
+        orbs.push({ type: 'orbit', cx: 7.2, cy: 6.5, r: 2.5, angSpeed: 2.0, phase: i * (Math.PI / 3) });
+        orbs.push({ type: 'orbit', cx: 12.8, cy: 6.5, r: 2.5, angSpeed: -2.0, phase: i * (Math.PI / 3) });
+      }
+      orbs.push({ type: 'patrol', x1: 10, y1: 2.5, x2: 10, y2: 10.5, speed: 2.3, phase: 0 });
+      return { ed: 2, name: 'Twin Turbines', grid: g, spawn: [2, 6], coins: [[7.2, 6.5], [12.8, 6.5]], orbs };
+    })(),
+    // WHG 3
+    (() => {
+      const g = blankGrid();
+      fillRect(g, 1, 5, 2, 7, 2);
+      fillRect(g, 3, 2, 16, 10, 1);
+      fillRect(g, 9, 6, 10, 6, 4);
+      fillRect(g, 17, 5, 18, 7, 3);
+      const orbs = [];
+      for (let c = 4; c <= 15; c += 2) {
+        orbs.push({ type: 'patrol', x1: c + 0.5, y1: 2.5, x2: c + 0.5, y2: 10.5, speed: 2.25, phase: c * 0.55 });
+      }
+      for (let r = 3; r <= 9; r += 3) {
+        orbs.push({ type: 'patrol', x1: 3.5, y1: r + 0.5, x2: 16.5, y2: r + 0.5, speed: 1.5, phase: r });
+      }
+      return { ed: 3, name: 'Checkerboard Matrix', grid: g, spawn: [1.5, 6], coins: [[5.5, 3.5], [14.5, 9.5], [5.5, 9.5], [14.5, 3.5]], orbs };
+    })(),
+    (() => {
+      const g = blankGrid();
+      fillRect(g, 9, 1, 10, 2, 2);
+      fillRect(g, 3, 3, 16, 10, 1);
+      fillRect(g, 6, 5, 13, 8, 0);
+      fillRect(g, 8, 6, 11, 7, 3);
+      fillRect(g, 9, 8, 10, 9, 1);
+      const orbs = [];
+      for (let i = 0; i < 8; i++) {
+        orbs.push({ type: 'patrol', x1: 3.6, y1: 4, x2: 16.4, y2: 4, speed: 1.6, phase: i * 0.8 });
+        orbs.push({ type: 'patrol', x1: 3.6, y1: 9.8, x2: 16.4, y2: 9.8, speed: 1.6, phase: i * 0.8 + Math.PI });
+      }
+      return { ed: 3, name: 'The Outer Vault', grid: g, spawn: [9.5, 1.5], coins: [[4, 4], [15.5, 4], [4, 9.5], [15.5, 9.5]], orbs };
+    })(),
+    (() => {
+      const g = blankGrid();
+      fillRect(g, 1, 5, 2, 7, 2);
+      fillRect(g, 3, 2, 16, 10, 1);
+      fillRect(g, 17, 5, 18, 7, 3);
+      const orbs = [];
+      for (let arm = 0; arm < 3; arm++) {
+        for (let r = 1; r <= 4; r++) {
+          orbs.push({ type: 'orbit', cx: 10, cy: 6.5, r: r * 1.15, angSpeed: 1.65, phase: (arm * Math.PI * 2) / 3 + r * 0.25 });
+        }
+      }
+      return { ed: 3, name: 'Spiral Reactor', grid: g, spawn: [1.5, 6], coins: [[10, 3], [10, 10]], orbs };
+    })(),
+    // WHG 4
+    (() => {
+      const g = blankGrid();
+      fillRect(g, 1, 1, 2, 3, 2);
+      fillRect(g, 3, 1, 16, 11, 1);
+      fillRect(g, 17, 9, 18, 11, 3);
+      const orbs = [];
+      for (let c = 4; c <= 15; c++) {
+        orbs.push({ type: 'patrol', x1: c + 0.5, y1: 1.5, x2: c + 0.5, y2: 11.5, speed: 2.35, phase: (c % 3) * 1.3 });
+      }
+      return { ed: 4, name: 'Hyper Grid', grid: g, spawn: [1.5, 2], coins: [[6.5, 9.5], [10, 3], [13.5, 9.5]], orbs };
+    })(),
+    (() => {
+      const g = blankGrid();
+      fillRect(g, 1, 5, 2, 7, 2);
+      fillRect(g, 3, 2, 16, 10, 1);
+      fillRect(g, 9, 5, 10, 7, 4);
+      fillRect(g, 17, 5, 18, 7, 3);
+      const orbs = [];
+      [[6.2, 6.5], [13.8, 6.5]].forEach(([cx, cy], idx) => {
+        for (let a = 0; a < 4; a++) {
+          for (let d = 1; d <= 3; d++) {
+            orbs.push({ type: 'orbit', cx, cy, r: d * 1.0, angSpeed: idx ? -1.8 : 1.8, phase: a * Math.PI / 2 });
+          }
+        }
+      });
+      return { ed: 4, name: 'Dual Orbit Matrix', grid: g, spawn: [1.5, 6], coins: [[6.2, 3.2], [6.2, 9.8], [13.8, 3.2], [13.8, 9.8]], orbs };
+    })(),
+    (() => {
+      const g = blankGrid();
+      fillRect(g, 1, 5, 2, 7, 2);
+      fillRect(g, 3, 1, 16, 11, 1);
+      fillRect(g, 17, 5, 18, 7, 3);
+      const orbs = [];
+      for (let a = 0; a < 4; a++) {
+        for (let d = 1; d <= 4; d++) {
+          orbs.push({ type: 'orbit', cx: 10, cy: 6.5, r: d * 1.12, angSpeed: d % 2 ? 1.8 : -1.5, phase: a * Math.PI / 2 });
+        }
+      }
+      orbs.push({ type: 'patrol', x1: 4.2, y1: 1.8, x2: 4.2, y2: 11.2, speed: 2.6, phase: 0 });
+      orbs.push({ type: 'patrol', x1: 15.8, y1: 1.8, x2: 15.8, y2: 11.2, speed: 2.6, phase: Math.PI });
+      return { ed: 4, name: 'Omega Finale', grid: g, spawn: [1.5, 6], coins: [[4.2, 3], [10, 2], [10, 11], [15.8, 3], [15.8, 10]], orbs };
+    })()
+  ];
+
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  const overlay = document.getElementById('overlay');
+  const lvlGrid = document.getElementById('lvl-grid');
+  const btnStart = document.getElementById('btn-start');
+  const banner = document.getElementById('banner-msg');
+
+  let levelIdx = Math.min(LEVELS.length - 1, Math.max(0, saveState.levelIdx));
+  let player = { x: 80, y: 260, size: 22, alive: true, deathTimer: 0 };
+  let checkpoint = { x: 80, y: 260 };
+  let coinsState = [];
+  let bounceState = [];
+  let particles = [];
+  let simTime = 0;
+  let paused = true;
+
+  const keys = { up: false, down: false, left: false, right: false };
+
+  function showBanner(msg) {
+    banner.textContent = msg;
+    banner.classList.add('show');
+    clearTimeout(banner._t);
+    banner._t = setTimeout(() => banner.classList.remove('show'), 1800);
+  }
+
+  function loadLevel(idx, keepOverlay = false) {
+    levelIdx = (idx + LEVELS.length) % LEVELS.length;
+    saveState.levelIdx = levelIdx;
+    persist();
+
+    const lvl = LEVELS[levelIdx];
+    checkpoint = { x: lvl.spawn[0] * TILE + TILE / 2 - 11, y: lvl.spawn[1] * TILE + TILE / 2 - 11 };
+    player = { x: checkpoint.x, y: checkpoint.y, size: 22, alive: true, deathTimer: 0 };
+    coinsState = lvl.coins.map(([cx, cy]) => ({ x: cx * TILE, y: cy * TILE, got: false }));
+    bounceState = lvl.orbs.filter(o => o.type === 'bounce').map(o => ({
+      x: o.x * TILE, y: o.y * TILE, vx: o.vx * TILE, vy: o.vy * TILE
+    }));
+
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', Number(b.dataset.ed) === lvl.ed));
+    updateHud();
+    renderLevelGrid();
+    if (!keepOverlay) {
+      overlay.classList.add('hidden');
+      paused = false;
+      showBanner(`Level ${levelIdx + 1}: ${lvl.name}`);
+    }
+  }
+
+  function updateHud() {
+    const lvl = LEVELS[levelIdx];
+    const got = coinsState.filter(c => c.got).length;
+    document.getElementById('hud-level').textContent = `LVL ${levelIdx + 1}/${LEVELS.length} · ${lvl.name}`;
+    document.getElementById('hud-deaths').textContent = `DEATHS: ${saveState.deaths}`;
+    document.getElementById('hud-coins').textContent = `COINS: ${got}/${coinsState.length}`;
+  }
+
+  function renderLevelGrid() {
+    lvlGrid.innerHTML = '';
+    LEVELS.forEach((l, i) => {
+      const b = document.createElement('button');
+      b.className = 'lvl-pick' + (i === levelIdx ? ' current' : '') + (saveState.beaten.includes(i) ? ' beaten' : '');
+      b.textContent = `WHG${l.ed} · L${i + 1}`;
+      b.onclick = () => loadLevel(i, false);
+      lvlGrid.appendChild(b);
+    });
+    btnStart.textContent = `PLAY LEVEL ${levelIdx + 1}`;
+  }
+
+  function isWalkable(px, py) {
+    const pad = 1;
+    const pts = [
+      [px + pad, py + pad],
+      [px + player.size - pad, py + pad],
+      [px + pad, py + player.size - pad],
+      [px + player.size - pad, py + player.size - pad]
+    ];
+    const g = LEVELS[levelIdx].grid;
+    for (const [x, y] of pts) {
+      const c = Math.floor(x / TILE);
+      const r = Math.floor(y / TILE);
+      if (r < 0 || r >= ROWS || c < 0 || c >= COLS || g[r][c] === 0) return false;
+    }
+    return true;
+  }
+
+  function getOrbPos(o, t) {
+    if (o.type === 'patrol') {
+      const s = 0.5 - 0.5 * Math.cos(t * o.speed + (o.phase || 0));
+      return [
+        (o.x1 + (o.x2 - o.x1) * s) * TILE,
+        (o.y1 + (o.y2 - o.y1) * s) * TILE
+      ];
+    }
+    if (o.type === 'orbit') {
+      const a = t * o.angSpeed + (o.phase || 0);
+      return [
+        (o.cx + Math.cos(a) * o.r) * TILE,
+        (o.cy + Math.sin(a) * o.r) * TILE
+      ];
+    }
+    return [o.x * TILE, o.y * TILE];
+  }
+
+  function killPlayer() {
+    if (!player.alive) return;
+    player.alive = false;
+    player.deathTimer = 0.28;
+    saveState.deaths++;
+    persist();
+    updateHud();
+    tone(180, 0.22, 'sawtooth', 0.16, -120);
+    for (let i = 0; i < 16; i++) {
+      const ang = (Math.PI * 2 * i) / 16;
+      const spd = 80 + Math.random() * 140;
+      particles.push({
+        x: player.x + player.size / 2, y: player.y + player.size / 2,
+        vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, life: 0.35, color: '#ef4444'
+      });
+    }
+  }
+
+  function step(dt) {
+    simTime += dt;
+    const lvl = LEVELS[levelIdx];
+
+    // Move bouncing orbs inside playable area
+    for (const b of bounceState) {
+      const nx = b.x + b.vx * dt;
+      const nc = Math.floor((nx + (b.vx > 0 ? 11 : -11)) / TILE);
+      const r = Math.floor(b.y / TILE);
+      if (r < 0 || r >= ROWS || nc < 0 || nc >= COLS || lvl.grid[r][nc] === 0) b.vx *= -1;
+      else b.x = nx;
+
+      const ny = b.y + b.vy * dt;
+      const nr = Math.floor((ny + (b.vy > 0 ? 11 : -11)) / TILE);
+      const c = Math.floor(b.x / TILE);
+      if (nr < 0 || nr >= ROWS || c < 0 || c >= COLS || lvl.grid[nr][c] === 0) b.vy *= -1;
+      else b.y = ny;
+    }
+
+    particles = particles.filter(p => (p.life -= dt) > 0);
+    for (const p of particles) { p.x += p.vx * dt; p.y += p.vy * dt; }
+
+    if (!player.alive) {
+      player.deathTimer -= dt;
+      if (player.deathTimer <= 0) {
+        player.x = checkpoint.x;
+        player.y = checkpoint.y;
+        player.alive = true;
+        // Reset non-checkpointed coins
+        coinsState.forEach(c => { c.got = false; });
+        updateHud();
+      }
+      return;
+    }
+
+    const spd = 178;
+    let dx = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
+    let dy = (keys.down ? 1 : 0) - (keys.up ? 1 : 0);
+    if (dx && dy) { dx *= 0.7071; dy *= 0.7071; }
+    if (dx) {
+      const nx = player.x + dx * spd * dt;
+      if (isWalkable(nx, player.y)) player.x = nx;
+    }
+    if (dy) {
+      const ny = player.y + dy * spd * dt;
+      if (isWalkable(player.x, ny)) player.y = ny;
+    }
+
+    const cx = player.x + player.size / 2;
+    const cy = player.y + player.size / 2;
+    const tileC = Math.floor(cx / TILE);
+    const tileR = Math.floor(cy / TILE);
+    const cell = lvl.grid[tileR]?.[tileC] || 0;
+
+    // Mid-level checkpoint tile
+    if (cell === 4) {
+      const newCx = tileC * TILE + TILE / 2 - player.size / 2;
+      const newCy = tileR * TILE + TILE / 2 - player.size / 2;
+      if (Math.hypot(checkpoint.x - newCx, checkpoint.y - newCy) > 8) {
+        checkpoint = { x: newCx, y: newCy };
+        tone(540, 0.14, 'sine', 0.12, 180);
+        showBanner('Checkpoint Reached!');
+      }
+    }
+
+    // Coin pickup
+    for (const c of coinsState) {
+      if (!c.got && Math.hypot(cx - c.x, cy - c.y) < 18) {
+        c.got = true;
+        tone(880, 0.15, 'triangle', 0.16, 260);
+        updateHud();
+      }
+    }
+
+    // Orb collision (forgiving inner radius)
+    const orbR = 9.5;
+    const half = player.size / 2 - 2;
+    const testHit = (ox, oy) => {
+      const nearX = Math.max(cx - half, Math.min(ox, cx + half));
+      const nearY = Math.max(cy - half, Math.min(oy, cy + half));
+      return Math.hypot(ox - nearX, oy - nearY) < orbR;
+    };
+
+    if (cell !== 2 && cell !== 3 && cell !== 4) {
+      for (const o of lvl.orbs) {
+        if (o.type === 'bounce') continue;
+        const [ox, oy] = getOrbPos(o, simTime);
+        if (testHit(ox, oy)) { killPlayer(); return; }
+      }
+      for (const b of bounceState) {
+        if (testHit(b.x, b.y)) { killPlayer(); return; }
+      }
+    }
+
+    // Goal check
+    if (cell === 3 && coinsState.every(c => c.got)) {
+      if (!saveState.beaten.includes(levelIdx)) saveState.beaten.push(levelIdx);
+      tone(523, 0.12, 'triangle', 0.15);
+      setTimeout(() => tone(659, 0.12, 'triangle', 0.15), 90);
+      setTimeout(() => tone(784, 0.25, 'triangle', 0.18), 180);
+      if (levelIdx + 1 < LEVELS.length) {
+        loadLevel(levelIdx + 1, false);
+      } else {
+        paused = true;
+        document.getElementById('ov-title').textContent = 'YOU BEAT ALL 12 LEVELS!';
+        document.getElementById('ov-desc').textContent = `Incredible! Total Deaths: ${saveState.deaths}. Pick any edition or replay a level below.`;
+        overlay.classList.remove('hidden');
+        renderLevelGrid();
+      }
+    }
+  }
+
+  function draw() {
+    const lvl = LEVELS[levelIdx];
+    ctx.fillStyle = '#b8b7ff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw floor tiles
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const v = lvl.grid[r][c];
+        if (v === 0) continue;
+        if (v === 2 || v === 3 || v === 4) {
+          ctx.fillStyle = v === 4 ? '#bbf7d0' : '#a7f3a0';
+        } else {
+          ctx.fillStyle = (r + c) % 2 === 0 ? '#f7f7ff' : '#e2e2fa';
+        }
+        ctx.fillRect(c * TILE, r * TILE, TILE, TILE);
+      }
+    }
+
+    // Crisp WHG wall outline around walkable areas
+    ctx.strokeStyle = '#111827';
+    ctx.lineWidth = 4;
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        if (lvl.grid[r][c] === 0) continue;
+        const x = c * TILE, y = r * TILE;
+        if (!lvl.grid[r - 1]?.[c]) { ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + TILE, y); ctx.stroke(); }
+        if (!lvl.grid[r + 1]?.[c]) { ctx.beginPath(); ctx.moveTo(x, y + TILE); ctx.lineTo(x + TILE, y + TILE); ctx.stroke(); }
+        if (!lvl.grid[r]?.[c - 1]) { ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + TILE); ctx.stroke(); }
+        if (!lvl.grid[r]?.[c + 1]) { ctx.beginPath(); ctx.moveTo(x + TILE, y); ctx.lineTo(x + TILE, y + TILE); ctx.stroke(); }
+      }
+    }
+
+    // Coins
+    for (const c of coinsState) {
+      if (c.got) continue;
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, 10, 0, Math.PI * 2);
+      ctx.fillStyle = '#facc15';
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#111';
+      ctx.stroke();
+    }
+
+    // Blue Enemy Orbs
+    for (const o of lvl.orbs) {
+      if (o.type === 'bounce') continue;
+      const [ox, oy] = getOrbPos(o, simTime);
+      ctx.beginPath();
+      ctx.arc(ox, oy, 10, 0, Math.PI * 2);
+      ctx.fillStyle = '#1d4ed8';
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#09090b';
+      ctx.stroke();
+    }
+    for (const b of bounceState) {
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, 10, 0, Math.PI * 2);
+      ctx.fillStyle = '#1d4ed8';
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#09090b';
+      ctx.stroke();
+    }
+
+    // Player Red Square
+    if (player.alive) {
+      ctx.fillStyle = '#ef1a1a';
+      ctx.fillRect(player.x, player.y, player.size, player.size);
+      ctx.lineWidth = 3.5;
+      ctx.strokeStyle = '#09090b';
+      ctx.strokeRect(player.x, player.y, player.size, player.size);
+    }
+
+    for (const p of particles) {
+      ctx.globalAlpha = Math.max(0, p.life / 0.35);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x - 3, p.y - 3, 6, 6);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  let last = performance.now();
+  function loop(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    if (!paused) step(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  const keyMap = {
+    ArrowUp: 'up', KeyW: 'up',
+    ArrowDown: 'down', KeyS: 'down',
+    ArrowLeft: 'left', KeyA: 'left',
+    ArrowRight: 'right', KeyD: 'right'
+  };
+  window.addEventListener('keydown', e => {
+    const dir = keyMap[e.code];
+    if (dir) { e.preventDefault(); keys[dir] = true; }
+    if (e.code === 'Space' && !overlay.classList.contains('hidden')) {
+      overlay.classList.add('hidden');
+      paused = false;
+    }
+  });
+  window.addEventListener('keyup', e => {
+    const dir = keyMap[e.code];
+    if (dir) keys[dir] = false;
+  });
+
+  // Touch D-Pad
+  const dpad = document.getElementById('touch-dpad');
+  if ('ontouchstart' in window || navigator.maxTouchPoints > 0) dpad.classList.add('visible');
+  document.getElementById('btn-dpad').onclick = () => dpad.classList.toggle('visible');
+  document.querySelectorAll('.dkey').forEach(btn => {
+    const dir = btn.dataset.dir;
+    const on = (e) => { e.preventDefault(); keys[dir] = true; btn.classList.add('pressed'); };
+    const off = (e) => { e.preventDefault(); keys[dir] = false; btn.classList.remove('pressed'); };
+    btn.addEventListener('touchstart', on, { passive: false });
+    btn.addEventListener('touchend', off, { passive: false });
+    btn.addEventListener('touchcancel', off, { passive: false });
+    btn.addEventListener('mousedown', on);
+    btn.addEventListener('mouseup', off);
+    btn.addEventListener('mouseleave', off);
+  });
+
+  document.getElementById('btn-start').onclick = () => {
+    overlay.classList.add('hidden');
+    paused = false;
+  };
+  document.getElementById('btn-levels').onclick = () => {
+    paused = true;
+    renderLevelGrid();
+    overlay.classList.remove('hidden');
+  };
+  document.getElementById('btn-mute').onclick = (e) => {
+    muted = !muted;
+    e.target.textContent = muted ? 'Sound: OFF' : 'Sound: ON';
+  };
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.onclick = () => loadLevel((Number(btn.dataset.ed) - 1) * 3, false);
+  });
+
+  // Flash SWF Toggle for WHG 1 / 3 / 4 originals
+  const flashWrap = document.getElementById('flash-wrap');
+  const flashFrame = document.getElementById('flash-frame');
+  const btnFlash = document.getElementById('btn-flash');
+  let flashOpen = false;
+  btnFlash.onclick = () => {
+    flashOpen = !flashOpen;
+    if (flashOpen) {
+      const ed = LEVELS[levelIdx].ed;
+      const swfUrl = ed === 3
+        ? 'https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Worlds-Hardest-Game-3/Worlds-Hardest-Game-3.swf'
+        : ed === 4
+        ? 'https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Worlds-Hardest-Game-4/Worlds-Hardest-Game-4.swf'
+        : 'https://cdn.jsdelivr.net/gh/UBGHyper/GameList.github.io@main/Worlds-Hardest-Game/Worlds-Hardest-Game.swf';
+      flashFrame.src = `flash-player.html?swf=${encodeURIComponent(swfUrl)}&title=Worlds+Hardest+Game+${ed}`;
+      flashWrap.classList.add('active');
+      btnFlash.classList.add('flash-on');
+      btnFlash.textContent = 'HTML5 Mode';
+      paused = true;
+    } else {
+      flashFrame.src = 'about:blank';
+      flashWrap.classList.remove('active');
+      btnFlash.classList.remove('flash-on');
+      btnFlash.textContent = 'Flash SWF';
+      paused = false;
+    }
+  };
+
+  loadLevel(levelIdx, true);
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

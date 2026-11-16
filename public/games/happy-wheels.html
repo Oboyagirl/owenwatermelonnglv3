@@ -1,158 +1,585 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Happy Wheels - Unblocked</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #000;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-    #game-frame {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      display: block;
-      background: #000;
-    }
-    #loading-container {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: #090d16;
-      color: #fff;
-      z-index: 20;
-      gap: 14px;
-      transition: opacity 0.3s;
-      pointer-events: none;
-    }
-    .hw-spinner {
-      width: 44px;
-      height: 44px;
-      border: 4px solid rgba(255, 255, 255, 0.15);
-      border-top-color: #10b981;
-      border-radius: 50%;
-      animation: hw-spin 0.8s linear infinite;
-    }
-    @keyframes hw-spin {
-      to { transform: rotate(360deg); }
-    }
-    #loading-text {
-      font-size: 15px;
-      font-weight: 700;
-      color: #f1f5f9;
-      letter-spacing: 0.02em;
-    }
-    #loading-sub {
-      font-size: 12px;
-      color: #94a3b8;
-    }
-    #controls-bar {
-      position: absolute;
-      bottom: 8px;
-      right: 8px;
-      z-index: 30;
-      display: flex;
-      gap: 6px;
-      opacity: 0.3;
-      transition: opacity 0.2s;
-    }
-    #controls-bar:hover {
-      opacity: 1;
-    }
-    .hw-btn {
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #fff;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      backdrop-filter: blur(4px);
-    }
-    .hw-btn:hover {
-      background: rgba(16, 185, 129, 0.8);
-      border-color: #10b981;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Happy Wheels - Unblocked</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: #111827;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: #f8fafc;
+    display: flex; flex-direction: column;
+    touch-action: none;
+  }
+  #topbar {
+    height: 44px; flex-shrink: 0;
+    background: #090d16; border-bottom: 1px solid #1e293b;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 12px; gap: 8px;
+  }
+  .hud { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 12px; }
+  .pill {
+    background: #1e293b; border: 1px solid #334155; padding: 4px 10px; border-radius: 7px;
+  }
+  .btn-sm {
+    background: #1e293b; color: #e2e8f0; border: 1px solid #475569;
+    padding: 4px 10px; border-radius: 7px; font-size: 11px; font-weight: 700; cursor: pointer;
+  }
+  .btn-sm:hover { border-color: #ef4444; color: #fff; }
+  #arena { flex: 1; position: relative; overflow: hidden; background: #bae6fd; }
+  canvas#world { display: block; width: 100%; height: 100%; }
+  #mirror-wrap { position: absolute; inset: 0; display: none; background: #000; z-index: 25; }
+  #mirror-wrap.active { display: block; }
+  #mirror-frame { width: 100%; height: 100%; border: 0; }
+
+  #touch-bar {
+    position: absolute; inset: auto 12px 12px 12px; z-index: 15;
+    display: flex; justify-content: space-between; align-items: flex-end; pointer-events: none;
+  }
+  .pad-row { display: flex; gap: 8px; pointer-events: auto; }
+  .tbtn {
+    width: 62px; height: 54px; border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.35); background: rgba(15, 23, 42, 0.72);
+    color: #fff; font-weight: 900; font-size: 12px; backdrop-filter: blur(4px);
+    cursor: pointer; touch-action: none;
+  }
+  .tbtn:active, .tbtn.lit { background: rgba(239, 68, 68, 0.85); }
+  .tbtn.boost { background: rgba(234, 88, 12, 0.8); width: 78px; }
+
+  #overlay {
+    position: absolute; inset: 0; z-index: 20;
+    background: rgba(9, 13, 25, 0.86); backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center; padding: 18px;
+  }
+  #overlay.hidden { display: none; }
+  .card {
+    background: #141b2d; border: 2px solid #ef4444; border-radius: 18px;
+    padding: 20px 22px; max-width: 460px; width: 100%; text-align: center;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.65);
+  }
+  .card h1 { font-size: 26px; font-weight: 900; color: #ef4444; margin-bottom: 4px; }
+  .card p { font-size: 12px; color: #cbd5e1; margin-bottom: 12px; }
+  .sec-lbl { font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin: 8px 0 6px; text-align: left; }
+  .grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 10px; }
+  .pick {
+    background: #1e293b; border: 1.5px solid #334155; border-radius: 9px;
+    padding: 7px 8px; color: #e2e8f0; font-size: 12px; font-weight: 800; cursor: pointer; text-align: left;
+  }
+  .pick.active { border-color: #ef4444; background: #2c1c25; color: #fff; }
+  .play-btn {
+    width: 100%; margin-top: 8px; padding: 12px; border-radius: 10px; border: 0;
+    background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff;
+    font-weight: 900; font-size: 15px; cursor: pointer;
+  }
+</style>
 </head>
 <body>
-  <div id="loading-container">
-    <div class="hw-spinner"></div>
-    <div id="loading-text">Loading Happy Wheels...</div>
-    <div id="loading-sub">Connecting to unblocked runner</div>
+  <div id="topbar">
+    <div class="hud">
+      <span class="pill" id="hud-course">Victory Run</span>
+      <span class="pill" id="hud-dist" style="color:#4ade80">0%</span>
+      <span class="pill" id="hud-hp" style="color:#f87171">HP: 100%</span>
+    </div>
+    <div class="hud">
+      <button class="btn-sm" id="btn-retry">Reset [R]</button>
+      <button class="btn-sm" id="btn-menu">Courses</button>
+      <button class="btn-sm" id="btn-mirror">⇄ Mirror</button>
+    </div>
   </div>
 
-  <iframe
-    id="game-frame"
-    src="https://happy-wheels.pages.dev/"
-    allow="autoplay; fullscreen; focus-without-user-activation *; gamepad; keyboard-map *; accelerometer; gyroscope"
-    allowfullscreen
-  ></iframe>
-
-  <div id="controls-bar">
-    <button class="hw-btn" onclick="switchMirror()">⇄ Mirror</button>
-    <button class="hw-btn" onclick="reloadHappyWheels()">↺ Reload</button>
-    <button class="hw-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+  <div id="arena">
+    <canvas id="world"></canvas>
+    <div id="touch-bar">
+      <div class="pad-row">
+        <button class="tbtn" data-k="left">↺ LEAN</button>
+        <button class="tbtn" data-k="right">LEAN ↻</button>
+      </div>
+      <div class="pad-row">
+        <button class="tbtn boost" data-k="boost">BOOST</button>
+        <button class="tbtn" data-k="brake">BRAKE</button>
+        <button class="tbtn" data-k="gas">GAS ▶</button>
+      </div>
+    </div>
+    <div id="mirror-wrap"><iframe id="mirror-frame" allow="autoplay; fullscreen; gamepad"></iframe></div>
+    <div id="overlay">
+      <div class="card">
+        <h1 id="ov-title">HAPPY WHEELS</h1>
+        <p id="ov-sub">Drive ↑/↓ · Lean ←/→ · Boost/Hop [SPACE] · Eject [Z] — Reach the green Victory gate!</p>
+        <div class="sec-lbl">1. Choose Character & Vehicle</div>
+        <div class="grid-4" id="char-grid"></div>
+        <div class="sec-lbl">2. Choose Obstacle Course</div>
+        <div class="grid-4" id="lvl-grid"></div>
+        <button class="play-btn" id="btn-start">PLAY COURSE ▶</button>
+      </div>
+    </div>
   </div>
 
-  <script>
-    const frame = document.getElementById('game-frame');
-    const loader = document.getElementById('loading-container');
-    const mirrors = [
-      "https://happy-wheels.pages.dev/",
-      "https://ubghyper.github.io/GameList.github.io/Happy-Wheels/"
-    ];
-    let mirrorIdx = 0;
+<script>
+(() => {
+  const CHARS = [
+    { id: 'segway', name: 'Segway Steve', desc: 'Agile & Fast', speed: 620, wheelBase: 14, singleWheel: true, color: '#38bdf8' },
+    { id: 'wheelchair', name: 'Wheelchair Tim', desc: 'Jet Boosted!', speed: 560, wheelBase: 36, singleWheel: false, color: '#f59e0b' },
+    { id: 'bmx', name: 'BMX Dad', desc: 'High Stunt Jump', speed: 670, wheelBase: 42, singleWheel: false, color: '#10b981' },
+    { id: 'mower', name: 'Lawnmower Hank', desc: 'Heavy Smasher', speed: 530, wheelBase: 46, singleWheel: false, color: '#ef4444' }
+  ];
 
-    frame.onload = function() {
-      setTimeout(function() {
-        if (loader) {
-          loader.style.opacity = '0';
-          setTimeout(function() { loader.style.display = 'none'; }, 300);
-        }
-      }, 500);
+  const COURSES = [
+    {
+      name: 'Victory Run', length: 3400,
+      terrain: [[0,380],[400,380],[650,330],[900,380],[1200,410],[1500,320],[1850,380],[2200,300],[2600,380],[3400,380]],
+      hazards: [
+        { x: 750, kind: 'crates' }, { x: 1060, kind: 'spikes' }, { x: 1350, kind: 'boost' },
+        { x: 1700, kind: 'saw' }, { x: 2050, kind: 'boost' }, { x: 2450, kind: 'mine' }, { x: 2950, kind: 'spikes' }
+      ]
+    },
+    {
+      name: 'Spike Canyon', length: 3800,
+      terrain: [[0,360],[350,360],[600,430],[950,430],[1200,340],[1600,340],[1900,420],[2300,350],[2800,390],[3800,390]],
+      hazards: [
+        { x: 470, kind: 'boost' }, { x: 740, kind: 'spikes' }, { x: 1080, kind: 'spikes' },
+        { x: 1450, kind: 'saw' }, { x: 1760, kind: 'crates' }, { x: 2100, kind: 'mine' },
+        { x: 2550, kind: 'saw' }, { x: 3100, kind: 'spikes' }, { x: 3350, kind: 'boost' }
+      ]
+    },
+    {
+      name: 'Sawblade Hall', length: 4000,
+      terrain: [[0,380],[500,380],[900,350],[1300,380],[1700,320],[2200,380],[2700,340],[3300,380],[4000,380]],
+      hazards: [
+        { x: 640, kind: 'saw' }, { x: 1050, kind: 'saw' }, { x: 1450, kind: 'boost' },
+        { x: 1850, kind: 'wreck' }, { x: 2350, kind: 'saw' }, { x: 2800, kind: 'crates' }, { x: 3450, kind: 'wreck' }
+      ]
+    },
+    {
+      name: 'Mega Ramps', length: 4200,
+      terrain: [[0,390],[450,390],[700,290],[760,390],[1200,390],[1500,260],[1560,390],[2100,390],[2500,240],[2560,390],[3200,380],[4200,380]],
+      hazards: [
+        { x: 560, kind: 'boost' }, { x: 960, kind: 'crates' }, { x: 1360, kind: 'boost' },
+        { x: 1850, kind: 'mine' }, { x: 2350, kind: 'boost' }, { x: 2900, kind: 'saw' }, { x: 3500, kind: 'crates' }
+      ]
+    }
+  ];
+
+  let actx = null;
+  function sfx(freq, dur = 0.12, type = 'sawtooth', vol = 0.14, slide = 0) {
+    try {
+      if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === 'suspended') actx.resume();
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = type; o.frequency.setValueAtTime(freq, actx.currentTime);
+      if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, freq + slide), actx.currentTime + dur);
+      g.gain.setValueAtTime(vol, actx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + dur);
+      o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime + dur);
+    } catch {}
+  }
+
+  const canvas = document.getElementById('world');
+  const ctx = canvas.getContext('2d');
+  let W = 800, H = 500;
+  function resize() {
+    const r = canvas.parentElement.getBoundingClientRect();
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = r.width; H = r.height;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  let charIdx = 0, courseIdx = 0;
+  let running = false, finished = false;
+  let veh = null, chunks = [], particles = [], hazards = [];
+  const inp = { gas: false, brake: false, left: false, right: false, boost: false };
+
+  function terrainY(x) {
+    const pts = COURSES[courseIdx].terrain;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const [x1, y1] = pts[i], [x2, y2] = pts[i + 1];
+      if (x >= x1 && x <= x2) {
+        const t = (x - x1) / (x2 - x1 || 1);
+        return y1 + (y2 - y1) * t;
+      }
+    }
+    return pts[pts.length - 1][1];
+  }
+
+  function startCourse() {
+    const ch = CHARS[charIdx], c = COURSES[courseIdx];
+    veh = {
+      x: 110, y: terrainY(110) - 36, vx: 0, vy: 0,
+      ang: 0, vang: 0, hp: 100, ejected: false,
+      boostCd: 0, onGround: false, char: ch
     };
+    chunks = [];
+    particles = [];
+    hazards = c.hazards.map(h => ({ ...h, y: terrainY(h.x), broken: false, t: Math.random() * 6 }));
+    finished = false;
+    running = true;
+    document.getElementById('hud-course').textContent = c.name;
+    document.getElementById('overlay').classList.add('hidden');
+  }
 
-    // Safety timeout in case load event fires late
-    setTimeout(function() {
-      if (loader && loader.style.display !== 'none') {
-        loader.style.opacity = '0';
-        setTimeout(function() { loader.style.display = 'none'; }, 300);
-      }
-    }, 4000);
+  function burstRagdoll(x, y, col, count = 12) {
+    for (let i = 0; i < count; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const s = 120 + Math.random() * 280;
+      particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 120, life: 1.1, col, sz: 5 + Math.random() * 5 });
+    }
+  }
 
-    function reloadHappyWheels() {
-      if (loader) {
-        loader.style.display = 'flex';
-        loader.style.opacity = '1';
+  function ejectHero() {
+    if (!veh || veh.ejected) return;
+    veh.ejected = true;
+    chunks.push({
+      x: veh.x, y: veh.y - 26,
+      vx: veh.vx + 220, vy: veh.vy - 360,
+      ang: veh.ang, vang: 8, hp: veh.hp
+    });
+    sfx(340, 0.16, 'triangle', 0.15, 220);
+  }
+
+  function damageHero(dmg, bx, by) {
+    if (veh.hp <= 0) return;
+    veh.hp = Math.max(0, veh.hp - dmg);
+    burstRagdoll(bx, by, '#ef4444', 10);
+    sfx(120, 0.18, 'sawtooth', 0.18, -70);
+    if (veh.hp <= 0) {
+      burstRagdoll(bx, by, '#ef4444', 22);
+      setTimeout(() => {
+        if (!finished) {
+          document.getElementById('ov-title').textContent = 'WIPED OUT!';
+          document.getElementById('ov-sub').textContent = 'Try another character or press Play to go again!';
+          document.getElementById('overlay').classList.remove('hidden');
+          running = false;
+        }
+      }, 900);
+    }
+  }
+
+  function step(dt) {
+    if (!running || !veh) return;
+    const c = COURSES[courseIdx];
+
+    // Physics
+    if (veh.hp > 0 && !veh.ejected) {
+      if (inp.left) veh.vang -= 9.5 * dt;
+      if (inp.right) veh.vang += 9.5 * dt;
+    }
+    veh.vang *= Math.pow(0.08, dt);
+    veh.ang += veh.vang * dt;
+    veh.vy += 940 * dt;
+
+    const gy = terrainY(veh.x);
+    const slope = (terrainY(veh.x + 10) - terrainY(veh.x - 10)) / 20;
+    const gAng = Math.atan(slope);
+
+    if (veh.y + 22 >= gy) {
+      veh.y = gy - 22;
+      veh.onGround = true;
+      if (veh.vy > 360) damageHero(Math.round((veh.vy - 360) * 0.08), veh.x, veh.y);
+      veh.vy = 0;
+
+      // Head upside-down slam check
+      const normAng = Math.atan2(Math.sin(veh.ang - gAng), Math.cos(veh.ang - gAng));
+      if (Math.abs(normAng) > 2.15 && Math.abs(veh.vx) > 90) {
+        damageHero(28, veh.x, veh.y);
+        veh.vx *= 0.4;
       }
-      frame.src = mirrors[mirrorIdx];
+
+      if (veh.hp > 0 && !veh.ejected) {
+        if (inp.gas) veh.vx += veh.char.speed * dt;
+        if (inp.brake) veh.vx -= 480 * dt;
+      }
+      veh.vx *= Math.pow(0.42, dt);
+      // Gentle upright stabilization when on ground unless actively leaning strongly
+      if (!inp.left && !inp.right) {
+        veh.ang += (gAng - veh.ang) * Math.min(1, dt * 4.5);
+      }
+    } else {
+      veh.onGround = false;
+      veh.vx *= Math.pow(0.88, dt);
     }
 
-    function switchMirror() {
-      mirrorIdx = (mirrorIdx + 1) % mirrors.length;
-      reloadHappyWheels();
+    if (veh.boostCd > 0) veh.boostCd -= dt;
+    if (inp.boost && veh.boostCd <= 0 && veh.hp > 0 && !veh.ejected) {
+      veh.boostCd = 0.8;
+      veh.vx += 260;
+      veh.vy -= 300;
+      burstRagdoll(veh.x - 18, veh.y + 8, '#f59e0b', 8);
+      sfx(460, 0.14, 'sawtooth', 0.14, 240);
     }
 
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(function() {});
+    veh.x = Math.max(40, veh.x + veh.vx * dt);
+    veh.y += veh.vy * dt;
+
+    // Ragdoll ejected hero body physics
+    for (const r of chunks) {
+      r.vy += 940 * dt;
+      r.x += r.vx * dt;
+      r.y += r.vy * dt;
+      r.ang += r.vang * dt;
+      const rgy = terrainY(r.x);
+      if (r.y + 10 >= rgy) {
+        r.y = rgy - 10;
+        r.vy *= -0.35;
+        r.vx *= 0.72;
+      }
+    }
+
+    // Hazards interaction
+    const refX = chunks[0] ? chunks[0].x : veh.x;
+    const refY = chunks[0] ? chunks[0].y : veh.y;
+    for (const h of hazards) {
+      h.t += dt;
+      if (h.broken) continue;
+      const dx = Math.abs(refX - h.x);
+      if (h.kind === 'boost' && dx < 32 && Math.abs(refY - h.y) < 40) {
+        veh.vx += 420; veh.vy -= 140; h.broken = true;
+        sfx(620, 0.15, 'triangle', 0.15, 220);
+      } else if (h.kind === 'crates' && dx < 28 && Math.abs(refY - h.y) < 42) {
+        h.broken = true;
+        if (veh.char.id !== 'mower') veh.vx *= 0.65;
+        burstRagdoll(h.x, h.y - 16, '#d97706', 10);
+        sfx(190, 0.1, 'square', 0.12);
+      } else if (h.kind === 'spikes' && dx < 26 && Math.abs(refY - h.y) < 28) {
+        damageHero(34, refX, refY);
+        veh.vy = -260; veh.x += 18;
+      } else if (h.kind === 'saw' && dx < 30 && Math.abs(refY - (h.y - 26)) < 36) {
+        damageHero(45, refX, refY);
+        veh.vx = -160; veh.vy = -280;
+      } else if (h.kind === 'mine' && dx < 26 && Math.abs(refY - h.y) < 34) {
+        h.broken = true;
+        damageHero(42, h.x, h.y);
+        veh.vy = -440; veh.vx += 150;
+        burstRagdoll(h.x, h.y - 10, '#f97316', 18);
+      } else if (h.kind === 'wreck') {
+        const bx = h.x + Math.sin(h.t * 2.5) * 90;
+        const by = h.y - 120 + Math.abs(Math.sin(h.t * 2.5)) * 75;
+        if (Math.hypot(refX - bx, refY - by) < 36) {
+          damageHero(40, refX, refY);
+          veh.vx = -220; veh.vy = -240;
+        }
+      }
+    }
+
+    particles = particles.filter(p => (p.life -= dt) > 0);
+    for (const p of particles) { p.vy += 760 * dt; p.x += p.vx * dt; p.y += p.vy * dt; }
+
+    const pct = Math.min(100, Math.max(0, Math.round((refX / c.length) * 100)));
+    document.getElementById('hud-dist').textContent = `${pct}%`;
+    document.getElementById('hud-hp').textContent = `HP: ${veh.hp}%`;
+
+    if (refX >= c.length && !finished) {
+      finished = true;
+      running = false;
+      sfx(523, 0.14, 'triangle', 0.16);
+      setTimeout(() => sfx(784, 0.28, 'triangle', 0.18), 110);
+      document.getElementById('ov-title').textContent = 'VICTORY! ★';
+      document.getElementById('ov-sub').textContent = `Cleared ${c.name} with ${veh.char.name} (${veh.hp}% HP)!`;
+      if (courseIdx + 1 < COURSES.length) courseIdx++;
+      renderMenu();
+      document.getElementById('overlay').classList.remove('hidden');
+    }
+  }
+
+  function draw() {
+    const c = COURSES[courseIdx];
+    const focusX = (chunks[0] ? chunks[0].x : (veh ? veh.x : 120));
+    const camX = Math.max(0, focusX - W * 0.3);
+
+    // Sky & distant hills
+    const sky = ctx.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0, '#38bdf8'); sky.addColorStop(1, '#e0f2fe');
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+
+    ctx.fillStyle = '#93c5fd';
+    for (let x = 0; x < W + 240; x += 240) {
+      ctx.beginPath(); ctx.arc(x - (camX * 0.15) % 240, H * 0.85, 160, Math.PI, 0); ctx.fill();
+    }
+
+    ctx.save();
+    ctx.translate(-camX, H * 0.12);
+
+    // Terrain fill
+    ctx.beginPath();
+    c.terrain.forEach(([x, y], i) => i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y));
+    ctx.lineTo(c.length + 500, H + 200);
+    ctx.lineTo(0, H + 200);
+    ctx.closePath();
+    ctx.fillStyle = '#334155'; ctx.fill();
+    ctx.lineWidth = 8; ctx.strokeStyle = '#16a34a'; ctx.stroke();
+
+    // Finish Victory Gate
+    const gyEnd = terrainY(c.length);
+    ctx.fillStyle = '#22c55e';
+    ctx.fillRect(c.length - 8, gyEnd - 120, 16, 120);
+    ctx.fillStyle = '#15803d';
+    ctx.fillRect(c.length - 60, gyEnd - 120, 120, 34);
+    ctx.fillStyle = '#fff'; ctx.font = '900 16px system-ui'; ctx.textAlign = 'center';
+    ctx.fillText('VICTORY!', c.length, gyEnd - 97);
+
+    // Hazards
+    for (const h of hazards) {
+      if (h.broken) continue;
+      if (h.kind === 'boost') {
+        ctx.fillStyle = '#facc15';
+        ctx.fillRect(h.x - 24, h.y - 8, 48, 8);
+      } else if (h.kind === 'crates') {
+        ctx.fillStyle = '#b45309'; ctx.fillRect(h.x - 16, h.y - 32, 32, 32);
+        ctx.strokeStyle = '#78350f'; ctx.lineWidth = 3; ctx.strokeRect(h.x - 16, h.y - 32, 32, 32);
+      } else if (h.kind === 'spikes') {
+        ctx.fillStyle = '#94a3b8';
+        for (let i = -2; i <= 2; i++) {
+          ctx.beginPath();
+          ctx.moveTo(h.x + i * 10 - 5, h.y);
+          ctx.lineTo(h.x + i * 10, h.y - 22);
+          ctx.lineTo(h.x + i * 10 + 5, h.y);
+          ctx.fill();
+        }
+      } else if (h.kind === 'saw') {
+        ctx.save(); ctx.translate(h.x, h.y - 24); ctx.rotate(h.t * 8);
+        ctx.fillStyle = '#cbd5e1'; ctx.beginPath(); ctx.arc(0, 0, 24, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 5; ctx.setLineDash([7, 7]); ctx.stroke();
+        ctx.restore();
+      } else if (h.kind === 'mine') {
+        ctx.fillStyle = '#1e293b'; ctx.beginPath(); ctx.arc(h.x, h.y - 10, 14, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(h.x, h.y - 10, 5, 0, Math.PI * 2); ctx.fill();
+      } else if (h.kind === 'wreck') {
+        const bx = h.x + Math.sin(h.t * 2.5) * 90;
+        const by = h.y - 120 + Math.abs(Math.sin(h.t * 2.5)) * 75;
+        ctx.strokeStyle = '#475569'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(h.x, h.y - 220); ctx.lineTo(bx, by); ctx.stroke();
+        ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(bx, by, 24, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+
+    // Vehicle + Rider
+    if (veh) {
+      ctx.save();
+      ctx.translate(veh.x, veh.y);
+      ctx.rotate(veh.ang);
+      const wb = veh.char.wheelBase;
+      ctx.fillStyle = '#111827';
+      if (veh.char.singleWheel) {
+        ctx.beginPath(); ctx.arc(0, 12, 13, 0, Math.PI * 2); ctx.fill();
       } else {
-        document.exitFullscreen().catch(function() {});
+        ctx.beginPath(); ctx.arc(-wb / 2, 12, 12, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(wb / 2, 12, 12, 0, Math.PI * 2); ctx.fill();
       }
+      ctx.fillStyle = veh.char.color;
+      ctx.fillRect(-wb / 2 - 4, -2, wb + 8, 10);
+
+      if (!veh.ejected && veh.hp > 0) {
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(-6, -24, 12, 22);
+        ctx.fillStyle = '#fde68a';
+        ctx.beginPath(); ctx.arc(0, -32, 9, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
     }
-  </script>
+
+    for (const r of chunks) {
+      ctx.save(); ctx.translate(r.x, r.y); ctx.rotate(r.ang);
+      ctx.fillStyle = '#f8fafc'; ctx.fillRect(-6, -12, 12, 20);
+      ctx.fillStyle = '#fde68a'; ctx.beginPath(); ctx.arc(0, -18, 8, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+
+    for (const p of particles) {
+      ctx.fillStyle = p.col;
+      ctx.fillRect(p.x - p.sz / 2, p.y - p.sz / 2, p.sz, p.sz);
+    }
+
+    ctx.restore();
+  }
+
+  let last = performance.now();
+  function loop(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    step(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  function renderMenu() {
+    const cg = document.getElementById('char-grid');
+    cg.innerHTML = '';
+    CHARS.forEach((ch, i) => {
+      const b = document.createElement('button');
+      b.className = 'pick' + (i === charIdx ? ' active' : '');
+      b.innerHTML = `<span style="color:${ch.color}">●</span> ${ch.name}<br><span style="font-size:10px;color:#94a3b8">${ch.desc}</span>`;
+      b.onclick = () => { charIdx = i; renderMenu(); };
+      cg.appendChild(b);
+    });
+    const lg = document.getElementById('lvl-grid');
+    lg.innerHTML = '';
+    COURSES.forEach((c, i) => {
+      const b = document.createElement('button');
+      b.className = 'pick' + (i === courseIdx ? ' active' : '');
+      b.textContent = `${i + 1}. ${c.name}`;
+      b.onclick = () => { courseIdx = i; renderMenu(); };
+      lg.appendChild(b);
+    });
+  }
+
+  const keyMap = {
+    ArrowUp: 'gas', KeyW: 'gas',
+    ArrowDown: 'brake', KeyS: 'brake',
+    ArrowLeft: 'left', KeyA: 'left',
+    ArrowRight: 'right', KeyD: 'right',
+    Space: 'boost'
+  };
+  window.addEventListener('keydown', (e) => {
+    const act = keyMap[e.code];
+    if (act) { e.preventDefault(); inp[act] = true; }
+    if (e.code === 'KeyZ') ejectHero();
+    if (e.code === 'KeyR') startCourse();
+  });
+  window.addEventListener('keyup', (e) => {
+    const act = keyMap[e.code];
+    if (act) inp[act] = false;
+  });
+
+  document.querySelectorAll('.tbtn[data-k]').forEach(btn => {
+    const k = btn.dataset.k;
+    const on = (e) => { e.preventDefault(); inp[k] = true; btn.classList.add('lit'); };
+    const off = (e) => { e.preventDefault(); inp[k] = false; btn.classList.remove('lit'); };
+    btn.addEventListener('pointerdown', on);
+    btn.addEventListener('pointerup', off);
+    btn.addEventListener('pointercancel', off);
+  });
+
+  document.getElementById('btn-start').onclick = startCourse;
+  document.getElementById('btn-retry').onclick = startCourse;
+  document.getElementById('btn-menu').onclick = () => {
+    running = false; renderMenu(); document.getElementById('overlay').classList.remove('hidden');
+  };
+
+  const mWrap = document.getElementById('mirror-wrap');
+  const mFrame = document.getElementById('mirror-frame');
+  let mirrorOn = false;
+  document.getElementById('btn-mirror').onclick = (e) => {
+    mirrorOn = !mirrorOn;
+    if (mirrorOn) {
+      const target = 'https://gameinclassroom.github.io/happy-wheels/';
+      const isStatic = window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:';
+      mFrame.src = isStatic ? 'https://happy-wheels.pages.dev/' : `/api/proxy/game?url=${encodeURIComponent(target)}`;
+      mWrap.classList.add('active');
+      e.target.textContent = 'HTML5 Mode';
+      running = false;
+    } else {
+      mFrame.src = 'about:blank';
+      mWrap.classList.remove('active');
+      e.target.textContent = '⇄ Mirror';
+    }
+  };
+
+  window.addEventListener('resize', resize);
+  resize();
+  renderMenu();
+  requestAnimationFrame(loop);
+})();
+</script>
 </body>
 </html>

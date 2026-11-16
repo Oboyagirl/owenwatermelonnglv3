@@ -207,9 +207,36 @@ export default function App() {
   const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   const [isCloakerOpen, setIsCloakerOpen] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isChatPinnedOpen, setIsChatPinnedOpen] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('owen_chat_keep_open') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [isChatOpen, setIsChatOpen] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('owen_chat_keep_open') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [musicDock, setMusicDock] = useState<{ side: 'right' | 'left'; topClearancePx: number }>({
+    side: 'right',
+    topClearancePx: 84
+  });
   const [onlineChatCount, setOnlineChatCount] = useState(0);
   const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(false);
+
+  const toggleChatPinnedOpen = () => {
+    setIsChatPinnedOpen(prev => {
+      const next = !prev;
+      try {
+        localStorage.setItem('owen_chat_keep_open', String(next));
+      } catch {}
+      return next;
+    });
+  };
 
   // Passcode Gate (owenpan2244)
   const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
@@ -281,7 +308,7 @@ export default function App() {
       if (tag === 'input' || tag === 'textarea' || tag === 'select' || activeEl?.isContentEditable) {
         return;
       }
-      if (isChatOpen) {
+      if (isChatOpen && !isChatPinnedOpen) {
         setIsChatOpen(false);
         return;
       }
@@ -291,7 +318,7 @@ export default function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedGame, isThemeModalOpen, isAccountModalOpen, isCloakerOpen, isChatOpen]);
+  }, [selectedGame, isThemeModalOpen, isAccountModalOpen, isCloakerOpen, isChatOpen, isChatPinnedOpen]);
 
   // Tab Switching & Mutation
   const handleSelectSpace = (space: SpaceType) => {
@@ -897,15 +924,19 @@ export default function App() {
         activeSpace={activeSpace}
         isGameActive={Boolean(selectedGame)}
         onOpenMusicSpace={() => handleSelectSpace('music')}
+        onDockChange={setMusicDock}
       />
 
-      {/* Persistent Bottom-Left Firebase Friends & Chatbox */}
+      {/* Persistent Firebase Friends & Chatbox (Docked cleanly above Background Music widget) */}
       <ChatBoxWidget
         isOpen={isChatOpen}
         onToggle={() => setIsChatOpen(prev => !prev)}
         onClose={() => setIsChatOpen(false)}
         activeTheme={activeTheme}
         onOnlineCountChange={setOnlineChatCount}
+        musicDock={musicDock}
+        isPinnedOpen={isChatPinnedOpen}
+        onTogglePinOpen={toggleChatPinnedOpen}
       />
     </div>
   );
