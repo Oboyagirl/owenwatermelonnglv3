@@ -190,7 +190,7 @@ export default function App() {
     { id: 'tab_home', title: 'Home', spaceType: 'home', icon: '🏠' },
     { id: 'tab_games', title: 'Games', spaceType: 'games', icon: '🎮' },
     { id: 'tab_chess', title: 'Chess', spaceType: 'chess', icon: '♟️' },
-    { id: 'tab_rooms', title: 'Rooms', spaceType: 'rooms', icon: '🕹️' },
+    { id: 'tab_rooms', title: 'Minigames', spaceType: 'rooms', icon: '🕹️' },
     { id: 'tab_apps', title: 'Apps', spaceType: 'apps', icon: '📱' },
     { id: 'tab_music', title: 'Music', spaceType: 'music', icon: '🎵' }
   ]);
@@ -381,7 +381,7 @@ export default function App() {
         apps: 'Apps',
         music: 'Music',
         chess: 'Chess',
-        rooms: 'Rooms',
+        rooms: 'Minigames',
         tools: 'Tab Cloaker',
         saved: 'Cloud Saves'
       };

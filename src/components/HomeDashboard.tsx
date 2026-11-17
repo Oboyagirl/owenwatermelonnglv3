@@ -224,8 +224,8 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             <div className="w-12 h-12 rounded-2xl bg-pink-500/20 text-pink-300 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
               🕹️
             </div>
-            <span className="text-xs md:text-sm font-bold text-white group-hover:text-pink-300">Rooms</span>
-            <span className="text-[10px] text-slate-400">8 Room Games</span>
+            <span className="text-xs md:text-sm font-bold text-white group-hover:text-pink-300">Minigames</span>
+            <span className="text-[10px] text-slate-400">42 Minigames</span>
           </button>
 
           <button

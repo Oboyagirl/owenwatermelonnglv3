@@ -139,7 +139,7 @@ service cloud.firestore {
       ]) &&
       isValidRoomCode(data.code) &&
       data.gameType is string && data.gameType.size() > 0 && data.gameType.size() <= 32 &&
-      data.gameType in ['connect4', 'checkers', 'reversi', 'dots-and-boxes', 'gomoku', 'ultimate-ttt', 'mancala', 'tictactoe', 'draw-guess', 'battleship', 'memory-match', 'dice-duel'] &&
+      data.gameType in ['connect4', 'checkers', 'reversi', 'dots-and-boxes', 'gomoku', 'ultimate-ttt', 'mancala', 'tictactoe', 'draw-guess', 'battleship', 'memory-match', 'dice-duel', 'pixel-guess', 'emoji-charades', 'nim', 'misere-nim', 'chomp', 'hex', 'grid-link-4', 'order-chaos', 'misere-ttt', 'gravity-5', 'snort', 'col-clash', 'domineering', 'cram', 'obstruction', 'ataxx', 'breakthrough', 'kings-escape', 'wordle-duel', 'hangman-duel', 'mastermind', 'hilo-target', 'word-chain', 'blackjack-21', 'yacht-dice', 'tug-of-war', 'rps-arena', 'penalty-kick', 'mines-duel', 'sos-grid'] &&
       data.creatorAuthUid is string && data.creatorAuthUid.size() > 0 && data.creatorAuthUid.size() <= 128 &&
       data.status is string && data.status.size() > 0 && data.status.size() <= 16 && data.status in ['waiting', 'active', 'finished'] &&
       (data.p1AuthUid == null || (data.p1AuthUid is string && data.p1AuthUid.size() > 0 && data.p1AuthUid.size() <= 128)) &&
@@ -278,7 +278,7 @@ service cloud.firestore {
         data.gameKind is string && data.gameKind.size() > 0 && data.gameKind.size() <= 16 &&
         data.gameKind in ['chess', 'arcade'] &&
         data.gameType is string && data.gameType.size() > 0 && data.gameType.size() <= 32 &&
-        data.gameType in ['chess', 'connect4', 'checkers', 'reversi', 'dots-and-boxes', 'gomoku', 'ultimate-ttt', 'mancala', 'tictactoe', 'draw-guess', 'battleship', 'memory-match', 'dice-duel'] &&
+        data.gameType in ['chess', 'connect4', 'checkers', 'reversi', 'dots-and-boxes', 'gomoku', 'ultimate-ttt', 'mancala', 'tictactoe', 'draw-guess', 'battleship', 'memory-match', 'dice-duel', 'pixel-guess', 'emoji-charades', 'nim', 'misere-nim', 'chomp', 'hex', 'grid-link-4', 'order-chaos', 'misere-ttt', 'gravity-5', 'snort', 'col-clash', 'domineering', 'cram', 'obstruction', 'ataxx', 'breakthrough', 'kings-escape', 'wordle-duel', 'hangman-duel', 'mastermind', 'hilo-target', 'word-chain', 'blackjack-21', 'yacht-dice', 'tug-of-war', 'rps-arena', 'penalty-kick', 'mines-duel', 'sos-grid'] &&
         data.gameTitle is string && data.gameTitle.size() > 0 && data.gameTitle.size() <= 64 &&
         isValidRoomCode(data.roomCode) &&
         data.status is string && data.status.size() > 0 && data.status.size() <= 16 &&

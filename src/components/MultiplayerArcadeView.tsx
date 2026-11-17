@@ -29,7 +29,9 @@ import {
   Trash2,
   RotateCw,
   Dices,
-  Anchor
+  Anchor,
+  ArrowLeft,
+  Search
 } from 'lucide-react';
 import { ThemeConfig } from '../services/themeStore';
 import { useAuth } from '../context/AuthContext';
@@ -38,11 +40,13 @@ import { auth } from '../services/firebase';
 import { AVATAR_PRESETS } from '../services/cloudSaveService';
 import { isProfileOnlineNow } from '../services/chatService';
 import { sendGameInvite } from '../services/inviteService';
+import { ExtendedArcadeBoard } from './ExtendedArcadeBoards';
 import {
   ARCADE_BOTS,
   ARCADE_GAMES,
   ArcadeBot,
   ArcadeBotDifficulty,
+  ArcadeGameCategory,
   ArcadeGameMeta,
   ArcadeGameType,
   ArcadePlayer,
@@ -58,6 +62,7 @@ import {
   DotsAndBoxesState,
   DrawGuessState,
   DrawStroke,
+  ExtendedArcadeState,
   GomokuState,
   MEMORY_SYMBOLS,
   MancalaState,
@@ -73,6 +78,7 @@ import {
   getCheckersLegalMoves,
   getReversiFlips,
   getShipCells,
+  isExtendedArcadeGameType,
   pickArcadeBotVoiceline,
   pickBotArcadeAction,
   serializeBattleshipFleetAction,
@@ -235,6 +241,11 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
   const [invitingFriendUid, setInvitingFriendUid] = useState<string | null>(null);
   const [invitedFriendUids, setInvitedFriendUids] = useState<Set<string>>(() => new Set());
 
+  // Hub directory vs active game board stage (always starts on All Minigames page unless deep-linked)
+  const [viewStage, setViewStage] = useState<'hub' | 'play'>('hub');
+  const [hubSearch, setHubSearch] = useState('');
+  const [hubCategory, setHubCategory] = useState<'All' | ArcadeGameCategory>('All');
+
   // UI/UX controls
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -374,6 +385,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
       lastMoveLenRef.current = nextMoves.length;
 
       setRoomCode(msg.code);
+      setViewStage('play');
       setSelectedGame(msg.gameType);
       try {
         localStorage.setItem(SELECTED_GAME_KEY, msg.gameType);
@@ -611,6 +623,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
     (targetGame?: ArcadeGameType) => {
       const gType = targetGame || selectedGame;
       setMode('online');
+      setViewStage('play');
       setOnlineError(null);
       const wsUrl = getLocalArcadeWsUrl();
       if (wsUrl) {
@@ -641,6 +654,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         return;
       }
       setMode('online');
+      setViewStage('play');
       setOnlineError(null);
       const wsUrl = getLocalArcadeWsUrl();
       if (wsUrl) {
@@ -691,6 +705,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
 
   const handleSelectGameType = (gameType: ArcadeGameType) => {
     setSelectedGame(gameType);
+    setViewStage('play');
     try {
       localStorage.setItem(SELECTED_GAME_KEY, gameType);
     } catch {}
@@ -706,6 +721,14 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
     }
   };
 
+  const handleBackToHub = () => {
+    if (mode === 'online' && roomCode) {
+      handleLeaveRoom();
+    }
+    setOnlineError(null);
+    setViewStage('hub');
+  };
+
   // Check URL ?arcadeRoom=CODE on mount, or rejoin tracked Firestore room when returning via tab
   const deepLinkedRef = useRef(false);
   useEffect(() => {
@@ -716,6 +739,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
       if (paramCode.length >= 4) {
         deepLinkedRef.current = true;
         setMode('online');
+        setViewStage('play');
         setJoinCodeInput(paramCode);
         setTimeout(() => {
           handleJoinRoom(paramCode);
@@ -725,6 +749,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
       if (!pendingArcadeJoinCode && trackedArcadeRoom?.code && !roomCode) {
         deepLinkedRef.current = true;
         setMode('online');
+        setViewStage('play');
         setJoinCodeInput(trackedArcadeRoom.code);
         void joinViaFirestore(trackedArcadeRoom.code);
       }
@@ -738,6 +763,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
     clearPendingArcadeJoinCode();
     if (clean.length < 4) return;
     setMode('online');
+    setViewStage('play');
     setJoinCodeInput(clean);
     void joinViaFirestore(clean);
   }, [pendingArcadeJoinCode, clearPendingArcadeJoinCode, joinViaFirestore]);
@@ -1269,6 +1295,28 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
   const hasVotedRematch =
     mode === 'online' && (mySeat === 'p1' || mySeat === 'p2') && rematchVotes.includes(mySeat);
 
+  const hubCategories: ('All' | ArcadeGameCategory)[] = [
+    'All',
+    'Drawing & Creative',
+    'Strategy',
+    'Territory & Pawns',
+    'Word & Code',
+    'Dice & Duel'
+  ];
+
+  const filteredHubGames = useMemo(() => {
+    const q = hubSearch.trim().toLowerCase();
+    return ARCADE_GAMES.filter(g => {
+      if (hubCategory !== 'All' && g.category !== hubCategory) return false;
+      if (!q) return true;
+      return (
+        g.name.toLowerCase().includes(q) ||
+        g.tagline.toLowerCase().includes(q) ||
+        (g.category || '').toLowerCase().includes(q)
+      );
+    });
+  }, [hubSearch, hubCategory]);
+
   return (
     <div
       ref={studioRef}
@@ -1330,65 +1378,270 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
           </div>
         )}
 
-        {/* Game Picker Strip */}
-        <div
-          className="rounded-2xl border p-2.5 shadow-lg"
-          style={{ backgroundColor: activeTheme.bgCard, borderColor: activeTheme.border }}
-        >
-          <div className="flex items-center justify-between gap-2 mb-2 px-1">
-            <div className="flex items-center gap-2 min-w-0">
-              <Sparkles className="w-4 h-4 shrink-0" style={{ color: activeTheme.accent }} />
-              <h2 className="text-sm md:text-base font-extrabold text-white truncate">
-                Multiplayer Arcade Rooms
-              </h2>
-              <span className="text-[11px] font-mono text-slate-400 hidden sm:inline">
-                12 instant room-code games · Zero delay sync
-              </span>
+        {viewStage === 'hub' ? (
+          <div className="flex flex-col gap-3">
+            {/* All Minigames Hub Header + Quick Room Join */}
+            <div
+              className="rounded-2xl border p-4 shadow-xl flex flex-col gap-3.5"
+              style={{ backgroundColor: activeTheme.bgCard, borderColor: activeTheme.border }}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 shrink-0" style={{ color: activeTheme.accent }} />
+                    <h2 className="text-lg md:text-xl font-black text-white tracking-tight">
+                      All Minigames
+                    </h2>
+                    <span className="text-xs font-mono text-slate-400">
+                      · {ARCADE_GAMES.length} Room-Code & Bot Games
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Pick any minigame below to open its arena, invite friends with 1 click, or battle {ARCADE_BOTS.length} AI bots.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* Quick Room Code Join right from All Minigames */}
+                  <form
+                    onSubmit={e => {
+                      e.preventDefault();
+                      handleJoinRoom();
+                    }}
+                    className="flex items-center gap-1.5"
+                  >
+                    <input
+                      type="text"
+                      value={joinCodeInput}
+                      onChange={e => setJoinCodeInput(e.target.value.toUpperCase())}
+                      placeholder="Room code..."
+                      maxLength={8}
+                      className="w-28 sm:w-32 px-2.5 py-2 rounded-xl border text-xs font-mono uppercase tracking-widest text-white focus:outline-none"
+                      style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
+                    />
+                    <button
+                      type="submit"
+                      disabled={connStatus === 'connecting'}
+                      className="px-3 py-2 rounded-xl text-black font-extrabold text-xs cursor-pointer hover:brightness-110 disabled:opacity-50"
+                      style={{ backgroundColor: activeTheme.accent }}
+                    >
+                      Join
+                    </button>
+                  </form>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const pick = ARCADE_GAMES[Math.floor(Math.random() * ARCADE_GAMES.length)];
+                      handleSelectGameType(pick.id);
+                    }}
+                    className="px-3 py-2 rounded-xl border text-xs font-bold text-slate-100 hover:bg-white/10 flex items-center gap-1.5 cursor-pointer"
+                    style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
+                  >
+                    <Shuffle className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
+                    <span>Random</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSoundEnabled(s => !s)}
+                    className="p-2 rounded-xl border text-slate-300 hover:text-white hover:bg-white/10 cursor-pointer"
+                    style={{ borderColor: activeTheme.border }}
+                    title={soundEnabled ? 'Mute sound effects' : 'Enable sound effects'}
+                  >
+                    {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
+                  </button>
+                </div>
+              </div>
+
+              {onlineError && (
+                <div className="p-2.5 rounded-xl bg-rose-500/15 border border-rose-500/35 text-xs text-rose-200 flex items-center justify-between gap-2">
+                  <span>{onlineError}</span>
+                  {onlineAuthNeeded && (
+                    <button
+                      type="button"
+                      onClick={handleGoogleSignIn}
+                      disabled={isSigningIn}
+                      className="px-3 py-1 rounded-lg bg-white text-slate-900 font-extrabold text-xs cursor-pointer shrink-0"
+                    >
+                      {isSigningIn ? 'Signing in...' : 'Sign in with Google'}
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Search & Category Filters */}
+              <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between">
+                <div className="relative flex-1 max-w-md">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={hubSearch}
+                    onChange={e => setHubSearch(e.target.value)}
+                    placeholder={`Search all ${ARCADE_GAMES.length} minigames...`}
+                    className="w-full pl-9 pr-8 py-2 rounded-xl border text-xs text-white placeholder-slate-500 focus:outline-none"
+                    style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
+                  />
+                  {hubSearch && (
+                    <button
+                      type="button"
+                      onClick={() => setHubSearch('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
+                  {hubCategories.map(cat => {
+                    const active = hubCategory === cat;
+                    const count =
+                      cat === 'All'
+                        ? ARCADE_GAMES.length
+                        : ARCADE_GAMES.filter(g => g.category === cat).length;
+                    return (
+                      <button
+                        key={cat}
+                        type="button"
+                        onClick={() => setHubCategory(cat)}
+                        className={`px-3 py-1.5 rounded-xl border text-[11px] font-bold whitespace-nowrap cursor-pointer transition-colors ${
+                          active ? 'text-black' : 'text-slate-300 hover:text-white hover:bg-white/5'
+                        }`}
+                        style={{
+                          backgroundColor: active ? activeTheme.accent : activeTheme.bgSecondary,
+                          borderColor: active ? activeTheme.accent : activeTheme.border
+                        }}
+                      >
+                        {cat} ({count})
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
 
-            <div className="flex items-center gap-1.5 shrink-0">
-              <button
-                onClick={() => setSoundEnabled(s => !s)}
-                className="p-2 rounded-xl border text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-                style={{ borderColor: activeTheme.border }}
-                title={soundEnabled ? 'Mute sound effects' : 'Enable sound effects'}
+            {/* Minigames Directory Grid */}
+            {filteredHubGames.length === 0 ? (
+              <div
+                className="rounded-2xl border p-10 text-center flex flex-col items-center gap-2"
+                style={{ backgroundColor: activeTheme.bgCard, borderColor: activeTheme.border }}
               >
-                {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
-              </button>
-              <button
-                onClick={toggleFullscreen}
-                className="p-2 rounded-xl border text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-                style={{ borderColor: activeTheme.border }}
-                title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen Arcade'}
-              >
-                {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-              </button>
+                <span className="text-3xl">🕹️</span>
+                <p className="text-sm font-bold text-white">No minigames matched &ldquo;{hubSearch}&rdquo;</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setHubSearch('');
+                    setHubCategory('All');
+                  }}
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-extrabold text-black cursor-pointer mt-1"
+                  style={{ backgroundColor: activeTheme.accent }}
+                >
+                  Show All {ARCADE_GAMES.length} Games
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5">
+                {filteredHubGames.map(g => {
+                  const isLastPlayed = selectedGame === g.id;
+                  return (
+                    <button
+                      key={g.id}
+                      type="button"
+                      onClick={() => handleSelectGameType(g.id)}
+                      className="group p-3.5 rounded-2xl border text-left transition-all cursor-pointer hover:-translate-y-0.5 hover:shadow-xl flex flex-col justify-between gap-2.5"
+                      style={{
+                        backgroundColor: activeTheme.bgCard,
+                        borderColor: isLastPlayed ? g.accentColor : activeTheme.border
+                      }}
+                    >
+                      <div className="flex items-start justify-between gap-2.5">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div
+                            className="w-10 h-10 rounded-xl border flex items-center justify-center text-xl shrink-0 transition-transform group-hover:scale-105"
+                            style={{
+                              backgroundColor: `${g.accentColor}20`,
+                              borderColor: `${g.accentColor}55`
+                            }}
+                          >
+                            <span>{g.emoji}</span>
+                          </div>
+                          <div className="min-w-0">
+                            <h3 className="text-sm font-extrabold text-white truncate group-hover:text-emerald-300 transition-colors">
+                              {g.name}
+                            </h3>
+                            <p className="text-[11px] text-slate-400 truncate mt-0.5">{g.tagline}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-2 pt-2 border-t text-[11px]" style={{ borderColor: activeTheme.border }}>
+                        <span className="text-slate-400 font-medium truncate">
+                          {g.category || 'Arcade'} · <span className="font-mono">{g.avgTime}</span>
+                        </span>
+                        <span
+                          className="font-extrabold shrink-0 flex items-center gap-1"
+                          style={{ color: g.accentColor }}
+                        >
+                          <span>Open</span>
+                          <Play className="w-3 h-3 fill-current" />
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        ) : (
+        <>
+        {/* Active Game Top Bar with Back to All Minigames */}
+        <div
+          className="rounded-2xl border px-3 py-2.5 shadow-lg flex flex-wrap items-center justify-between gap-2"
+          style={{ backgroundColor: activeTheme.bgCard, borderColor: activeTheme.border }}
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            <button
+              type="button"
+              onClick={handleBackToHub}
+              className="px-3 py-1.5 rounded-xl border text-xs font-extrabold text-white hover:bg-white/10 flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors"
+              style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.borderActive }}
+            >
+              <ArrowLeft className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
+              <span>All Minigames</span>
+            </button>
+
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-xl shrink-0">{meta.emoji}</span>
+              <div className="min-w-0">
+                <h2 className="text-sm md:text-base font-extrabold text-white truncate leading-tight">
+                  {meta.name}
+                </h2>
+                <div className="text-[11px] text-slate-400 truncate">
+                  {meta.category || 'Arcade'} · {meta.tagline}
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-1.5">
-            {ARCADE_GAMES.map(g => {
-              const active = selectedGame === g.id;
-              return (
-                <button
-                  key={g.id}
-                  onClick={() => handleSelectGameType(g.id)}
-                  className={`flex items-center gap-2 px-2.5 py-2 rounded-xl border text-left transition-all cursor-pointer ${
-                    active ? 'text-white shadow-md scale-[1.01]' : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                  }`}
-                  style={{
-                    backgroundColor: active ? activeTheme.accentBadge : activeTheme.bgSecondary,
-                    borderColor: active ? g.accentColor : activeTheme.border
-                  }}
-                >
-                  <span className="text-base shrink-0">{g.emoji}</span>
-                  <div className="min-w-0">
-                    <div className="text-[11px] font-extrabold truncate leading-tight">{g.name}</div>
-                    <div className="text-[9px] text-slate-400 font-mono">{g.avgTime}</div>
-                  </div>
-                </button>
-              );
-            })}
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              onClick={() => setSoundEnabled(s => !s)}
+              className="p-2 rounded-xl border text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              style={{ borderColor: activeTheme.border }}
+              title={soundEnabled ? 'Mute sound effects' : 'Enable sound effects'}
+            >
+              {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
+            </button>
+            <button
+              onClick={toggleFullscreen}
+              className="p-2 rounded-xl border text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              style={{ borderColor: activeTheme.border }}
+              title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen Arcade'}
+            >
+              {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+            </button>
           </div>
         </div>
 
@@ -1571,6 +1824,25 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                 <DiceSprintBoard
                   state={gameState}
                   canAct={canActNow}
+                  p1Name={p1Display}
+                  p2Name={p2Display}
+                  onAction={performAction}
+                />
+              )}
+
+              {isExtendedArcadeGameType(gameState.gameType) && (
+                <ExtendedArcadeBoard
+                  state={gameState as ExtendedArcadeState}
+                  canAct={canActNow}
+                  viewerRole={
+                    mode === 'online'
+                      ? mySeat === 'p1' || mySeat === 'p2'
+                        ? mySeat
+                        : 'spectator'
+                      : mode === 'ai'
+                      ? humanSeat
+                      : 'local'
+                  }
                   p1Name={p1Display}
                   p2Name={p2Display}
                   onAction={performAction}
@@ -2102,6 +2374,8 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
             )}
           </div>
         </div>
+        </>
+        )}
       </div>
     </div>
   );

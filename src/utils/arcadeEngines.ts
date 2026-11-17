@@ -1,33 +1,38 @@
-export type ArcadeGameType =
-  | 'connect4'
-  | 'checkers'
-  | 'reversi'
-  | 'dots-and-boxes'
-  | 'gomoku'
-  | 'ultimate-ttt'
-  | 'mancala'
-  | 'tictactoe'
-  | 'draw-guess'
-  | 'battleship'
-  | 'memory-match'
-  | 'dice-duel';
+import {
+  ArcadeBot,
+  ArcadeBotDifficulty,
+  ArcadeGameCategory,
+  ArcadeGameMeta,
+  ArcadeGameType,
+  ArcadePlayer,
+  ArcadeWinner,
+  BaseArcadeGameType,
+  EXTENDED_ARCADE_GAMES,
+  ExtendedArcadeGameType,
+  ExtendedArcadeState
+} from './arcadeExtendedTypes';
+import {
+  applyExtendedArcadeAction,
+  createExtendedInitialState,
+  getExtendedLegalActions,
+  isExtendedArcadeGameType,
+  pickExtendedBotAction
+} from './arcadeExtendedEngines';
 
-export type ArcadePlayer = 'p1' | 'p2';
-export type ArcadeWinner = ArcadePlayer | 'draw' | null;
+export * from './arcadeExtendedTypes';
+export {
+  isExtendedArcadeGameType,
+  createExtendedInitialState,
+  getExtendedLegalActions,
+  applyExtendedArcadeAction,
+  pickExtendedBotAction,
+  PIXEL_BOT_TEMPLATES,
+  cardValue21,
+  formatCardLabel,
+  scoreYachtCategory
+} from './arcadeExtendedEngines';
 
-export interface ArcadeGameMeta {
-  id: ArcadeGameType;
-  name: string;
-  tagline: string;
-  emoji: string;
-  avgTime: string;
-  accentColor: string;
-  rulesSummary: string;
-  p1Label: string;
-  p2Label: string;
-}
-
-export const ARCADE_GAMES: ArcadeGameMeta[] = [
+export const BASE_ARCADE_GAMES: ArcadeGameMeta[] = [
   {
     id: 'connect4',
     name: 'Connect 4',
@@ -35,6 +40,7 @@ export const ARCADE_GAMES: ArcadeGameMeta[] = [
     emoji: '🔴',
     avgTime: '2 min',
     accentColor: '#f43f5e',
+    category: 'Strategy',
     rulesSummary: 'Take turns dropping discs into the 7×6 rack. First player to line up 4 horizontally, vertically, or diagonally wins.',
     p1Label: 'Red',
     p2Label: 'Yellow'
@@ -46,6 +52,7 @@ export const ARCADE_GAMES: ArcadeGameMeta[] = [
     emoji: '🏁',
     avgTime: '5 min',
     accentColor: '#f59e0b',
+    category: 'Territory & Pawns',
     rulesSummary: 'Move diagonally on dark squares. Captures are mandatory and chain automatically; reach the back rank to crown a King.',
     p1Label: 'Red',
     p2Label: 'White'
@@ -57,6 +64,7 @@ export const ARCADE_GAMES: ArcadeGameMeta[] = [
     emoji: '⚪',
     avgTime: '4 min',
     accentColor: '#10b981',
+    category: 'Territory & Pawns',
     rulesSummary: 'Place a disc to flank one or more opponent discs in any straight line. Highest disc count when the board locks wins.',
     p1Label: 'Dark',
     p2Label: 'Light'
@@ -68,6 +76,7 @@ export const ARCADE_GAMES: ArcadeGameMeta[] = [
     emoji: '🟦',
     avgTime: '3 min',
     accentColor: '#38bdf8',
+    category: 'Territory & Pawns',
     rulesSummary: 'Draw lines between adjacent dots. Completing the 4th side of any box claims it and immediately grants another turn!',
     p1Label: 'Cyan',
     p2Label: 'Amber'
@@ -79,6 +88,7 @@ export const ARCADE_GAMES: ArcadeGameMeta[] = [
     emoji: '⚫',
     avgTime: '4 min',
     accentColor: '#a855f7',
+    category: 'Strategy',
     rulesSummary: 'Place stones on the 15×15 grid. First player to build an unbroken line of 5 stones wins instantly.',
     p1Label: 'Black',
     p2Label: 'White'
@@ -90,6 +100,7 @@ export const ARCADE_GAMES: ArcadeGameMeta[] = [
     emoji: '❌',
     avgTime: '4 min',
     accentColor: '#ec4899',
+    category: 'Strategy',
     rulesSummary: 'Each cell you play sends your opponent to that corresponding mini-board. Win 3 mini-boards in a row to claim victory.',
     p1Label: 'X (Neon)',
     p2Label: 'O (Gold)'
@@ -101,6 +112,7 @@ export const ARCADE_GAMES: ArcadeGameMeta[] = [
     emoji: '🪨',
     avgTime: '4 min',
     accentColor: '#14b8a6',
+    category: 'Strategy',
     rulesSummary: 'Pick a pit on your row to sow seeds counter-clockwise. Land in your store for a free turn or in an empty pit to capture opposite seeds!',
     p1Label: 'Bottom',
     p2Label: 'Top'
@@ -112,6 +124,7 @@ export const ARCADE_GAMES: ArcadeGameMeta[] = [
     emoji: '⭕',
     avgTime: '30 sec',
     accentColor: '#22c55e',
+    category: 'Strategy',
     rulesSummary: 'Fast 3×3 showdown. Great for instant rematches and quick reflex rounds with room codes.',
     p1Label: 'X',
     p2Label: 'O'
@@ -123,6 +136,7 @@ export const ARCADE_GAMES: ArcadeGameMeta[] = [
     emoji: '🎨',
     avgTime: '4 min',
     accentColor: '#f472b6',
+    category: 'Drawing & Creative',
     rulesSummary: '6 rounds of Pictionary-style sketching! Pick or type a secret word, draw it on the canvas, and send it to your opponent to guess in up to 3 tries.',
     p1Label: 'Artist P1',
     p2Label: 'Artist P2'
@@ -134,6 +148,7 @@ export const ARCADE_GAMES: ArcadeGameMeta[] = [
     emoji: '🚢',
     avgTime: '4 min',
     accentColor: '#0ea5e9',
+    category: 'Territory & Pawns',
     rulesSummary: 'Place 4 ships (sizes 4, 3, 2, 2) on your 8×8 grid, then trade salvos! First commander to sink all 11 enemy hull segments wins.',
     p1Label: 'Admiral 1',
     p2Label: 'Admiral 2'
@@ -145,6 +160,7 @@ export const ARCADE_GAMES: ArcadeGameMeta[] = [
     emoji: '🃏',
     avgTime: '2 min',
     accentColor: '#c084fc',
+    category: 'Word & Code',
     rulesSummary: 'Take turns flipping 2 cards from the 4×4 deck. Finding a matching pair scores a point and grants another turn!',
     p1Label: 'Player 1',
     p2Label: 'Player 2'
@@ -156,11 +172,14 @@ export const ARCADE_GAMES: ArcadeGameMeta[] = [
     emoji: '🎲',
     avgTime: '2 min',
     accentColor: '#fb923c',
+    category: 'Dice & Duel',
     rulesSummary: 'Roll to add points to your turn bank, or Hold to lock them in. Rolling a 1 busts your turn bank! First to 50 points wins.',
     p1Label: 'Roller 1',
     p2Label: 'Roller 2'
   }
 ];
+
+export const ARCADE_GAMES: ArcadeGameMeta[] = [...BASE_ARCADE_GAMES, ...EXTENDED_ARCADE_GAMES];
 
 export function isValidArcadeGameType(val: unknown): val is ArcadeGameType {
   return ARCADE_GAMES.some(g => g.id === val);
@@ -366,7 +385,8 @@ export type ArcadeState =
   | DrawGuessState
   | BattleshipState
   | MemoryMatchState
-  | DiceDuelState;
+  | DiceDuelState
+  | ExtendedArcadeState;
 
 export interface ApplyArcadeResult {
   valid: boolean;
@@ -378,6 +398,9 @@ export interface ApplyArcadeResult {
 // ---------------- INITIAL STATE CREATORS ----------------
 
 export function createInitialArcadeState(gameType: ArcadeGameType): ArcadeState {
+  if (isExtendedArcadeGameType(gameType)) {
+    return createExtendedInitialState(gameType);
+  }
   switch (gameType) {
     case 'connect4':
       return {
@@ -1045,6 +1068,9 @@ export function getCheckersLegalMoves(state: CheckersState): CheckersMoveOption[
 
 export function getLegalArcadeActions(state: ArcadeState): string[] {
   if (state.winner) return [];
+  if (isExtendedArcadeGameType(state.gameType)) {
+    return getExtendedLegalActions(state as ExtendedArcadeState);
+  }
 
   switch (state.gameType) {
     case 'connect4': {
@@ -1180,6 +1206,9 @@ export function applyArcadeAction(state: ArcadeState, rawAction: string): ApplyA
     capturedOrScored: false
   };
   if (state.winner) return invalid;
+  if (isExtendedArcadeGameType(state.gameType)) {
+    return applyExtendedArcadeAction(state as ExtendedArcadeState, action);
+  }
 
   const opp: ArcadePlayer = state.turn === 'p1' ? 'p2' : 'p1';
 
@@ -2151,25 +2180,6 @@ export function replayArcadeMoves(
 
 // ---------------- MULTI-BOT ROSTER & DIFFICULTY ENGINES ----------------
 
-export type ArcadeBotDifficulty = 'easy' | 'medium' | 'hard' | 'expert';
-
-export interface ArcadeBot {
-  id: string;
-  name: string;
-  avatar: string;
-  rating: number;
-  difficulty: ArcadeBotDifficulty;
-  title: string;
-  tagline: string;
-  accentColor: string;
-  voicelines: {
-    start: string[];
-    bonus: string[];
-    win: string[];
-    lose: string[];
-  };
-}
-
 export const ARCADE_BOTS: ArcadeBot[] = [
   {
     id: 'melon-sprout',
@@ -2810,6 +2820,10 @@ export function pickBotArcadeAction(
   const difficulty = botProfile.difficulty;
   const bot = state.turn;
   const opp: ArcadePlayer = bot === 'p1' ? 'p2' : 'p1';
+
+  if (isExtendedArcadeGameType(state.gameType)) {
+    return pickExtendedBotAction(state as ExtendedArcadeState, botProfile);
+  }
 
   // Sprout / Sunny Chips (easy): casual play with ~42% relaxed/playful randomness
   if (difficulty === 'easy') {

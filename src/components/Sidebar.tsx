@@ -73,7 +73,7 @@ export const Sidebar: React.FC<OwenSidebarProps> = ({
     { id: 'home', label: 'Home', icon: Home, emoji: '🏠' },
     { id: 'games', label: 'Games', icon: Gamepad2, emoji: '🎮' },
     { id: 'chess', label: 'Chess', icon: Crown, emoji: '♟️' },
-    { id: 'rooms', label: 'Rooms', icon: Swords, emoji: '🕹️' },
+    { id: 'rooms', label: 'Minigames', icon: Swords, emoji: '🕹️' },
     { id: 'apps', label: 'Apps', icon: LayoutGrid, emoji: '📱' },
     { id: 'music', label: 'Music', icon: Radio, emoji: '🎵' },
     { id: 'tools', label: 'Cloaker', icon: ShieldCheck, emoji: '🛠️' },
