@@ -886,7 +886,7 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                  <div className="grid grid-cols-3 gap-1.5">
+                  <div className="grid grid-cols-3 gap-1.5 max-h-48 overflow-y-auto pr-0.5">
                     <button
                       type="button"
                       disabled={Boolean(invitingGameKey)}

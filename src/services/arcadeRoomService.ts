@@ -62,9 +62,10 @@ export interface ArcadeRoomViewPayload {
   moves: string[];
   resignedWinner: ArcadePlayer | null;
   rematchVotes: ArcadePlayer[];
+  creatorAuthUid?: string;
   players: {
-    p1: { name: string; connected: boolean } | null;
-    p2: { name: string; connected: boolean } | null;
+    p1: { uid?: string; name: string; connected: boolean } | null;
+    p2: { uid?: string; name: string; connected: boolean } | null;
   };
 }
 
@@ -190,12 +191,13 @@ export function arcadeDocToViewPayload(
     moves,
     resignedWinner: docData.resignedWinner || null,
     rematchVotes: Array.isArray(docData.rematchVotes) ? docData.rematchVotes : [],
+    creatorAuthUid: docData.creatorAuthUid || undefined,
     players: {
       p1: docData.p1AuthUid
-        ? { name: docData.p1Name || 'Player 1', connected: true }
+        ? { uid: docData.p1AuthUid, name: docData.p1Name || 'Player 1', connected: true }
         : null,
       p2: docData.p2AuthUid
-        ? { name: docData.p2Name || 'Player 2', connected: true }
+        ? { uid: docData.p2AuthUid, name: docData.p2Name || 'Player 2', connected: true }
         : null
     }
   };
@@ -506,7 +508,7 @@ function computeArcadeMoveUpdatePayload(
     throw new Error('Not your turn.');
   }
 
-  const cleanAction = String(action || '').trim().slice(0, 32);
+  const cleanAction = String(action || '').trim().slice(0, 800);
   const res = applyArcadeAction(currentState, cleanAction);
   if (!res.valid) {
     throw new Error('Illegal move rejected.');

@@ -113,6 +113,7 @@ interface Premove {
 }
 
 interface OnlineSeatInfo {
+  uid?: string;
   name: string;
   elo: number;
   connected: boolean;
@@ -504,7 +505,9 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     pushTurnToast,
     contacts,
     directoryProfiles,
+    allInvites,
     incomingInvites,
+    lastAcceptedInvite,
     acceptGameInvite,
     declineGameInvite
   } = useNotifications();
@@ -704,6 +707,14 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     whiteTimeMs,
     blackTimeMs
   ]);
+
+  // Keep default name synced to signed-in profile if still generic
+  useEffect(() => {
+    const preferred = profile?.displayName || user?.displayName;
+    if (preferred && (playerName === 'Player' || !playerName.trim())) {
+      setPlayerName(preferred.slice(0, 24));
+    }
+  }, [profile?.displayName, user?.displayName, playerName]);
 
   // Persist player name
   const handlePlayerNameChange = (val: string) => {
@@ -1461,6 +1472,85 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
   const incomingChessInvites = useMemo(
     () => incomingInvites.filter(inv => inv.gameKind === 'chess'),
     [incomingInvites]
+  );
+
+  const activeChessRoomInvite = useMemo(() => {
+    if (!onlineRoomCode) return null;
+    const match = allInvites.find(
+      inv => inv.gameKind === 'chess' && inv.roomCode === onlineRoomCode
+    );
+    if (match) return match;
+    if (
+      lastAcceptedInvite &&
+      lastAcceptedInvite.gameKind === 'chess' &&
+      lastAcceptedInvite.roomCode === onlineRoomCode
+    ) {
+      return lastAcceptedInvite;
+    }
+    return null;
+  }, [onlineRoomCode, allInvites, lastAcceptedInvite]);
+
+  const resolveAvatarIcon = useCallback((avatarId?: string | null) => {
+    return (AVATAR_PRESETS.find(a => a.id === avatarId) || AVATAR_PRESETS[0]).icon;
+  }, []);
+
+  const resolvePersonByUid = useCallback(
+    (uid?: string | null, fallbackName?: string | null) => {
+      if (uid && uid === myFirebaseUid) {
+        const myName =
+          playerName && playerName !== 'Player'
+            ? playerName
+            : profile?.displayName || user?.displayName || fallbackName || 'You';
+        return {
+          name: myName,
+          avatarIcon: resolveAvatarIcon(profile?.avatarId)
+        };
+      }
+      const contact = uid ? contacts.find(c => c.contactUid === uid) : undefined;
+      const dir = uid ? directoryProfiles.find(p => p.userId === uid) : undefined;
+      const matchedInv =
+        uid && activeChessRoomInvite
+          ? activeChessRoomInvite.fromUid === uid
+            ? { name: activeChessRoomInvite.fromName, avatarId: activeChessRoomInvite.fromAvatarId }
+            : activeChessRoomInvite.toUid === uid
+            ? { name: activeChessRoomInvite.toName, avatarId: contact?.avatarId || dir?.avatarId }
+            : null
+          : null;
+
+      const cleanFallback =
+        fallbackName &&
+        fallbackName !== 'Player' &&
+        fallbackName !== 'White' &&
+        fallbackName !== 'Black'
+          ? fallbackName
+          : '';
+
+      const resolvedName =
+        contact?.nickname ||
+        dir?.displayName ||
+        contact?.displayName ||
+        matchedInv?.name ||
+        cleanFallback ||
+        fallbackName ||
+        'Player';
+
+      const avatarId = dir?.avatarId || contact?.avatarId || matchedInv?.avatarId;
+      return {
+        name: resolvedName,
+        avatarIcon: avatarId ? resolveAvatarIcon(avatarId) : null
+      };
+    },
+    [
+      myFirebaseUid,
+      playerName,
+      profile?.displayName,
+      profile?.avatarId,
+      user?.displayName,
+      contacts,
+      directoryProfiles,
+      activeChessRoomInvite,
+      resolveAvatarIcon
+    ]
   );
 
   const handleInviteFriendToChess = async (target: { uid: string; name: string }) => {
@@ -2558,16 +2648,41 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
 
   const getPlayerInfo = (
     color: PieceColor
-  ): { name: string; elo: number | null; connected?: boolean } => {
+  ): { name: string; elo: number | null; connected?: boolean; avatarIcon?: string | null } => {
     if (mode === 'pvp') {
       return {
-        name: color === 'w' ? 'Player 1' : 'Player 2',
+        name: color === 'w' ? 'Player 1 (White)' : 'Player 2 (Black)',
         elo: null
       };
     }
     if (mode === 'online') {
       const seat = color === 'w' ? onlinePlayers.w : onlinePlayers.b;
       if (!seat) {
+        // Show invited peer name if we created the room and invited a friend
+        if (activeChessRoomInvite && activeChessRoomInvite.fromUid === myFirebaseUid) {
+          const peer = resolvePersonByUid(
+            activeChessRoomInvite.toUid,
+            activeChessRoomInvite.toName
+          );
+          return {
+            name: `Waiting for ${peer.name}...`,
+            elo: null,
+            connected: false,
+            avatarIcon: peer.avatarIcon
+          };
+        }
+        if (activeChessRoomInvite && activeChessRoomInvite.toUid === myFirebaseUid) {
+          const inviter = resolvePersonByUid(
+            activeChessRoomInvite.fromUid,
+            activeChessRoomInvite.fromName
+          );
+          return {
+            name: inviter.name,
+            elo: null,
+            connected: false,
+            avatarIcon: inviter.avatarIcon
+          };
+        }
         return {
           name: onlineRoomCode ? 'Waiting for opponent...' : color === 'w' ? 'White' : 'Black',
           elo: null,
@@ -2575,24 +2690,62 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
         };
       }
       const isMe = onlineMyColor === color;
+      const resolved = resolvePersonByUid(seat.uid, seat.name);
       return {
-        name: isMe ? `${seat.name} (You)` : seat.name,
+        name: isMe ? `${resolved.name} (You)` : resolved.name,
         elo: seat.elo,
-        connected: seat.connected
+        connected: seat.connected,
+        avatarIcon: resolved.avatarIcon
       };
     }
     if (color === humanColor) {
-      return { name: playerName.trim() || 'You', elo: 1200 };
+      return {
+        name:
+          (playerName && playerName !== 'Player' ? playerName.trim() : '') ||
+          profile?.displayName ||
+          user?.displayName ||
+          'You',
+        elo: 1200,
+        avatarIcon: resolveAvatarIcon(profile?.avatarId)
+      };
     }
     return { name: selectedBot.name, elo: selectedBot.rating };
   };
 
+  const onlineOpponentInfo = useMemo(() => {
+    if (mode !== 'online' || !onlineRoomCode) return null;
+    if (onlineMyColor === 'w' || onlineMyColor === 'b') {
+      const oppColor: PieceColor = onlineMyColor === 'w' ? 'b' : 'w';
+      const oppSeat = oppColor === 'w' ? onlinePlayers.w : onlinePlayers.b;
+      if (oppSeat) {
+        const person = resolvePersonByUid(oppSeat.uid, oppSeat.name);
+        return { name: person.name, avatarIcon: person.avatarIcon, seated: true, color: oppColor };
+      }
+      if (activeChessRoomInvite) {
+        const peerUid =
+          activeChessRoomInvite.fromUid === myFirebaseUid
+            ? activeChessRoomInvite.toUid
+            : activeChessRoomInvite.fromUid;
+        const peerName =
+          activeChessRoomInvite.fromUid === myFirebaseUid
+            ? activeChessRoomInvite.toName
+            : activeChessRoomInvite.fromName;
+        const person = resolvePersonByUid(peerUid, peerName);
+        return { name: person.name, avatarIcon: person.avatarIcon, seated: false, color: oppColor };
+      }
+    }
+    return null;
+  }, [mode, onlineRoomCode, onlineMyColor, onlinePlayers, activeChessRoomInvite, myFirebaseUid, resolvePersonByUid]);
+
   const getEndBannerCopy = () => {
+    const wName = getPlayerInfo('w').name.replace(/ \(You\)$/, '');
+    const bName = getPlayerInfo('b').name.replace(/ \(You\)$/, '');
     if (resignedWinner) {
-      const winnerName = resignedWinner === 'w' ? 'White' : 'Black';
+      const winnerName = resignedWinner === 'w' ? wName : bName;
+      const loserName = resignedWinner === 'w' ? bName : wName;
       return {
         title: `${winnerName} Wins`,
-        subtitle: `${resignedWinner === 'w' ? 'Black' : 'White'} resigned the match.`
+        subtitle: `${loserName} resigned the match.`
       };
     }
     if (timeoutWinner) {
@@ -2602,7 +2755,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
           subtitle: 'Clock expired, but opponent has insufficient material to mate.'
         };
       }
-      const winnerName = timeoutWinner === 'w' ? 'White' : 'Black';
+      const winnerName = timeoutWinner === 'w' ? wName : bName;
       if (mode === 'ai') {
         return timeoutWinner === humanColor
           ? {
@@ -2616,11 +2769,11 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       }
       return {
         title: `${winnerName} Wins on Time`,
-        subtitle: `${timeoutWinner === 'w' ? 'Black' : 'White'} ran out of time.`
+        subtitle: `${timeoutWinner === 'w' ? bName : wName} ran out of time.`
       };
     }
     if (gameState.status === 'checkmate') {
-      const winnerName = gameState.winner === 'w' ? 'White' : 'Black';
+      const winnerName = gameState.winner === 'w' ? wName : bName;
       if (mode === 'ai') {
         return gameState.winner === humanColor
           ? {
@@ -2695,6 +2848,8 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
             style={{
               backgroundColor: isBotHere
                 ? `${selectedBot.accentColor}22`
+                : info.avatarIcon
+                ? 'rgba(15, 23, 42, 0.7)'
                 : color === 'w'
                 ? '#e2e8f0'
                 : '#0f172a',
@@ -2707,13 +2862,21 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
           >
             {isBotHere ? (
               <span aria-hidden="true">{selectedBot.avatar}</span>
+            ) : info.avatarIcon ? (
+              <span aria-hidden="true">{info.avatarIcon}</span>
             ) : (
               <ChessPieceSvg piece={{ color, type: 'k' }} className="w-5 h-5" />
             )}
           </div>
 
           <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
-            <span className="text-xs font-bold text-white truncate max-w-[140px]">
+            <span
+              className={`w-2.5 h-2.5 rounded-full shrink-0 border ${
+                color === 'w' ? 'bg-slate-100 border-slate-400' : 'bg-slate-900 border-slate-500'
+              }`}
+              title={color === 'w' ? 'White pieces' : 'Black pieces'}
+            />
+            <span className="text-xs font-bold text-white truncate max-w-[150px]">
               {info.name}
             </span>
             {info.elo !== null && (
@@ -2841,7 +3004,62 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       <div
         className={`${
           isFullscreen ? 'max-w-7xl' : 'max-w-5xl'
-        } mx-auto w-full flex flex-col lg:flex-row gap-3 items-start justify-center`}
+        } mx-auto w-full flex flex-col gap-2.5`}
+      >
+        {/* Top-Level Incoming Chess Invites Banner (visible in ALL modes) */}
+        {incomingChessInvites.length > 0 && (
+          <div className="w-full rounded-xl border border-sky-400/50 bg-sky-500/15 px-3 py-2 flex flex-col gap-1.5 shadow-lg">
+            <div className="text-[10px] font-extrabold uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
+              <Gamepad2 className="w-3.5 h-3.5 shrink-0" />
+              <span>Chess Game Invites ({incomingChessInvites.length})</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {incomingChessInvites.map(inv => {
+                const inviter = resolvePersonByUid(inv.fromUid, inv.fromName);
+                const icon = inviter.avatarIcon || resolveAvatarIcon(inv.fromAvatarId);
+                return (
+                  <div
+                    key={inv.id}
+                    className="flex items-center justify-between gap-3 bg-black/35 px-2.5 py-1.5 rounded-lg border border-white/15 flex-1 min-w-[230px]"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-base shrink-0">{icon}</span>
+                      <div className="min-w-0">
+                        <div className="text-xs font-extrabold text-white truncate">
+                          {inviter.name} invited you to Chess
+                        </div>
+                        <div className="text-[10px] text-sky-200/80 font-mono">
+                          Room {inv.roomCode}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => void acceptGameInvite(inv)}
+                        className="px-2.5 py-1 rounded-md bg-sky-400 hover:bg-sky-300 text-black text-[11px] font-extrabold flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                      >
+                        <Play className="w-3 h-3 fill-current" />
+                        <span>Accept</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void declineGameInvite(inv)}
+                        className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-white/10 cursor-pointer"
+                        title="Decline invite"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+      <div
+        className="w-full flex flex-col lg:flex-row gap-3 items-start justify-center"
       >
         {/* Left Column: Compact Focused Main Board that fits viewport without zooming */}
         <div
@@ -2852,17 +3070,33 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
               : `min(100%, ${analysisEnabled ? 536 : 510}px, calc(100vh - 224px))`
           }}
         >
-          {/* Slim Top Utility Strip */}
+          {/* Slim Top Utility Strip + Explicit Inviter/Opponent Info */}
           <div className="w-full flex items-center justify-between gap-2 px-0.5">
-            <div className="flex items-center gap-1.5 min-w-0">
+            <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
               {mode === 'online' && onlineRoomCode ? (
-                <span className="text-[11px] font-mono font-bold text-slate-300 flex items-center gap-1">
-                  <Globe className="w-3 h-3" style={{ color: activeTheme.accent }} />
-                  Room <span className="text-white">{onlineRoomCode}</span>
-                  {onlineMyColor === 'spectator' && (
-                    <span className="text-amber-300">(Spectating)</span>
+                <>
+                  <span className="text-[11px] font-mono font-bold text-slate-300 flex items-center gap-1 shrink-0">
+                    <Globe className="w-3 h-3" style={{ color: activeTheme.accent }} />
+                    Room <span className="text-white">{onlineRoomCode}</span>
+                  </span>
+                  {onlineOpponentInfo && (
+                    <span className="text-[11px] font-bold text-white flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/10 border border-white/15 truncate">
+                      <span>{onlineOpponentInfo.seated ? 'Playing vs' : 'Waiting for'}</span>
+                      {onlineOpponentInfo.avatarIcon && <span>{onlineOpponentInfo.avatarIcon}</span>}
+                      <span className="truncate">{onlineOpponentInfo.name}</span>
+                    </span>
                   )}
-                </span>
+                  {activeChessRoomInvite && (
+                    <span className="text-[10px] font-semibold text-sky-300 truncate">
+                      {activeChessRoomInvite.fromUid === myFirebaseUid
+                        ? `(Invited ${resolvePersonByUid(activeChessRoomInvite.toUid, activeChessRoomInvite.toName).name})`
+                        : `(Invited by ${resolvePersonByUid(activeChessRoomInvite.fromUid, activeChessRoomInvite.fromName).name})`}
+                    </span>
+                  )}
+                  {onlineMyColor === 'spectator' && (
+                    <span className="text-[11px] text-amber-300 font-bold">(Spectating)</span>
+                  )}
+                </>
               ) : (
                 <span className="text-[11px] font-semibold text-slate-400 truncate">
                   {isGameOver
@@ -4417,6 +4651,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
             </div>
           </div>
         </div>
+      </div>
       </div>
 
       {/* Floating Dragged Piece Overlay (rendered outside overflow-hidden board for unrestricted touch/mouse drag) */}

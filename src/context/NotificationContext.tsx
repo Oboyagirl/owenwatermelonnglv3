@@ -71,8 +71,10 @@ interface NotificationContextValue {
   dismissToast: (id: string) => void;
   contacts: UserContact[];
   directoryProfiles: ChatProfile[];
+  allInvites: GameInvite[];
   incomingInvites: GameInvite[];
   outgoingInvites: GameInvite[];
+  lastAcceptedInvite: GameInvite | null;
   pendingChessJoinCode: string | null;
   clearPendingChessJoinCode: () => void;
   pendingArcadeJoinCode: string | null;
@@ -118,6 +120,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   const [pendingChessJoinCode, setPendingChessJoinCode] = useState<string | null>(null);
   const [pendingArcadeJoinCode, setPendingArcadeJoinCode] = useState<string | null>(null);
   const [pendingChatTarget, setPendingChatTarget] = useState<ChatPeerTarget | null>(null);
+  const [lastAcceptedInvite, setLastAcceptedInvite] = useState<GameInvite | null>(null);
 
   const [trackedChessRoom, setTrackedChessRoomState] = useState<TrackedChessRoom | null>(null);
   const [trackedArcadeRoom, setTrackedArcadeRoomState] = useState<TrackedArcadeRoom | null>(null);
@@ -526,6 +529,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     async (invite: GameInvite) => {
       dismissToast(`toast_${invite.id}`);
       setToasts(prev => prev.filter(t => t.invite?.id !== invite.id));
+      setLastAcceptedInvite(invite);
       try {
         await respondToGameInvite(invite.id, 'accepted');
       } catch {}
@@ -582,8 +586,10 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       dismissToast,
       contacts,
       directoryProfiles,
+      allInvites: invites,
       incomingInvites,
       outgoingInvites,
+      lastAcceptedInvite,
       pendingChessJoinCode,
       clearPendingChessJoinCode: () => setPendingChessJoinCode(null),
       pendingArcadeJoinCode,
@@ -606,8 +612,10 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       dismissToast,
       contacts,
       directoryProfiles,
+      invites,
       incomingInvites,
       outgoingInvites,
+      lastAcceptedInvite,
       pendingChessJoinCode,
       pendingArcadeJoinCode,
       pendingChatTarget,

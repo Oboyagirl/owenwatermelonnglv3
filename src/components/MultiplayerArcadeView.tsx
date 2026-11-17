@@ -21,7 +21,15 @@ import {
   Gamepad2,
   Play,
   Send,
-  X
+  X,
+  Eraser,
+  Eye,
+  EyeOff,
+  Undo2,
+  Trash2,
+  RotateCw,
+  Dices,
+  Anchor
 } from 'lucide-react';
 import { ThemeConfig } from '../services/themeStore';
 import { useAuth } from '../context/AuthContext';
@@ -39,22 +47,37 @@ import {
   ArcadeGameType,
   ArcadePlayer,
   ArcadeState,
+  BATTLESHIP_SIZES,
+  BattleshipShipSpec,
+  BattleshipState,
   CheckersState,
   Connect4State,
+  DRAW_BRUSH_SIZES,
+  DRAW_COLORS,
+  DiceDuelState,
   DotsAndBoxesState,
+  DrawGuessState,
+  DrawStroke,
   GomokuState,
+  MEMORY_SYMBOLS,
   MancalaState,
+  MemoryMatchState,
   ReversiState,
   TicTacToeState,
   UltimateTTTState,
   applyArcadeAction,
   createInitialArcadeState,
+  generateRandomBattleshipFleet,
   getArcadeBotById,
   getArcadeGameMeta,
   getCheckersLegalMoves,
   getReversiFlips,
+  getShipCells,
   pickArcadeBotVoiceline,
-  pickBotArcadeAction
+  pickBotArcadeAction,
+  serializeBattleshipFleetAction,
+  serializeDrawStrokeAction,
+  validateBattleshipFleet
 } from '../utils/arcadeEngines';
 import {
   ArcadeAuthRequiredError,
@@ -80,8 +103,8 @@ type SeatPref = 'p1' | 'p2' | 'random';
 type ConnStatus = 'disconnected' | 'connecting' | 'connected';
 
 interface OnlinePlayersInfo {
-  p1: { name: string; connected: boolean } | null;
-  p2: { name: string; connected: boolean } | null;
+  p1: { uid?: string; name: string; connected: boolean } | null;
+  p2: { uid?: string; name: string; connected: boolean } | null;
 }
 
 const SELECTED_GAME_KEY = 'owen_arcade_selected_game_v1';
@@ -128,7 +151,9 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
     pushTurnToast,
     contacts,
     directoryProfiles,
+    allInvites,
     incomingInvites,
+    lastAcceptedInvite,
     acceptGameInvite,
     declineGameInvite
   } = useNotifications();
@@ -785,6 +810,85 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
     [incomingInvites]
   );
 
+  const activeArcadeRoomInvite = useMemo(() => {
+    if (!roomCode) return null;
+    const match = allInvites.find(
+      inv => inv.gameKind === 'arcade' && inv.roomCode === roomCode
+    );
+    if (match) return match;
+    if (
+      lastAcceptedInvite &&
+      lastAcceptedInvite.gameKind === 'arcade' &&
+      lastAcceptedInvite.roomCode === roomCode
+    ) {
+      return lastAcceptedInvite;
+    }
+    return null;
+  }, [roomCode, allInvites, lastAcceptedInvite]);
+
+  const resolveAvatarIcon = useCallback((avatarId?: string | null) => {
+    return (AVATAR_PRESETS.find(a => a.id === avatarId) || AVATAR_PRESETS[0]).icon;
+  }, []);
+
+  const resolvePersonByUid = useCallback(
+    (uid?: string | null, fallbackName?: string | null) => {
+      if (uid && uid === myFirebaseUid) {
+        const myName =
+          playerName && playerName !== 'Player'
+            ? playerName
+            : profile?.displayName || user?.displayName || fallbackName || 'You';
+        return {
+          name: myName,
+          avatarIcon: resolveAvatarIcon(profile?.avatarId)
+        };
+      }
+      const contact = uid ? contacts.find(c => c.contactUid === uid) : undefined;
+      const dir = uid ? directoryProfiles.find(p => p.userId === uid) : undefined;
+      const matchedInv =
+        uid && activeArcadeRoomInvite
+          ? activeArcadeRoomInvite.fromUid === uid
+            ? { name: activeArcadeRoomInvite.fromName, avatarId: activeArcadeRoomInvite.fromAvatarId }
+            : activeArcadeRoomInvite.toUid === uid
+            ? { name: activeArcadeRoomInvite.toName, avatarId: contact?.avatarId || dir?.avatarId }
+            : null
+          : null;
+
+      const cleanFallback =
+        fallbackName &&
+        fallbackName !== 'Player' &&
+        fallbackName !== 'Player 1' &&
+        fallbackName !== 'Player 2'
+          ? fallbackName
+          : '';
+
+      const resolvedName =
+        contact?.nickname ||
+        dir?.displayName ||
+        contact?.displayName ||
+        matchedInv?.name ||
+        cleanFallback ||
+        fallbackName ||
+        'Player';
+
+      const avatarId = dir?.avatarId || contact?.avatarId || matchedInv?.avatarId;
+      return {
+        name: resolvedName,
+        avatarIcon: avatarId ? resolveAvatarIcon(avatarId) : null
+      };
+    },
+    [
+      myFirebaseUid,
+      playerName,
+      profile?.displayName,
+      profile?.avatarId,
+      user?.displayName,
+      contacts,
+      directoryProfiles,
+      activeArcadeRoomInvite,
+      resolveAvatarIcon
+    ]
+  );
+
   const handleInviteFriendToArcade = async (target: { uid: string; name: string }) => {
     setOnlineError(null);
     setInvitingFriendUid(target.uid);
@@ -1056,23 +1160,84 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
 
   const botLabel = `${selectedBot.avatar} ${selectedBot.name}`;
 
+  const p1Resolved = useMemo(() => {
+    if (mode !== 'online') return null;
+    if (players.p1) return resolvePersonByUid(players.p1.uid, players.p1.name);
+    if (activeArcadeRoomInvite) {
+      if (activeArcadeRoomInvite.fromUid === myFirebaseUid && mySeat === 'p1') {
+        return resolvePersonByUid(myFirebaseUid, playerName);
+      }
+      if (activeArcadeRoomInvite.toUid === myFirebaseUid && mySeat === 'p2') {
+        return resolvePersonByUid(activeArcadeRoomInvite.fromUid, activeArcadeRoomInvite.fromName);
+      }
+      if (activeArcadeRoomInvite.fromUid === myFirebaseUid) {
+        return resolvePersonByUid(activeArcadeRoomInvite.toUid, activeArcadeRoomInvite.toName);
+      }
+    }
+    return null;
+  }, [mode, players.p1, activeArcadeRoomInvite, myFirebaseUid, mySeat, playerName, resolvePersonByUid]);
+
+  const p2Resolved = useMemo(() => {
+    if (mode !== 'online') return null;
+    if (players.p2) return resolvePersonByUid(players.p2.uid, players.p2.name);
+    if (activeArcadeRoomInvite) {
+      if (activeArcadeRoomInvite.fromUid === myFirebaseUid && mySeat === 'p1') {
+        return resolvePersonByUid(activeArcadeRoomInvite.toUid, activeArcadeRoomInvite.toName);
+      }
+      if (activeArcadeRoomInvite.fromUid === myFirebaseUid && mySeat === 'p2') {
+        return resolvePersonByUid(myFirebaseUid, playerName);
+      }
+    }
+    return null;
+  }, [mode, players.p2, activeArcadeRoomInvite, myFirebaseUid, mySeat, playerName, resolvePersonByUid]);
+
   const p1Display =
     mode === 'online'
-      ? players.p1?.name || (mySeat === 'p1' ? playerName : 'Waiting for P1...')
+      ? players.p1
+        ? p1Resolved?.name || players.p1.name
+        : mySeat === 'p1'
+        ? playerName
+        : p1Resolved
+        ? `Waiting for ${p1Resolved.name}...`
+        : 'Waiting for P1...'
       : mode === 'ai'
       ? humanSeat === 'p1'
-        ? `${playerName || 'You'}`
+        ? `${(playerName && playerName !== 'Player' ? playerName : '') || profile?.displayName || user?.displayName || 'You'}`
         : botLabel
       : `Player 1 (${meta.p1Label})`;
 
   const p2Display =
     mode === 'online'
-      ? players.p2?.name || (mySeat === 'p2' ? playerName : 'Waiting for P2...')
+      ? players.p2
+        ? p2Resolved?.name || players.p2.name
+        : mySeat === 'p2'
+        ? playerName
+        : p2Resolved
+        ? `Waiting for ${p2Resolved.name}...`
+        : 'Waiting for P2...'
       : mode === 'ai'
       ? humanSeat === 'p2'
-        ? `${playerName || 'You'}`
+        ? `${(playerName && playerName !== 'Player' ? playerName : '') || profile?.displayName || user?.displayName || 'You'}`
         : botLabel
       : `Player 2 (${meta.p2Label})`;
+
+  const p1Avatar =
+    mode === 'online'
+      ? p1Resolved?.avatarIcon || null
+      : mode === 'ai'
+      ? humanSeat === 'p1'
+        ? resolveAvatarIcon(profile?.avatarId)
+        : selectedBot.avatar
+      : null;
+
+  const p2Avatar =
+    mode === 'online'
+      ? p2Resolved?.avatarIcon || null
+      : mode === 'ai'
+      ? humanSeat === 'p2'
+        ? resolveAvatarIcon(profile?.avatarId)
+        : selectedBot.avatar
+      : null;
 
   const statusHeadline = useMemo(() => {
     if (effectiveWinner === 'draw') return 'Match Drawn!';
@@ -1113,6 +1278,58 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
       style={{ backgroundColor: activeTheme.bgPrimary }}
     >
       <div className="max-w-6xl mx-auto w-full flex flex-col gap-3">
+        {/* Top-Level Incoming Arcade Invites Banner (visible in ALL modes) */}
+        {incomingArcadeInvites.length > 0 && (
+          <div className="w-full rounded-2xl border border-sky-400/50 bg-sky-500/15 px-3.5 py-2.5 flex flex-col gap-2 shadow-lg">
+            <div className="text-[11px] font-extrabold uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
+              <Gamepad2 className="w-4 h-4 shrink-0" />
+              <span>Game Invites Waiting ({incomingArcadeInvites.length})</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {incomingArcadeInvites.map(inv => {
+                const inviter = resolvePersonByUid(inv.fromUid, inv.fromName);
+                const icon = inviter.avatarIcon || resolveAvatarIcon(inv.fromAvatarId);
+                return (
+                  <div
+                    key={inv.id}
+                    className="flex items-center justify-between gap-3 bg-black/35 px-3 py-2 rounded-xl border border-white/15 flex-1 min-w-[240px]"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="text-lg shrink-0">{icon}</span>
+                      <div className="min-w-0">
+                        <div className="text-xs font-extrabold text-white truncate">
+                          {inviter.name} invited you to {inv.gameTitle}
+                        </div>
+                        <div className="text-[10px] text-sky-200/80 font-mono">
+                          Room {inv.roomCode}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => void acceptGameInvite(inv)}
+                        className="px-3 py-1 rounded-lg bg-sky-400 hover:bg-sky-300 text-black text-xs font-extrabold flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                      >
+                        <Play className="w-3 h-3 fill-current" />
+                        <span>Accept</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void declineGameInvite(inv)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 cursor-pointer"
+                        title="Decline invite"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Game Picker Strip */}
         <div
           className="rounded-2xl border p-2.5 shadow-lg"
@@ -1125,7 +1342,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                 Multiplayer Arcade Rooms
               </h2>
               <span className="text-[11px] font-mono text-slate-400 hidden sm:inline">
-                8 instant room-code games · Zero delay sync
+                12 instant room-code games · Zero delay sync
               </span>
             </div>
 
@@ -1149,7 +1366,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1.5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-1.5">
             {ARCADE_GAMES.map(g => {
               const active = selectedGame === g.id;
               return (
@@ -1184,30 +1401,40 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
           >
             {/* Compact Player Versus Header */}
             <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b" style={{ borderColor: activeTheme.border }}>
-              <div className="flex items-center gap-2 min-w-0">
+              <div className="flex items-center gap-2 min-w-0 flex-wrap">
                 <div
-                  className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all ${
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all ${
                     !isGameOver && gameState.turn === 'p1' ? 'ring-2 ring-emerald-400/70 text-white' : 'text-slate-300'
                   }`}
                   style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
                 >
                   <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
-                  <span className="truncate max-w-[120px]">{p1Display}</span>
+                  {p1Avatar && <span className="shrink-0">{p1Avatar}</span>}
+                  <span className="truncate max-w-[130px]">{p1Display}</span>
                   {mySeat === 'p1' && mode === 'online' && <span className="text-[9px] font-mono text-emerald-400">YOU</span>}
                 </div>
 
                 <span className="text-[10px] font-extrabold text-slate-500 uppercase">VS</span>
 
                 <div
-                  className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all ${
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all ${
                     !isGameOver && gameState.turn === 'p2' ? 'ring-2 ring-amber-400/70 text-white' : 'text-slate-300'
                   }`}
                   style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
                 >
                   <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0" />
-                  <span className="truncate max-w-[120px]">{p2Display}</span>
+                  {p2Avatar && <span className="shrink-0">{p2Avatar}</span>}
+                  <span className="truncate max-w-[130px]">{p2Display}</span>
                   {mySeat === 'p2' && mode === 'online' && <span className="text-[9px] font-mono text-emerald-400">YOU</span>}
                 </div>
+
+                {mode === 'online' && activeArcadeRoomInvite && (
+                  <span className="text-[10px] font-semibold text-sky-300 bg-sky-500/10 border border-sky-400/25 px-2 py-0.5 rounded-md truncate">
+                    {activeArcadeRoomInvite.fromUid === myFirebaseUid
+                      ? `Invited ${resolvePersonByUid(activeArcadeRoomInvite.toUid, activeArcadeRoomInvite.toName).name}`
+                      : `Invited by ${resolvePersonByUid(activeArcadeRoomInvite.fromUid, activeArcadeRoomInvite.fromName).name}`}
+                  </span>
+                )}
               </div>
 
               <div className="flex items-center gap-2 text-xs font-bold">
@@ -1286,6 +1513,67 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                   state={gameState}
                   canAct={canActNow}
                   onPickCell={idx => performAction(`i:${idx}`)}
+                />
+              )}
+
+              {gameState.gameType === 'draw-guess' && (
+                <DrawGuessBoard
+                  state={gameState}
+                  canAct={canActNow}
+                  viewerRole={
+                    mode === 'online' && (mySeat === 'p1' || mySeat === 'p2')
+                      ? mySeat
+                      : mode === 'ai'
+                      ? humanSeat
+                      : 'local'
+                  }
+                  p1Name={p1Display}
+                  p2Name={p2Display}
+                  onAction={performAction}
+                />
+              )}
+
+              {gameState.gameType === 'battleship' && (
+                <BattleshipBoard
+                  state={gameState}
+                  canAct={canActNow}
+                  viewer={
+                    mode === 'online' && mySeat === 'p2'
+                      ? 'p2'
+                      : mode === 'ai'
+                      ? humanSeat
+                      : mode === 'pvp'
+                      ? gameState.turn
+                      : 'p1'
+                  }
+                  isLocalPvp={mode === 'pvp'}
+                  onAction={performAction}
+                />
+              )}
+
+              {gameState.gameType === 'memory-match' && (
+                <MemoryMatchBoard
+                  state={gameState}
+                  canAct={canActNow}
+                  p1Name={p1Display}
+                  p2Name={p2Display}
+                  onFlip={idx =>
+                    performAction(
+                      gameState.moveCount === 0
+                        ? `m:${idx}:${Math.floor(Math.random() * 900000) + 100}`
+                        : `m:${idx}`
+                    )
+                  }
+                />
+              )}
+
+              {gameState.gameType === 'dice-duel' && (
+                <DiceSprintBoard
+                  state={gameState}
+                  canAct={canActNow}
+                  p1Name={p1Display}
+                  p2Name={p2Display}
+                  onAction={performAction}
                 />
               )}
             </div>
@@ -2450,3 +2738,853 @@ const TicTacToeBoard: React.FC<{
     </div>
   );
 };
+
+// ---------------- NEW MINIGAME BOARDS ----------------
+
+const DrawGuessBoard: React.FC<{
+  state: DrawGuessState;
+  canAct: boolean;
+  viewerRole: ArcadePlayer | 'local';
+  p1Name: string;
+  p2Name: string;
+  onAction: (act: string) => void;
+}> = ({ state, canAct, viewerRole, p1Name, p2Name, onAction }) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [selectedColor, setSelectedColor] = useState(0);
+  const [selectedSize, setSelectedSize] = useState(1);
+  const [customWord, setCustomWord] = useState('');
+  const [guessInput, setGuessInput] = useState('');
+  const [hideLocalWord, setHideLocalWord] = useState(false);
+  const activePtsRef = useRef<[number, number][]>([]);
+  const isDrawingRef = useRef(false);
+
+  const isDrawerViewer = viewerRole === 'local' ? state.turn === state.drawer : viewerRole === state.drawer;
+  const isGuesserViewer = viewerRole === 'local' ? state.turn === state.guesser : viewerRole === state.guesser;
+  const canDrawOnCanvas = canAct && state.phase === 'draw' && isDrawerViewer;
+
+  const drawerName = state.drawer === 'p1' ? p1Name : p2Name;
+  const guesserName = state.guesser === 'p1' ? p1Name : p2Name;
+
+  const renderStrokes = useCallback((livePts?: [number, number][]) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const drawPath = (stroke: DrawStroke) => {
+      if (stroke.pts.length === 0) return;
+      ctx.save();
+      ctx.strokeStyle = DRAW_COLORS[stroke.colorIdx] || '#0f172a';
+      ctx.fillStyle = DRAW_COLORS[stroke.colorIdx] || '#0f172a';
+      ctx.lineWidth = DRAW_BRUSH_SIZES[stroke.sizeIdx] || 9;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      if (stroke.pts.length === 1) {
+        const [x, y] = stroke.pts[0];
+        ctx.beginPath();
+        ctx.arc(x * 2, y * 2, (ctx.lineWidth || 6) / 2, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(stroke.pts[0][0] * 2, stroke.pts[0][1] * 2);
+        for (let i = 1; i < stroke.pts.length; i++) {
+          ctx.lineTo(stroke.pts[i][0] * 2, stroke.pts[i][1] * 2);
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+    };
+
+    for (const s of state.strokes) {
+      drawPath(s);
+    }
+    if (livePts && livePts.length > 0) {
+      drawPath({ colorIdx: selectedColor, sizeIdx: selectedSize, pts: livePts });
+    }
+  }, [state.strokes, selectedColor, selectedSize]);
+
+  useEffect(() => {
+    renderStrokes();
+  }, [renderStrokes]);
+
+  const toLogicalPoint = (e: React.PointerEvent<HTMLCanvasElement>): [number, number] => {
+    const canvas = canvasRef.current!;
+    const rect = canvas.getBoundingClientRect();
+    const rx = (e.clientX - rect.left) / Math.max(1, rect.width);
+    const ry = (e.clientY - rect.top) / Math.max(1, rect.height);
+    return [
+      Math.max(0, Math.min(200, Math.round(rx * 200))),
+      Math.max(0, Math.min(150, Math.round(ry * 150)))
+    ];
+  };
+
+  const commitActiveStroke = () => {
+    const pts = activePtsRef.current;
+    isDrawingRef.current = false;
+    activePtsRef.current = [];
+    if (pts.length === 0) return;
+
+    // Split long strokes safely into <= 65-point chunks so every action stays well inside size limit
+    const CHUNK = 65;
+    if (pts.length <= CHUNK) {
+      onAction(serializeDrawStrokeAction({ colorIdx: selectedColor, sizeIdx: selectedSize, pts }));
+    } else {
+      for (let i = 0; i < pts.length; i += CHUNK - 1) {
+        const slice = pts.slice(i, i + CHUNK);
+        if (slice.length > 0) {
+          onAction(serializeDrawStrokeAction({ colorIdx: selectedColor, sizeIdx: selectedSize, pts: slice }));
+        }
+      }
+    }
+  };
+
+  const maskedWord = state.word
+    ? state.word
+        .split('')
+        .map(ch => (ch === ' ' ? '  ' : '_'))
+        .join(' ')
+    : '';
+
+  return (
+    <div className="w-full max-w-[520px] flex flex-col gap-2.5">
+      {/* Round & Score Header */}
+      <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 rounded-xl bg-black/30 border border-white/10 text-xs">
+        <span className="font-extrabold text-pink-300 font-mono">
+          Round {state.round}/{state.maxRounds}
+        </span>
+        <div className="flex items-center gap-3 font-mono font-bold">
+          <span className="text-rose-300">{p1Name}: {state.scores.p1}</span>
+          <span className="text-slate-500">|</span>
+          <span className="text-amber-300">{p2Name}: {state.scores.p2}</span>
+        </div>
+        <span className="text-[11px] font-bold text-slate-300">
+          {state.phase === 'pick'
+            ? `🎨 ${drawerName} picking word`
+            : state.phase === 'draw'
+            ? `✏️ ${drawerName} drawing`
+            : `💬 ${guesserName} guessing`}
+        </span>
+      </div>
+
+      {/* Previous Round Outcome Banner */}
+      {state.lastRoundResult && (
+        <div
+          className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center justify-between ${
+            state.lastRoundResult.guessed
+              ? 'bg-emerald-500/15 border-emerald-400/40 text-emerald-200'
+              : 'bg-slate-800/80 border-white/10 text-slate-300'
+          }`}
+        >
+          <span>
+            Round {state.lastRoundResult.round}: word was &ldquo;{state.lastRoundResult.word.toUpperCase()}&rdquo;
+          </span>
+          <span className="font-mono">
+            {state.lastRoundResult.guessed ? `+${state.lastRoundResult.points} pts!` : 'Missed (0 pts)'}
+          </span>
+        </div>
+      )}
+
+      {/* Phase 1: Word Selection */}
+      {state.phase === 'pick' ? (
+        <div className="p-4 rounded-2xl bg-slate-950/75 border border-white/10 flex flex-col items-center gap-3 text-center">
+          {canAct && isDrawerViewer ? (
+            <>
+              <div className="text-sm font-extrabold text-white">
+                Choose a secret word to draw for {guesserName}
+              </div>
+              <div className="flex flex-wrap justify-center gap-2">
+                {state.wordChoices.map(word => (
+                  <button
+                    key={word}
+                    type="button"
+                    onClick={() => onAction(`dw:${word}`)}
+                    className="px-4 py-2 rounded-xl bg-pink-500/20 hover:bg-pink-500/35 border border-pink-400/50 text-white font-extrabold text-xs uppercase tracking-wider cursor-pointer transition-transform hover:scale-105"
+                  >
+                    {word}
+                  </button>
+                ))}
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-2 w-full max-w-sm pt-1">
+                {state.rerollCount < 3 && (
+                  <button
+                    type="button"
+                    onClick={() => onAction('dr')}
+                    className="px-3 py-1.5 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 text-[11px] font-bold text-slate-200 flex items-center gap-1 cursor-pointer"
+                  >
+                    <Shuffle className="w-3 h-3" />
+                    <span>New Words</span>
+                  </button>
+                )}
+                <form
+                  onSubmit={e => {
+                    e.preventDefault();
+                    const clean = customWord.toLowerCase().trim().replace(/[^a-z ]/g, '').trim();
+                    if (clean.length >= 2) {
+                      onAction(`dw:${clean}`);
+                      setCustomWord('');
+                    }
+                  }}
+                  className="flex items-center gap-1.5 flex-1 min-w-[180px]"
+                >
+                  <input
+                    type="text"
+                    maxLength={20}
+                    value={customWord}
+                    onChange={e => setCustomWord(e.target.value)}
+                    placeholder="Or type custom word..."
+                    className="flex-1 px-2.5 py-1.5 rounded-lg border border-white/15 bg-black/40 text-xs text-white focus:outline-none focus:border-pink-400"
+                  />
+                  <button
+                    type="submit"
+                    disabled={customWord.trim().length < 2}
+                    className="px-2.5 py-1.5 rounded-lg bg-pink-400 text-black text-xs font-extrabold cursor-pointer disabled:opacity-40"
+                  >
+                    Draw
+                  </button>
+                </form>
+              </div>
+            </>
+          ) : (
+            <div className="py-6 flex flex-col items-center gap-2">
+              <span className="text-3xl">🎨</span>
+              <div className="text-sm font-extrabold text-white">
+                Waiting for {drawerName} to pick a word...
+              </div>
+              <div className="text-xs text-slate-400">
+                Get ready to guess as soon as they sketch!
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <>
+          {/* Active Secret Word / Hint Strip */}
+          <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 rounded-xl bg-slate-950/75 border border-white/10">
+            {isDrawerViewer && state.word ? (
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold uppercase text-slate-400">Your Word:</span>
+                <span className="text-sm font-black tracking-widest uppercase text-pink-300">
+                  {viewerRole === 'local' && hideLocalWord ? '••••••' : state.word}
+                </span>
+                {viewerRole === 'local' && (
+                  <button
+                    type="button"
+                    onClick={() => setHideLocalWord(h => !h)}
+                    className="p-1 rounded bg-white/10 text-slate-300 hover:text-white cursor-pointer"
+                    title="Hide/Show secret word for Local 2P"
+                  >
+                    {hideLocalWord ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold uppercase text-slate-400">Clue:</span>
+                <span className="font-mono text-sm font-black tracking-widest text-amber-300">
+                  {maskedWord}
+                </span>
+                <span className="text-[10px] font-mono text-slate-400">
+                  ({(state.word || '').replace(/ /g, '').length} letters)
+                </span>
+              </div>
+            )}
+
+            <span className="text-[11px] font-mono text-slate-400">
+              Strokes: {state.strokes.length}
+            </span>
+          </div>
+
+          {/* Drawing Canvas */}
+          <div className="w-full rounded-2xl overflow-hidden border-2 border-slate-700 bg-[#f8fafc] shadow-2xl">
+            <canvas
+              ref={canvasRef}
+              width={400}
+              height={300}
+              onPointerDown={e => {
+                if (!canDrawOnCanvas) return;
+                e.currentTarget.setPointerCapture(e.pointerId);
+                isDrawingRef.current = true;
+                const pt = toLogicalPoint(e);
+                activePtsRef.current = [pt];
+                renderStrokes(activePtsRef.current);
+              }}
+              onPointerMove={e => {
+                if (!canDrawOnCanvas || !isDrawingRef.current) return;
+                const pt = toLogicalPoint(e);
+                const prev = activePtsRef.current[activePtsRef.current.length - 1];
+                if (!prev || Math.hypot(pt[0] - prev[0], pt[1] - prev[1]) >= 2) {
+                  activePtsRef.current.push(pt);
+                  renderStrokes(activePtsRef.current);
+                }
+              }}
+              onPointerUp={() => {
+                if (isDrawingRef.current) commitActiveStroke();
+              }}
+              onPointerCancel={() => {
+                if (isDrawingRef.current) commitActiveStroke();
+              }}
+              className={`w-full aspect-[4/3] block touch-none ${
+                canDrawOnCanvas ? 'cursor-crosshair' : 'cursor-default'
+              }`}
+            />
+          </div>
+
+          {/* Drawer Palette & Finish Sketch Controls */}
+          {canDrawOnCanvas && (
+            <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-950/80 border border-white/10">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {DRAW_COLORS.map((hex, idx) => {
+                  const isEraser = idx === 9;
+                  const active = selectedColor === idx;
+                  return (
+                    <button
+                      key={hex}
+                      type="button"
+                      onClick={() => setSelectedColor(idx)}
+                      aria-label={isEraser ? 'Eraser' : `Color ${idx + 1}`}
+                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center cursor-pointer transition-transform ${
+                        active ? 'scale-115 ring-2 ring-white border-black' : 'border-white/30'
+                      }`}
+                      style={{ backgroundColor: hex }}
+                    >
+                      {isEraser && <Eraser className="w-3 h-3 text-slate-900" />}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                {DRAW_BRUSH_SIZES.map((sz, idx) => (
+                  <button
+                    key={sz}
+                    type="button"
+                    onClick={() => setSelectedSize(idx)}
+                    className={`w-7 h-7 rounded-lg border flex items-center justify-center cursor-pointer ${
+                      selectedSize === idx
+                        ? 'border-pink-400 bg-pink-500/20 text-white'
+                        : 'border-white/10 bg-white/5 text-slate-400'
+                    }`}
+                    title={`Brush size ${['Small', 'Medium', 'Large'][idx]}`}
+                  >
+                    <span
+                      className="rounded-full bg-current"
+                      style={{ width: idx === 0 ? 4 : idx === 1 ? 8 : 13, height: idx === 0 ? 4 : idx === 1 ? 8 : 13 }}
+                    />
+                  </button>
+                ))}
+
+                <button
+                  type="button"
+                  disabled={state.strokes.length === 0}
+                  onClick={() => onAction('du')}
+                  className="px-2 py-1.5 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-200 cursor-pointer disabled:opacity-40"
+                  title="Undo last stroke"
+                >
+                  <Undo2 className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  disabled={state.strokes.length === 0}
+                  onClick={() => onAction('dc')}
+                  className="px-2 py-1.5 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-200 cursor-pointer disabled:opacity-40"
+                  title="Clear canvas"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  disabled={state.strokes.length === 0}
+                  onClick={() => onAction('dp')}
+                  className="px-3 py-1.5 rounded-lg bg-emerald-400 hover:bg-emerald-300 text-black text-xs font-extrabold cursor-pointer disabled:opacity-40 whitespace-nowrap"
+                >
+                  Ready to Guess!
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Guesser Controls & Past Guesses */}
+          {state.phase === 'guess' && (
+            <div className="flex flex-col gap-2 p-2.5 rounded-xl bg-slate-950/80 border border-white/10">
+              {state.guesses.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {state.guesses.map((g, idx) => (
+                    <span
+                      key={`${g.text}-${idx}`}
+                      className="px-2 py-0.5 rounded-md bg-rose-500/15 border border-rose-400/30 text-[11px] font-bold text-rose-200"
+                    >
+                      ✗ {g.text} {g.hint ? `· ${g.hint}` : ''}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {canAct && isGuesserViewer ? (
+                <div className="flex flex-wrap items-center gap-2">
+                  <form
+                    onSubmit={e => {
+                      e.preventDefault();
+                      const clean = guessInput.toLowerCase().trim().replace(/[^a-z ]/g, '').trim();
+                      if (clean) {
+                        onAction(`dg:${clean}`);
+                        setGuessInput('');
+                      }
+                    }}
+                    className="flex items-center gap-1.5 flex-1 min-w-[200px]"
+                  >
+                    <input
+                      type="text"
+                      maxLength={24}
+                      value={guessInput}
+                      onChange={e => setGuessInput(e.target.value)}
+                      placeholder={`Guess (${3 - state.guesses.length} tries left)...`}
+                      className="flex-1 px-3 py-2 rounded-xl border border-white/15 bg-black/40 text-xs text-white focus:outline-none focus:border-emerald-400"
+                    />
+                    <button
+                      type="submit"
+                      disabled={!guessInput.trim()}
+                      className="px-3.5 py-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black text-xs font-extrabold cursor-pointer disabled:opacity-40"
+                    >
+                      Guess
+                    </button>
+                  </form>
+                  <button
+                    type="button"
+                    onClick={() => onAction('dn')}
+                    className="px-2.5 py-2 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-200 cursor-pointer whitespace-nowrap"
+                  >
+                    More Drawing
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onAction('dq')}
+                    className="px-2.5 py-2 rounded-xl border border-rose-400/30 bg-rose-500/10 hover:bg-rose-500/20 text-xs font-bold text-rose-200 cursor-pointer whitespace-nowrap"
+                  >
+                    Skip Round
+                  </button>
+                </div>
+              ) : (
+                <div className="text-xs text-slate-300 font-semibold text-center py-1">
+                  Waiting for {guesserName} to guess ({3 - state.guesses.length} tries left)...
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
+const BattleshipBoard: React.FC<{
+  state: BattleshipState;
+  canAct: boolean;
+  viewer: ArcadePlayer;
+  isLocalPvp: boolean;
+  onAction: (act: string) => void;
+}> = ({ state, canAct, viewer, isLocalPvp, onAction }) => {
+  const [draftFleet, setDraftFleet] = useState<BattleshipShipSpec[]>(() =>
+    generateRandomBattleshipFleet()
+  );
+  const [selectedShipIdx, setSelectedShipIdx] = useState(0);
+  const [placeDir, setPlaceDir] = useState<'h' | 'v'>('h');
+  const [showLocalOwnFleet, setShowLocalOwnFleet] = useState(false);
+
+  const opp: ArcadePlayer = viewer === 'p1' ? 'p2' : 'p1';
+  const myFleet = state.fleets[viewer];
+
+  const draftCellMap = useMemo(() => {
+    const map = new Map<string, number>();
+    draftFleet.forEach((s, idx) => {
+      getShipCells(s).forEach(([r, c]) => map.set(`${r},${c}`, idx));
+    });
+    return map;
+  }, [draftFleet]);
+
+  const myFleetCellSet = useMemo(() => {
+    const set = new Set<string>();
+    (myFleet || []).forEach(s => {
+      getShipCells(s).forEach(([r, c]) => set.add(`${r},${c}`));
+    });
+    return set;
+  }, [myFleet]);
+
+  const handlePlaceSelectedShip = (r: number, c: number) => {
+    const size = BATTLESHIP_SIZES[selectedShipIdx];
+    const cand: BattleshipShipSpec = { r, c, dir: placeDir, size };
+    const next = draftFleet.map((s, idx) => (idx === selectedShipIdx ? cand : s));
+    if (validateBattleshipFleet(next)) {
+      setDraftFleet(next);
+      setSelectedShipIdx(idx => (idx + 1) % BATTLESHIP_SIZES.length);
+    }
+  };
+
+  if (state.phase === 'setup') {
+    const iNeedToPlace = myFleet === null && canAct;
+    return (
+      <div className="w-full max-w-[440px] flex flex-col items-center gap-3">
+        <div className="flex items-center justify-between w-full px-3 py-2 rounded-xl bg-black/30 border border-white/10 text-xs font-bold">
+          <span className="flex items-center gap-1.5 text-sky-300">
+            <Anchor className="w-4 h-4" />
+            <span>{iNeedToPlace ? `Place Your Fleet (${state.turn.toUpperCase()})` : 'Waiting for opponent fleet...'}</span>
+          </span>
+          <span className="font-mono text-slate-400">Ships: 4, 3, 2, 2</span>
+        </div>
+
+        {iNeedToPlace ? (
+          <>
+            <div className="flex flex-wrap items-center justify-center gap-1.5 w-full">
+              {BATTLESHIP_SIZES.map((sz, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setSelectedShipIdx(idx)}
+                  className={`px-2.5 py-1 rounded-lg border text-xs font-bold cursor-pointer ${
+                    selectedShipIdx === idx
+                      ? 'border-sky-400 bg-sky-500/25 text-white'
+                      : 'border-white/10 bg-white/5 text-slate-300'
+                  }`}
+                >
+                  Ship #{idx + 1} ({sz})
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => setPlaceDir(d => (d === 'h' ? 'v' : 'h'))}
+                className="px-2.5 py-1 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-200 flex items-center gap-1 cursor-pointer"
+              >
+                <RotateCw className="w-3 h-3" />
+                <span>{placeDir === 'h' ? 'Horiz' : 'Vert'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setDraftFleet(generateRandomBattleshipFleet())}
+                className="px-2.5 py-1 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-200 flex items-center gap-1 cursor-pointer"
+              >
+                <Shuffle className="w-3 h-3" />
+                <span>Randomize</span>
+              </button>
+            </div>
+
+            <div className="w-full max-w-[330px] aspect-square grid grid-cols-8 grid-rows-8 gap-1 p-2 rounded-2xl bg-sky-950/75 border-2 border-sky-500/40 shadow-2xl">
+              {Array.from({ length: 8 }).map((_, r) =>
+                Array.from({ length: 8 }).map((__, c) => {
+                  const shipIdx = draftCellMap.get(`${r},${c}`);
+                  const hasShip = shipIdx !== undefined;
+                  return (
+                    <button
+                      key={`${r}-${c}`}
+                      type="button"
+                      onClick={() => handlePlaceSelectedShip(r, c)}
+                      className={`rounded-md border text-[10px] font-black transition-all cursor-pointer ${
+                        hasShip
+                          ? shipIdx === selectedShipIdx
+                            ? 'bg-sky-400 border-white text-slate-950'
+                            : 'bg-sky-600 border-sky-300/70 text-white'
+                          : 'bg-sky-900/50 border-sky-400/20 hover:bg-sky-700/60'
+                      }`}
+                    >
+                      {hasShip ? BATTLESHIP_SIZES[shipIdx] : ''}
+                    </button>
+                  );
+                })
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => onAction(serializeBattleshipFleetAction(draftFleet))}
+              className="px-5 py-2.5 rounded-xl bg-sky-400 hover:bg-sky-300 text-black text-xs font-extrabold cursor-pointer shadow-lg"
+            >
+              Lock Fleet & Start Battle
+            </button>
+          </>
+        ) : (
+          <div className="py-12 text-center text-sm font-bold text-slate-300">
+            Your fleet is locked! Waiting for opponent to deploy ships...
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  const myShots = state.shots[viewer];
+  const enemyShots = state.shots[opp];
+
+  return (
+    <div className="w-full flex flex-col gap-3 items-center">
+      {state.lastShot && (
+        <div className="px-3 py-1 rounded-xl bg-black/30 border border-white/10 text-xs font-bold text-slate-200">
+          Last salvo by {state.lastShot.shooter.toUpperCase()}:{' '}
+          <span
+            className={
+              state.lastShot.result === 'sunk'
+                ? 'text-rose-400'
+                : state.lastShot.result === 'hit'
+                ? 'text-amber-300'
+                : 'text-sky-300'
+            }
+          >
+            {state.lastShot.result.toUpperCase()}!
+          </span>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-[640px]">
+        {/* Target Waters */}
+        <div className="flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-slate-950/75 border border-sky-400/30">
+          <div className="flex items-center justify-between w-full text-[11px] font-extrabold px-1">
+            <span className="text-sky-300">Enemy Waters ({canAct ? 'Tap to Fire!' : 'Wait'})</span>
+            <span className="font-mono text-slate-300">
+              Hits {state.hitsCount[viewer]}/11 · Sunk {state.sunkBy[viewer].length}/4
+            </span>
+          </div>
+          <div className="w-full max-w-[260px] aspect-square grid grid-cols-8 grid-rows-8 gap-1">
+            {myShots.map((row, r) =>
+              row.map((cell, c) => {
+                const clickable = canAct && cell === null;
+                return (
+                  <button
+                    key={`${r}-${c}`}
+                    type="button"
+                    disabled={!clickable}
+                    onClick={() => onAction(`s:${r},${c}`)}
+                    className={`rounded border flex items-center justify-center text-xs font-black transition-all ${
+                      cell === 'hit'
+                        ? 'bg-rose-500/80 border-rose-300 text-white'
+                        : cell === 'miss'
+                        ? 'bg-slate-800/80 border-white/10 text-slate-400'
+                        : clickable
+                        ? 'bg-sky-900/50 border-sky-400/30 hover:bg-sky-500/40 cursor-pointer'
+                        : 'bg-sky-950/60 border-white/10 cursor-default'
+                    }`}
+                  >
+                    {cell === 'hit' ? '💥' : cell === 'miss' ? '•' : ''}
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        {/* Own Fleet Waters */}
+        <div className="flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-slate-950/75 border border-white/10">
+          <div className="flex items-center justify-between w-full text-[11px] font-extrabold px-1">
+            <span className="text-slate-300">My Fleet</span>
+            {isLocalPvp ? (
+              <button
+                type="button"
+                onClick={() => setShowLocalOwnFleet(v => !v)}
+                className="text-[10px] font-bold text-sky-300 flex items-center gap-1 cursor-pointer"
+              >
+                {showLocalOwnFleet ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                <span>{showLocalOwnFleet ? 'Hide Ships' : 'Peek Ships'}</span>
+              </button>
+            ) : (
+              <span className="font-mono text-slate-400">Lost {state.hitsCount[opp]}/11</span>
+            )}
+          </div>
+          <div className="w-full max-w-[260px] aspect-square grid grid-cols-8 grid-rows-8 gap-1">
+            {enemyShots.map((row, r) =>
+              row.map((cell, c) => {
+                const hasShip = myFleetCellSet.has(`${r},${c}`) && (!isLocalPvp || showLocalOwnFleet);
+                return (
+                  <div
+                    key={`${r}-${c}`}
+                    className={`rounded border flex items-center justify-center text-xs font-black ${
+                      cell === 'hit'
+                        ? 'bg-rose-600/85 border-rose-300 text-white'
+                        : cell === 'miss'
+                        ? 'bg-slate-800/80 border-white/10 text-slate-500'
+                        : hasShip
+                        ? 'bg-sky-600/75 border-sky-300/60'
+                        : 'bg-slate-900/60 border-white/10'
+                    }`}
+                  >
+                    {cell === 'hit' ? '💥' : cell === 'miss' ? '•' : ''}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const MemoryMatchBoard: React.FC<{
+  state: MemoryMatchState;
+  canAct: boolean;
+  p1Name: string;
+  p2Name: string;
+  onFlip: (idx: number) => void;
+}> = ({ state, canAct, p1Name, p2Name, onFlip }) => {
+  const [peekMismatch, setPeekMismatch] = useState<{ idxA: number; idxB: number } | null>(null);
+
+  useEffect(() => {
+    if (state.lastPair && !state.lastPair.matched && state.openIndices.length === 0) {
+      setPeekMismatch({ idxA: state.lastPair.idxA, idxB: state.lastPair.idxB });
+      const id = window.setTimeout(() => setPeekMismatch(null), 1050);
+      return () => window.clearTimeout(id);
+    }
+    setPeekMismatch(null);
+  }, [state.lastPair, state.openIndices.length]);
+
+  return (
+    <div className="w-full max-w-[380px] flex flex-col items-center gap-3">
+      <div className="flex items-center justify-between w-full px-3 py-1.5 rounded-xl bg-black/30 border border-white/10 text-xs font-extrabold">
+        <span className="text-rose-300">{p1Name}: {state.scores.p1} pairs</span>
+        <span className="text-slate-400 font-mono">{state.scores.p1 + state.scores.p2}/8</span>
+        <span className="text-amber-300">{p2Name}: {state.scores.p2} pairs</span>
+      </div>
+
+      <div className="w-full aspect-square grid grid-cols-4 grid-rows-4 gap-2 p-2.5 rounded-2xl bg-slate-950/75 border border-white/10 shadow-2xl">
+        {state.deck.map((symIdx, idx) => {
+          const owner = state.matchedBy[idx];
+          const isOpen = state.openIndices.includes(idx);
+          const isMismatchPeek = peekMismatch?.idxA === idx || peekMismatch?.idxB === idx;
+          const revealed = owner !== null || isOpen || isMismatchPeek;
+          const clickable = canAct && owner === null && !isOpen;
+
+          return (
+            <button
+              key={idx}
+              type="button"
+              disabled={!clickable}
+              onClick={() => onFlip(idx)}
+              className={`rounded-xl border flex items-center justify-center text-3xl transition-all ${
+                owner === 'p1'
+                  ? 'bg-rose-500/20 border-rose-400/60'
+                  : owner === 'p2'
+                  ? 'bg-amber-500/20 border-amber-400/60'
+                  : isOpen
+                  ? 'bg-purple-500/25 border-purple-400 scale-105'
+                  : isMismatchPeek
+                  ? 'bg-slate-800 border-rose-400/50'
+                  : clickable
+                  ? 'bg-slate-900 border-white/15 hover:bg-slate-800 hover:scale-[1.03] cursor-pointer'
+                  : 'bg-slate-900/70 border-white/10 cursor-default'
+              }`}
+            >
+              {revealed ? MEMORY_SYMBOLS[symIdx] : <span className="text-lg text-slate-500 font-black">?</span>}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+const DiceSprintBoard: React.FC<{
+  state: DiceDuelState;
+  canAct: boolean;
+  p1Name: string;
+  p2Name: string;
+  onAction: (act: string) => void;
+}> = ({ state, canAct, p1Name, p2Name, onAction }) => {
+  const pipMap: Record<number, number[]> = {
+    1: [4],
+    2: [0, 8],
+    3: [0, 4, 8],
+    4: [0, 2, 6, 8],
+    5: [0, 2, 4, 6, 8],
+    6: [0, 2, 3, 5, 6, 8]
+  };
+  const face = state.lastRoll || 6;
+  const activePips = pipMap[face] || pipMap[1];
+
+  return (
+    <div className="w-full max-w-[440px] flex flex-col items-center gap-4 p-4 rounded-2xl bg-slate-950/75 border border-white/10 shadow-2xl">
+      {/* Race to 50 Scorebars */}
+      <div className="w-full flex flex-col gap-2.5">
+        <div>
+          <div className="flex justify-between text-xs font-extrabold mb-1">
+            <span className="text-rose-300">{p1Name}</span>
+            <span className="font-mono text-white">{state.scores.p1} / {state.target}</span>
+          </div>
+          <div className="h-3 rounded-full bg-black/50 overflow-hidden border border-white/10">
+            <div
+              className="h-full bg-gradient-to-r from-rose-500 to-pink-400 transition-all duration-300"
+              style={{ width: `${Math.min(100, (state.scores.p1 / state.target) * 100)}%` }}
+            />
+          </div>
+        </div>
+
+        <div>
+          <div className="flex justify-between text-xs font-extrabold mb-1">
+            <span className="text-amber-300">{p2Name}</span>
+            <span className="font-mono text-white">{state.scores.p2} / {state.target}</span>
+          </div>
+          <div className="h-3 rounded-full bg-black/50 overflow-hidden border border-white/10">
+            <div
+              className="h-full bg-gradient-to-r from-amber-500 to-yellow-300 transition-all duration-300"
+              style={{ width: `${Math.min(100, (state.scores.p2 / state.target) * 100)}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Die Visual + Turn Bank */}
+      <div className="flex items-center gap-6 py-2">
+        <div
+          className={`w-24 h-24 rounded-2xl border-2 p-3 grid grid-cols-3 grid-rows-3 gap-1.5 shadow-2xl ${
+            state.bustedBy
+              ? 'bg-rose-500/20 border-rose-400'
+              : 'bg-slate-100 border-white'
+          }`}
+        >
+          {Array.from({ length: 9 }).map((_, idx) => (
+            <div key={idx} className="flex items-center justify-center">
+              {activePips.includes(idx) && (
+                <span
+                  className={`w-3.5 h-3.5 rounded-full ${
+                    state.bustedBy ? 'bg-rose-400' : 'bg-slate-900'
+                  }`}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+            Turn Bank
+          </span>
+          <span className="text-4xl font-black font-mono text-orange-300 tabular-nums">
+            +{state.turnBank}
+          </span>
+          <span className="text-xs text-slate-300 min-h-[18px]">
+            {state.lastEvent || 'Roll a 2–6 to build points'}
+          </span>
+        </div>
+      </div>
+
+      {/* Roll / Hold Controls */}
+      <div className="flex items-center gap-2.5 w-full">
+        <button
+          type="button"
+          disabled={!canAct}
+          onClick={() => onAction(`r:${Math.floor(Math.random() * 6) + 1}`)}
+          className="flex-1 py-3 rounded-xl bg-orange-400 hover:bg-orange-300 text-black font-extrabold text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-45 shadow-lg transition-transform hover:scale-[1.01]"
+        >
+          <Dices className="w-4 h-4" />
+          <span>Roll Dice</span>
+        </button>
+        <button
+          type="button"
+          disabled={!canAct || state.turnBank <= 0}
+          onClick={() => onAction('h')}
+          className="flex-1 py-3 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black font-extrabold text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-40 shadow-lg transition-transform hover:scale-[1.01]"
+        >
+          <Check className="w-4 h-4" />
+          <span>Hold (+{state.turnBank})</span>
+        </button>
+      </div>
+    </div>
+  );
+};
+

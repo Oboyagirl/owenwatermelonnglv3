@@ -81,9 +81,10 @@ export interface ChessRoomViewPayload {
     serverNow: number;
     timeoutWinner: PieceColor | 'draw' | null;
   };
+  creatorAuthUid?: string;
   players: {
-    w: { name: string; elo: number; connected: boolean } | null;
-    b: { name: string; elo: number; connected: boolean } | null;
+    w: { uid?: string; name: string; elo: number; connected: boolean } | null;
+    b: { uid?: string; name: string; elo: number; connected: boolean } | null;
   };
 }
 
@@ -290,9 +291,11 @@ export function roomDocToViewPayload(
       serverNow: now,
       timeoutWinner: docData.timeoutWinner || null
     },
+    creatorAuthUid: docData.creatorAuthUid || undefined,
     players: {
       w: docData.whiteAuthUid
         ? {
+            uid: docData.whiteAuthUid,
             name: docData.whiteName || 'White',
             elo: docData.whiteElo || 1200,
             connected: true
@@ -300,6 +303,7 @@ export function roomDocToViewPayload(
         : null,
       b: docData.blackAuthUid
         ? {
+            uid: docData.blackAuthUid,
             name: docData.blackName || 'Black',
             elo: docData.blackElo || 1200,
             connected: true

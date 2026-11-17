@@ -321,7 +321,7 @@ export function attachArcadeRoomServer(httpServer: http.Server, app: express.Exp
           return;
         }
 
-        const action = String(msg.action || '').trim().slice(0, 32);
+        const action = String(msg.action || '').trim().slice(0, 800);
         const res = applyArcadeAction(room.state, action);
         if (!res.valid) {
           sendJson(ws, { type: 'room:error', message: 'Illegal move rejected by server.' });

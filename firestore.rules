@@ -139,7 +139,7 @@ service cloud.firestore {
       ]) &&
       isValidRoomCode(data.code) &&
       data.gameType is string && data.gameType.size() > 0 && data.gameType.size() <= 32 &&
-      data.gameType in ['connect4', 'checkers', 'reversi', 'dots-and-boxes', 'gomoku', 'ultimate-ttt', 'mancala', 'tictactoe'] &&
+      data.gameType in ['connect4', 'checkers', 'reversi', 'dots-and-boxes', 'gomoku', 'ultimate-ttt', 'mancala', 'tictactoe', 'draw-guess', 'battleship', 'memory-match', 'dice-duel'] &&
       data.creatorAuthUid is string && data.creatorAuthUid.size() > 0 && data.creatorAuthUid.size() <= 128 &&
       data.status is string && data.status.size() > 0 && data.status.size() <= 16 && data.status in ['waiting', 'active', 'finished'] &&
       (data.p1AuthUid == null || (data.p1AuthUid is string && data.p1AuthUid.size() > 0 && data.p1AuthUid.size() <= 128)) &&
@@ -149,7 +149,7 @@ service cloud.firestore {
       (data.p2PlayerId == null || (data.p2PlayerId is string && data.p2PlayerId.size() > 0 && data.p2PlayerId.size() <= 64)) &&
       (data.p2Name == null || (data.p2Name is string && data.p2Name.size() > 0 && data.p2Name.size() <= 24)) &&
       data.moves is list && data.moves.size() <= 600 &&
-      (data.moves.size() == 0 || (data.moves[0] is string && data.moves[0].size() >= 1 && data.moves[0].size() <= 32)) &&
+      (data.moves.size() == 0 || (data.moves[0] is string && data.moves[0].size() >= 1 && data.moves[0].size() <= 800)) &&
       data.turn is string && data.turn.size() == 2 && data.turn in ['p1', 'p2'] &&
       (data.winner == null || (data.winner is string && data.winner.size() >= 2 && data.winner.size() <= 4 && data.winner in ['p1', 'p2', 'draw'])) &&
       (data.resignedWinner == null || (data.resignedWinner is string && data.resignedWinner.size() == 2 && data.resignedWinner in ['p1', 'p2'])) &&
@@ -278,7 +278,7 @@ service cloud.firestore {
         data.gameKind is string && data.gameKind.size() > 0 && data.gameKind.size() <= 16 &&
         data.gameKind in ['chess', 'arcade'] &&
         data.gameType is string && data.gameType.size() > 0 && data.gameType.size() <= 32 &&
-        data.gameType in ['chess', 'connect4', 'checkers', 'reversi', 'dots-and-boxes', 'gomoku', 'ultimate-ttt', 'mancala', 'tictactoe'] &&
+        data.gameType in ['chess', 'connect4', 'checkers', 'reversi', 'dots-and-boxes', 'gomoku', 'ultimate-ttt', 'mancala', 'tictactoe', 'draw-guess', 'battleship', 'memory-match', 'dice-duel'] &&
         data.gameTitle is string && data.gameTitle.size() > 0 && data.gameTitle.size() <= 64 &&
         isValidRoomCode(data.roomCode) &&
         data.status is string && data.status.size() > 0 && data.status.size() <= 16 &&
@@ -632,7 +632,7 @@ service cloud.firestore {
             incoming().moves.size() == existing().moves.size() + 1 &&
             incoming().moves[existing().moves.size()] is string &&
             incoming().moves[existing().moves.size()].size() >= 1 &&
-            incoming().moves[existing().moves.size()].size() <= 32
+            incoming().moves[existing().moves.size()].size() <= 800
           ) ||
           // Action: Participant Resigns
           (

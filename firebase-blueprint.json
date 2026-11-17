@@ -539,7 +539,7 @@
     },
     "arcadeRoom": {
       "title": "Multiplayer Arcade Room",
-      "description": "Zero-delay multiplayer room synchronized via Firestore for 8 room-code games",
+      "description": "Zero-delay multiplayer room synchronized via Firestore for 12 room-code games",
       "type": "object",
       "properties": {
         "code": {
@@ -560,7 +560,11 @@
             "gomoku",
             "ultimate-ttt",
             "mancala",
-            "tictactoe"
+            "tictactoe",
+            "draw-guess",
+            "battleship",
+            "memory-match",
+            "dice-duel"
           ],
           "maxLength": 32
         },
@@ -717,7 +721,11 @@
             "gomoku",
             "ultimate-ttt",
             "mancala",
-            "tictactoe"
+            "tictactoe",
+            "draw-guess",
+            "battleship",
+            "memory-match",
+            "dice-duel"
           ],
           "maxLength": 32
         },

@@ -6,7 +6,11 @@ export type ArcadeGameType =
   | 'gomoku'
   | 'ultimate-ttt'
   | 'mancala'
-  | 'tictactoe';
+  | 'tictactoe'
+  | 'draw-guess'
+  | 'battleship'
+  | 'memory-match'
+  | 'dice-duel';
 
 export type ArcadePlayer = 'p1' | 'p2';
 export type ArcadeWinner = ArcadePlayer | 'draw' | null;
@@ -111,6 +115,50 @@ export const ARCADE_GAMES: ArcadeGameMeta[] = [
     rulesSummary: 'Fast 3×3 showdown. Great for instant rematches and quick reflex rounds with room codes.',
     p1Label: 'X',
     p2Label: 'O'
+  },
+  {
+    id: 'draw-guess',
+    name: 'Draw & Guess',
+    tagline: 'Sketch clues live & guess the secret word',
+    emoji: '🎨',
+    avgTime: '4 min',
+    accentColor: '#f472b6',
+    rulesSummary: '6 rounds of Pictionary-style sketching! Pick or type a secret word, draw it on the canvas, and send it to your opponent to guess in up to 3 tries.',
+    p1Label: 'Artist P1',
+    p2Label: 'Artist P2'
+  },
+  {
+    id: 'battleship',
+    name: 'Battleship',
+    tagline: 'Hide your fleet & hunt enemy ships on 8×8 waters',
+    emoji: '🚢',
+    avgTime: '4 min',
+    accentColor: '#0ea5e9',
+    rulesSummary: 'Place 4 ships (sizes 4, 3, 2, 2) on your 8×8 grid, then trade salvos! First commander to sink all 11 enemy hull segments wins.',
+    p1Label: 'Admiral 1',
+    p2Label: 'Admiral 2'
+  },
+  {
+    id: 'memory-match',
+    name: 'Memory Match',
+    tagline: 'Flip pairs & streak bonus turns on a 4×4 deck',
+    emoji: '🃏',
+    avgTime: '2 min',
+    accentColor: '#c084fc',
+    rulesSummary: 'Take turns flipping 2 cards from the 4×4 deck. Finding a matching pair scores a point and grants another turn!',
+    p1Label: 'Player 1',
+    p2Label: 'Player 2'
+  },
+  {
+    id: 'dice-duel',
+    name: 'Dice Sprint',
+    tagline: 'Push-your-luck dice race to 50 points',
+    emoji: '🎲',
+    avgTime: '2 min',
+    accentColor: '#fb923c',
+    rulesSummary: 'Roll to add points to your turn bank, or Hold to lock them in. Rolling a 1 busts your turn bank! First to 50 points wins.',
+    p1Label: 'Roller 1',
+    p2Label: 'Roller 2'
   }
 ];
 
@@ -217,6 +265,95 @@ export interface TicTacToeState {
   moveCount: number;
 }
 
+export interface DrawStroke {
+  colorIdx: number;
+  sizeIdx: number;
+  pts: [number, number][]; // logical coordinates: x in 0..200, y in 0..150
+}
+
+export interface DrawGuessEntry {
+  text: string;
+  hit: boolean;
+  hint?: string;
+}
+
+export interface DrawGuessState {
+  gameType: 'draw-guess';
+  round: number;
+  maxRounds: number;
+  phase: 'pick' | 'draw' | 'guess';
+  drawer: ArcadePlayer;
+  guesser: ArcadePlayer;
+  turn: ArcadePlayer;
+  rerollCount: number;
+  wordChoices: string[];
+  word: string | null;
+  strokes: DrawStroke[];
+  guesses: DrawGuessEntry[];
+  scores: { p1: number; p2: number };
+  lastRoundResult: {
+    round: number;
+    word: string;
+    guessed: boolean;
+    points: number;
+    guesser: ArcadePlayer;
+  } | null;
+  winner: ArcadeWinner;
+  moveCount: number;
+}
+
+export interface BattleshipShipSpec {
+  r: number;
+  c: number;
+  dir: 'h' | 'v';
+  size: number;
+}
+
+export interface BattleshipState {
+  gameType: 'battleship';
+  phase: 'setup' | 'battle';
+  fleets: {
+    p1: BattleshipShipSpec[] | null;
+    p2: BattleshipShipSpec[] | null;
+  };
+  shots: {
+    p1: ('hit' | 'miss' | null)[][]; // shots fired by p1 onto p2's grid
+    p2: ('hit' | 'miss' | null)[][]; // shots fired by p2 onto p1's grid
+  };
+  hitsCount: { p1: number; p2: number };
+  sunkBy: { p1: number[]; p2: number[] };
+  lastShot: { shooter: ArcadePlayer; r: number; c: number; result: 'hit' | 'miss' | 'sunk' } | null;
+  turn: ArcadePlayer;
+  winner: ArcadeWinner;
+  moveCount: number;
+}
+
+export interface MemoryMatchState {
+  gameType: 'memory-match';
+  deck: number[]; // length 16, symbol indices 0..7
+  matchedBy: (ArcadePlayer | null)[]; // length 16
+  openIndices: number[]; // 0 or 1 currently revealed card
+  lastPair: { idxA: number; idxB: number; matched: boolean; by: ArcadePlayer } | null;
+  seenIndices: number[];
+  scores: { p1: number; p2: number };
+  turn: ArcadePlayer;
+  winner: ArcadeWinner;
+  moveCount: number;
+}
+
+export interface DiceDuelState {
+  gameType: 'dice-duel';
+  target: number;
+  scores: { p1: number; p2: number };
+  turnBank: number;
+  lastRoll: number | null;
+  bustedBy: ArcadePlayer | null;
+  lastEvent: string | null;
+  turn: ArcadePlayer;
+  winner: ArcadeWinner;
+  moveCount: number;
+}
+
 export type ArcadeState =
   | Connect4State
   | CheckersState
@@ -225,7 +362,11 @@ export type ArcadeState =
   | GomokuState
   | UltimateTTTState
   | MancalaState
-  | TicTacToeState;
+  | TicTacToeState
+  | DrawGuessState
+  | BattleshipState
+  | MemoryMatchState
+  | DiceDuelState;
 
 export interface ApplyArcadeResult {
   valid: boolean;
@@ -353,7 +494,414 @@ export function createInitialArcadeState(gameType: ArcadeGameType): ArcadeState 
         lastCell: null,
         moveCount: 0
       };
+
+    case 'draw-guess':
+      return {
+        gameType: 'draw-guess',
+        round: 1,
+        maxRounds: 6,
+        phase: 'pick',
+        drawer: 'p1',
+        guesser: 'p2',
+        turn: 'p1',
+        rerollCount: 0,
+        wordChoices: getDrawWordChoices(1, 0),
+        word: null,
+        strokes: [],
+        guesses: [],
+        scores: { p1: 0, p2: 0 },
+        lastRoundResult: null,
+        winner: null,
+        moveCount: 0
+      };
+
+    case 'battleship':
+      return {
+        gameType: 'battleship',
+        phase: 'setup',
+        fleets: { p1: null, p2: null },
+        shots: {
+          p1: Array.from({ length: 8 }, () => Array<'hit' | 'miss' | null>(8).fill(null)),
+          p2: Array.from({ length: 8 }, () => Array<'hit' | 'miss' | null>(8).fill(null))
+        },
+        hitsCount: { p1: 0, p2: 0 },
+        sunkBy: { p1: [], p2: [] },
+        lastShot: null,
+        turn: 'p1',
+        winner: null,
+        moveCount: 0
+      };
+
+    case 'memory-match':
+      return {
+        gameType: 'memory-match',
+        deck: buildMemoryDeck(101),
+        matchedBy: Array<ArcadePlayer | null>(16).fill(null),
+        openIndices: [],
+        lastPair: null,
+        seenIndices: [],
+        scores: { p1: 0, p2: 0 },
+        turn: 'p1',
+        winner: null,
+        moveCount: 0
+      };
+
+    case 'dice-duel':
+      return {
+        gameType: 'dice-duel',
+        target: 50,
+        scores: { p1: 0, p2: 0 },
+        turnBank: 0,
+        lastRoll: null,
+        bustedBy: null,
+        lastEvent: null,
+        turn: 'p1',
+        winner: null,
+        moveCount: 0
+      };
   }
+}
+
+// ---------------- DRAW & GUESS / BATTLESHIP / MEMORY SHARED DATA ----------------
+
+export const DRAW_COLORS = [
+  '#0f172a', // 0: Ink Black
+  '#ef4444', // 1: Red
+  '#f97316', // 2: Orange
+  '#eab308', // 3: Yellow
+  '#22c55e', // 4: Green
+  '#3b82f6', // 5: Blue
+  '#a855f7', // 6: Purple
+  '#ec4899', // 7: Pink
+  '#92400e', // 8: Brown
+  '#ffffff'  // 9: Eraser (White)
+];
+
+export const DRAW_BRUSH_SIZES = [4, 9, 16];
+
+export const DRAW_WORD_BANK: string[] = [
+  'house',
+  'sun',
+  'tree',
+  'cat',
+  'fish',
+  'rocket',
+  'car',
+  'boat',
+  'crown',
+  'heart',
+  'star',
+  'flower',
+  'apple',
+  'pizza',
+  'robot',
+  'ghost',
+  'guitar',
+  'snowman',
+  'umbrella',
+  'diamond',
+  'mountain',
+  'moon',
+  'watermelon',
+  'trophy',
+  'glasses',
+  'key',
+  'cake',
+  'kite',
+  'lightning',
+  'smiley'
+];
+
+// Multi-stroke recognizable vector drawings (200x150 logical canvas) for AI Bots
+const BOT_DRAW_PATHS: Record<string, { colorIdx: number; sizeIdx: number; pts: [number, number][] }[]> = {
+  house: [
+    { colorIdx: 0, sizeIdx: 1, pts: [[55, 70], [145, 70], [145, 130], [55, 130], [55, 70]] },
+    { colorIdx: 1, sizeIdx: 1, pts: [[45, 72], [100, 26], [155, 72]] },
+    { colorIdx: 8, sizeIdx: 1, pts: [[90, 130], [90, 96], [110, 96], [110, 130]] },
+    { colorIdx: 5, sizeIdx: 0, pts: [[66, 84], [82, 84], [82, 100], [66, 100], [66, 84]] }
+  ],
+  sun: [
+    { colorIdx: 3, sizeIdx: 2, pts: [[100, 48], [120, 56], [128, 75], [120, 95], [100, 103], [80, 95], [72, 75], [80, 56], [100, 48]] },
+    { colorIdx: 2, sizeIdx: 1, pts: [[100, 20], [100, 38]] },
+    { colorIdx: 2, sizeIdx: 1, pts: [[100, 113], [100, 132]] },
+    { colorIdx: 2, sizeIdx: 1, pts: [[44, 75], [62, 75]] },
+    { colorIdx: 2, sizeIdx: 1, pts: [[138, 75], [156, 75]] },
+    { colorIdx: 2, sizeIdx: 1, pts: [[60, 36], [73, 49]] },
+    { colorIdx: 2, sizeIdx: 1, pts: [[127, 101], [140, 114]] }
+  ],
+  tree: [
+    { colorIdx: 8, sizeIdx: 2, pts: [[94, 86], [94, 134], [106, 134], [106, 86]] },
+    { colorIdx: 4, sizeIdx: 2, pts: [[100, 24], [134, 52], [126, 88], [74, 88], [66, 52], [100, 24]] },
+    { colorIdx: 1, sizeIdx: 1, pts: [[88, 56], [90, 58]] },
+    { colorIdx: 1, sizeIdx: 1, pts: [[112, 64], [114, 66]] }
+  ],
+  cat: [
+    { colorIdx: 0, sizeIdx: 1, pts: [[68, 52], [62, 24], [86, 42], [114, 42], [138, 24], [132, 52], [140, 82], [126, 106], [74, 106], [60, 82], [68, 52]] },
+    { colorIdx: 5, sizeIdx: 1, pts: [[84, 68], [86, 70]] },
+    { colorIdx: 5, sizeIdx: 1, pts: [[114, 68], [116, 70]] },
+    { colorIdx: 7, sizeIdx: 1, pts: [[96, 80], [104, 80], [100, 86], [96, 80]] },
+    { colorIdx: 0, sizeIdx: 0, pts: [[46, 76], [72, 82]] },
+    { colorIdx: 0, sizeIdx: 0, pts: [[154, 76], [128, 82]] }
+  ],
+  fish: [
+    { colorIdx: 5, sizeIdx: 1, pts: [[56, 75], [84, 46], [126, 54], [142, 75], [126, 96], [84, 104], [56, 75]] },
+    { colorIdx: 2, sizeIdx: 1, pts: [[142, 75], [166, 50], [166, 100], [142, 75]] },
+    { colorIdx: 0, sizeIdx: 1, pts: [[74, 68], [76, 70]] },
+    { colorIdx: 5, sizeIdx: 0, pts: [[38, 58], [40, 56]] },
+    { colorIdx: 5, sizeIdx: 0, pts: [[28, 44], [31, 42]] }
+  ],
+  rocket: [
+    { colorIdx: 5, sizeIdx: 1, pts: [[100, 20], [118, 52], [118, 108], [82, 108], [82, 52], [100, 20]] },
+    { colorIdx: 1, sizeIdx: 1, pts: [[82, 86], [62, 114], [82, 108]] },
+    { colorIdx: 1, sizeIdx: 1, pts: [[118, 86], [138, 114], [118, 108]] },
+    { colorIdx: 2, sizeIdx: 2, pts: [[90, 112], [100, 138], [110, 112]] },
+    { colorIdx: 3, sizeIdx: 1, pts: [[100, 62], [106, 68], [100, 74], [94, 68], [100, 62]] }
+  ],
+  car: [
+    { colorIdx: 1, sizeIdx: 1, pts: [[40, 86], [56, 86], [70, 60], [128, 60], [142, 86], [162, 86], [162, 110], [40, 110], [40, 86]] },
+    { colorIdx: 0, sizeIdx: 2, pts: [[64, 110], [74, 118], [64, 126], [54, 118], [64, 110]] },
+    { colorIdx: 0, sizeIdx: 2, pts: [[136, 110], [146, 118], [136, 126], [126, 118], [136, 110]] },
+    { colorIdx: 5, sizeIdx: 0, pts: [[74, 66], [124, 66], [134, 84], [64, 84], [74, 66]] }
+  ],
+  boat: [
+    { colorIdx: 8, sizeIdx: 1, pts: [[44, 92], [156, 92], [136, 122], [64, 122], [44, 92]] },
+    { colorIdx: 0, sizeIdx: 1, pts: [[100, 92], [100, 26]] },
+    { colorIdx: 1, sizeIdx: 1, pts: [[100, 30], [144, 80], [100, 80]] },
+    { colorIdx: 5, sizeIdx: 1, pts: [[26, 130], [60, 124], [100, 132], [140, 124], [174, 130]] }
+  ],
+  crown: [
+    { colorIdx: 3, sizeIdx: 2, pts: [[48, 108], [44, 52], [74, 78], [100, 38], [126, 78], [156, 52], [152, 108], [48, 108]] },
+    { colorIdx: 1, sizeIdx: 1, pts: [[100, 84], [102, 86]] },
+    { colorIdx: 5, sizeIdx: 1, pts: [[68, 88], [70, 90]] },
+    { colorIdx: 5, sizeIdx: 1, pts: [[132, 88], [134, 90]] }
+  ],
+  heart: [
+    { colorIdx: 1, sizeIdx: 2, pts: [[100, 56], [82, 34], [54, 42], [52, 74], [100, 124], [148, 74], [146, 42], [118, 34], [100, 56]] }
+  ],
+  star: [
+    { colorIdx: 3, sizeIdx: 2, pts: [[100, 22], [116, 62], [158, 64], [124, 90], [136, 130], [100, 106], [64, 130], [76, 90], [42, 64], [84, 62], [100, 22]] }
+  ],
+  flower: [
+    { colorIdx: 4, sizeIdx: 1, pts: [[100, 86], [100, 136]] },
+    { colorIdx: 4, sizeIdx: 1, pts: [[100, 114], [124, 102]] },
+    { colorIdx: 7, sizeIdx: 2, pts: [[100, 44], [118, 30], [130, 50], [144, 66], [124, 82], [100, 88], [76, 82], [56, 66], [70, 50], [82, 30], [100, 44]] },
+    { colorIdx: 3, sizeIdx: 2, pts: [[100, 56], [110, 66], [100, 76], [90, 66], [100, 56]] }
+  ],
+  apple: [
+    { colorIdx: 1, sizeIdx: 2, pts: [[100, 46], [130, 44], [144, 72], [132, 114], [100, 124], [68, 114], [56, 72], [70, 44], [100, 46]] },
+    { colorIdx: 8, sizeIdx: 1, pts: [[100, 46], [104, 24]] },
+    { colorIdx: 4, sizeIdx: 1, pts: [[102, 32], [124, 24], [118, 38], [102, 32]] }
+  ],
+  pizza: [
+    { colorIdx: 2, sizeIdx: 2, pts: [[56, 40], [144, 40], [100, 130], [56, 40]] },
+    { colorIdx: 3, sizeIdx: 1, pts: [[64, 50], [136, 50]] },
+    { colorIdx: 1, sizeIdx: 2, pts: [[88, 68], [92, 72]] },
+    { colorIdx: 1, sizeIdx: 2, pts: [[112, 66], [116, 70]] },
+    { colorIdx: 1, sizeIdx: 2, pts: [[98, 96], [102, 100]] }
+  ],
+  robot: [
+    { colorIdx: 5, sizeIdx: 1, pts: [[68, 44], [132, 44], [132, 92], [68, 92], [68, 44]] },
+    { colorIdx: 0, sizeIdx: 1, pts: [[100, 44], [100, 24]] },
+    { colorIdx: 1, sizeIdx: 1, pts: [[100, 22], [102, 22]] },
+    { colorIdx: 3, sizeIdx: 1, pts: [[84, 62], [88, 62]] },
+    { colorIdx: 3, sizeIdx: 1, pts: [[112, 62], [116, 62]] },
+    { colorIdx: 0, sizeIdx: 1, pts: [[82, 78], [118, 78]] },
+    { colorIdx: 5, sizeIdx: 1, pts: [[74, 92], [126, 92], [126, 132], [74, 132], [74, 92]] }
+  ],
+  ghost: [
+    { colorIdx: 6, sizeIdx: 1, pts: [[64, 124], [64, 60], [82, 32], [118, 32], [136, 60], [136, 124], [118, 110], [100, 126], [82, 110], [64, 124]] },
+    { colorIdx: 0, sizeIdx: 2, pts: [[86, 66], [88, 68]] },
+    { colorIdx: 0, sizeIdx: 2, pts: [[114, 66], [116, 68]] },
+    { colorIdx: 0, sizeIdx: 1, pts: [[94, 88], [106, 88]] }
+  ],
+  guitar: [
+    { colorIdx: 8, sizeIdx: 2, pts: [[82, 74], [116, 74], [128, 100], [116, 132], [82, 132], [70, 100], [82, 74]] },
+    { colorIdx: 0, sizeIdx: 1, pts: [[99, 74], [99, 20]] },
+    { colorIdx: 0, sizeIdx: 1, pts: [[92, 20], [106, 20]] },
+    { colorIdx: 3, sizeIdx: 1, pts: [[99, 98], [105, 104], [99, 110], [93, 104], [99, 98]] }
+  ],
+  snowman: [
+    { colorIdx: 5, sizeIdx: 1, pts: [[100, 82], [126, 94], [130, 118], [100, 134], [70, 118], [74, 94], [100, 82]] },
+    { colorIdx: 5, sizeIdx: 1, pts: [[100, 44], [118, 54], [118, 72], [100, 82], [82, 72], [82, 54], [100, 44]] },
+    { colorIdx: 0, sizeIdx: 1, pts: [[76, 44], [124, 44]] },
+    { colorIdx: 0, sizeIdx: 1, pts: [[86, 44], [86, 26], [114, 26], [114, 44]] },
+    { colorIdx: 2, sizeIdx: 1, pts: [[100, 62], [116, 65]] }
+  ],
+  umbrella: [
+    { colorIdx: 6, sizeIdx: 2, pts: [[48, 78], [66, 42], [100, 32], [134, 42], [152, 78], [126, 72], [100, 78], [74, 72], [48, 78]] },
+    { colorIdx: 0, sizeIdx: 1, pts: [[100, 32], [100, 122], [114, 128], [120, 118]] }
+  ],
+  diamond: [
+    { colorIdx: 5, sizeIdx: 1, pts: [[68, 44], [132, 44], [154, 68], [100, 128], [46, 68], [68, 44]] },
+    { colorIdx: 5, sizeIdx: 0, pts: [[46, 68], [154, 68]] },
+    { colorIdx: 5, sizeIdx: 0, pts: [[68, 44], [100, 128], [132, 44]] }
+  ],
+  mountain: [
+    { colorIdx: 8, sizeIdx: 2, pts: [[34, 124], [84, 40], [124, 124]] },
+    { colorIdx: 8, sizeIdx: 2, pts: [[94, 124], [134, 54], [170, 124]] },
+    { colorIdx: 5, sizeIdx: 1, pts: [[70, 64], [84, 68], [98, 62]] }
+  ],
+  moon: [
+    { colorIdx: 3, sizeIdx: 2, pts: [[118, 30], [80, 44], [68, 76], [82, 110], [118, 124], [94, 102], [90, 76], [96, 48], [118, 30]] }
+  ],
+  watermelon: [
+    { colorIdx: 4, sizeIdx: 2, pts: [[46, 66], [70, 112], [100, 124], [130, 112], [154, 66]] },
+    { colorIdx: 1, sizeIdx: 2, pts: [[54, 66], [146, 66], [124, 104], [76, 104], [54, 66]] },
+    { colorIdx: 0, sizeIdx: 0, pts: [[84, 78], [86, 82]] },
+    { colorIdx: 0, sizeIdx: 0, pts: [[102, 86], [104, 90]] },
+    { colorIdx: 0, sizeIdx: 0, pts: [[116, 76], [118, 80]] }
+  ],
+  trophy: [
+    { colorIdx: 3, sizeIdx: 2, pts: [[68, 36], [132, 36], [122, 86], [78, 86], [68, 36]] },
+    { colorIdx: 3, sizeIdx: 1, pts: [[100, 86], [100, 118]] },
+    { colorIdx: 8, sizeIdx: 2, pts: [[76, 120], [124, 120]] },
+    { colorIdx: 3, sizeIdx: 1, pts: [[68, 44], [50, 52], [58, 72], [74, 72]] },
+    { colorIdx: 3, sizeIdx: 1, pts: [[132, 44], [150, 52], [142, 72], [126, 72]] }
+  ]
+};
+
+export const MEMORY_SYMBOLS = ['🍉', '🚀', '💎', '🦊', '👑', '⚡', '🎸', '🌈'];
+
+export function buildMemoryDeck(seedInput: number): number[] {
+  const deck = [0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7];
+  let seed = (Math.abs(Math.floor(seedInput)) || 101) % 2147483647;
+  if (seed <= 0) seed += 2147483646;
+  for (let i = deck.length - 1; i > 0; i--) {
+    seed = (seed * 48271) % 2147483647;
+    const j = seed % (i + 1);
+    const tmp = deck[i];
+    deck[i] = deck[j];
+    deck[j] = tmp;
+  }
+  return deck;
+}
+
+function getDrawWordChoices(round: number, rerollCount: number): string[] {
+  const drawableKeys = Object.keys(BOT_DRAW_PATHS);
+  const start = ((round - 1) * 3 + rerollCount * 5) % drawableKeys.length;
+  return [
+    drawableKeys[start % drawableKeys.length],
+    drawableKeys[(start + 7) % drawableKeys.length],
+    drawableKeys[(start + 13) % drawableKeys.length]
+  ];
+}
+
+function computeGuessHint(secret: string, attempt: string): string {
+  const a = secret.toLowerCase().trim();
+  const b = attempt.toLowerCase().trim();
+  if (!a || !b) return '';
+  if (Math.abs(a.length - b.length) <= 2) {
+    // Simple Levenshtein check
+    const dp: number[][] = Array.from({ length: a.length + 1 }, () =>
+      Array<number>(b.length + 1).fill(0)
+    );
+    for (let i = 0; i <= a.length; i++) dp[i][0] = i;
+    for (let j = 0; j <= b.length; j++) dp[0][j] = j;
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
+      }
+    }
+    if (dp[a.length][b.length] <= 2) return 'Very close!';
+  }
+  if (a[0] === b[0]) return `Starts with "${a[0].toUpperCase()}"!`;
+  return `Word has ${a.length} letters`;
+}
+
+export function serializeDrawStrokeAction(stroke: DrawStroke): string {
+  const colorIdx = Math.max(0, Math.min(DRAW_COLORS.length - 1, Math.round(stroke.colorIdx)));
+  const sizeIdx = Math.max(0, Math.min(DRAW_BRUSH_SIZES.length - 1, Math.round(stroke.sizeIdx)));
+  const ptsStr = stroke.pts
+    .map(([x, y]) => `${Math.max(0, Math.min(200, Math.round(x)))},${Math.max(0, Math.min(150, Math.round(y)))}`)
+    .join(';');
+  return `ds:${colorIdx}:${sizeIdx}:${ptsStr}`.slice(0, 760);
+}
+
+export const BATTLESHIP_SIZES = [4, 3, 2, 2] as const;
+
+export function getShipCells(ship: BattleshipShipSpec): [number, number][] {
+  const out: [number, number][] = [];
+  for (let i = 0; i < ship.size; i++) {
+    out.push(ship.dir === 'h' ? [ship.r, ship.c + i] : [ship.r + i, ship.c]);
+  }
+  return out;
+}
+
+export function validateBattleshipFleet(specs: BattleshipShipSpec[]): boolean {
+  if (specs.length !== BATTLESHIP_SIZES.length) return false;
+  const occupied = new Set<string>();
+  for (let i = 0; i < specs.length; i++) {
+    const s = specs[i];
+    if (s.size !== BATTLESHIP_SIZES[i]) return false;
+    if (s.dir !== 'h' && s.dir !== 'v') return false;
+    for (const [r, c] of getShipCells(s)) {
+      if (r < 0 || r >= 8 || c < 0 || c >= 8) return false;
+      const key = `${r},${c}`;
+      if (occupied.has(key)) return false;
+      occupied.add(key);
+    }
+  }
+  return true;
+}
+
+export function parseBattleshipFleetAction(action: string): BattleshipShipSpec[] | null {
+  if (!action.startsWith('f:')) return null;
+  const parts = action.slice(2).split(';');
+  if (parts.length !== BATTLESHIP_SIZES.length) return null;
+  const specs: BattleshipShipSpec[] = [];
+  for (let i = 0; i < parts.length; i++) {
+    const m = /^([0-7]),([0-7]),(h|v)$/.exec(parts[i]);
+    if (!m) return null;
+    specs.push({
+      r: Number(m[1]),
+      c: Number(m[2]),
+      dir: m[3] as 'h' | 'v',
+      size: BATTLESHIP_SIZES[i]
+    });
+  }
+  return validateBattleshipFleet(specs) ? specs : null;
+}
+
+export function serializeBattleshipFleetAction(specs: BattleshipShipSpec[]): string {
+  return `f:${specs.map(s => `${s.r},${s.c},${s.dir}`).join(';')}`;
+}
+
+export function generateRandomBattleshipFleet(): BattleshipShipSpec[] {
+  for (let attempt = 0; attempt < 200; attempt++) {
+    const occupied = new Set<string>();
+    const specs: BattleshipShipSpec[] = [];
+    let ok = true;
+    for (const size of BATTLESHIP_SIZES) {
+      let placed = false;
+      for (let tries = 0; tries < 60; tries++) {
+        const dir: 'h' | 'v' = Math.random() < 0.5 ? 'h' : 'v';
+        const maxR = dir === 'v' ? 8 - size : 7;
+        const maxC = dir === 'h' ? 8 - size : 7;
+        const r = Math.floor(Math.random() * (maxR + 1));
+        const c = Math.floor(Math.random() * (maxC + 1));
+        const cand: BattleshipShipSpec = { r, c, dir, size };
+        const cells = getShipCells(cand);
+        if (cells.every(([cr, cc]) => !occupied.has(`${cr},${cc}`))) {
+          cells.forEach(([cr, cc]) => occupied.add(`${cr},${cc}`));
+          specs.push(cand);
+          placed = true;
+          break;
+        }
+      }
+      if (!placed) {
+        ok = false;
+        break;
+      }
+    }
+    if (ok && validateBattleshipFleet(specs)) return specs;
+  }
+  return [
+    { r: 0, c: 0, dir: 'h', size: 4 },
+    { r: 2, c: 1, dir: 'v', size: 3 },
+    { r: 5, c: 3, dir: 'h', size: 2 },
+    { r: 7, c: 5, dir: 'h', size: 2 }
+  ];
 }
 
 // ---------------- HELPERS PER ENGINE ----------------
@@ -577,6 +1125,46 @@ export function getLegalArcadeActions(state: ArcadeState): string[] {
         if (!state.board[i]) cells.push(`i:${i}`);
       }
       return cells;
+    }
+
+    case 'draw-guess': {
+      if (state.phase === 'pick') {
+        return state.wordChoices.map(w => `dw:${w}`);
+      }
+      if (state.phase === 'draw') {
+        return state.strokes.length > 0 ? ['dp'] : [];
+      }
+      return state.word ? [`dg:${state.word}`, 'dq'] : ['dq'];
+    }
+
+    case 'battleship': {
+      if (state.phase === 'setup') {
+        return [serializeBattleshipFleetAction(generateRandomBattleshipFleet())];
+      }
+      const myShots = state.shots[state.turn];
+      const moves: string[] = [];
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+          if (myShots[r][c] === null) moves.push(`s:${r},${c}`);
+        }
+      }
+      return moves;
+    }
+
+    case 'memory-match': {
+      const moves: string[] = [];
+      for (let i = 0; i < 16; i++) {
+        if (state.matchedBy[i] === null && !state.openIndices.includes(i)) {
+          moves.push(state.moveCount === 0 ? `m:${i}:${Math.floor(Math.random() * 900000) + 100}` : `m:${i}`);
+        }
+      }
+      return moves;
+    }
+
+    case 'dice-duel': {
+      const moves = [`r:${Math.floor(Math.random() * 6) + 1}`];
+      if (state.turnBank > 0) moves.push('h');
+      return moves;
     }
   }
 }
@@ -1061,6 +1649,458 @@ export function applyArcadeAction(state: ArcadeState, rawAction: string): ApplyA
           winner,
           winLine,
           lastCell: idx,
+          moveCount: state.moveCount + 1
+        }
+      };
+    }
+
+    case 'draw-guess': {
+      const finishRound = (guessed: boolean, ptsGuesser: number, ptsDrawer: number): ApplyArcadeResult => {
+        const nextScores = { ...state.scores };
+        if (guessed) {
+          nextScores[state.guesser] += ptsGuesser;
+          nextScores[state.drawer] += ptsDrawer;
+        }
+        const roundResult = {
+          round: state.round,
+          word: state.word || 'mystery',
+          guessed,
+          points: ptsGuesser,
+          guesser: state.guesser
+        };
+        if (state.round >= state.maxRounds) {
+          const winner: ArcadeWinner =
+            nextScores.p1 > nextScores.p2 ? 'p1' : nextScores.p2 > nextScores.p1 ? 'p2' : 'draw';
+          return {
+            valid: true,
+            extraTurn: false,
+            capturedOrScored: guessed,
+            nextState: {
+              ...state,
+              scores: nextScores,
+              lastRoundResult: roundResult,
+              winner,
+              moveCount: state.moveCount + 1
+            }
+          };
+        }
+        const nextRound = state.round + 1;
+        const nextDrawer: ArcadePlayer = state.drawer === 'p1' ? 'p2' : 'p1';
+        const nextGuesser: ArcadePlayer = nextDrawer === 'p1' ? 'p2' : 'p1';
+        return {
+          valid: true,
+          extraTurn: false,
+          capturedOrScored: guessed,
+          nextState: {
+            gameType: 'draw-guess',
+            round: nextRound,
+            maxRounds: state.maxRounds,
+            phase: 'pick',
+            drawer: nextDrawer,
+            guesser: nextGuesser,
+            turn: nextDrawer,
+            rerollCount: 0,
+            wordChoices: getDrawWordChoices(nextRound, 0),
+            word: null,
+            strokes: [],
+            guesses: [],
+            scores: nextScores,
+            lastRoundResult: roundResult,
+            winner: null,
+            moveCount: state.moveCount + 1
+          }
+        };
+      };
+
+      if (state.phase === 'pick') {
+        if (action === 'dr') {
+          if (state.rerollCount >= 3) return invalid;
+          const nextReroll = state.rerollCount + 1;
+          return {
+            valid: true,
+            extraTurn: true,
+            capturedOrScored: false,
+            nextState: {
+              ...state,
+              rerollCount: nextReroll,
+              wordChoices: getDrawWordChoices(state.round, nextReroll),
+              moveCount: state.moveCount + 1
+            }
+          };
+        }
+        if (action.startsWith('dw:')) {
+          const chosen = action.slice(3).toLowerCase().trim().replace(/[^a-z ]/g, '').slice(0, 20).trim();
+          if (chosen.length < 2) return invalid;
+          return {
+            valid: true,
+            extraTurn: true,
+            capturedOrScored: false,
+            nextState: {
+              ...state,
+              phase: 'draw',
+              word: chosen,
+              strokes: [],
+              guesses: [],
+              turn: state.drawer,
+              moveCount: state.moveCount + 1
+            }
+          };
+        }
+        return invalid;
+      }
+
+      if (state.phase === 'draw') {
+        if (action.startsWith('ds:')) {
+          const parts = action.split(':');
+          if (parts.length < 4) return invalid;
+          const colorIdx = Number(parts[1]);
+          const sizeIdx = Number(parts[2]);
+          if (
+            !Number.isInteger(colorIdx) ||
+            colorIdx < 0 ||
+            colorIdx >= DRAW_COLORS.length ||
+            !Number.isInteger(sizeIdx) ||
+            sizeIdx < 0 ||
+            sizeIdx >= DRAW_BRUSH_SIZES.length
+          ) {
+            return invalid;
+          }
+          const rawPts = parts.slice(3).join(':').split(';').filter(Boolean);
+          if (rawPts.length === 0 || rawPts.length > 140) return invalid;
+          const pts: [number, number][] = [];
+          for (const pair of rawPts) {
+            const [xs, ys] = pair.split(',');
+            const x = Number(xs);
+            const y = Number(ys);
+            if (!Number.isFinite(x) || !Number.isFinite(y)) return invalid;
+            pts.push([Math.max(0, Math.min(200, Math.round(x))), Math.max(0, Math.min(150, Math.round(y)))]);
+          }
+          return {
+            valid: true,
+            extraTurn: true,
+            capturedOrScored: false,
+            nextState: {
+              ...state,
+              strokes: [...state.strokes, { colorIdx, sizeIdx, pts }],
+              moveCount: state.moveCount + 1
+            }
+          };
+        }
+        if (action === 'du') {
+          if (state.strokes.length === 0) return invalid;
+          return {
+            valid: true,
+            extraTurn: true,
+            capturedOrScored: false,
+            nextState: {
+              ...state,
+              strokes: state.strokes.slice(0, -1),
+              moveCount: state.moveCount + 1
+            }
+          };
+        }
+        if (action === 'dc') {
+          if (state.strokes.length === 0) return invalid;
+          return {
+            valid: true,
+            extraTurn: true,
+            capturedOrScored: false,
+            nextState: {
+              ...state,
+              strokes: [],
+              moveCount: state.moveCount + 1
+            }
+          };
+        }
+        if (action === 'dp') {
+          if (state.strokes.length === 0) return invalid;
+          return {
+            valid: true,
+            extraTurn: false,
+            capturedOrScored: false,
+            nextState: {
+              ...state,
+              phase: 'guess',
+              turn: state.guesser,
+              moveCount: state.moveCount + 1
+            }
+          };
+        }
+        return invalid;
+      }
+
+      // phase === 'guess'
+      if (action === 'dn') {
+        return {
+          valid: true,
+          extraTurn: false,
+          capturedOrScored: false,
+          nextState: {
+            ...state,
+            phase: 'draw',
+            turn: state.drawer,
+            moveCount: state.moveCount + 1
+          }
+        };
+      }
+      if (action === 'dq') {
+        return finishRound(false, 0, 0);
+      }
+      if (action.startsWith('dg:')) {
+        const guess = action.slice(3).toLowerCase().trim().replace(/[^a-z ]/g, '').slice(0, 24).trim();
+        if (!guess) return invalid;
+        const target = (state.word || '').toLowerCase().trim();
+        const hit = guess === target;
+        if (hit) {
+          const ptsGuesser = Math.max(60, 120 - state.guesses.length * 30);
+          return finishRound(true, ptsGuesser, 60);
+        }
+        const hint = computeGuessHint(target, guess);
+        const nextGuesses = [...state.guesses, { text: guess, hit: false, hint }];
+        if (nextGuesses.length >= 3) {
+          return finishRound(false, 0, 0);
+        }
+        return {
+          valid: true,
+          extraTurn: true,
+          capturedOrScored: false,
+          nextState: {
+            ...state,
+            guesses: nextGuesses,
+            moveCount: state.moveCount + 1
+          }
+        };
+      }
+      return invalid;
+    }
+
+    case 'battleship': {
+      if (state.phase === 'setup') {
+        const specs = parseBattleshipFleetAction(action);
+        if (!specs) return invalid;
+        if (state.fleets[state.turn] !== null) return invalid;
+        const nextFleets = { ...state.fleets, [state.turn]: specs };
+        const bothReady = nextFleets.p1 !== null && nextFleets.p2 !== null;
+        return {
+          valid: true,
+          extraTurn: false,
+          capturedOrScored: true,
+          nextState: {
+            ...state,
+            phase: bothReady ? 'battle' : 'setup',
+            fleets: nextFleets,
+            turn: bothReady ? 'p1' : opp,
+            moveCount: state.moveCount + 1
+          }
+        };
+      }
+
+      const m = /^s:([0-7]),([0-7])$/.exec(action);
+      if (!m) return invalid;
+      const r = Number(m[1]);
+      const c = Number(m[2]);
+      const targetFleet = state.fleets[opp];
+      if (!targetFleet) return invalid;
+      if (state.shots[state.turn][r][c] !== null) return invalid;
+
+      const myShotsGrid = state.shots[state.turn].map(row => [...row]);
+      let hitShipIdx = -1;
+      for (let i = 0; i < targetFleet.length; i++) {
+        if (getShipCells(targetFleet[i]).some(([sr, sc]) => sr === r && sc === c)) {
+          hitShipIdx = i;
+          break;
+        }
+      }
+
+      const isHit = hitShipIdx !== -1;
+      myShotsGrid[r][c] = isHit ? 'hit' : 'miss';
+
+      const nextShots = { ...state.shots, [state.turn]: myShotsGrid };
+      const nextHitsCount = {
+        ...state.hitsCount,
+        [state.turn]: state.hitsCount[state.turn] + (isHit ? 1 : 0)
+      };
+
+      let resultKind: 'hit' | 'miss' | 'sunk' = isHit ? 'hit' : 'miss';
+      const nextSunk = [...state.sunkBy[state.turn]];
+      if (isHit && !nextSunk.includes(hitShipIdx)) {
+        const sunkNow = getShipCells(targetFleet[hitShipIdx]).every(
+          ([sr, sc]) => myShotsGrid[sr][sc] === 'hit'
+        );
+        if (sunkNow) {
+          nextSunk.push(hitShipIdx);
+          resultKind = 'sunk';
+        }
+      }
+
+      const totalHull = BATTLESHIP_SIZES.reduce((a, b) => a + b, 0);
+      const winner: ArcadeWinner = nextHitsCount[state.turn] >= totalHull ? state.turn : null;
+
+      return {
+        valid: true,
+        extraTurn: false,
+        capturedOrScored: isHit,
+        nextState: {
+          ...state,
+          shots: nextShots,
+          hitsCount: nextHitsCount,
+          sunkBy: { ...state.sunkBy, [state.turn]: nextSunk },
+          lastShot: { shooter: state.turn, r, c, result: resultKind },
+          turn: winner ? state.turn : opp,
+          winner,
+          moveCount: state.moveCount + 1
+        }
+      };
+    }
+
+    case 'memory-match': {
+      const m = /^m:(\d{1,2})(?::(\d{1,7}))?$/.exec(action);
+      if (!m) return invalid;
+      const idx = Number(m[1]);
+      if (idx < 0 || idx >= 16) return invalid;
+      if (state.matchedBy[idx] !== null || state.openIndices.includes(idx)) return invalid;
+
+      const deck =
+        state.moveCount === 0 && m[2] ? buildMemoryDeck(Number(m[2])) : state.deck;
+      const nextSeen = state.seenIndices.includes(idx)
+        ? state.seenIndices
+        : [...state.seenIndices, idx];
+
+      if (state.openIndices.length === 0) {
+        return {
+          valid: true,
+          extraTurn: true,
+          capturedOrScored: false,
+          nextState: {
+            ...state,
+            deck,
+            openIndices: [idx],
+            lastPair: null,
+            seenIndices: nextSeen,
+            moveCount: state.moveCount + 1
+          }
+        };
+      }
+
+      // Second card flipped
+      const firstIdx = state.openIndices[0];
+      const isMatch = deck[firstIdx] === deck[idx];
+      const nextMatched = [...state.matchedBy];
+      const nextScores = { ...state.scores };
+
+      if (isMatch) {
+        nextMatched[firstIdx] = state.turn;
+        nextMatched[idx] = state.turn;
+        nextScores[state.turn] += 1;
+      }
+
+      const allClaimed = nextMatched.every(x => x !== null);
+      const winner: ArcadeWinner = allClaimed
+        ? nextScores.p1 > nextScores.p2
+          ? 'p1'
+          : nextScores.p2 > nextScores.p1
+          ? 'p2'
+          : 'draw'
+        : null;
+
+      return {
+        valid: true,
+        extraTurn: !winner && isMatch,
+        capturedOrScored: isMatch,
+        nextState: {
+          ...state,
+          deck,
+          matchedBy: nextMatched,
+          openIndices: [],
+          lastPair: { idxA: firstIdx, idxB: idx, matched: isMatch, by: state.turn },
+          seenIndices: nextSeen,
+          scores: nextScores,
+          turn: winner ? state.turn : isMatch ? state.turn : opp,
+          winner,
+          moveCount: state.moveCount + 1
+        }
+      };
+    }
+
+    case 'dice-duel': {
+      if (action === 'h') {
+        if (state.turnBank <= 0) return invalid;
+        const nextScores = {
+          ...state.scores,
+          [state.turn]: state.scores[state.turn] + state.turnBank
+        };
+        const winner: ArcadeWinner = nextScores[state.turn] >= state.target ? state.turn : null;
+        return {
+          valid: true,
+          extraTurn: false,
+          capturedOrScored: true,
+          nextState: {
+            ...state,
+            scores: nextScores,
+            turnBank: 0,
+            bustedBy: null,
+            lastEvent: `Banked +${state.turnBank} pts!`,
+            turn: winner ? state.turn : opp,
+            winner,
+            moveCount: state.moveCount + 1
+          }
+        };
+      }
+
+      const m = /^r:([1-6])$/.exec(action);
+      if (!m) return invalid;
+      const roll = Number(m[1]);
+      if (roll === 1) {
+        return {
+          valid: true,
+          extraTurn: false,
+          capturedOrScored: false,
+          nextState: {
+            ...state,
+            turnBank: 0,
+            lastRoll: 1,
+            bustedBy: state.turn,
+            lastEvent: 'Rolled a 1 — turn bank busted!',
+            turn: opp,
+            moveCount: state.moveCount + 1
+          }
+        };
+      }
+
+      const nextBank = state.turnBank + roll;
+      if (state.scores[state.turn] + nextBank >= state.target) {
+        const nextScores = {
+          ...state.scores,
+          [state.turn]: state.scores[state.turn] + nextBank
+        };
+        return {
+          valid: true,
+          extraTurn: false,
+          capturedOrScored: true,
+          nextState: {
+            ...state,
+            scores: nextScores,
+            turnBank: 0,
+            lastRoll: roll,
+            bustedBy: null,
+            lastEvent: `Rolled ${roll} and crossed ${state.target}!`,
+            turn: state.turn,
+            winner: state.turn,
+            moveCount: state.moveCount + 1
+          }
+        };
+      }
+
+      return {
+        valid: true,
+        extraTurn: true,
+        capturedOrScored: false,
+        nextState: {
+          ...state,
+          turnBank: nextBank,
+          lastRoll: roll,
+          bustedBy: null,
+          lastEvent: `Rolled ${roll} (+${roll} in bank)`,
           moveCount: state.moveCount + 1
         }
       };
@@ -2018,6 +3058,146 @@ export function pickBotArcadeAction(
       }
       const pref = ['i:4', 'i:0', 'i:2', 'i:6', 'i:8', 'i:1', 'i:3', 'i:5', 'i:7'];
       return pref.find(p => legal.includes(p)) || legal[0];
+    }
+
+    case 'draw-guess': {
+      if (state.phase === 'pick') {
+        const known = state.wordChoices.filter(w => Boolean(BOT_DRAW_PATHS[w]));
+        return `dw:${pickRandom(known.length > 0 ? known : state.wordChoices)}`;
+      }
+      if (state.phase === 'draw') {
+        const targetStrokes = BOT_DRAW_PATHS[state.word || ''] || BOT_DRAW_PATHS.house;
+        const idx = state.strokes.length;
+        if (idx < targetStrokes.length) {
+          return serializeDrawStrokeAction(targetStrokes[idx]);
+        }
+        return 'dp';
+      }
+      // Bot guessing
+      const secret = state.word || 'house';
+      const attempt = state.guesses.length;
+      const hitChance =
+        difficulty === 'expert'
+          ? attempt === 0 ? 0.82 : 0.96
+          : difficulty === 'hard'
+          ? attempt === 0 ? 0.62 : 0.88
+          : difficulty === 'medium'
+          ? attempt === 0 ? 0.38 : attempt === 1 ? 0.68 : 0.82
+          : attempt === 0 ? 0.22 : attempt === 1 ? 0.42 : 0.58;
+
+      if (Math.random() < hitChance) {
+        return `dg:${secret}`;
+      }
+      const decoys = DRAW_WORD_BANK.filter(
+        w => w !== secret && !state.guesses.some(g => g.text === w)
+      );
+      return `dg:${pickRandom(decoys.length > 0 ? decoys : DRAW_WORD_BANK)}`;
+    }
+
+    case 'battleship': {
+      if (state.phase === 'setup') {
+        return serializeBattleshipFleetAction(generateRandomBattleshipFleet());
+      }
+      const myShots = state.shots[bot];
+      const targetFleet = state.fleets[opp] || [];
+      const sunkSet = new Set(state.sunkBy[bot]);
+
+      // Cells belonging to already-sunk ships should not attract target-mode pursuit
+      const sunkCells = new Set<string>();
+      targetFleet.forEach((ship, i) => {
+        if (sunkSet.has(i)) {
+          getShipCells(ship).forEach(([sr, sc]) => sunkCells.add(`${sr},${sc}`));
+        }
+      });
+
+      if (difficulty !== 'easy') {
+        const adjacentTargets: string[] = [];
+        for (let r = 0; r < 8; r++) {
+          for (let c = 0; c < 8; c++) {
+            if (myShots[r][c] === 'hit' && !sunkCells.has(`${r},${c}`)) {
+              const neighbors: [number, number][] = [
+                [r - 1, c],
+                [r + 1, c],
+                [r, c - 1],
+                [r, c + 1]
+              ];
+              for (const [nr, nc] of neighbors) {
+                if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && myShots[nr][nc] === null) {
+                  adjacentTargets.push(`s:${nr},${nc}`);
+                }
+              }
+            }
+          }
+        }
+        if (adjacentTargets.length > 0) {
+          return pickRandom(adjacentTargets);
+        }
+      }
+
+      if (difficulty === 'hard' || difficulty === 'expert') {
+        const parity = legal.filter(act => {
+          const [r, c] = act.slice(2).split(',').map(Number);
+          return (r + c) % 2 === 0;
+        });
+        if (parity.length > 0) return pickRandom(parity);
+      }
+
+      return pickRandom(legal);
+    }
+
+    case 'memory-match': {
+      const memoryChance =
+        difficulty === 'expert' ? 1 : difficulty === 'hard' ? 0.85 : difficulty === 'medium' ? 0.55 : 0.2;
+
+      const knownBySymbol = new Map<number, number[]>();
+      for (const idx of state.seenIndices) {
+        if (state.matchedBy[idx] === null && Math.random() <= memoryChance) {
+          const sym = state.deck[idx];
+          const arr = knownBySymbol.get(sym) || [];
+          arr.push(idx);
+          knownBySymbol.set(sym, arr);
+        }
+      }
+
+      if (state.openIndices.length === 1) {
+        const openIdx = state.openIndices[0];
+        const sym = state.deck[openIdx];
+        const known = knownBySymbol.get(sym) || [];
+        const partner = known.find(i => i !== openIdx);
+        if (partner !== undefined) return `m:${partner}`;
+        return pickRandom(legal);
+      }
+
+      // First flip: pick a known pair if bot remembers both cards
+      for (const arr of knownBySymbol.values()) {
+        if (arr.length >= 2) {
+          const act = state.moveCount === 0 ? `m:${arr[0]}:${Math.floor(Math.random() * 900000) + 100}` : `m:${arr[0]}`;
+          return act;
+        }
+      }
+      // Otherwise prefer unseen cards to gather info
+      const unseen = legal.filter(act => {
+        const idx = Number(act.split(':')[1]);
+        return !state.seenIndices.includes(idx);
+      });
+      return pickRandom(unseen.length > 0 ? unseen : legal);
+    }
+
+    case 'dice-duel': {
+      if (state.turnBank > 0) {
+        if (state.scores[bot] + state.turnBank >= state.target) return 'h';
+        const oppAhead = state.scores[opp] - state.scores[bot];
+        const baseThreshold =
+          difficulty === 'easy'
+            ? 25
+            : difficulty === 'medium'
+            ? 15
+            : difficulty === 'hard'
+            ? 19
+            : 20 + Math.min(8, Math.max(0, Math.floor(oppAhead / 4)));
+        if (state.turnBank >= baseThreshold) return 'h';
+      }
+      return `r:${Math.floor(Math.random() * 6) + 1}`;
     }
   }
 }
