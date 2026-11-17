@@ -26,10 +26,11 @@ export class ErrorBoundary extends Component<Props, State> {
 
   private handleReset = () => {
     try {
-      // Clear potentially corrupted state cache
+      // Clear potentially corrupted catalog/chunk flags without touching user login or passcode unlock
       localStorage.removeItem('owen_watermelon_v3_games_v28');
       localStorage.removeItem('owen_watermelon_v3_games_v27');
-      sessionStorage.clear();
+      sessionStorage.removeItem('vite_preload_reloaded');
+      sessionStorage.removeItem('owen_asset_reload_ts');
     } catch {}
     window.location.reload();
   };

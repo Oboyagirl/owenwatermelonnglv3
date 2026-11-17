@@ -873,9 +873,14 @@ Example format:
     }
     app.use(express.static(path.resolve('dist'), {
       index: 'index.html',
-      maxAge: '1h'
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.html')) {
+          res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        }
+      }
     }));
     app.get('*', (req, res) => {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       res.sendFile(path.resolve('dist/index.html'));
     });
   } else {

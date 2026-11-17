@@ -1109,29 +1109,704 @@ export function replayArcadeMoves(
   return state;
 }
 
-// ---------------- SMART BOT ENGINE ----------------
+// ---------------- MULTI-BOT ROSTER & DIFFICULTY ENGINES ----------------
 
-export function pickBotArcadeAction(state: ArcadeState): string | null {
+export type ArcadeBotDifficulty = 'easy' | 'medium' | 'hard' | 'expert';
+
+export interface ArcadeBot {
+  id: string;
+  name: string;
+  avatar: string;
+  rating: number;
+  difficulty: ArcadeBotDifficulty;
+  title: string;
+  tagline: string;
+  accentColor: string;
+  voicelines: {
+    start: string[];
+    bonus: string[];
+    win: string[];
+    lose: string[];
+  };
+}
+
+export const ARCADE_BOTS: ArcadeBot[] = [
+  {
+    id: 'melon-sprout',
+    name: 'Sprout',
+    avatar: '🌱',
+    rating: 650,
+    difficulty: 'easy',
+    title: 'Casual Sprout',
+    tagline: 'Playful warm-up bot — great for learning rules',
+    accentColor: '#4ade80',
+    voicelines: {
+      start: ['Let’s have a chill round!', 'Still learning the ropes — your move!'],
+      bonus: ['Ooh, nice combo!', 'Wait, I got a lucky break!'],
+      win: ['Whoa, I actually won that one!', 'Good game! Want a rematch?'],
+      lose: ['You crushed me — nice tactics!', 'Oof, I didn’t even see that coming!']
+    }
+  },
+  {
+    id: 'sunny-chips',
+    name: 'Sunny Chips',
+    avatar: '☀️',
+    rating: 850,
+    difficulty: 'easy',
+    title: 'Arcade Rookie',
+    tagline: 'Spots obvious wins, keeps things fun and breezy',
+    accentColor: '#facc15',
+    voicelines: {
+      start: ['Sun’s out, game’s on!', 'I’ll go easy... maybe!'],
+      bonus: ['Boom! Bonus move!', 'Lucky bounce right there!'],
+      win: ['Sunny victory!', 'Haha, caught you sleeping!'],
+      lose: ['Well played! Run it back?', 'You outplayed me cleanly!']
+    }
+  },
+  {
+    id: 'orbit-bot',
+    name: 'Orbit',
+    avatar: '🛰️',
+    rating: 1120,
+    difficulty: 'medium',
+    title: 'Club Tactician',
+    tagline: 'Solid fundamentals — blocks threats and plays clean shapes',
+    accentColor: '#38bdf8',
+    voicelines: {
+      start: ['Orbit telemetry locked. Good luck.', 'Scanning optimal opening lines...'],
+      bonus: ['Trajectory aligned. Bonus action.', 'Tactical advantage secured.'],
+      win: ['Mission accomplished.', 'Trajectory converged on victory.'],
+      lose: ['Signal lost — strong finish!', 'Recalibrating after that defeat.']
+    }
+  },
+  {
+    id: 'pixel-ninja',
+    name: 'Pixel Ninja',
+    avatar: '🥷',
+    rating: 1320,
+    difficulty: 'medium',
+    title: 'Combo Hunter',
+    tagline: 'Loves double-jumps, captures, and sneaky bonus turns',
+    accentColor: '#a855f7',
+    voicelines: {
+      start: ['Silent steps, sharp strikes.', 'Watch your flanks!'],
+      bonus: ['Shadow combo! Again!', 'Blink and you’ll miss it.'],
+      win: ['Strike from the shadows!', 'Clean tactical takedown.'],
+      lose: ['A worthy rival! Respect.', 'You saw through my feint!']
+    }
+  },
+  {
+    id: 'crimson-fox',
+    name: 'Crimson Fox',
+    avatar: '🦊',
+    rating: 1580,
+    difficulty: 'hard',
+    title: 'Sharp Strategist',
+    tagline: 'Multi-move lookahead & trap setups',
+    accentColor: '#fb7185',
+    voicelines: {
+      start: ['Try not to fall into my trap.', 'I already planned three turns ahead.'],
+      bonus: ['Walked right into it!', 'Momentum is mine now.'],
+      win: ['Check the board — outfoxed!', 'That trap snapped shut perfectly.'],
+      lose: ['Clever escape... I’ll get you next game.', 'Sharp eye! Impressive defense.']
+    }
+  },
+  {
+    id: 'neon-viper',
+    name: 'Neon Viper',
+    avatar: '🐍',
+    rating: 1760,
+    difficulty: 'hard',
+    title: 'Counter-Puncher',
+    tagline: 'Punishes careless moves with fast minimax lookahead',
+    accentColor: '#2dd4bf',
+    voicelines: {
+      start: ['One slip and I strike.', 'Show me your best opening.'],
+      bonus: ['Swift counter-strike!', 'Tightening the coils...'],
+      win: ['Venomous finish!', 'No room left to breathe.'],
+      lose: ['You slipped the strike — well played!', 'Tough opponent. Rematch!']
+    }
+  },
+  {
+    id: 'titan-core',
+    name: 'Titan Core',
+    avatar: '🤖',
+    rating: 2050,
+    difficulty: 'expert',
+    title: 'Deep Search AI',
+    tagline: 'Deep alpha-beta minimax & ruthless positional defense',
+    accentColor: '#60a5fa',
+    voicelines: {
+      start: ['Search depth maximized. Your move.', 'Calculating winning trees...'],
+      bonus: ['Forced continuation found.', 'Evaluation climbing rapidly.'],
+      win: ['Solved the endgame.', 'Optimal play achieved.'],
+      lose: ['Anomalous human brilliance detected!', 'Impressive — you beat the core engine!']
+    }
+  },
+  {
+    id: 'melon-gm',
+    name: 'Melon GM',
+    avatar: '🍉',
+    rating: 2300,
+    difficulty: 'expert',
+    title: 'Apex Grandmaster',
+    tagline: 'Unforgiving top-tier engine across every board game',
+    accentColor: '#10b981',
+    voicelines: {
+      start: ['Welcome to the Championship table.', 'Every move counts from turn one.'],
+      bonus: ['Grandmaster precision!', 'Chain sequence unlocked.'],
+      win: ['Crown stays with Melon GM!', 'Clean conversion from start to finish.'],
+      lose: ['Legendary play! You beat the Melon Grandmaster!', 'Hats off — pure mastery!']
+    }
+  }
+];
+
+export function getArcadeBotById(botId?: string | null): ArcadeBot {
+  return ARCADE_BOTS.find(b => b.id === botId) || ARCADE_BOTS[2]; // Orbit default
+}
+
+export function pickArcadeBotVoiceline(
+  bot: ArcadeBot,
+  event: keyof ArcadeBot['voicelines'],
+  prev?: string
+): string {
+  const pool = bot.voicelines[event];
+  if (!pool || pool.length === 0) return '';
+  if (pool.length === 1) return pool[0];
+  const filtered = prev ? pool.filter(line => line !== prev) : pool;
+  const pickFrom = filtered.length > 0 ? filtered : pool;
+  return pickFrom[Math.floor(Math.random() * pickFrom.length)];
+}
+
+function pickRandom<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// --- Connect 4 Alpha-Beta Evaluator ---
+function scoreConnect4Window(board: (ArcadePlayer | null)[][], bot: ArcadePlayer, opp: ArcadePlayer): number {
+  let score = 0;
+  // Center column weight
+  for (let r = 0; r < 6; r++) {
+    if (board[r][3] === bot) score += 6;
+    else if (board[r][3] === opp) score -= 6;
+  }
+  const evalFour = (cells: (ArcadePlayer | null)[]) => {
+    let b = 0;
+    let o = 0;
+    let e = 0;
+    for (const c of cells) {
+      if (c === bot) b++;
+      else if (c === opp) o++;
+      else e++;
+    }
+    if (b === 4) return 10000;
+    if (o === 4) return -10000;
+    if (b === 3 && e === 1) return 22;
+    if (b === 2 && e === 2) return 5;
+    if (o === 3 && e === 1) return -26;
+    if (o === 2 && e === 2) return -5;
+    return 0;
+  };
+  for (let r = 0; r < 6; r++) {
+    for (let c = 0; c <= 3; c++) {
+      score += evalFour([board[r][c], board[r][c + 1], board[r][c + 2], board[r][c + 3]]);
+    }
+  }
+  for (let r = 0; r <= 2; r++) {
+    for (let c = 0; c < 7; c++) {
+      score += evalFour([board[r][c], board[r + 1][c], board[r + 2][c], board[r + 3][c]]);
+    }
+  }
+  for (let r = 0; r <= 2; r++) {
+    for (let c = 0; c <= 3; c++) {
+      score += evalFour([board[r][c], board[r + 1][c + 1], board[r + 2][c + 2], board[r + 3][c + 3]]);
+    }
+  }
+  for (let r = 3; r < 6; r++) {
+    for (let c = 0; c <= 3; c++) {
+      score += evalFour([board[r][c], board[r - 1][c + 1], board[r - 2][c + 2], board[r - 3][c + 3]]);
+    }
+  }
+  return score;
+}
+
+function searchConnect4(
+  state: Connect4State,
+  depth: number,
+  alpha: number,
+  beta: number,
+  bot: ArcadePlayer,
+  opp: ArcadePlayer,
+  budget: { nodes: number }
+): { score: number; action: string | null } {
+  budget.nodes++;
+  if (state.winner === bot) return { score: 100000 + depth * 100, action: null };
+  if (state.winner === opp) return { score: -100000 - depth * 100, action: null };
+  if (state.winner === 'draw') return { score: 0, action: null };
+  const legal = ['c:3', 'c:2', 'c:4', 'c:1', 'c:5', 'c:0', 'c:6'].filter(act => {
+    const col = Number(act.slice(2));
+    return state.board[0][col] === null;
+  });
+  if (depth === 0 || legal.length === 0 || budget.nodes > 5500) {
+    return { score: scoreConnect4Window(state.board, bot, opp), action: legal[0] || null };
+  }
+
+  const maximizing = state.turn === bot;
+  let bestAct = legal[0];
+  let bestScore = maximizing ? -Infinity : Infinity;
+
+  for (const act of legal) {
+    const next = applyArcadeAction(state, act).nextState as Connect4State;
+    const res = searchConnect4(next, depth - 1, alpha, beta, bot, opp, budget);
+    if (maximizing) {
+      if (res.score > bestScore) {
+        bestScore = res.score;
+        bestAct = act;
+      }
+      alpha = Math.max(alpha, bestScore);
+      if (alpha >= beta) break;
+    } else {
+      if (res.score < bestScore) {
+        bestScore = res.score;
+        bestAct = act;
+      }
+      beta = Math.min(beta, bestScore);
+      if (alpha >= beta) break;
+    }
+  }
+  return { score: bestScore, action: bestAct };
+}
+
+// --- Tic-Tac-Toe Exact Minimax ---
+function searchTicTacToe(
+  state: TicTacToeState,
+  depth: number,
+  bot: ArcadePlayer,
+  opp: ArcadePlayer
+): { score: number; action: string | null } {
+  if (state.winner === bot) return { score: 100 - depth, action: null };
+  if (state.winner === opp) return { score: depth - 100, action: null };
+  if (state.winner === 'draw') return { score: 0, action: null };
+
+  const legal = getLegalArcadeActions(state);
+  const maximizing = state.turn === bot;
+  let bestScore = maximizing ? -Infinity : Infinity;
+  let bestMoves: string[] = [];
+
+  for (const act of legal) {
+    const next = applyArcadeAction(state, act).nextState as TicTacToeState;
+    const { score } = searchTicTacToe(next, depth + 1, bot, opp);
+    if (maximizing) {
+      if (score > bestScore) {
+        bestScore = score;
+        bestMoves = [act];
+      } else if (score === bestScore) {
+        bestMoves.push(act);
+      }
+    } else {
+      if (score < bestScore) {
+        bestScore = score;
+        bestMoves = [act];
+      } else if (score === bestScore) {
+        bestMoves.push(act);
+      }
+    }
+  }
+  return {
+    score: bestScore,
+    action: bestMoves.length > 0 ? pickRandom(bestMoves) : legal[0] || null
+  };
+}
+
+// --- Checkers Evaluator ---
+function evalCheckersState(state: CheckersState, bot: ArcadePlayer, opp: ArcadePlayer): number {
+  if (state.winner === bot) return 10000;
+  if (state.winner === opp) return -10000;
+  let score = 0;
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      const p = state.board[r][c];
+      if (!p) continue;
+      const val = p.king ? 34 : 15;
+      const advance = p.owner === 'p1' ? 7 - r : r;
+      const centerBonus = c >= 2 && c <= 5 && r >= 2 && r <= 5 ? 3 : 0;
+      const total = val + (p.king ? 0 : advance * 0.8) + centerBonus;
+      score += p.owner === bot ? total : -total;
+    }
+  }
+  if (state.chainFrom && state.turn === bot) score += 12;
+  if (state.chainFrom && state.turn === opp) score -= 12;
+  return score;
+}
+
+function searchCheckers(
+  state: CheckersState,
+  depth: number,
+  alpha: number,
+  beta: number,
+  bot: ArcadePlayer,
+  opp: ArcadePlayer,
+  budget: { nodes: number }
+): { score: number; action: string | null } {
+  budget.nodes++;
+  if (state.winner || depth === 0 || budget.nodes > 2500) {
+    return { score: evalCheckersState(state, bot, opp), action: null };
+  }
+  const legal = getLegalArcadeActions(state);
+  if (legal.length === 0) return { score: evalCheckersState(state, bot, opp), action: null };
+
+  const maximizing = state.turn === bot;
+  let bestAct = legal[0];
+  let bestScore = maximizing ? -Infinity : Infinity;
+
+  for (const act of legal) {
+    const next = applyArcadeAction(state, act).nextState as CheckersState;
+    const nextDepth = next.turn === state.turn ? depth : depth - 1;
+    const res = searchCheckers(next, Math.max(0, nextDepth), alpha, beta, bot, opp, budget);
+    if (maximizing) {
+      if (res.score > bestScore) {
+        bestScore = res.score;
+        bestAct = act;
+      }
+      alpha = Math.max(alpha, bestScore);
+      if (alpha >= beta) break;
+    } else {
+      if (res.score < bestScore) {
+        bestScore = res.score;
+        bestAct = act;
+      }
+      beta = Math.min(beta, bestScore);
+      if (alpha >= beta) break;
+    }
+  }
+  return { score: bestScore, action: bestAct };
+}
+
+// --- Reversi Evaluator ---
+const REVERSI_WEIGHTS = [
+  [120, -25, 14, 6, 6, 14, -25, 120],
+  [-25, -45, -3, -2, -2, -3, -45, -25],
+  [14, -3, 5, 2, 2, 5, -3, 14],
+  [6, -2, 2, 1, 1, 2, -2, 6],
+  [6, -2, 2, 1, 1, 2, -2, 6],
+  [14, -3, 5, 2, 2, 5, -3, 14],
+  [-25, -45, -3, -2, -2, -3, -45, -25],
+  [120, -25, 14, 6, 6, 14, -25, 120]
+];
+
+function evalReversiState(state: ReversiState, bot: ArcadePlayer, opp: ArcadePlayer): number {
+  if (state.winner === bot) return 10000;
+  if (state.winner === opp) return -10000;
+  if (state.winner === 'draw') return 0;
+  let score = 0;
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      const cell = state.board[r][c];
+      if (!cell) continue;
+      score += cell === bot ? REVERSI_WEIGHTS[r][c] : -REVERSI_WEIGHTS[r][c];
+    }
+  }
+  const totalDiscs = state.counts.p1 + state.counts.p2;
+  if (totalDiscs > 48) {
+    const myDiscs = bot === 'p1' ? state.counts.p1 : state.counts.p2;
+    const oppDiscs = bot === 'p1' ? state.counts.p2 : state.counts.p1;
+    score += (myDiscs - oppDiscs) * 4;
+  }
+  return score;
+}
+
+function searchReversi(
+  state: ReversiState,
+  depth: number,
+  alpha: number,
+  beta: number,
+  bot: ArcadePlayer,
+  opp: ArcadePlayer,
+  budget: { nodes: number }
+): { score: number; action: string | null } {
+  budget.nodes++;
+  if (state.winner || depth === 0 || budget.nodes > 2200) {
+    return { score: evalReversiState(state, bot, opp), action: null };
+  }
+  const legal = getLegalArcadeActions(state);
+  if (legal.length === 0) return { score: evalReversiState(state, bot, opp), action: null };
+
+  const maximizing = state.turn === bot;
+  let bestAct = legal[0];
+  let bestScore = maximizing ? -Infinity : Infinity;
+
+  for (const act of legal) {
+    const next = applyArcadeAction(state, act).nextState as ReversiState;
+    const res = searchReversi(next, depth - 1, alpha, beta, bot, opp, budget);
+    if (maximizing) {
+      if (res.score > bestScore) {
+        bestScore = res.score;
+        bestAct = act;
+      }
+      alpha = Math.max(alpha, bestScore);
+      if (alpha >= beta) break;
+    } else {
+      if (res.score < bestScore) {
+        bestScore = res.score;
+        bestAct = act;
+      }
+      beta = Math.min(beta, bestScore);
+      if (alpha >= beta) break;
+    }
+  }
+  return { score: bestScore, action: bestAct };
+}
+
+// --- Mancala Deep Alpha-Beta ---
+function evalMancalaState(state: MancalaState, bot: ArcadePlayer): number {
+  const myStore = bot === 'p1' ? 6 : 13;
+  const oppStore = bot === 'p1' ? 13 : 6;
+  if (state.winner === bot) return 10000 + (state.pits[myStore] - state.pits[oppStore]);
+  if (state.winner && state.winner !== 'draw') return -10000;
+  let mySeeds = 0;
+  let oppSeeds = 0;
+  for (let i = 0; i < 6; i++) {
+    mySeeds += state.pits[(bot === 'p1' ? 0 : 7) + i];
+    oppSeeds += state.pits[(bot === 'p1' ? 7 : 0) + i];
+  }
+  return (state.pits[myStore] - state.pits[oppStore]) * 12 + (mySeeds - oppSeeds) * 2;
+}
+
+function searchMancala(
+  state: MancalaState,
+  depth: number,
+  alpha: number,
+  beta: number,
+  bot: ArcadePlayer,
+  budget: { nodes: number }
+): { score: number; action: string | null } {
+  budget.nodes++;
+  if (state.winner || depth === 0 || budget.nodes > 3500) {
+    return { score: evalMancalaState(state, bot), action: null };
+  }
+  const legal = getLegalArcadeActions(state);
+  if (legal.length === 0) return { score: evalMancalaState(state, bot), action: null };
+
+  const maximizing = state.turn === bot;
+  let bestAct = legal[0];
+  let bestScore = maximizing ? -Infinity : Infinity;
+
+  for (const act of legal) {
+    const resMove = applyArcadeAction(state, act);
+    const next = resMove.nextState as MancalaState;
+    const nextDepth = resMove.extraTurn ? depth : depth - 1;
+    const res = searchMancala(next, Math.max(0, nextDepth), alpha, beta, bot, budget);
+    if (maximizing) {
+      if (res.score > bestScore) {
+        bestScore = res.score;
+        bestAct = act;
+      }
+      alpha = Math.max(alpha, bestScore);
+      if (alpha >= beta) break;
+    } else {
+      if (res.score < bestScore) {
+        bestScore = res.score;
+        bestAct = act;
+      }
+      beta = Math.min(beta, bestScore);
+      if (alpha >= beta) break;
+    }
+  }
+  return { score: bestScore, action: bestAct };
+}
+
+// --- Dots & Boxes Chain-Length Evaluator ---
+function countOpponentBoxCascade(after: DotsAndBoxesState): number {
+  let sim = after;
+  let cascade = 0;
+  const mover = after.turn;
+  while (cascade < 16) {
+    const moves = getLegalArcadeActions(sim);
+    const scoringMove = moves.find(m => applyArcadeAction(sim, m).capturedOrScored);
+    if (!scoringMove) break;
+    const res = applyArcadeAction(sim, scoringMove);
+    sim = res.nextState as DotsAndBoxesState;
+    if (sim.turn !== mover) break;
+    cascade += sim.claimedThisMove.length;
+  }
+  return cascade;
+}
+
+// --- Ultimate TTT Heuristic & Search ---
+function evalUltimateTTT(state: UltimateTTTState, bot: ArcadePlayer, opp: ArcadePlayer): number {
+  if (state.winner === bot) return 10000;
+  if (state.winner === opp) return -10000;
+  if (state.winner === 'draw') return 0;
+
+  let score = 0;
+  for (let i = 0; i < 9; i++) {
+    const mw = state.miniWinners[i];
+    const centerMult = i === 4 ? 1.5 : i === 0 || i === 2 || i === 6 || i === 8 ? 1.2 : 1;
+    if (mw === bot) score += 60 * centerMult;
+    else if (mw === opp) score -= 60 * centerMult;
+  }
+  for (const [a, b, c] of TTT_LINES) {
+    const line = [state.miniWinners[a], state.miniWinners[b], state.miniWinners[c]];
+    const bc = line.filter(x => x === bot).length;
+    const oc = line.filter(x => x === opp).length;
+    const ec = line.filter(x => x === null).length;
+    if (bc === 2 && ec === 1) score += 90;
+    if (oc === 2 && ec === 1) score -= 95;
+  }
+  if (state.activeMini === null) {
+    score += state.turn === bot ? 24 : -24;
+  }
+  return score;
+}
+
+function searchUltimateTTT(
+  state: UltimateTTTState,
+  depth: number,
+  alpha: number,
+  beta: number,
+  bot: ArcadePlayer,
+  opp: ArcadePlayer,
+  budget: { nodes: number }
+): { score: number; action: string | null } {
+  budget.nodes++;
+  if (state.winner || depth === 0 || budget.nodes > 2000) {
+    return { score: evalUltimateTTT(state, bot, opp), action: null };
+  }
+  const legal = getLegalArcadeActions(state);
+  if (legal.length === 0) return { score: evalUltimateTTT(state, bot, opp), action: null };
+
+  // Prioritize capturing mini-boards and avoiding giving free choice when branching > 9
+  const sortedLegal =
+    legal.length > 10
+      ? legal
+          .map(act => {
+            const after = applyArcadeAction(state, act).nextState as UltimateTTTState;
+            return { act, q: evalUltimateTTT(after, bot, opp) };
+          })
+          .sort((a, b) => (state.turn === bot ? b.q - a.q : a.q - b.q))
+          .slice(0, 9)
+          .map(x => x.act)
+      : legal;
+
+  const maximizing = state.turn === bot;
+  let bestAct = sortedLegal[0];
+  let bestScore = maximizing ? -Infinity : Infinity;
+
+  for (const act of sortedLegal) {
+    const next = applyArcadeAction(state, act).nextState as UltimateTTTState;
+    const res = searchUltimateTTT(next, depth - 1, alpha, beta, bot, opp, budget);
+    if (maximizing) {
+      if (res.score > bestScore) {
+        bestScore = res.score;
+        bestAct = act;
+      }
+      alpha = Math.max(alpha, bestScore);
+      if (alpha >= beta) break;
+    } else {
+      if (res.score < bestScore) {
+        bestScore = res.score;
+        bestAct = act;
+      }
+      beta = Math.min(beta, bestScore);
+      if (alpha >= beta) break;
+    }
+  }
+  return { score: bestScore, action: bestAct };
+}
+
+function scoreGomokuCell(board: (ArcadePlayer | null)[][], r: number, c: number, bot: ArcadePlayer, opp: ArcadePlayer): number {
+  const dirs = [[0, 1], [1, 0], [1, 1], [1, -1]];
+  let score = 0;
+
+  const evalForPlayer = (player: ArcadePlayer) => {
+    let total = 0;
+    for (const [dr, dc] of dirs) {
+      let count = 1;
+      let openEnds = 0;
+      for (const sign of [-1, 1]) {
+        let k = 1;
+        while (k <= 4) {
+          const nr = r + dr * k * sign;
+          const nc = c + dc * k * sign;
+          if (nr < 0 || nr >= 15 || nc < 0 || nc >= 15) break;
+          const cell = board[nr][nc];
+          if (cell === player) {
+            count++;
+            k++;
+          } else {
+            if (cell === null) openEnds++;
+            break;
+          }
+        }
+      }
+      if (count >= 5) total += 100000;
+      else if (count === 4 && openEnds === 2) total += 15000;
+      else if (count === 4 && openEnds === 1) total += 3200;
+      else if (count === 3 && openEnds === 2) total += 2400;
+      else if (count === 3 && openEnds === 1) total += 300;
+      else if (count === 2 && openEnds === 2) total += 140;
+      else if (count === 2 && openEnds === 1) total += 25;
+      else if (openEnds === 2) total += 6;
+    }
+    return total;
+  };
+
+  score += evalForPlayer(bot) * 1.15 + evalForPlayer(opp);
+  score += Math.max(0, 7 - (Math.abs(r - 7) + Math.abs(c - 7))) * 0.5;
+  return score;
+}
+
+export function pickBotArcadeAction(
+  state: ArcadeState,
+  botOrId?: ArcadeBot | string
+): string | null {
   const legal = getLegalArcadeActions(state);
   if (legal.length === 0) return null;
+
+  const botProfile =
+    typeof botOrId === 'string'
+      ? getArcadeBotById(botOrId)
+      : botOrId || ARCADE_BOTS[2];
+  const difficulty = botProfile.difficulty;
   const bot = state.turn;
   const opp: ArcadePlayer = bot === 'p1' ? 'p2' : 'p1';
 
-  // 1. Immediate win check (applicable to most games)
-  for (const act of legal) {
-    const res = applyArcadeAction(state, act);
-    if (res.valid && res.nextState.winner === bot) return act;
+  // Sprout / Sunny Chips (easy): casual play with ~42% relaxed/playful randomness
+  if (difficulty === 'easy') {
+    // Spot immediate win ~60% of the time
+    if (Math.random() < 0.6) {
+      for (const act of legal) {
+        if (applyArcadeAction(state, act).nextState.winner === bot) return act;
+      }
+    }
+    if (Math.random() < 0.42) {
+      return pickRandom(legal);
+    }
+  } else {
+    // Medium/Hard/Expert always take immediate 1-move wins
+    for (const act of legal) {
+      if (applyArcadeAction(state, act).nextState.winner === bot) return act;
+    }
   }
 
   switch (state.gameType) {
     case 'connect4': {
-      // Block opponent immediate win
-      for (const act of legal) {
-        const simState: Connect4State = { ...state, turn: opp };
-        const oppRes = applyArcadeAction(simState, act);
-        if (oppRes.valid && oppRes.nextState.winner === opp) return act;
+      if (difficulty === 'hard') {
+        return (
+          searchConnect4(state, 3, -Infinity, Infinity, bot, opp, { nodes: 0 }).action ||
+          legal[0]
+        );
       }
-      // Prefer center columns without gifting win directly above
+      if (difficulty === 'expert') {
+        return (
+          searchConnect4(state, 5, -Infinity, Infinity, bot, opp, { nodes: 0 }).action ||
+          legal[0]
+        );
+      }
+      for (const act of legal) {
+        const oppSim: Connect4State = { ...state, turn: opp };
+        if (applyArcadeAction(oppSim, act).nextState.winner === opp) return act;
+      }
       const order = ['c:3', 'c:2', 'c:4', 'c:1', 'c:5', 'c:0', 'c:6'].filter(c => legal.includes(c));
       const safe = order.filter(act => {
         const after = applyArcadeAction(state, act).nextState as Connect4State;
@@ -1143,12 +1818,24 @@ export function pickBotArcadeAction(state: ArcadeState): string | null {
     }
 
     case 'checkers': {
+      if (difficulty === 'hard') {
+        return (
+          searchCheckers(state, 2, -Infinity, Infinity, bot, opp, { nodes: 0 }).action ||
+          legal[0]
+        );
+      }
+      if (difficulty === 'expert') {
+        return (
+          searchCheckers(state, 4, -Infinity, Infinity, bot, opp, { nodes: 0 }).action ||
+          legal[0]
+        );
+      }
       let best = legal[0];
       let bestScore = -9999;
       for (const act of legal) {
         const after = applyArcadeAction(state, act).nextState as CheckersState;
         let score = 0;
-        if (after.turn === bot) score += 30; // chain jump
+        if (after.turn === bot) score += 30;
         const [, toPart] = act.split('>');
         const [tr, tc] = toPart.split(',').map(Number);
         if (after.board[tr][tc]?.king) score += 20;
@@ -1163,23 +1850,25 @@ export function pickBotArcadeAction(state: ArcadeState): string | null {
     }
 
     case 'reversi': {
-      const weights = [
-        [100, -25, 10, 5, 5, 10, -25, 100],
-        [-25, -40, -2, -2, -2, -2, -40, -25],
-        [10, -2, 4, 2, 2, 4, -2, 10],
-        [5, -2, 2, 1, 1, 2, -2, 5],
-        [5, -2, 2, 1, 1, 2, -2, 5],
-        [10, -2, 4, 2, 2, 4, -2, 10],
-        [-25, -40, -2, -2, -2, -2, -40, -25],
-        [100, -25, 10, 5, 5, 10, -25, 100]
-      ];
+      if (difficulty === 'hard') {
+        return (
+          searchReversi(state, 2, -Infinity, Infinity, bot, opp, { nodes: 0 }).action ||
+          legal[0]
+        );
+      }
+      if (difficulty === 'expert') {
+        return (
+          searchReversi(state, 3, -Infinity, Infinity, bot, opp, { nodes: 0 }).action ||
+          legal[0]
+        );
+      }
       let best = legal[0];
       let bestScore = -9999;
       for (const act of legal) {
         const [r, c] = act.split(',').map(Number);
         const res = applyArcadeAction(state, act).nextState as ReversiState;
-        const flipBonus = res.flippedCells.length;
-        const score = weights[r][c] + flipBonus * 0.5 + (res.turn === bot ? 15 : 0);
+        const score =
+          REVERSI_WEIGHTS[r][c] + res.flippedCells.length * 0.6 + (res.turn === bot ? 15 : 0);
         if (score > bestScore) {
           bestScore = score;
           best = act;
@@ -1189,61 +1878,89 @@ export function pickBotArcadeAction(state: ArcadeState): string | null {
     }
 
     case 'dots-and-boxes': {
-      // Take box-completing edge first
       for (const act of legal) {
-        const res = applyArcadeAction(state, act);
-        if (res.capturedOrScored) return act;
+        if (applyArcadeAction(state, act).capturedOrScored) return act;
       }
-      // Avoid creating a 3-sided box for opponent
       const safe = legal.filter(act => {
         const after = applyArcadeAction(state, act).nextState as DotsAndBoxesState;
-        return !getLegalArcadeActions(after).some(reply => applyArcadeAction(after, reply).capturedOrScored);
+        return !getLegalArcadeActions(after).some(
+          reply => applyArcadeAction(after, reply).capturedOrScored
+        );
       });
-      const pool = safe.length > 0 ? safe : legal;
-      return pool[Math.floor(Math.random() * pool.length)];
+      if (safe.length > 0) {
+        return pickRandom(safe);
+      }
+      if (difficulty === 'hard' || difficulty === 'expert') {
+        let bestAct = legal[0];
+        let minCascade = Infinity;
+        for (const act of legal) {
+          const after = applyArcadeAction(state, act).nextState as DotsAndBoxesState;
+          const cascade = countOpponentBoxCascade(after);
+          if (cascade < minCascade) {
+            minCascade = cascade;
+            bestAct = act;
+          }
+        }
+        return bestAct;
+      }
+      return pickRandom(legal);
     }
 
     case 'gomoku': {
-      // Block immediate opp win or extend near existing stones
       for (const act of legal) {
         const oppSim: GomokuState = { ...state, turn: opp };
         if (applyArcadeAction(oppSim, act).nextState.winner === opp) return act;
       }
-      let best = '7,7';
-      if (!legal.includes(best)) {
-        let bestScore = -1;
-        const dirs = [[0,1],[1,0],[1,1],[1,-1]];
-        for (const act of legal) {
+      if (state.moveCount === 0 && legal.includes('7,7')) return '7,7';
+
+      const scored = legal
+        .map(act => {
           const [r, c] = act.split(',').map(Number);
-          let score = 0;
-          for (const [dr, dc] of dirs) {
-            for (const sign of [-1, 1]) {
-              let runSelf = 0;
-              let runOpp = 0;
-              for (let k = 1; k <= 4; k++) {
-                const nr = r + dr * k * sign;
-                const nc = c + dc * k * sign;
-                if (nr < 0 || nr >= 15 || nc < 0 || nc >= 15) break;
-                const cell = state.board[nr][nc];
-                if (cell === bot && runOpp === 0) runSelf++;
-                else if (cell === opp && runSelf === 0) runOpp++;
-                else break;
-              }
-              score += runSelf * runSelf * 6 + runOpp * runOpp * 5;
-            }
+          return {
+            act,
+            score: scoreGomokuCell(state.board, r, c, bot, opp)
+          };
+        })
+        .sort((a, b) => b.score - a.score);
+
+      if (difficulty === 'expert' && scored.length > 1) {
+        // 2-ply lookahead over top 8 tactical candidates
+        let bestAct = scored[0].act;
+        let bestEval = -Infinity;
+        for (const cand of scored.slice(0, 8)) {
+          const next = applyArcadeAction(state, cand.act).nextState as GomokuState;
+          if (next.winner === bot) return cand.act;
+          let oppBestThreat = 0;
+          for (const reply of getLegalArcadeActions(next).slice(0, 120)) {
+            const [rr, rc] = reply.split(',').map(Number);
+            const t = scoreGomokuCell(next.board, rr, rc, opp, bot);
+            if (t > oppBestThreat) oppBestThreat = t;
           }
-          // Slight center preference
-          score += Math.max(0, 7 - (Math.abs(r - 7) + Math.abs(c - 7))) * 0.25;
-          if (score > bestScore) {
-            bestScore = score;
-            best = act;
+          const net = cand.score - oppBestThreat * 0.72;
+          if (net > bestEval) {
+            bestEval = net;
+            bestAct = cand.act;
           }
         }
+        return bestAct;
       }
-      return best;
+
+      return scored[0]?.act || legal[0];
     }
 
     case 'ultimate-ttt': {
+      if (difficulty === 'hard') {
+        return (
+          searchUltimateTTT(state, 2, -Infinity, Infinity, bot, opp, { nodes: 0 }).action ||
+          legal[0]
+        );
+      }
+      if (difficulty === 'expert') {
+        return (
+          searchUltimateTTT(state, 3, -Infinity, Infinity, bot, opp, { nodes: 0 }).action ||
+          legal[0]
+        );
+      }
       let best = legal[0];
       let bestScore = -999;
       for (const act of legal) {
@@ -1252,7 +1969,7 @@ export function pickBotArcadeAction(state: ArcadeState): string | null {
         const [r, c] = act.split(',').map(Number);
         const miniIdx = Math.floor(r / 3) * 3 + Math.floor(c / 3);
         if (after.miniWinners[miniIdx] === bot) score += 45;
-        if (after.activeMini === null) score -= 18; // avoid gifting free choice
+        if (after.activeMini === null) score -= 18;
         if (r % 3 === 1 && c % 3 === 1) score += 6;
         score += Math.random() * 2;
         if (score > bestScore) {
@@ -1264,6 +1981,16 @@ export function pickBotArcadeAction(state: ArcadeState): string | null {
     }
 
     case 'mancala': {
+      if (difficulty === 'hard') {
+        return (
+          searchMancala(state, 3, -Infinity, Infinity, bot, { nodes: 0 }).action || legal[0]
+        );
+      }
+      if (difficulty === 'expert') {
+        return (
+          searchMancala(state, 5, -Infinity, Infinity, bot, { nodes: 0 }).action || legal[0]
+        );
+      }
       let best = legal[0];
       let bestScore = -999;
       for (const act of legal) {
@@ -1271,7 +1998,8 @@ export function pickBotArcadeAction(state: ArcadeState): string | null {
         const after = res.nextState as MancalaState;
         const storeIdx = bot === 'p1' ? 6 : 13;
         const gain = after.pits[storeIdx] - state.pits[storeIdx];
-        const score = gain * 4 + (res.extraTurn ? 20 : 0) + (after.capturedPit !== null ? 15 : 0);
+        const score =
+          gain * 4 + (res.extraTurn ? 20 : 0) + (after.capturedPit !== null ? 15 : 0);
         if (score > bestScore) {
           bestScore = score;
           best = act;
@@ -1281,6 +2009,9 @@ export function pickBotArcadeAction(state: ArcadeState): string | null {
     }
 
     case 'tictactoe': {
+      if (difficulty === 'expert' || (difficulty === 'hard' && Math.random() < 0.85)) {
+        return searchTicTacToe(state, 0, bot, opp).action || legal[0];
+      }
       for (const act of legal) {
         const oppSim: TicTacToeState = { ...state, turn: opp };
         if (applyArcadeAction(oppSim, act).nextState.winner === opp) return act;
@@ -1290,3 +2021,4 @@ export function pickBotArcadeAction(state: ArcadeState): string | null {
     }
   }
 }
+

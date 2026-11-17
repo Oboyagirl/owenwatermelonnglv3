@@ -325,6 +325,9 @@ function isPermissionDeniedError(err: unknown): boolean {
  * ChessAuthRequiredError if Firebase requires explicit Google sign-in.
  */
 export async function ensureChessFirebaseUid(): Promise<string> {
+  if (auth.currentUser?.uid) {
+    return auth.currentUser.uid;
+  }
   await waitForAuthReady();
   if (auth.currentUser?.uid) {
     return auth.currentUser.uid;
@@ -1020,4 +1023,44 @@ export async function leaveFirestoreChessRoom(code: string): Promise<void> {
   } catch {
     // Non-fatal cleanup on room exit
   }
+}
+
+export interface ChessRoomTurnSummary {
+  code: string;
+  status: 'waiting' | 'active' | 'finished';
+  turn: PieceColor;
+  moveCount: number;
+  opponentJoined: boolean;
+  opponentName: string | null;
+}
+
+export function watchChessRoomSummary(
+  code: string,
+  mySide: PieceColor,
+  onSummary: (summary: ChessRoomTurnSummary) => void
+): Unsubscribe {
+  const cleanCode = sanitizeRoomCode(code);
+  if (!cleanCode || !auth.currentUser?.uid) return () => {};
+  const roomRef = doc(db, CHESS_ROOMS_COLLECTION, cleanCode);
+  return onSnapshot(
+    roomRef,
+    (snapshot) => {
+      if (!snapshot.exists()) return;
+      const data = snapshot.data() as FirestoreChessRoomDoc;
+      const moves = Array.isArray(data.moves) ? data.moves : [];
+      const oppName = mySide === 'w' ? data.blackName : data.whiteName;
+      const oppUid = mySide === 'w' ? data.blackAuthUid : data.whiteAuthUid;
+      onSummary({
+        code: cleanCode,
+        status: data.status,
+        turn: data.turn,
+        moveCount: moves.length,
+        opponentJoined: Boolean(oppUid),
+        opponentName: oppName || null
+      });
+    },
+    () => {
+      // Background watcher errors are non-fatal
+    }
+  );
 }

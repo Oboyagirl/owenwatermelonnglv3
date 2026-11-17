@@ -1,6 +1,13 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { User, onAuthStateChanged, signInAnonymously, signOut } from 'firebase/auth';
-import { auth, ensureAuthPersistence, waitForAuthReady } from '../services/firebase';
+import {
+  auth,
+  ensureAuthPersistence,
+  waitForAuthReady,
+  backupFirebaseAuthSession,
+  restoreFirebaseAuthSessionIfNeeded,
+  clearFirebaseAuthBackup
+} from '../services/firebase';
 import {
   UserProfile,
   GameSave,
@@ -117,7 +124,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const syncSignedInUser = async (u: User) => {
       const guestSessionUid = getOrCreateLocalGuest().uid;
       const prevRemembered = getRememberedLogin();
+      let cachedGlobalProf: UserProfile | null = null;
+      try {
+        const rawCached = localStorage.getItem('owen_gamer_profile');
+        if (rawCached) cachedGlobalProf = JSON.parse(rawCached) as UserProfile;
+      } catch {}
+
       setUser(u);
+      try {
+        sessionStorage.removeItem('owen_fb_session_restored');
+      } catch {}
+      void backupFirebaseAuthSession();
 
       try {
         if (!u.isAnonymous && guestSessionUid && guestSessionUid !== u.uid) {
@@ -126,9 +143,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (prevRemembered.account?.uid && prevRemembered.account.uid !== u.uid) {
           await migrateLocalGuestSavesToUser(prevRemembered.account.uid, u.uid);
         }
+        if (cachedGlobalProf?.userId && cachedGlobalProf.userId !== u.uid) {
+          await migrateLocalGuestSavesToUser(cachedGlobalProf.userId, u.uid);
+        }
         const syncedProf = await syncInitialProfile({
           uid: u.uid,
-          displayName: u.displayName || prevRemembered.account?.displayName || null,
+          displayName:
+            u.displayName ||
+            prevRemembered.account?.displayName ||
+            cachedGlobalProf?.displayName ||
+            null,
           email: u.email,
           photoURL: u.photoURL,
           isAnonymous: u.isAnonymous
@@ -149,6 +173,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           localStorage.setItem('owen_gamer_profile', JSON.stringify(syncedProf));
         } catch {}
+        void backupFirebaseAuthSession();
       } catch (e) {
         console.warn('Auth profile sync warning:', e);
       }
@@ -158,12 +183,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await waitForAuthReady();
       if (!active) return;
 
+      if (auth.currentUser) {
+        setUser(auth.currentUser);
+        setIsAuthReady(true);
+        void backupFirebaseAuthSession();
+      }
+
       unsubscribe = onAuthStateChanged(auth, async (u) => {
         if (!active) return;
 
         if (u) {
-          await syncSignedInUser(u);
+          setUser(u);
           if (active) setIsAuthReady(true);
+          await syncSignedInUser(u);
           return;
         }
 
@@ -171,13 +203,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await waitForAuthReady();
         if (!active) return;
         if (auth.currentUser) {
-          await syncSignedInUser(auth.currentUser);
+          setUser(auth.currentUser);
           if (active) setIsAuthReady(true);
+          await syncSignedInUser(auth.currentUser);
           return;
         }
 
-        setUser(null);
         const remembered = getRememberedLogin();
+        if (remembered.mode !== 'signed_out') {
+          try {
+            const alreadyTriedRestore = sessionStorage.getItem('owen_fb_session_restored') === '1';
+            if (!alreadyTriedRestore) {
+              const restored = await restoreFirebaseAuthSessionIfNeeded();
+              if (!active) return;
+              if (restored) {
+                sessionStorage.setItem('owen_fb_session_restored', '1');
+                window.location.reload();
+                return;
+              }
+            }
+          } catch {}
+        }
+
+        setUser(null);
         const guestSessionUid = getOrCreateLocalGuest().uid;
         let existingLocal: UserProfile | null = null;
         try {
@@ -299,6 +347,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       const syncedProf = await syncInitialProfile(appUser);
       markRememberedLogin(appUser, syncedProf.avatarId);
+      void backupFirebaseAuthSession();
       setRememberedState(getRememberedLogin());
       setProfile(syncedProf);
       try {
@@ -334,6 +383,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
         guestProf.avatarId
       );
+      void backupFirebaseAuthSession();
       setRememberedState(getRememberedLogin());
       setProfile(guestProf);
       try {
@@ -357,6 +407,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     setAuthError(null);
     clearRememberedLogin();
+    clearFirebaseAuthBackup();
     setRememberedState(getRememberedLogin());
     if (user?.uid && auth.currentUser?.uid === user.uid) {
       await setMyChatOffline(user.uid);
@@ -369,6 +420,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       localStorage.removeItem('owen_gamer_profile');
       localStorage.removeItem('owen_local_guest_session');
+      sessionStorage.removeItem('owen_fb_session_restored');
     } catch {}
   };
 

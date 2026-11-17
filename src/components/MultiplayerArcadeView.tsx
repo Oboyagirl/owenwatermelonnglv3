@@ -17,12 +17,24 @@ import {
   Trophy,
   Users,
   Volume2,
-  VolumeX
+  VolumeX,
+  Gamepad2,
+  Play,
+  Send,
+  X
 } from 'lucide-react';
 import { ThemeConfig } from '../services/themeStore';
 import { useAuth } from '../context/AuthContext';
+import { useNotifications } from '../context/NotificationContext';
+import { auth } from '../services/firebase';
+import { AVATAR_PRESETS } from '../services/cloudSaveService';
+import { isProfileOnlineNow } from '../services/chatService';
+import { sendGameInvite } from '../services/inviteService';
 import {
+  ARCADE_BOTS,
   ARCADE_GAMES,
+  ArcadeBot,
+  ArcadeBotDifficulty,
   ArcadeGameMeta,
   ArcadeGameType,
   ArcadePlayer,
@@ -37,9 +49,11 @@ import {
   UltimateTTTState,
   applyArcadeAction,
   createInitialArcadeState,
+  getArcadeBotById,
   getArcadeGameMeta,
   getCheckersLegalMoves,
   getReversiFlips,
+  pickArcadeBotVoiceline,
   pickBotArcadeAction
 } from '../utils/arcadeEngines';
 import {
@@ -71,6 +85,14 @@ interface OnlinePlayersInfo {
 }
 
 const SELECTED_GAME_KEY = 'owen_arcade_selected_game_v1';
+const SELECTED_BOT_KEY = 'owen_arcade_bot_id_v1';
+
+const DIFFICULTY_LABELS: Record<ArcadeBotDifficulty, string> = {
+  easy: 'Beginner',
+  medium: 'Club',
+  hard: 'Master',
+  expert: 'GM'
+};
 
 function getLocalArcadeWsUrl(): string | null {
   if (typeof window === 'undefined') return null;
@@ -98,6 +120,19 @@ function getOrCreateArcadePlayerId(): string {
 
 export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ activeTheme }) => {
   const { user, profile } = useAuth();
+  const {
+    pendingArcadeJoinCode,
+    clearPendingArcadeJoinCode,
+    trackedArcadeRoom,
+    setTrackedArcadeRoom,
+    pushTurnToast,
+    contacts,
+    directoryProfiles,
+    incomingInvites,
+    acceptGameInvite,
+    declineGameInvite
+  } = useNotifications();
+
   const studioRef = useRef<HTMLDivElement | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
@@ -125,6 +160,28 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
     return 'connect4';
   });
 
+  const [selectedBotId, setSelectedBotId] = useState<string>(() => {
+    try {
+      const saved = localStorage.getItem(SELECTED_BOT_KEY);
+      if (saved && ARCADE_BOTS.some(b => b.id === saved)) return saved;
+    } catch {}
+    return 'orbit-bot';
+  });
+  const [botTierFilter, setBotTierFilter] = useState<'all' | ArcadeBotDifficulty>('all');
+
+  const selectedBot: ArcadeBot = useMemo(() => getArcadeBotById(selectedBotId), [selectedBotId]);
+  const filteredBots = useMemo(
+    () =>
+      botTierFilter === 'all'
+        ? ARCADE_BOTS
+        : ARCADE_BOTS.filter(b => b.difficulty === botTierFilter),
+    [botTierFilter]
+  );
+
+  const [botQuote, setBotQuote] = useState<string>(() =>
+    pickArcadeBotVoiceline(getArcadeBotById(selectedBotId), 'start')
+  );
+
   const [mode, setMode] = useState<PlayMode>('online');
   const [humanSeat, setHumanSeat] = useState<ArcadePlayer>('p1');
   const [seatPref, setSeatPref] = useState<SeatPref>('p1');
@@ -150,6 +207,8 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
   const [onlineAuthNeeded, setOnlineAuthNeeded] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [copiedType, setCopiedType] = useState<'code' | 'link' | null>(null);
+  const [invitingFriendUid, setInvitingFriendUid] = useState<string | null>(null);
+  const [invitedFriendUids, setInvitedFriendUids] = useState<Set<string>>(() => new Set());
 
   // UI/UX controls
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -309,13 +368,31 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
       }
 
       if (!roomChanged && nextMoves.length > prevLen) {
-        if (endedByEvent) playSfx('win');
-        else playSfx('move');
+        if (endedByEvent) {
+          playSfx('win');
+        } else {
+          playSfx('move');
+          if (
+            (msg.mySeat === 'p1' || msg.mySeat === 'p2') &&
+            msg.state.turn === msg.mySeat &&
+            typeof document !== 'undefined' &&
+            document.visibilityState === 'hidden'
+          ) {
+            const gameMeta = getArcadeGameMeta(msg.gameType);
+            const oppName = msg.mySeat === 'p1' ? msg.players?.p2?.name : msg.players?.p1?.name;
+            pushTurnToast({
+              space: 'rooms',
+              title: `It's your turn in ${gameMeta.name}!`,
+              body: `${oppName || 'Opponent'} moved in room ${msg.code}.`,
+              roomCode: msg.code
+            });
+          }
+        }
       } else if (!roomChanged && msg.resignedWinner) {
         playSfx('win');
       }
     },
-    [playSfx]
+    [playSfx, pushTurnToast]
   );
 
   const startFirestoreSub = useCallback(
@@ -562,6 +639,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
 
   const handleLeaveRoom = useCallback(() => {
     const leavingCode = roomCode;
+    setTrackedArcadeRoom(null);
     if (leavingCode) {
       if (activeTransportRef.current === 'ws' && wsRef.current?.readyState === WebSocket.OPEN) {
         wsRef.current.send(JSON.stringify({ type: 'room:leave', code: leavingCode, playerId }));
@@ -584,7 +662,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
     setGameState(createInitialArcadeState(selectedGame));
     setMoves([]);
     setCheckersFrom(null);
-  }, [roomCode, playerId, selectedGame, closeWs, closeFirestore]);
+  }, [roomCode, playerId, selectedGame, closeWs, closeFirestore, setTrackedArcadeRoom]);
 
   const handleSelectGameType = (gameType: ArcadeGameType) => {
     setSelectedGame(gameType);
@@ -599,10 +677,11 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
       setGameState(createInitialArcadeState(gameType));
       setMoves([]);
       setCheckersFrom(null);
+      setBotQuote(prev => pickArcadeBotVoiceline(selectedBot, 'start', prev));
     }
   };
 
-  // Check URL ?arcadeRoom=CODE on mount
+  // Check URL ?arcadeRoom=CODE on mount, or rejoin tracked Firestore room when returning via tab
   const deepLinkedRef = useRef(false);
   useEffect(() => {
     if (deepLinkedRef.current) return;
@@ -616,9 +695,151 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         setTimeout(() => {
           handleJoinRoom(paramCode);
         }, 80);
+        return;
+      }
+      if (!pendingArcadeJoinCode && trackedArcadeRoom?.code && !roomCode) {
+        deepLinkedRef.current = true;
+        setMode('online');
+        setJoinCodeInput(trackedArcadeRoom.code);
+        void joinViaFirestore(trackedArcadeRoom.code);
       }
     } catch {}
-  }, [handleJoinRoom]);
+  }, [handleJoinRoom, pendingArcadeJoinCode, trackedArcadeRoom, roomCode, joinViaFirestore]);
+
+  // Auto-join when user clicks "Accept" on invite toast or "Jump to Match" on turn toast
+  useEffect(() => {
+    if (!pendingArcadeJoinCode) return;
+    const clean = sanitizeArcadeRoomCode(pendingArcadeJoinCode);
+    clearPendingArcadeJoinCode();
+    if (clean.length < 4) return;
+    setMode('online');
+    setJoinCodeInput(clean);
+    void joinViaFirestore(clean);
+  }, [pendingArcadeJoinCode, clearPendingArcadeJoinCode, joinViaFirestore]);
+
+  // Sync background turn watcher when seated in a Firestore arcade room
+  useEffect(() => {
+    const activeWinner = resignedWinner || gameState.winner;
+    if (
+      mode === 'online' &&
+      activeTransportRef.current === 'firestore' &&
+      roomCode &&
+      (mySeat === 'p1' || mySeat === 'p2') &&
+      !activeWinner
+    ) {
+      setTrackedArcadeRoom({
+        code: roomCode,
+        mySide: mySeat,
+        gameType: gameState.gameType,
+        gameTitle: getArcadeGameMeta(gameState.gameType).name
+      });
+    }
+  }, [mode, roomCode, mySeat, resignedWinner, gameState.winner, gameState.gameType, setTrackedArcadeRoom]);
+
+  useEffect(() => {
+    if (!roomCode) {
+      setInvitedFriendUids(new Set());
+    }
+  }, [roomCode]);
+
+  const myFirebaseUid =
+    user?.uid && auth.currentUser?.uid === user.uid ? user.uid : auth.currentUser?.uid || '';
+
+  const invitableArcadePlayers = useMemo(() => {
+    const byUid = new Map<
+      string,
+      { uid: string; name: string; avatarId: string; isFriend: boolean; online: boolean }
+    >();
+    const dirMap = new Map(directoryProfiles.map(p => [p.userId, p]));
+
+    for (const c of contacts) {
+      if (!c.contactUid || c.contactUid === myFirebaseUid) continue;
+      const live = dirMap.get(c.contactUid);
+      byUid.set(c.contactUid, {
+        uid: c.contactUid,
+        name: live?.displayName || c.nickname || c.displayName,
+        avatarId: live?.avatarId || c.avatarId || 'melon_classic',
+        isFriend: true,
+        online: live ? isProfileOnlineNow(live) : false
+      });
+    }
+
+    for (const p of directoryProfiles) {
+      if (!p.userId || p.userId === myFirebaseUid || byUid.has(p.userId)) continue;
+      byUid.set(p.userId, {
+        uid: p.userId,
+        name: p.displayName,
+        avatarId: p.avatarId || 'melon_classic',
+        isFriend: false,
+        online: isProfileOnlineNow(p)
+      });
+    }
+
+    return Array.from(byUid.values())
+      .sort((a, b) => Number(b.online) - Number(a.online) || Number(b.isFriend) - Number(a.isFriend))
+      .slice(0, 12);
+  }, [contacts, directoryProfiles, myFirebaseUid]);
+
+  const incomingArcadeInvites = useMemo(
+    () => incomingInvites.filter(inv => inv.gameKind === 'arcade'),
+    [incomingInvites]
+  );
+
+  const handleInviteFriendToArcade = async (target: { uid: string; name: string }) => {
+    setOnlineError(null);
+    setInvitingFriendUid(target.uid);
+    try {
+      let roomToShare =
+        roomCode && activeTransportRef.current === 'firestore' ? roomCode : '';
+      let targetGame = gameState.gameType || selectedGame;
+      let senderUid = myFirebaseUid;
+
+      if (!roomToShare) {
+        closeWs();
+        closeFirestore();
+        setConnStatus('connecting');
+        const created = await createFirestoreArcadeRoom({
+          gameType: selectedGame,
+          playerId,
+          playerName: playerName.trim() || profile?.displayName || user?.displayName || 'Player',
+          preferredSeat: seatPref
+        });
+        roomToShare = created.code;
+        senderUid = created.uid;
+        targetGame = selectedGame;
+        startFirestoreSub(created.code, created.uid);
+      }
+
+      if (!senderUid || auth.currentUser?.uid !== senderUid) {
+        throw new ArcadeAuthRequiredError('Sign in with Google once to invite friends directly.');
+      }
+
+      await sendGameInvite({
+        fromUid: senderUid,
+        fromName: playerName.trim() || profile?.displayName || user?.displayName || 'Player',
+        fromAvatarId: profile?.avatarId || 'melon_classic',
+        toUid: target.uid,
+        toName: target.name,
+        gameKind: 'arcade',
+        gameType: targetGame,
+        gameTitle: getArcadeGameMeta(targetGame).name,
+        roomCode: roomToShare
+      });
+
+      setInvitedFriendUids(prev => {
+        const next = new Set(prev);
+        next.add(target.uid);
+        return next;
+      });
+    } catch (err) {
+      if (err instanceof ArcadeAuthRequiredError) {
+        setOnlineAuthNeeded(true);
+      }
+      setOnlineError(err instanceof Error ? err.message : 'Could not send invite.');
+    } finally {
+      setInvitingFriendUid(null);
+    }
+  };
 
   const handleGoogleSignIn = async () => {
     setIsSigningIn(true);
@@ -640,12 +861,25 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
     }
   };
 
-  const resetLocalMatch = (nextGameType: ArcadeGameType = selectedGame, nextHumanSeat: ArcadePlayer = humanSeat) => {
+  const resetLocalMatch = (
+    nextGameType: ArcadeGameType = selectedGame,
+    nextHumanSeat: ArcadePlayer = humanSeat,
+    botOverride: ArcadeBot = selectedBot
+  ) => {
     setGameState(createInitialArcadeState(nextGameType));
     setMoves([]);
     setResignedWinner(null);
     setCheckersFrom(null);
     setHumanSeat(nextHumanSeat);
+    setBotQuote(prev => pickArcadeBotVoiceline(botOverride, 'start', prev));
+  };
+
+  const handleSelectBot = (bot: ArcadeBot) => {
+    setSelectedBotId(bot.id);
+    try {
+      localStorage.setItem(SELECTED_BOT_KEY, bot.id);
+    } catch {}
+    resetLocalMatch(selectedGame, humanSeat, bot);
   };
 
   const effectiveWinner = resignedWinner || gameState.winner;
@@ -673,10 +907,18 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
       if (!res.valid) return;
 
       // Instant audio cue
-      if (res.nextState.winner) playSfx('win');
-      else if (res.extraTurn) playSfx('bonus');
-      else if (res.capturedOrScored) playSfx('capture');
-      else playSfx('move');
+      if (res.nextState.winner) {
+        playSfx('win');
+        if (mode === 'ai' && res.nextState.winner === humanSeat) {
+          setBotQuote(prev => pickArcadeBotVoiceline(selectedBot, 'lose', prev));
+        }
+      } else if (res.extraTurn) {
+        playSfx('bonus');
+      } else if (res.capturedOrScored) {
+        playSfx('capture');
+      } else {
+        playSfx('move');
+      }
 
       const prevState = gameState;
       const prevMoves = moves;
@@ -734,6 +976,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
       gameState,
       moves,
       humanSeat,
+      selectedBot,
       roomCode,
       mySeat,
       playerId,
@@ -742,23 +985,34 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
     ]
   );
 
-  // Smart Bot turn automation (also handles chain jumps & bonus turns seamlessly)
+  // Selected AI Bot turn automation across all 8 arcade games
   useEffect(() => {
     if (mode !== 'ai' || isGameOver || gameState.turn !== botSeat) return;
     const timer = window.setTimeout(() => {
-      const act = pickBotArcadeAction(gameState);
+      const act = pickBotArcadeAction(gameState, selectedBot);
       if (!act) return;
       const res = applyArcadeAction(gameState, act);
       if (!res.valid) return;
-      if (res.nextState.winner) playSfx('win');
-      else if (res.extraTurn) playSfx('bonus');
-      else if (res.capturedOrScored) playSfx('capture');
-      else playSfx('move');
+      if (res.nextState.winner) {
+        playSfx('win');
+        if (res.nextState.winner === botSeat) {
+          setBotQuote(prev => pickArcadeBotVoiceline(selectedBot, 'win', prev));
+        } else if (res.nextState.winner === humanSeat) {
+          setBotQuote(prev => pickArcadeBotVoiceline(selectedBot, 'lose', prev));
+        }
+      } else if (res.extraTurn) {
+        playSfx('bonus');
+        setBotQuote(prev => pickArcadeBotVoiceline(selectedBot, 'bonus', prev));
+      } else if (res.capturedOrScored) {
+        playSfx('capture');
+      } else {
+        playSfx('move');
+      }
       setGameState(res.nextState);
       setMoves(prev => [...prev, act]);
-    }, 280);
+    }, 260);
     return () => window.clearTimeout(timer);
-  }, [mode, isGameOver, gameState, botSeat, playSfx]);
+  }, [mode, isGameOver, gameState, botSeat, humanSeat, selectedBot, playSfx]);
 
   const handleCopy = (text: string, type: 'code' | 'link') => {
     try {
@@ -800,13 +1054,15 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
 
   const meta: ArcadeGameMeta = useMemo(() => getArcadeGameMeta(gameState.gameType), [gameState.gameType]);
 
+  const botLabel = `${selectedBot.avatar} ${selectedBot.name}`;
+
   const p1Display =
     mode === 'online'
       ? players.p1?.name || (mySeat === 'p1' ? playerName : 'Waiting for P1...')
       : mode === 'ai'
       ? humanSeat === 'p1'
         ? `${playerName || 'You'}`
-        : 'Smart Bot'
+        : botLabel
       : `Player 1 (${meta.p1Label})`;
 
   const p2Display =
@@ -815,7 +1071,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
       : mode === 'ai'
       ? humanSeat === 'p2'
         ? `${playerName || 'You'}`
-        : 'Smart Bot'
+        : botLabel
       : `Player 2 (${meta.p2Label})`;
 
   const statusHeadline = useMemo(() => {
@@ -1119,7 +1375,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                 style={{ backgroundColor: mode === 'ai' ? activeTheme.accent : undefined }}
               >
                 <Bot className="w-3.5 h-3.5" />
-                <span>Smart Bot</span>
+                <span>vs Bots</span>
               </button>
               <button
                 onClick={() => {
@@ -1277,19 +1533,239 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                     </button>
                   </div>
                 )}
+
+                {/* Pending Direct Arcade Invites */}
+                {incomingArcadeInvites.length > 0 && (
+                  <div className="p-2.5 rounded-xl border border-sky-400/40 bg-sky-500/10 flex flex-col gap-1.5">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
+                      <Gamepad2 className="w-3.5 h-3.5" />
+                      <span>Game Invites ({incomingArcadeInvites.length})</span>
+                    </div>
+                    {incomingArcadeInvites.map(inv => (
+                      <div
+                        key={inv.id}
+                        className="flex items-center justify-between gap-2 bg-black/30 px-2.5 py-1.5 rounded-lg border border-white/10"
+                      >
+                        <div className="min-w-0">
+                          <div className="text-[11px] font-bold text-white truncate">
+                            {(AVATAR_PRESETS.find(a => a.id === inv.fromAvatarId) || AVATAR_PRESETS[0]).icon}{' '}
+                            {inv.fromName}
+                          </div>
+                          <div className="text-[10px] text-sky-200/80 truncate">{inv.gameTitle}</div>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => void acceptGameInvite(inv)}
+                            className="px-2.5 py-1 rounded-lg bg-sky-400 hover:bg-sky-300 text-black text-[10px] font-extrabold flex items-center gap-1 cursor-pointer"
+                          >
+                            <Play className="w-2.5 h-2.5 fill-current" />
+                            <span>Accept</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => void declineGameInvite(inv)}
+                            className="p-1 rounded text-slate-400 hover:text-white cursor-pointer"
+                            title="Decline invite"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* 1-Click Direct Friend Invites (No Code Needed) */}
+                {(!roomCode || !(players.p1 && players.p2)) && invitableArcadePlayers.length > 0 && (
+                  <div
+                    className="p-2.5 rounded-xl border flex flex-col gap-1.5"
+                    style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
+                  >
+                    <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      <span>Invite Friend to {meta.name}</span>
+                      <span className="font-mono text-emerald-400">
+                        {invitableArcadePlayers.filter(p => p.online).length} online
+                      </span>
+                    </div>
+                    <div className="max-h-32 overflow-y-auto flex flex-col gap-1 pr-0.5">
+                      {invitableArcadePlayers.map(person => {
+                        const alreadyInvited = invitedFriendUids.has(person.uid);
+                        const isSendingThis = invitingFriendUid === person.uid;
+                        const icon = (AVATAR_PRESETS.find(a => a.id === person.avatarId) || AVATAR_PRESETS[0]).icon;
+                        return (
+                          <div
+                            key={person.uid}
+                            className="flex items-center justify-between gap-2 px-2 py-1.5 rounded-lg bg-black/30 border border-white/5"
+                          >
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <span className="text-xs shrink-0">{icon}</span>
+                              <span className="text-[11px] font-bold text-white truncate">{person.name}</span>
+                              {person.online && (
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" title="Online now" />
+                              )}
+                            </div>
+                            <button
+                              type="button"
+                              disabled={Boolean(invitingFriendUid) || alreadyInvited}
+                              onClick={() => void handleInviteFriendToArcade(person)}
+                              className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold flex items-center gap-1 shrink-0 cursor-pointer transition-colors disabled:opacity-65 ${
+                                alreadyInvited
+                                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                                  : 'text-black hover:brightness-110'
+                              }`}
+                              style={!alreadyInvited ? { backgroundColor: activeTheme.accent } : undefined}
+                            >
+                              {alreadyInvited ? (
+                                <>
+                                  <Check className="w-2.5 h-2.5" />
+                                  <span>Invited</span>
+                                </>
+                              ) : isSendingThis ? (
+                                <span>Sending...</span>
+                              ) : (
+                                <>
+                                  <Send className="w-2.5 h-2.5" />
+                                  <span>Invite</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
-            {/* AI Side Switch */}
+            {/* Multi-Bot AI Opponent Selector */}
             {mode === 'ai' && (
               <div className="flex flex-col gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  Play As
-                </span>
-                <div className="grid grid-cols-2 gap-2">
+                {/* Active Bot Quote Card */}
+                <div
+                  className="p-2.5 rounded-xl border flex items-center gap-2.5"
+                  style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
+                >
+                  <div
+                    className="w-9 h-9 rounded-lg border flex items-center justify-center text-lg shrink-0"
+                    style={{
+                      backgroundColor: `${selectedBot.accentColor}22`,
+                      borderColor: `${selectedBot.accentColor}66`
+                    }}
+                  >
+                    <span aria-hidden="true">{selectedBot.avatar}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1 text-[11px]">
+                      <span className="font-extrabold truncate" style={{ color: selectedBot.accentColor }}>
+                        {selectedBot.name} ({selectedBot.rating})
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-400 shrink-0">
+                        {selectedBot.title}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-200 leading-tight truncate mt-0.5" title={botQuote}>
+                      &ldquo;{botQuote}&rdquo;
+                    </p>
+                  </div>
+                </div>
+
+                {/* Difficulty Tier Filter + Random Bot */}
+                <div className="flex items-center gap-1">
+                  <div className="grid grid-cols-5 gap-1 flex-1">
+                    {(
+                      [
+                        { id: 'all', label: 'All' },
+                        { id: 'easy', label: 'Beg' },
+                        { id: 'medium', label: 'Club' },
+                        { id: 'hard', label: 'Master' },
+                        { id: 'expert', label: 'GM' }
+                      ] as { id: 'all' | ArcadeBotDifficulty; label: string }[]
+                    ).map(tier => {
+                      const active = botTierFilter === tier.id;
+                      return (
+                        <button
+                          key={tier.id}
+                          type="button"
+                          onClick={() => setBotTierFilter(tier.id)}
+                          className={`py-1 px-1 rounded-lg border text-[10px] font-bold cursor-pointer whitespace-nowrap truncate transition-colors ${
+                            active ? 'text-black' : 'text-slate-400 hover:text-white'
+                          }`}
+                          style={{
+                            backgroundColor: active ? activeTheme.accent : activeTheme.bgSecondary,
+                            borderColor: active ? activeTheme.accent : activeTheme.border
+                          }}
+                        >
+                          {tier.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const pool = filteredBots.filter(b => b.id !== selectedBot.id);
+                      const source = pool.length > 0 ? pool : ARCADE_BOTS;
+                      const randomPick = source[Math.floor(Math.random() * source.length)];
+                      handleSelectBot(randomPick);
+                    }}
+                    className="p-1.5 rounded-lg border text-slate-200 hover:bg-white/10 cursor-pointer shrink-0"
+                    style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
+                    title="Pick a random AI bot"
+                  >
+                    <Shuffle className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
+                  </button>
+                </div>
+
+                {/* Scrollable Bot Roster */}
+                <div className="max-h-40 overflow-y-auto pr-0.5 flex flex-col gap-1">
+                  {filteredBots.map(bot => {
+                    const active = bot.id === selectedBot.id;
+                    return (
+                      <button
+                        key={bot.id}
+                        type="button"
+                        onClick={() => handleSelectBot(bot)}
+                        className={`w-full px-2.5 py-1.5 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-2 ${
+                          active ? 'text-white shadow-sm' : 'text-slate-300 hover:bg-white/5'
+                        }`}
+                        style={{
+                          backgroundColor: active ? activeTheme.accentBadge : activeTheme.bgSecondary,
+                          borderColor: active ? bot.accentColor : activeTheme.border
+                        }}
+                      >
+                        <div
+                          className="w-7 h-7 rounded-lg border flex items-center justify-center text-sm shrink-0"
+                          style={{
+                            backgroundColor: `${bot.accentColor}22`,
+                            borderColor: `${bot.accentColor}55`
+                          }}
+                        >
+                          <span aria-hidden="true">{bot.avatar}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-1.5">
+                            <span className="text-[11px] font-extrabold truncate">{bot.name}</span>
+                            <span
+                              className="text-[10px] font-mono font-bold tabular-nums shrink-0"
+                              style={{ color: bot.accentColor }}
+                            >
+                              {bot.rating} · {DIFFICULTY_LABELS[bot.difficulty]}
+                            </span>
+                          </div>
+                          <div className="text-[10px] text-slate-400 truncate">{bot.tagline}</div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Play As Switch */}
+                <div className="grid grid-cols-2 gap-1.5 pt-1">
                   <button
                     onClick={() => resetLocalMatch(selectedGame, 'p1')}
-                    className={`py-2 rounded-xl border text-xs font-bold cursor-pointer ${
+                    className={`py-1.5 rounded-xl border text-xs font-bold cursor-pointer ${
                       humanSeat === 'p1' ? 'text-white' : 'text-slate-400 hover:text-white'
                     }`}
                     style={{
@@ -1297,11 +1773,11 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                       borderColor: humanSeat === 'p1' ? activeTheme.borderActive : activeTheme.border
                     }}
                   >
-                    1st ({meta.p1Label})
+                    Play 1st ({meta.p1Label})
                   </button>
                   <button
                     onClick={() => resetLocalMatch(selectedGame, 'p2')}
-                    className={`py-2 rounded-xl border text-xs font-bold cursor-pointer ${
+                    className={`py-1.5 rounded-xl border text-xs font-bold cursor-pointer ${
                       humanSeat === 'p2' ? 'text-white' : 'text-slate-400 hover:text-white'
                     }`}
                     style={{
@@ -1309,17 +1785,9 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                       borderColor: humanSeat === 'p2' ? activeTheme.borderActive : activeTheme.border
                     }}
                   >
-                    2nd ({meta.p2Label})
+                    Play 2nd ({meta.p2Label})
                   </button>
                 </div>
-                <button
-                  onClick={() => resetLocalMatch(selectedGame, Math.random() < 0.5 ? 'p1' : 'p2')}
-                  className="flex items-center justify-center gap-1.5 py-1.5 rounded-xl border text-[11px] font-bold text-slate-300 hover:text-white cursor-pointer"
-                  style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
-                >
-                  <Shuffle className="w-3.5 h-3.5" />
-                  <span>Randomize First Player</span>
-                </button>
               </div>
             )}
 

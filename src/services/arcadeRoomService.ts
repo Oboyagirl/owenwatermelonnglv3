@@ -212,6 +212,9 @@ function isPermissionDeniedError(err: unknown): boolean {
 }
 
 export async function ensureArcadeFirebaseUid(): Promise<string> {
+  if (auth.currentUser?.uid) {
+    return auth.currentUser.uid;
+  }
   await waitForAuthReady();
   if (auth.currentUser?.uid) {
     return auth.currentUser.uid;
@@ -731,4 +734,46 @@ export async function leaveFirestoreArcadeRoom(code: string): Promise<void> {
   } catch {
     // Non-fatal cleanup on room exit
   }
+}
+
+export interface ArcadeRoomTurnSummary {
+  code: string;
+  gameType: ArcadeGameType;
+  status: 'waiting' | 'active' | 'finished';
+  turn: ArcadePlayer;
+  moveCount: number;
+  opponentJoined: boolean;
+  opponentName: string | null;
+}
+
+export function watchArcadeRoomSummary(
+  code: string,
+  mySide: ArcadePlayer,
+  onSummary: (summary: ArcadeRoomTurnSummary) => void
+): Unsubscribe {
+  const cleanCode = sanitizeArcadeRoomCode(code);
+  if (!cleanCode || !auth.currentUser?.uid) return () => {};
+  const roomRef = doc(db, ARCADE_ROOMS_COLLECTION, cleanCode);
+  return onSnapshot(
+    roomRef,
+    (snapshot) => {
+      if (!snapshot.exists()) return;
+      const data = snapshot.data() as FirestoreArcadeRoomDoc;
+      const moves = Array.isArray(data.moves) ? data.moves : [];
+      const oppName = mySide === 'p1' ? data.p2Name : data.p1Name;
+      const oppUid = mySide === 'p1' ? data.p2AuthUid : data.p1AuthUid;
+      onSummary({
+        code: cleanCode,
+        gameType: isValidArcadeGameType(data.gameType) ? data.gameType : 'connect4',
+        status: data.status,
+        turn: data.turn,
+        moveCount: moves.length,
+        opponentJoined: Boolean(oppUid),
+        opponentName: oppName || null
+      });
+    },
+    () => {
+      // Background watcher errors are non-fatal
+    }
+  );
 }

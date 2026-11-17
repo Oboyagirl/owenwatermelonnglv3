@@ -18,19 +18,26 @@ import {
   ChevronDown,
   ChevronUp,
   Pin,
-  PinOff
+  PinOff,
+  Gamepad2,
+  Play
 } from 'lucide-react';
 import { signInAnonymously } from 'firebase/auth';
-import { auth, ensureAuthPersistence } from '../services/firebase';
+import { auth, ensureAuthPersistence, backupFirebaseAuthSession } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
+import { useNotifications } from '../context/NotificationContext';
 import { AVATAR_PRESETS, markRememberedLogin } from '../services/cloudSaveService';
 import { ThemeConfig, THEMES } from '../services/themeStore';
+import { ARCADE_GAMES, ArcadeGameType } from '../utils/arcadeEngines';
+import { createFirestoreChessRoom } from '../services/chessRoomService';
+import { createFirestoreArcadeRoom } from '../services/arcadeRoomService';
+import { sendGameInvite } from '../services/inviteService';
 import {
   ChatMessage,
   ChatProfile,
   ChatThread,
-  UserContact,
   addFriendContact,
+  createChatMessageId,
   deriveFriendCode,
   findChatProfileByCodeOrUid,
   formatChatTimestamp,
@@ -40,9 +47,7 @@ import {
   removeFriendContact,
   sendDirectMessage,
   setDiscoverablePreference,
-  subscribeDiscoverableProfiles,
   subscribeMyChatThreads,
-  subscribeMyContacts,
   subscribeThreadMessages,
   syncMyChatProfile,
   getCanonicalThreadMeta
@@ -112,53 +117,49 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
   const myFriendCode = myUid ? deriveFriendCode(myUid) : '';
   const myAvatar = getAvatarPreset(myAvatarId);
 
+  const {
+    contacts,
+    directoryProfiles: directory,
+    incomingInvites,
+    pendingChatTarget,
+    clearPendingChatTarget,
+    setChatOpenState,
+    openGameRoom,
+    acceptGameInvite,
+    declineGameInvite
+  } = useNotifications();
+
   const [activeTab, setActiveTab] = useState<'chats' | 'people'>('chats');
   const [discoverable, setDiscoverable] = useState<boolean>(() => getDiscoverablePreference());
-  const [directory, setDirectory] = useState<ChatProfile[]>([]);
-  const [contacts, setContacts] = useState<UserContact[]>([]);
   const [threads, setThreads] = useState<ChatThread[]>([]);
   const [activePartner, setActivePartner] = useState<PartnerTarget | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [optimisticMessages, setOptimisticMessages] = useState<ChatMessage[]>([]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [messageInput, setMessageInput] = useState('');
-  const [isSending, setIsSending] = useState(false);
   const [isAddingUid, setIsAddingUid] = useState<string | null>(null);
   const [isSigningInGuest, setIsSigningInGuest] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
   const [chatError, setChatError] = useState<string | null>(null);
   const [chatNotice, setChatNotice] = useState<string | null>(null);
+  const [showInvitePicker, setShowInvitePicker] = useState(false);
+  const [invitingGameKey, setInvitingGameKey] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Subscribe to discoverable directory, contacts, and active threads when signed into Firebase
+  // Sync open/active partner state to NotificationContext so active chats suppress duplicate banners
+  useEffect(() => {
+    setChatOpenState(isOpen, activePartner?.userId || null);
+  }, [isOpen, activePartner?.userId, setChatOpenState]);
+
+  // Subscribe to recent chat threads (directory & contacts are shared via NotificationContext)
   useEffect(() => {
     if (!isFirebaseConnected || !myUid) {
-      setDirectory([]);
-      setContacts([]);
       setThreads([]);
       onOnlineCountChange?.(0);
       return;
     }
-
-    const unsubDir = subscribeDiscoverableProfiles(
-      (list) => {
-        setDirectory(list);
-      },
-      (err) => {
-        setChatError(err.message);
-      }
-    );
-
-    const unsubContacts = subscribeMyContacts(
-      myUid,
-      (list) => {
-        setContacts(list);
-      },
-      (err) => {
-        setChatError(err.message);
-      }
-    );
 
     const unsubThreads = subscribeMyChatThreads(
       myUid,
@@ -171,8 +172,6 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
     );
 
     return () => {
-      unsubDir();
-      unsubContacts();
       unsubThreads();
     };
   }, [isFirebaseConnected, myUid]);
@@ -207,6 +206,8 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
       myUid,
       (msgs) => {
         setMessages(msgs);
+        const confirmedIds = new Set(msgs.map((m) => m.id));
+        setOptimisticMessages((prev) => prev.filter((m) => !confirmedIds.has(m.id)));
       },
       (err) => {
         setChatError(err.message);
@@ -216,12 +217,21 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
     return () => unsubMsgs();
   }, [isFirebaseConnected, myUid, activeThreadId]);
 
+  const displayedMessages = useMemo(() => {
+    if (!activeThreadId) return messages;
+    const confirmedIds = new Set(messages.map((m) => m.id));
+    const pending = optimisticMessages.filter(
+      (m) => m.threadId === activeThreadId && !confirmedIds.has(m.id)
+    );
+    return pending.length > 0 ? [...messages, ...pending] : messages;
+  }, [messages, optimisticMessages, activeThreadId]);
+
   // Scroll to bottom when messages arrive
   useEffect(() => {
     if (activePartner && messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages.length, activePartner?.userId]);
+  }, [displayedMessages.length, activePartner?.userId]);
 
   const directoryByUid = useMemo(() => {
     const map = new Map<string, ChatProfile>();
@@ -289,6 +299,7 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
   const handleOpenChatWithTarget = async (target: PartnerTarget) => {
     if (!isFirebaseConnected || !myUid) return;
     setChatError(null);
+    setShowInvitePicker(false);
     setActivePartner(target);
     setActiveTab('chats');
 
@@ -311,6 +322,14 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
       setChatError(err instanceof Error ? err.message : 'Could not open conversation.');
     }
   };
+
+  // Auto-open chat thread when triggered from a notification toast ("___ texted you")
+  useEffect(() => {
+    if (!pendingChatTarget || !isFirebaseConnected || !myUid) return;
+    const target = pendingChatTarget;
+    clearPendingChatTarget();
+    void handleOpenChatWithTarget(target);
+  }, [pendingChatTarget, isFirebaseConnected, myUid]);
 
   const handleAddFriend = async (target: PartnerTarget, openChatAfter: boolean = false) => {
     if (!isFirebaseConnected || !myUid) return;
@@ -363,11 +382,31 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!activePartner || !myUid || !messageInput.trim() || isSending) return;
+    if (!activePartner || !myUid) return;
     const draft = messageInput.trim();
+    if (!draft) return;
+
+    const partner = activePartner;
+    const clientMessageId = createChatMessageId();
+    const threadId = getCanonicalThreadMeta(myUid, partner.userId).threadId;
+
     setMessageInput('');
-    setIsSending(true);
     setChatError(null);
+
+    // 0ms optimistic append so rapid texting never stalls
+    setOptimisticMessages((prev) => [
+      ...prev,
+      {
+        id: clientMessageId,
+        threadId,
+        senderUid: myUid,
+        senderName: myDisplayName,
+        senderAvatarId: myAvatarId,
+        participantUids: [myUid, partner.userId],
+        text: draft,
+        createdAt: Date.now()
+      }
+    ]);
 
     try {
       await sendDirectMessage({
@@ -376,14 +415,82 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
           displayName: myDisplayName,
           avatarId: myAvatarId
         },
-        targetProfile: activePartner,
-        text: draft
+        targetProfile: partner,
+        text: draft,
+        clientMessageId
       });
     } catch (err) {
-      setMessageInput(draft);
+      setOptimisticMessages((prev) => prev.filter((m) => m.id !== clientMessageId));
+      setMessageInput((curr) => curr || draft);
       setChatError(err instanceof Error ? err.message : 'Failed to send message.');
+    }
+  };
+
+  const handleInvitePartnerToGame = async (gameOption: {
+    gameKind: 'chess' | 'arcade';
+    gameType: 'chess' | ArcadeGameType;
+    gameTitle: string;
+  }) => {
+    if (!activePartner || !myUid || invitingGameKey) return;
+    setChatError(null);
+    setInvitingGameKey(gameOption.gameType);
+
+    try {
+      const playerId = myUid;
+      let code = '';
+      if (gameOption.gameKind === 'chess') {
+        const res = await createFirestoreChessRoom({
+          playerId,
+          playerName: myDisplayName,
+          preferredColor: 'w',
+          timeControlId: 'none'
+        });
+        code = res.code;
+      } else {
+        const res = await createFirestoreArcadeRoom({
+          gameType: gameOption.gameType as ArcadeGameType,
+          playerId,
+          playerName: myDisplayName,
+          preferredSeat: 'p1'
+        });
+        code = res.code;
+      }
+
+      await sendGameInvite({
+        fromUid: myUid,
+        fromName: myDisplayName,
+        fromAvatarId: myAvatarId,
+        toUid: activePartner.userId,
+        toName: activePartner.displayName,
+        gameKind: gameOption.gameKind,
+        gameType: gameOption.gameType,
+        gameTitle: gameOption.gameTitle,
+        roomCode: code
+      });
+
+      const inviteMsgId = createChatMessageId();
+      await sendDirectMessage({
+        myProfile: {
+          userId: myUid,
+          displayName: myDisplayName,
+          avatarId: myAvatarId
+        },
+        targetProfile: activePartner,
+        text: `🎮 Invited you to play ${gameOption.gameTitle}! Tap Accept on the invite notification to join.`,
+        clientMessageId: inviteMsgId
+      }).catch(() => {});
+
+      setShowInvitePicker(false);
+      setChatNotice(`Invited ${activePartner.displayName} to ${gameOption.gameTitle}!`);
+      window.setTimeout(() => setChatNotice(null), 2600);
+      openGameRoom(gameOption.gameKind === 'chess' ? 'chess' : 'rooms', code);
+      if (!isPinnedOpen) {
+        onClose();
+      }
+    } catch (err) {
+      setChatError(err instanceof Error ? err.message : 'Could not send game invite.');
     } finally {
-      setIsSending(false);
+      setInvitingGameKey(null);
     }
   };
 
@@ -403,6 +510,7 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
             photoURL: null,
             isAnonymous: true
           });
+          void backupFirebaseAuthSession();
         }
       }
     } catch (err: any) {
@@ -707,7 +815,10 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
                 <div className="flex items-center gap-2 min-w-0">
                   <button
                     type="button"
-                    onClick={() => setActivePartner(null)}
+                    onClick={() => {
+                      setShowInvitePicker(false);
+                      setActivePartner(null);
+                    }}
                     className="p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white cursor-pointer"
                     title="Back to chats"
                   >
@@ -731,28 +842,99 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
                   </div>
                 </div>
 
-                {!contactUidSet.has(activePartner.userId) && (
+                <div className="flex items-center gap-1 shrink-0">
                   <button
                     type="button"
-                    onClick={() => handleAddFriend(activePartner, false)}
-                    disabled={isAddingUid === activePartner.userId}
-                    className="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold flex items-center gap-1 cursor-pointer shrink-0"
+                    onClick={() => setShowInvitePicker((v) => !v)}
+                    className={`px-2 py-1 rounded-lg border text-[11px] font-bold flex items-center gap-1 cursor-pointer transition-colors ${
+                      showInvitePicker
+                        ? 'bg-sky-500/25 border-sky-400 text-sky-200'
+                        : 'bg-sky-500/15 hover:bg-sky-500/25 border-sky-500/35 text-sky-300'
+                    }`}
+                    title={`Invite ${activePartner.displayName} to play a 2-player game`}
                   >
-                    <UserPlus className="w-3 h-3" />
-                    <span>Add Friend</span>
+                    <Gamepad2 className="w-3 h-3" />
+                    <span>Play</span>
                   </button>
-                )}
+                  {!contactUidSet.has(activePartner.userId) && (
+                    <button
+                      type="button"
+                      onClick={() => handleAddFriend(activePartner, false)}
+                      disabled={isAddingUid === activePartner.userId}
+                      className="px-2 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold flex items-center gap-1 cursor-pointer shrink-0"
+                    >
+                      <UserPlus className="w-3 h-3" />
+                      <span className="hidden sm:inline">Add</span>
+                    </button>
+                  )}
+                </div>
               </div>
+
+              {/* 1-Click Direct Game Challenge Picker */}
+              {showInvitePicker && (
+                <div
+                  className="px-3 py-2.5 border-b flex flex-col gap-2 shrink-0"
+                  style={{ backgroundColor: bgHeader, borderColor }}
+                >
+                  <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-sky-300">
+                    <span>Invite {activePartner.displayName} (No Code Needed)</span>
+                    <button
+                      type="button"
+                      onClick={() => setShowInvitePicker(false)}
+                      className="text-slate-400 hover:text-white cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    <button
+                      type="button"
+                      disabled={Boolean(invitingGameKey)}
+                      onClick={() =>
+                        void handleInvitePartnerToGame({
+                          gameKind: 'chess',
+                          gameType: 'chess',
+                          gameTitle: 'Chess'
+                        })
+                      }
+                      className="px-2 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-[11px] font-bold text-white flex items-center gap-1.5 truncate cursor-pointer disabled:opacity-50"
+                    >
+                      <span>♟️</span>
+                      <span className="truncate">{invitingGameKey === 'chess' ? 'Starting...' : 'Chess'}</span>
+                    </button>
+                    {ARCADE_GAMES.map((g) => (
+                      <button
+                        key={g.id}
+                        type="button"
+                        disabled={Boolean(invitingGameKey)}
+                        onClick={() =>
+                          void handleInvitePartnerToGame({
+                            gameKind: 'arcade',
+                            gameType: g.id,
+                            gameTitle: g.name
+                          })
+                        }
+                        className="px-2 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-[11px] font-bold text-white flex items-center gap-1.5 truncate cursor-pointer disabled:opacity-50"
+                      >
+                        <span>{g.emoji}</span>
+                        <span className="truncate">
+                          {invitingGameKey === g.id ? 'Starting...' : g.name.split(' ')[0]}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Messages Feed */}
               <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2.5">
-                {messages.length === 0 ? (
+                {displayedMessages.length === 0 ? (
                   <div className="flex-1 flex flex-col items-center justify-center text-center text-xs text-slate-400 px-6">
                     <MessageCircle className="w-8 h-8 text-slate-600 mb-2" />
                     <p>Say hi to {activePartner.displayName}! Messages sync live across Firebase.</p>
                   </div>
                 ) : (
-                  messages.map((msg) => {
+                  displayedMessages.map((msg) => {
                     const isMine = msg.senderUid === myUid;
                     return (
                       <div
@@ -795,7 +977,7 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
                 />
                 <button
                   type="submit"
-                  disabled={isSending || !messageInput.trim()}
+                  disabled={!messageInput.trim()}
                   className="p-2 rounded-xl text-black font-bold flex items-center justify-center cursor-pointer disabled:opacity-40 transition-all"
                   style={{ backgroundColor: accentColor }}
                   title="Send message"
@@ -807,6 +989,52 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
           ) : activeTab === 'chats' ? (
             /* Friends & Recent Threads View */
             <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-4">
+              {/* Pending Game Invites */}
+              {incomingInvites.length > 0 && (
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-sky-400 px-1 flex items-center gap-1.5">
+                    <Gamepad2 className="w-3.5 h-3.5" />
+                    <span>Game Invites ({incomingInvites.length})</span>
+                  </span>
+                  {incomingInvites.map((inv) => (
+                    <div
+                      key={inv.id}
+                      className="p-2.5 rounded-xl border border-sky-400/40 bg-sky-500/10 flex items-center justify-between gap-2"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-base shrink-0">{getAvatarPreset(inv.fromAvatarId).icon}</span>
+                        <div className="min-w-0">
+                          <div className="text-xs font-bold text-white truncate">
+                            {inv.fromName} → {inv.gameTitle}
+                          </div>
+                          <div className="text-[10px] text-sky-200/80 truncate">
+                            Direct invite · No code needed
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => void acceptGameInvite(inv)}
+                          className="px-2.5 py-1 rounded-lg bg-sky-400 hover:bg-sky-300 text-black font-extrabold text-[11px] flex items-center gap-1 cursor-pointer"
+                        >
+                          <Play className="w-2.5 h-2.5 fill-current" />
+                          <span>Accept</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void declineGameInvite(inv)}
+                          className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 cursor-pointer"
+                          title="Decline invite"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {/* Friends List */}
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between px-1">

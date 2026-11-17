@@ -17,6 +17,10 @@ function mountApp() {
   }
 
   hasMounted = true;
+  try {
+    sessionStorage.removeItem('vite_preload_reloaded');
+    sessionStorage.removeItem('owen_asset_reload_ts');
+  } catch {}
   console.log('[OwenWatermelon] Mounting React application...');
   const statusEl = document.getElementById('preloader-status');
   if (statusEl) statusEl.textContent = 'Starting arcade...';
@@ -46,7 +50,7 @@ function mountApp() {
             <div style="font-size: 11px; font-family: monospace; background-color: #050d09; border: 1px solid #234e38; padding: 12px; border-radius: 10px; color: #f87171; margin-bottom: 20px; word-break: break-all;">
               ${err?.message || 'Initialization error'}
             </div>
-            <button onclick="try { sessionStorage.clear(); if ('caches' in window) { caches.keys().then(function(names){ names.forEach(function(n){ caches.delete(n); }); }); } } catch(e){} window.location.reload();" style="width: 100%; padding: 12px 20px; background-color: #10b981; color: #042f1f; font-weight: 700; font-size: 13px; border-radius: 12px; border: none; cursor: pointer;">
+            <button onclick="try { sessionStorage.removeItem('vite_preload_reloaded'); sessionStorage.removeItem('owen_asset_reload_ts'); if ('caches' in window) { caches.keys().then(function(names){ names.forEach(function(n){ caches.delete(n); }); }); } } catch(e){} window.location.reload();" style="width: 100%; padding: 12px 20px; background-color: #10b981; color: #042f1f; font-weight: 700; font-size: 13px; border-radius: 12px; border: none; cursor: pointer;">
               Reset Cache & Reload Arcade
             </button>
           </div>

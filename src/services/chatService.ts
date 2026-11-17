@@ -21,6 +21,13 @@ const FRIEND_CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const DISCOVERABLE_PREF_KEY = 'owen_chat_discoverable';
 const ONLINE_FRESHNESS_MS = 4 * 60 * 1000;
 
+// Tracks threadIds confirmed to exist in Firestore so sendDirectMessage skips blocking pre-read RPCs
+const knownExistingThreads = new Set<string>();
+
+export function createChatMessageId(): string {
+  return `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
 export interface ChatProfile {
   userId: string;
   displayName: string;
@@ -452,7 +459,11 @@ export function subscribeMyChatThreads(
   return onSnapshot(
     q,
     (snapshot) => {
-      const list = snapshot.docs.map((d) => d.data() as ChatThread);
+      const list = snapshot.docs.map((d) => {
+        const t = d.data() as ChatThread;
+        if (t?.threadId) knownExistingThreads.add(t.threadId);
+        return t;
+      });
       list.sort((a, b) => timestampToMs(b.updatedAt) - timestampToMs(a.updatedAt));
       onUpdate(list);
     },
@@ -547,6 +558,7 @@ export async function openOrCreateDirectThread(params: {
         updatedAt: serverTimestamp()
       });
     }
+    knownExistingThreads.add(meta.threadId);
     return meta.threadId;
   } catch (err) {
     if (isPermissionDeniedError(err)) {
@@ -560,9 +572,10 @@ export async function sendDirectMessage(params: {
   myProfile: Pick<ChatProfile, 'userId' | 'displayName' | 'avatarId'>;
   targetProfile: Pick<ChatProfile, 'userId' | 'displayName' | 'avatarId'>;
   text: string;
-}): Promise<void> {
+  clientMessageId?: string;
+}): Promise<string> {
   const cleanText = String(params.text || '').trim().slice(0, 1000);
-  if (!cleanText) return;
+  if (!cleanText) return '';
 
   const { myProfile, targetProfile } = params;
   if (!auth.currentUser || auth.currentUser.uid !== myProfile.userId) {
@@ -574,7 +587,7 @@ export async function sendDirectMessage(params: {
 
   const meta = getCanonicalThreadMeta(myProfile.userId, targetProfile.userId);
   const threadRef = doc(db, CHAT_THREADS_COLLECTION, meta.threadId);
-  const messageId = `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const messageId = params.clientMessageId || createChatMessageId();
   const messageRef = doc(db, CHAT_THREADS_COLLECTION, meta.threadId, 'messages', messageId);
 
   const isMeA = meta.userAUid === myProfile.userId;
@@ -587,9 +600,35 @@ export async function sendDirectMessage(params: {
   const userAAvatarId = sanitizeAvatarId(userA.avatarId);
   const userBAvatarId = sanitizeAvatarId(userB.avatarId);
 
+  const messagePayload = {
+    id: messageId,
+    threadId: meta.threadId,
+    senderUid: myProfile.userId,
+    senderName: sanitizeDisplayName(myProfile.displayName, myProfile.userId),
+    senderAvatarId: sanitizeAvatarId(myProfile.avatarId),
+    participantUids: meta.participantUids,
+    text: cleanText,
+    createdAt: serverTimestamp()
+  };
+
   const path = `${CHAT_THREADS_COLLECTION}/${meta.threadId}/messages/${messageId}`;
 
-  try {
+  const commitAsUpdate = async () => {
+    const batch = writeBatch(db);
+    batch.update(threadRef, {
+      userAName,
+      userBName,
+      userAAvatarId,
+      userBAvatarId,
+      lastMessageText: previewText,
+      lastMessageSenderUid: myProfile.userId,
+      updatedAt: serverTimestamp()
+    });
+    batch.set(messageRef, messagePayload);
+    await batch.commit();
+  };
+
+  const commitWithExistenceCheck = async () => {
     const existingThreadSnap = await getDoc(threadRef);
     const batch = writeBatch(db);
 
@@ -620,18 +659,29 @@ export async function sendDirectMessage(params: {
       });
     }
 
-    batch.set(messageRef, {
-      id: messageId,
-      threadId: meta.threadId,
-      senderUid: myProfile.userId,
-      senderName: sanitizeDisplayName(myProfile.displayName, myProfile.userId),
-      senderAvatarId: sanitizeAvatarId(myProfile.avatarId),
-      participantUids: meta.participantUids,
-      text: cleanText,
-      createdAt: serverTimestamp()
-    });
-
+    batch.set(messageRef, messagePayload);
     await batch.commit();
+    knownExistingThreads.add(meta.threadId);
+  };
+
+  try {
+    if (knownExistingThreads.has(meta.threadId)) {
+      try {
+        await commitAsUpdate();
+        return messageId;
+      } catch (err) {
+        const code = (err as { code?: string } | null)?.code;
+        if (code === 'not-found') {
+          knownExistingThreads.delete(meta.threadId);
+          await commitWithExistenceCheck();
+          return messageId;
+        }
+        throw err;
+      }
+    }
+
+    await commitWithExistenceCheck();
+    return messageId;
   } catch (err) {
     if (isPermissionDeniedError(err)) {
       handleFirestoreError(err, OperationType.WRITE, path);

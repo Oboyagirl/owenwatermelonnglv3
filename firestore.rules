@@ -254,6 +254,39 @@ service cloud.firestore {
         data.createdAt is timestamp;
     }
 
+    function isValidGameInvite(data) {
+      return data.keys().hasAll([
+          'id', 'fromUid', 'fromName', 'fromAvatarId', 'toUid', 'toName',
+          'participantUids', 'gameKind', 'gameType', 'gameTitle', 'roomCode',
+          'status', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'fromUid', 'fromName', 'fromAvatarId', 'toUid', 'toName',
+          'participantUids', 'gameKind', 'gameType', 'gameTitle', 'roomCode',
+          'status', 'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.id) &&
+        data.fromUid is string && isValidId(data.fromUid) &&
+        data.fromName is string && data.fromName.size() > 0 && data.fromName.size() <= 64 &&
+        data.fromAvatarId is string && data.fromAvatarId.size() > 0 && data.fromAvatarId.size() <= 64 &&
+        data.toUid is string && isValidId(data.toUid) &&
+        data.fromUid != data.toUid &&
+        data.toName is string && data.toName.size() > 0 && data.toName.size() <= 64 &&
+        data.participantUids is list && data.participantUids.size() == 2 &&
+        data.participantUids[0] is string && data.participantUids[0] == data.fromUid &&
+        data.participantUids[1] is string && data.participantUids[1] == data.toUid &&
+        data.gameKind is string && data.gameKind.size() > 0 && data.gameKind.size() <= 16 &&
+        data.gameKind in ['chess', 'arcade'] &&
+        data.gameType is string && data.gameType.size() > 0 && data.gameType.size() <= 32 &&
+        data.gameType in ['chess', 'connect4', 'checkers', 'reversi', 'dots-and-boxes', 'gomoku', 'ultimate-ttt', 'mancala', 'tictactoe'] &&
+        data.gameTitle is string && data.gameTitle.size() > 0 && data.gameTitle.size() <= 64 &&
+        isValidRoomCode(data.roomCode) &&
+        data.status is string && data.status.size() > 0 && data.status.size() <= 16 &&
+        data.status in ['pending', 'accepted', 'declined', 'cancelled'] &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
     // User Profile Document
     match /users/{userId} {
       allow get: if isSignedIn() && request.auth.uid == userId;
@@ -644,6 +677,49 @@ service cloud.firestore {
         isValidRoomCode(roomCode) &&
         existing().creatorAuthUid == request.auth.uid &&
         existing().moves.size() == 0;
+    }
+
+    // Direct Friend Game Invites (participant-isolated)
+    match /gameInvites/{inviteId} {
+      allow get: if isSignedIn() && isValidId(inviteId) && (
+        resource == null || request.auth.uid in existing().participantUids
+      );
+
+      allow list: if isSignedIn() && request.auth.uid in resource.data.participantUids;
+
+      allow create: if isSignedIn() &&
+        isValidId(inviteId) &&
+        isValidGameInvite(incoming()) &&
+        incoming().id == inviteId &&
+        incoming().fromUid == request.auth.uid &&
+        incoming().status == 'pending' &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        exists(/databases/$(database)/documents/chatProfiles/$(incoming().toUid));
+
+      allow update: if isSignedIn() &&
+        isValidId(inviteId) &&
+        isValidGameInvite(incoming()) &&
+        incoming().id == existing().id &&
+        incoming().fromUid == existing().fromUid &&
+        incoming().toUid == existing().toUid &&
+        incoming().participantUids == existing().participantUids &&
+        incoming().gameKind == existing().gameKind &&
+        incoming().gameType == existing().gameType &&
+        incoming().gameTitle == existing().gameTitle &&
+        incoming().roomCode == existing().roomCode &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']) &&
+        existing().status == 'pending' &&
+        (
+          (request.auth.uid == existing().toUid && incoming().status in ['accepted', 'declined']) ||
+          (request.auth.uid == existing().fromUid && incoming().status == 'cancelled')
+        );
+
+      allow delete: if isSignedIn() &&
+        isValidId(inviteId) &&
+        request.auth.uid in existing().participantUids;
     }
   }
 }

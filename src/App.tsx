@@ -13,6 +13,8 @@ import { PasscodeGate, PASSCODE_STORAGE_KEY } from './components/PasscodeGate';
 import { HomeDashboard } from './components/HomeDashboard';
 import { FloatingMusicPlayer } from './components/FloatingMusicPlayer';
 import { ChatBoxWidget } from './components/ChatBoxWidget';
+import { NotificationToasts } from './components/NotificationToasts';
+import { NotificationProvider } from './context/NotificationContext';
 import { useGamesStore } from './services/gamesStore';
 import { useSiteSettingsStore } from './services/siteSettingsStore';
 import { useThemeStore } from './services/themeStore';
@@ -243,12 +245,27 @@ export default function App() {
     });
   };
 
-  // Passcode Gate (owenpan2244)
+  // Passcode Gate (owenpan2244) — never re-lock existing/signed-in users across site updates
   const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
     try {
-      return localStorage.getItem(PASSCODE_STORAGE_KEY) === 'unlocked' ||
-             localStorage.getItem('owen_watermelon_v3_unlocked') === 'unlocked' ||
-             sessionStorage.getItem(PASSCODE_STORAGE_KEY) === 'unlocked';
+      if (localStorage.getItem('owen_site_explicitly_locked') === 'true') {
+        return false;
+      }
+      const alreadyUnlocked =
+        localStorage.getItem(PASSCODE_STORAGE_KEY) === 'unlocked' ||
+        localStorage.getItem('owen_watermelon_v3_unlocked') === 'unlocked' ||
+        sessionStorage.getItem(PASSCODE_STORAGE_KEY) === 'unlocked' ||
+        Boolean(localStorage.getItem('owen_gamer_profile')) ||
+        Boolean(localStorage.getItem('owen_remembered_account')) ||
+        Boolean(localStorage.getItem('owen_local_guest_session')) ||
+        Boolean(localStorage.getItem('owen_fb_auth_backup_v1'));
+
+      if (alreadyUnlocked) {
+        try {
+          localStorage.setItem(PASSCODE_STORAGE_KEY, 'unlocked');
+        } catch {}
+      }
+      return alreadyUnlocked;
     } catch {
       return false;
     }
@@ -791,10 +808,15 @@ export default function App() {
   const splitTab = tabs.find(t => t.id === splitTabId);
 
   return (
-    <div 
-      className="h-screen w-screen text-slate-100 flex overflow-hidden font-sans select-none"
-      style={{ backgroundColor: activeTheme.bgPrimary }}
+    <NotificationProvider
+      activeSpace={activeSpace}
+      onNavigateSpace={handleSelectSpace}
+      onOpenChat={() => setIsChatOpen(true)}
     >
+      <div 
+        className="h-screen w-screen text-slate-100 flex overflow-hidden font-sans select-none"
+        style={{ backgroundColor: activeTheme.bgPrimary }}
+      >
       {/* Background Starfield */}
       <StarfieldBackground
         speedMultiplier={siteSettings.starSpeed}
@@ -969,6 +991,10 @@ export default function App() {
         isPinnedOpen={isChatPinnedOpen}
         onTogglePinOpen={toggleChatPinnedOpen}
       />
-    </div>
+
+      {/* Global Real-Time Notifications (Texts, Turns, & Game Invites) */}
+      <NotificationToasts activeTheme={activeTheme} />
+      </div>
+    </NotificationProvider>
   );
 }

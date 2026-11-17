@@ -171,3 +171,16 @@
 4. **Action-Isolated Updates**: Updates isolate `affectedKeys` across `Join/Reconnect`, `Vacate`, `Move` (+1 move only by active turn UID, allowing multi-turn chains such as Checkers double jumps, Mancala store landings, Dots & Boxes completions, and Reversi auto-passes), `Resign`, `RematchVote`, and `RematchReset`.
 5. **Terminal Lock**: Once `status == 'finished'`, gameplay moves, joins, and resignations are locked out; only seated participants may vote for or reset a rematch.
 
+---
+
+## 5. Direct Friend Game Invites (`/gameInvites/{inviteId}`) Security Invariants
+
+1. **Strict Participant Isolation (`get` & `list`)**: Only users whose `request.auth.uid` appears inside `participantUids` (`[fromUid, toUid]`) may read or list game invites.
+2. **Sender & Verified Recipient Integrity**: On create, `fromUid == request.auth.uid`, `fromUid != toUid`, `status == 'pending'`, `createdAt == request.time && updatedAt == request.time`, and target `chatProfiles/{toUid}` must exist.
+3. **Immutable Challenge Metadata & Role-Gated Transitions**: Updates may only touch `status` and `updatedAt` while `existing().status == 'pending'`; only `toUid` can accept/decline and only `fromUid` can cancel.
+
+### Game Invites Malicious Payloads
+1. **Impersonating Another Sender**: `{ "fromUid": "victim", "toUid": "friend", "auth": { "uid": "attacker" } }` -> `PERMISSION_DENIED`
+2. **Spoofed List Query Without Participant Filter**: `{ "path": "/gameInvites", "auth": { "uid": "u1" }, "operation": "list" }` -> `PERMISSION_DENIED`
+3. **Self-Accepting Own Sent Invite**: `fromUid` attempting `update({ status: 'accepted' })` -> `PERMISSION_DENIED`
+4. **Tampering Room Code After Sending Invite**: `toUid` attempting `update({ roomCode: 'EVIL99', status: 'accepted' })` -> `PERMISSION_DENIED`

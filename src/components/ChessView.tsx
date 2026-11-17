@@ -30,9 +30,18 @@ import {
   ChevronLast,
   ChevronLeft,
   ChevronRight,
-  Activity
+  Activity,
+  Gamepad2,
+  Play,
+  Send
 } from 'lucide-react';
 import { ThemeConfig } from '../services/themeStore';
+import { useAuth } from '../context/AuthContext';
+import { useNotifications } from '../context/NotificationContext';
+import { auth } from '../services/firebase';
+import { AVATAR_PRESETS } from '../services/cloudSaveService';
+import { isProfileOnlineNow } from '../services/chatService';
+import { sendGameInvite } from '../services/inviteService';
 import {
   AnalysisLine,
   BotMoveDecision,
@@ -486,6 +495,19 @@ function loadSavedLocalChessMatch(): {
 }
 
 export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
+  const { user, profile } = useAuth();
+  const {
+    pendingChessJoinCode,
+    clearPendingChessJoinCode,
+    trackedChessRoom,
+    setTrackedChessRoom,
+    pushTurnToast,
+    contacts,
+    directoryProfiles,
+    incomingInvites,
+    acceptGameInvite,
+    declineGameInvite
+  } = useNotifications();
   const initialRestoredMatch = useMemo(() => loadSavedLocalChessMatch(), []);
 
   // Match Configuration
@@ -603,6 +625,8 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
   const [onlineAuthNeeded, setOnlineAuthNeeded] = useState(false);
   const [onlineSigningIn, setOnlineSigningIn] = useState(false);
   const [copiedType, setCopiedType] = useState<'code' | 'link' | null>(null);
+  const [invitingFriendUid, setInvitingFriendUid] = useState<string | null>(null);
+  const [invitedFriendUids, setInvitedFriendUids] = useState<Set<string>>(() => new Set());
 
   const wsRef = useRef<WebSocket | null>(null);
   const firestoreUnsubRef = useRef<(() => void) | null>(null);
@@ -970,10 +994,25 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
           } else {
             playSound('move');
           }
+
+          if (
+            (msg.myColor === 'w' || msg.myColor === 'b') &&
+            nextState.turn === msg.myColor &&
+            typeof document !== 'undefined' &&
+            document.visibilityState === 'hidden'
+          ) {
+            const opp = msg.myColor === 'w' ? msg.players?.b?.name : msg.players?.w?.name;
+            pushTurnToast({
+              space: 'chess',
+              title: "It's your turn in Chess!",
+              body: `${opp || 'Opponent'} moved in room ${msg.code}.`,
+              roomCode: msg.code
+            });
+          }
         }
       }
     },
-    [playSound]
+    [playSound, pushTurnToast]
   );
 
   const startFirestoreRoomSubscription = useCallback(
@@ -1202,7 +1241,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     };
   }, [closeWebSocket, closeFirestoreRoom]);
 
-  // Auto-join ?chessRoom=CODE from URL on mount
+  // Auto-join ?chessRoom=CODE from URL or rejoin tracked Firestore room on mount
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
@@ -1227,12 +1266,49 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
           } else {
             void joinOnlineViaFirestore(cleanCode);
           }
+          return;
         }
+      }
+      if (!pendingChessJoinCode && trackedChessRoom?.code && !onlineRoomCode) {
+        setMode('online');
+        setJoinCodeInput(trackedChessRoom.code);
+        void joinOnlineViaFirestore(trackedChessRoom.code);
       }
     } catch {}
     // Run once on initial mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Auto-join when clicking "Accept" on a game invite or "Jump to Match" on a turn notification
+  useEffect(() => {
+    if (!pendingChessJoinCode) return;
+    const cleanCode = sanitizeRoomCode(pendingChessJoinCode);
+    clearPendingChessJoinCode();
+    if (!cleanCode) return;
+    setMode('online');
+    setJoinCodeInput(cleanCode);
+    void joinOnlineViaFirestore(cleanCode);
+  }, [pendingChessJoinCode, clearPendingChessJoinCode, joinOnlineViaFirestore]);
+
+  // Keep global background turn watcher synced for Firestore chess rooms
+  useEffect(() => {
+    if (
+      mode === 'online' &&
+      activeTransportRef.current === 'firestore' &&
+      onlineRoomCode &&
+      (onlineMyColor === 'w' || onlineMyColor === 'b') &&
+      !isGameOver
+    ) {
+      setTrackedChessRoom({ code: onlineRoomCode, mySide: onlineMyColor });
+    }
+  }, [mode, onlineRoomCode, onlineMyColor, isGameOver, setTrackedChessRoom]);
+
+  // Reset invite sent badges when room resets
+  useEffect(() => {
+    if (!onlineRoomCode) {
+      setInvitedFriendUids(new Set());
+    }
+  }, [onlineRoomCode]);
 
   const handleGoogleSignInForOnline = async () => {
     setOnlineSigningIn(true);
@@ -1300,6 +1376,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
 
   const handleLeaveRoom = () => {
     const codeToLeave = onlineRoomCode;
+    setTrackedChessRoom(null);
     if (codeToLeave) {
       if (activeTransportRef.current === 'ws') {
         if (wsRef.current?.readyState === WebSocket.OPEN) {
@@ -1341,6 +1418,103 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       activeColor: null,
       anchoredAt: Date.now()
     };
+  };
+
+  const myFirebaseUid =
+    user?.uid && auth.currentUser?.uid === user.uid ? user.uid : auth.currentUser?.uid || '';
+
+  const invitableChessPlayers = useMemo(() => {
+    const byUid = new Map<
+      string,
+      { uid: string; name: string; avatarId: string; isFriend: boolean; online: boolean }
+    >();
+    const dirMap = new Map(directoryProfiles.map(p => [p.userId, p]));
+
+    for (const c of contacts) {
+      if (!c.contactUid || c.contactUid === myFirebaseUid) continue;
+      const live = dirMap.get(c.contactUid);
+      byUid.set(c.contactUid, {
+        uid: c.contactUid,
+        name: live?.displayName || c.nickname || c.displayName,
+        avatarId: live?.avatarId || c.avatarId || 'melon_classic',
+        isFriend: true,
+        online: live ? isProfileOnlineNow(live) : false
+      });
+    }
+
+    for (const p of directoryProfiles) {
+      if (!p.userId || p.userId === myFirebaseUid || byUid.has(p.userId)) continue;
+      byUid.set(p.userId, {
+        uid: p.userId,
+        name: p.displayName,
+        avatarId: p.avatarId || 'melon_classic',
+        isFriend: false,
+        online: isProfileOnlineNow(p)
+      });
+    }
+
+    return Array.from(byUid.values())
+      .sort((a, b) => Number(b.online) - Number(a.online) || Number(b.isFriend) - Number(a.isFriend))
+      .slice(0, 12);
+  }, [contacts, directoryProfiles, myFirebaseUid]);
+
+  const incomingChessInvites = useMemo(
+    () => incomingInvites.filter(inv => inv.gameKind === 'chess'),
+    [incomingInvites]
+  );
+
+  const handleInviteFriendToChess = async (target: { uid: string; name: string }) => {
+    setOnlineError(null);
+    setInvitingFriendUid(target.uid);
+    try {
+      let roomToShare =
+        onlineRoomCode && activeTransportRef.current === 'firestore' ? onlineRoomCode : '';
+      let senderUid = myFirebaseUid;
+
+      if (!roomToShare) {
+        closeWebSocket();
+        closeFirestoreRoom();
+        setWsStatus('connecting');
+        const created = await createFirestoreChessRoom({
+          playerId,
+          playerName: playerName.trim() || profile?.displayName || user?.displayName || 'Player',
+          preferredColor: sidePref,
+          timeControlId
+        });
+        roomToShare = created.code;
+        senderUid = created.uid;
+        startFirestoreRoomSubscription(created.code, created.uid);
+      }
+
+      if (!senderUid || auth.currentUser?.uid !== senderUid) {
+        throw new ChessAuthRequiredError('Sign in with Google once to invite friends directly.');
+      }
+
+      await sendGameInvite({
+        fromUid: senderUid,
+        fromName: playerName.trim() || profile?.displayName || user?.displayName || 'Player',
+        fromAvatarId: profile?.avatarId || 'melon_classic',
+        toUid: target.uid,
+        toName: target.name,
+        gameKind: 'chess',
+        gameType: 'chess',
+        gameTitle: 'Chess',
+        roomCode: roomToShare
+      });
+
+      setInvitedFriendUids(prev => {
+        const next = new Set(prev);
+        next.add(target.uid);
+        return next;
+      });
+    } catch (err) {
+      if (err instanceof ChessAuthRequiredError) {
+        setOnlineAuthNeeded(true);
+      }
+      setOnlineError(err instanceof Error ? err.message : 'Could not send invite.');
+    } finally {
+      setInvitingFriendUid(null);
+    }
   };
 
   const sendWsMove = useCallback(
@@ -3800,6 +3974,106 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                       <LogOut className="w-3 h-3" />
                       Leave
                     </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Pending Direct Chess Invites */}
+              {incomingChessInvites.length > 0 && (
+                <div className="p-2 rounded-lg border border-sky-400/40 bg-sky-500/10 flex flex-col gap-1.5">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-sky-300 flex items-center gap-1">
+                    <Gamepad2 className="w-3 h-3" />
+                    <span>Chess Invites ({incomingChessInvites.length})</span>
+                  </div>
+                  {incomingChessInvites.map(inv => (
+                    <div
+                      key={inv.id}
+                      className="flex items-center justify-between gap-2 bg-black/25 px-2 py-1.5 rounded-md border border-white/10"
+                    >
+                      <span className="text-[11px] font-bold text-white truncate">
+                        {(AVATAR_PRESETS.find(a => a.id === inv.fromAvatarId) || AVATAR_PRESETS[0]).icon}{' '}
+                        {inv.fromName}
+                      </span>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => void acceptGameInvite(inv)}
+                          className="px-2 py-0.5 rounded bg-sky-400 hover:bg-sky-300 text-black text-[10px] font-extrabold flex items-center gap-1 cursor-pointer"
+                        >
+                          <Play className="w-2.5 h-2.5 fill-current" />
+                          <span>Accept</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void declineGameInvite(inv)}
+                          className="p-0.5 rounded text-slate-400 hover:text-white cursor-pointer"
+                          title="Decline"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* 1-Click Direct Friend Invites (No Code Needed) */}
+              {(!onlineRoomCode || !(onlinePlayers.w && onlinePlayers.b)) && invitableChessPlayers.length > 0 && (
+                <div
+                  className="p-2 rounded-lg border flex flex-col gap-1.5"
+                  style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
+                >
+                  <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    <span>Invite Friend (No Code)</span>
+                    <span className="font-mono text-emerald-400">
+                      {invitableChessPlayers.filter(p => p.online).length} online
+                    </span>
+                  </div>
+                  <div className="max-h-28 overflow-y-auto flex flex-col gap-1 pr-0.5">
+                    {invitableChessPlayers.map(person => {
+                      const alreadyInvited = invitedFriendUids.has(person.uid);
+                      const isSendingThis = invitingFriendUid === person.uid;
+                      const icon = (AVATAR_PRESETS.find(a => a.id === person.avatarId) || AVATAR_PRESETS[0]).icon;
+                      return (
+                        <div
+                          key={person.uid}
+                          className="flex items-center justify-between gap-2 px-2 py-1 rounded-md bg-black/25 border border-white/5"
+                        >
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="text-xs shrink-0">{icon}</span>
+                            <span className="text-[11px] font-bold text-white truncate">{person.name}</span>
+                            {person.online && (
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" title="Online now" />
+                            )}
+                          </div>
+                          <button
+                            type="button"
+                            disabled={Boolean(invitingFriendUid) || alreadyInvited}
+                            onClick={() => void handleInviteFriendToChess(person)}
+                            className={`px-2 py-0.5 rounded text-[10px] font-extrabold flex items-center gap-1 shrink-0 cursor-pointer transition-colors disabled:opacity-65 ${
+                              alreadyInvited
+                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                                : 'text-black hover:brightness-110'
+                            }`}
+                            style={!alreadyInvited ? { backgroundColor: activeTheme.accent } : undefined}
+                          >
+                            {alreadyInvited ? (
+                              <>
+                                <Check className="w-2.5 h-2.5" />
+                                <span>Invited</span>
+                              </>
+                            ) : isSendingThis ? (
+                              <span>Sending...</span>
+                            ) : (
+                              <>
+                                <Send className="w-2.5 h-2.5" />
+                                <span>Invite</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}

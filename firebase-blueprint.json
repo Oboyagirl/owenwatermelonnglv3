@@ -659,6 +659,113 @@
         "createdAt",
         "updatedAt"
       ]
+    },
+    "gameInvite": {
+      "title": "Direct Friend Game Invite",
+      "description": "1-click cross-device game challenge sent between Firebase players without typing room codes",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique invite document ID",
+          "maxLength": 128
+        },
+        "fromUid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the challenger",
+          "maxLength": 128
+        },
+        "fromName": {
+          "type": "string",
+          "description": "Display name of the challenger",
+          "maxLength": 64
+        },
+        "fromAvatarId": {
+          "type": "string",
+          "description": "Avatar ID of the challenger",
+          "maxLength": 64
+        },
+        "toUid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the invited friend",
+          "maxLength": 128
+        },
+        "toName": {
+          "type": "string",
+          "description": "Display name of the invited friend",
+          "maxLength": 64
+        },
+        "participantUids": {
+          "type": "array",
+          "description": "Bounded two-element array [fromUid, toUid]"
+        },
+        "gameKind": {
+          "type": "string",
+          "description": "Target game studio category",
+          "enum": ["chess", "arcade"],
+          "maxLength": 16
+        },
+        "gameType": {
+          "type": "string",
+          "description": "Specific game identifier",
+          "enum": [
+            "chess",
+            "connect4",
+            "checkers",
+            "reversi",
+            "dots-and-boxes",
+            "gomoku",
+            "ultimate-ttt",
+            "mancala",
+            "tictactoe"
+          ],
+          "maxLength": 32
+        },
+        "gameTitle": {
+          "type": "string",
+          "description": "Human-readable game name",
+          "maxLength": 64
+        },
+        "roomCode": {
+          "type": "string",
+          "description": "Target 4-8 character uppercase room code",
+          "minLength": 4,
+          "maxLength": 8,
+          "pattern": "^[A-Z0-9]+$"
+        },
+        "status": {
+          "type": "string",
+          "description": "Invite lifecycle state",
+          "enum": ["pending", "accepted", "declined", "cancelled"],
+          "maxLength": 16
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of invite creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update"
+        }
+      },
+      "required": [
+        "id",
+        "fromUid",
+        "fromName",
+        "fromAvatarId",
+        "toUid",
+        "toName",
+        "participantUids",
+        "gameKind",
+        "gameType",
+        "gameTitle",
+        "roomCode",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
     }
   },
   "firestore": {
@@ -715,6 +822,12 @@
         "$ref": "#/entities/arcadeRoom"
       },
       "description": "Online Multiplayer Arcade room state addressed strictly by single-document room code"
+    },
+    "/gameInvites/{inviteId}": {
+      "schema": {
+        "$ref": "#/entities/gameInvite"
+      },
+      "description": "Direct friend game invites for 1-click joining without typing room codes"
     }
   }
 }

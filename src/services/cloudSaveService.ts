@@ -14,7 +14,7 @@ import {
   deleteDoc,
   onSnapshot
 } from 'firebase/firestore';
-import { auth, db, googleProvider, ensureAuthPersistence, handleFirestoreError, OperationType } from './firebase';
+import { auth, db, googleProvider, ensureAuthPersistence, clearFirebaseAuthBackup, handleFirestoreError, OperationType } from './firebase';
 
 export interface UserProfile {
   userId: string;
@@ -521,6 +521,7 @@ export async function loginAsGuest(customName?: string): Promise<AppUser> {
 
 export async function logoutUser(): Promise<void> {
   clearRememberedLogin();
+  clearFirebaseAuthBackup();
   try {
     if (auth.currentUser) {
       await signOut(auth);
@@ -553,20 +554,49 @@ export function subscribeToAuth(callback: (user: AppUser | null) => void) {
 export async function syncInitialProfile(user: AppUser, fallbackName?: string): Promise<UserProfile> {
   const localProfKey = `owen_profile_${user.uid}`;
   let localProf: UserProfile | null = null;
+  let globalCachedProf: UserProfile | null = null;
+  let rememberedProf: RememberedAccount | null = null;
   try {
     const raw = localStorage.getItem(localProfKey);
     if (raw) localProf = JSON.parse(raw);
   } catch (e) {}
+  try {
+    const rawGlobal = localStorage.getItem('owen_gamer_profile');
+    if (rawGlobal) globalCachedProf = JSON.parse(rawGlobal);
+  } catch (e) {}
+  try {
+    rememberedProf = getRememberedLogin().account;
+  } catch (e) {}
 
-  const displayName = (user.displayName || fallbackName || localProf?.displayName || `Player_${user.uid.slice(0, 5)}`).trim() || 'Player';
+  const previousProfileFallback =
+    localProf ||
+    (globalCachedProf && (!globalCachedProf.userId || globalCachedProf.userId === user.uid || user.isAnonymous)
+      ? globalCachedProf
+      : null);
+
+  const displayName =
+    (
+      user.displayName ||
+      fallbackName ||
+      previousProfileFallback?.displayName ||
+      rememberedProf?.displayName ||
+      `Player_${user.uid.slice(0, 5)}`
+    ).trim() || 'Player';
   const newProfile: UserProfile = {
     userId: user.uid,
     displayName: displayName.slice(0, 60),
-    photoURL: (user.photoURL || localProf?.photoURL || '').slice(0, 500),
-    avatarId: (localProf?.avatarId || 'melon_classic').slice(0, 64),
-    favoriteGameIds: Array.isArray(localProf?.favoriteGameIds) ? localProf.favoriteGameIds.slice(0, 100) : [],
-    recentGameIds: Array.isArray(localProf?.recentGameIds) ? localProf.recentGameIds.slice(0, 50) : [],
-    createdAt: typeof localProf?.createdAt === 'string' ? localProf.createdAt.slice(0, 64) : new Date().toISOString(),
+    photoURL: (user.photoURL || previousProfileFallback?.photoURL || rememberedProf?.photoURL || '').slice(0, 500),
+    avatarId: (previousProfileFallback?.avatarId || rememberedProf?.avatarId || 'melon_classic').slice(0, 64),
+    favoriteGameIds: Array.isArray(previousProfileFallback?.favoriteGameIds)
+      ? previousProfileFallback.favoriteGameIds.slice(0, 100)
+      : [],
+    recentGameIds: Array.isArray(previousProfileFallback?.recentGameIds)
+      ? previousProfileFallback.recentGameIds.slice(0, 50)
+      : [],
+    createdAt:
+      typeof previousProfileFallback?.createdAt === 'string'
+        ? previousProfileFallback.createdAt.slice(0, 64)
+        : new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
 
@@ -1220,6 +1250,12 @@ const APP_INTERNAL_KEYS = new Set([
   'search_history',
   'owen_gamer_profile',
   'owen_local_guest_session',
+  'owen_session_mode',
+  'owen_remembered_account',
+  'owen_fb_auth_backup_v1',
+  'owen_site_explicitly_locked',
+  'owen_chat_discoverable',
+  'owen_chat_keep_open',
   'owen_autosave_enabled',
   'owen_game_overrides_v2',
   'owen_creator_mode_active',

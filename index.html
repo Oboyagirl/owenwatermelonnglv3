@@ -3,6 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>Owen Watermelon V3</title>
     <meta name="description" content="Unblocked games website template with built-in iframe games catalog, tab cloaker, music studio, and customizable games JSON." />
     <meta property="og:title" content="Owen Watermelon V3" />
@@ -50,7 +53,7 @@
         <span id="preloader-status" style="font-size: 11px; color: #64748b; margin-top: 12px; font-family: monospace;">Loading catalog...</span>
         <div id="preloader-troubleshoot" style="display: none; margin-top: 16px;">
           <p style="font-size: 12px; color: #f59e0b; margin: 0 0 10px 0;">Loading taking longer than usual?</p>
-          <button onclick="try { sessionStorage.clear(); if ('caches' in window) { caches.keys().then(function(names){ names.forEach(function(n){ caches.delete(n); }); }); } if (navigator.serviceWorker) { navigator.serviceWorker.getRegistrations().then(function(regs){ regs.forEach(function(r){ r.unregister(); }); }); } } catch(e){} window.location.reload();" style="padding: 8px 16px; background-color: #10b981; color: #042f1f; font-weight: 700; font-size: 12px; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(16,185,129,0.3);">
+          <button onclick="try { sessionStorage.removeItem('vite_preload_reloaded'); sessionStorage.removeItem('owen_asset_reload_ts'); if ('caches' in window) { caches.keys().then(function(names){ names.forEach(function(n){ caches.delete(n); }); }); } if (navigator.serviceWorker) { navigator.serviceWorker.getRegistrations().then(function(regs){ regs.forEach(function(r){ r.unregister(); }); }); } } catch(e){} window.location.reload();" style="padding: 8px 16px; background-color: #10b981; color: #042f1f; font-weight: 700; font-size: 12px; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(16,185,129,0.3);">
             Reset Cache & Reload
           </button>
         </div>
@@ -63,6 +66,24 @@
           var ts = document.getElementById('preloader-troubleshoot');
           if (ts) ts.style.display = 'block';
         }, 5000);
+
+        function clearAssetCachesAndReloadOnce() {
+          try {
+            var now = Date.now();
+            var last = Number(sessionStorage.getItem('owen_asset_reload_ts') || '0');
+            if (last && now - last < 15000) return false;
+            sessionStorage.setItem('owen_asset_reload_ts', String(now));
+            if ('caches' in window) {
+              caches.keys().then(function(names) {
+                names.forEach(function(n) { caches.delete(n); });
+              });
+            }
+            window.location.reload();
+            return true;
+          } catch (err) {
+            return false;
+          }
+        }
 
         function showError(msg) {
           clearTimeout(timer);
@@ -79,7 +100,11 @@
           var target = e && e.target;
           if (target && target.tagName) {
             if (target.tagName === 'SCRIPT') {
-              showError('Failed to load script: ' + (target.src || 'unknown'));
+              var src = target.src || '';
+              if (src.indexOf('/assets/') !== -1 && clearAssetCachesAndReloadOnce()) {
+                return;
+              }
+              showError('Failed to load script: ' + (src || 'unknown'));
             }
             return;
           }
@@ -87,10 +112,16 @@
         }, true);
 
         window.addEventListener('unhandledrejection', function(e) {
-          showError('Async error: ' + (e.reason && (e.reason.message || e.reason) || 'Promise failed'));
+          var msg = (e.reason && (e.reason.message || e.reason)) || 'Promise failed';
+          if (String(msg).indexOf('Failed to fetch dynamically imported module') !== -1 ||
+              String(msg).indexOf('Importing a module script failed') !== -1) {
+            if (clearAssetCachesAndReloadOnce()) return;
+          }
+          showError('Async error: ' + msg);
         });
 
-        window.addEventListener('vite:preloadError', function() {
+        window.addEventListener('vite:preloadError', function(e) {
+          if (e && e.preventDefault) e.preventDefault();
           try {
             if (!sessionStorage.getItem('vite_preload_reloaded')) {
               sessionStorage.setItem('vite_preload_reloaded', '1');
