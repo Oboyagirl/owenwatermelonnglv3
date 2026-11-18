@@ -262,7 +262,36 @@
         },
         "rematchVotes": {
           "type": "array",
-          "description": "Array of colors voting for rematch (max 2)"
+          "description": "Array of color or seat tokens voting for rematch (max 6)"
+        },
+        "teamMode": {
+          "type": "string",
+          "description": "Match team size mode (1v1, 2v2, or 3v3)",
+          "enum": ["1v1", "2v2", "3v3"],
+          "maxLength": 4
+        },
+        "whiteSeats": {
+          "type": "array",
+          "description": "Team White seat roster (length 1, 2, or 3)"
+        },
+        "blackSeats": {
+          "type": "array",
+          "description": "Team Black seat roster (length 1, 2, or 3)"
+        },
+        "participantUids": {
+          "type": "array",
+          "description": "Unique human Firebase Auth UIDs seated in this room (max 6)"
+        },
+        "activeSeatKind": {
+          "type": "string",
+          "description": "Kind of seat currently on the move (open, human, or bot)",
+          "enum": ["open", "human", "bot"],
+          "maxLength": 8
+        },
+        "activeSeatUid": {
+          "type": "string",
+          "description": "Auth UID of active human seat on the move or null",
+          "maxLength": 128
         },
         "createdAt": {
           "type": "string",
@@ -691,7 +720,44 @@
         },
         "rematchVotes": {
           "type": "array",
-          "description": "Array of players voting for rematch (max 2)"
+          "description": "Array of player or seat tokens voting for rematch (max 6)"
+        },
+        "teamMode": {
+          "type": "string",
+          "description": "Match team size mode (1v1, 2v2, or 3v3)",
+          "enum": ["1v1", "2v2", "3v3"],
+          "maxLength": 4
+        },
+        "team1Seats": {
+          "type": "array",
+          "description": "Team 1 seat roster (length 1, 2, or 3)"
+        },
+        "team2Seats": {
+          "type": "array",
+          "description": "Team 2 seat roster (length 1, 2, or 3)"
+        },
+        "participantUids": {
+          "type": "array",
+          "description": "Unique human Firebase Auth UIDs seated in this room (max 6)"
+        },
+        "team1TurnCount": {
+          "type": "number",
+          "description": "Completed Team 1 turns for relay rotation"
+        },
+        "team2TurnCount": {
+          "type": "number",
+          "description": "Completed Team 2 turns for relay rotation"
+        },
+        "activeSeatKind": {
+          "type": "string",
+          "description": "Kind of seat currently on the move (open, human, or bot)",
+          "enum": ["open", "human", "bot"],
+          "maxLength": 8
+        },
+        "activeSeatUid": {
+          "type": "string",
+          "description": "Auth UID of active human seat on the move or null",
+          "maxLength": 128
         },
         "createdAt": {
           "type": "string",

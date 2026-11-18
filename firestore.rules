@@ -71,6 +71,60 @@ service cloud.firestore {
       return code is string && code.size() >= 4 && code.size() <= 8 && code.matches('^[A-Z0-9]+$');
     }
 
+    function isValidTeamSeat(seat) {
+      return seat is map &&
+        seat.keys().hasAll(['kind', 'uid', 'playerId', 'name', 'botId']) &&
+        seat.keys().hasOnly(['kind', 'uid', 'playerId', 'name', 'botId']) &&
+        seat.kind is string && seat.kind.size() >= 3 && seat.kind.size() <= 8 &&
+        seat.kind in ['open', 'human', 'bot'] &&
+        (seat.uid == null || (seat.uid is string && seat.uid.size() > 0 && seat.uid.size() <= 128)) &&
+        (seat.playerId == null || (seat.playerId is string && seat.playerId.size() > 0 && seat.playerId.size() <= 64)) &&
+        (seat.name == null || (seat.name is string && seat.name.size() <= 24)) &&
+        (seat.botId == null || (seat.botId is string && seat.botId.size() > 0 && seat.botId.size() <= 32));
+    }
+
+    function isValidSeatList(seats) {
+      return seats is list &&
+        seats.size() >= 1 &&
+        seats.size() <= 3 &&
+        isValidTeamSeat(seats[0]) &&
+        (seats.size() < 2 || isValidTeamSeat(seats[1])) &&
+        (seats.size() < 3 || isValidTeamSeat(seats[2]));
+    }
+
+    function isValidParticipantList(uids) {
+      return uids is list &&
+        uids.size() <= 6 &&
+        (uids.size() < 1 || (uids[0] is string && uids[0].size() > 0 && uids[0].size() <= 128)) &&
+        (uids.size() < 2 || (uids[1] is string && uids[1].size() > 0 && uids[1].size() <= 128)) &&
+        (uids.size() < 3 || (uids[2] is string && uids[2].size() > 0 && uids[2].size() <= 128)) &&
+        (uids.size() < 4 || (uids[3] is string && uids[3].size() > 0 && uids[3].size() <= 128)) &&
+        (uids.size() < 5 || (uids[4] is string && uids[4].size() > 0 && uids[4].size() <= 128)) &&
+        (uids.size() < 6 || (uids[5] is string && uids[5].size() > 0 && uids[5].size() <= 128));
+    }
+
+    function isValidArcadeRematchVotes(votes) {
+      return votes is list &&
+        votes.size() <= 6 &&
+        (votes.size() < 1 || (votes[0] is string && votes[0].size() >= 2 && votes[0].size() <= 6 && votes[0].matches('^(p1|p2)(:[0-2])?$'))) &&
+        (votes.size() < 2 || (votes[1] is string && votes[1].size() >= 2 && votes[1].size() <= 6 && votes[1].matches('^(p1|p2)(:[0-2])?$'))) &&
+        (votes.size() < 3 || (votes[2] is string && votes[2].size() >= 2 && votes[2].size() <= 6 && votes[2].matches('^(p1|p2)(:[0-2])?$'))) &&
+        (votes.size() < 4 || (votes[3] is string && votes[3].size() >= 2 && votes[3].size() <= 6 && votes[3].matches('^(p1|p2)(:[0-2])?$'))) &&
+        (votes.size() < 5 || (votes[4] is string && votes[4].size() >= 2 && votes[4].size() <= 6 && votes[4].matches('^(p1|p2)(:[0-2])?$'))) &&
+        (votes.size() < 6 || (votes[5] is string && votes[5].size() >= 2 && votes[5].size() <= 6 && votes[5].matches('^(p1|p2)(:[0-2])?$')));
+    }
+
+    function isValidChessRematchVotes(votes) {
+      return votes is list &&
+        votes.size() <= 6 &&
+        (votes.size() < 1 || (votes[0] is string && votes[0].size() >= 1 && votes[0].size() <= 4 && votes[0].matches('^(w|b)(:[0-2])?$'))) &&
+        (votes.size() < 2 || (votes[1] is string && votes[1].size() >= 1 && votes[1].size() <= 4 && votes[1].matches('^(w|b)(:[0-2])?$'))) &&
+        (votes.size() < 3 || (votes[2] is string && votes[2].size() >= 1 && votes[2].size() <= 4 && votes[2].matches('^(w|b)(:[0-2])?$'))) &&
+        (votes.size() < 4 || (votes[3] is string && votes[3].size() >= 1 && votes[3].size() <= 4 && votes[3].matches('^(w|b)(:[0-2])?$'))) &&
+        (votes.size() < 5 || (votes[4] is string && votes[4].size() >= 1 && votes[4].size() <= 4 && votes[4].matches('^(w|b)(:[0-2])?$'))) &&
+        (votes.size() < 6 || (votes[5] is string && votes[5].size() >= 1 && votes[5].size() <= 4 && votes[5].matches('^(w|b)(:[0-2])?$')));
+    }
+
     function isValidChessRoom(data) {
       return data.keys().hasAll([
         'code', 'creatorAuthUid', 'status', 'timeControlId', 'baseMs', 'incMs',
@@ -84,7 +138,8 @@ service cloud.firestore {
         'whiteAuthUid', 'whitePlayerId', 'whiteName', 'whiteElo',
         'blackAuthUid', 'blackPlayerId', 'blackName', 'blackElo',
         'moves', 'turn', 'whiteTimeMs', 'blackTimeMs', 'clockAnchorMs',
-        'resignedWinner', 'timeoutWinner', 'rematchVotes', 'createdAt', 'updatedAt'
+        'resignedWinner', 'timeoutWinner', 'rematchVotes', 'createdAt', 'updatedAt',
+        'teamMode', 'whiteSeats', 'blackSeats', 'participantUids', 'activeSeatKind', 'activeSeatUid'
       ]) &&
       isValidRoomCode(data.code) &&
       data.creatorAuthUid is string && data.creatorAuthUid.size() > 0 && data.creatorAuthUid.size() <= 128 &&
@@ -108,9 +163,13 @@ service cloud.firestore {
       (data.clockAnchorMs == null || (data.clockAnchorMs is int && data.clockAnchorMs > 0)) &&
       (data.resignedWinner == null || (data.resignedWinner is string && data.resignedWinner.size() == 1 && data.resignedWinner in ['w', 'b'])) &&
       (data.timeoutWinner == null || (data.timeoutWinner is string && data.timeoutWinner.size() >= 1 && data.timeoutWinner.size() <= 4 && data.timeoutWinner in ['w', 'b', 'draw'])) &&
-      data.rematchVotes is list && data.rematchVotes.size() <= 2 &&
-      (data.rematchVotes.size() == 0 || (data.rematchVotes[0] is string && data.rematchVotes[0].size() == 1 && data.rematchVotes[0] in ['w', 'b'])) &&
-      (data.rematchVotes.size() < 2 || (data.rematchVotes[1] is string && data.rematchVotes[1].size() == 1 && data.rematchVotes[1] in ['w', 'b'])) &&
+      isValidChessRematchVotes(data.rematchVotes) &&
+      (!('teamMode' in data) || (data.teamMode is string && data.teamMode.size() == 3 && data.teamMode in ['1v1', '2v2', '3v3'])) &&
+      (!('whiteSeats' in data) || isValidSeatList(data.whiteSeats)) &&
+      (!('blackSeats' in data) || isValidSeatList(data.blackSeats)) &&
+      (!('participantUids' in data) || isValidParticipantList(data.participantUids)) &&
+      (!('activeSeatKind' in data) || (data.activeSeatKind is string && data.activeSeatKind.size() >= 3 && data.activeSeatKind.size() <= 8 && data.activeSeatKind in ['open', 'human', 'bot'])) &&
+      (!('activeSeatUid' in data) || data.activeSeatUid == null || (data.activeSeatUid is string && data.activeSeatUid.size() > 0 && data.activeSeatUid.size() <= 128)) &&
       data.createdAt is timestamp &&
       data.updatedAt is timestamp;
     }
@@ -118,7 +177,8 @@ service cloud.firestore {
     function isChessRoomParticipant(data) {
       return isSignedIn() && (
         data.whiteAuthUid == request.auth.uid ||
-        data.blackAuthUid == request.auth.uid
+        data.blackAuthUid == request.auth.uid ||
+        ('participantUids' in data && request.auth.uid in data.participantUids)
       );
     }
 
@@ -135,7 +195,9 @@ service cloud.firestore {
         'p1AuthUid', 'p1PlayerId', 'p1Name',
         'p2AuthUid', 'p2PlayerId', 'p2Name',
         'moves', 'turn', 'winner', 'resignedWinner', 'rematchVotes',
-        'createdAt', 'updatedAt'
+        'createdAt', 'updatedAt',
+        'teamMode', 'team1Seats', 'team2Seats', 'participantUids',
+        'team1TurnCount', 'team2TurnCount', 'activeSeatKind', 'activeSeatUid'
       ]) &&
       isValidRoomCode(data.code) &&
       data.gameType is string && data.gameType.size() > 0 && data.gameType.size() <= 32 &&
@@ -153,9 +215,15 @@ service cloud.firestore {
       data.turn is string && data.turn.size() == 2 && data.turn in ['p1', 'p2'] &&
       (data.winner == null || (data.winner is string && data.winner.size() >= 2 && data.winner.size() <= 4 && data.winner in ['p1', 'p2', 'draw'])) &&
       (data.resignedWinner == null || (data.resignedWinner is string && data.resignedWinner.size() == 2 && data.resignedWinner in ['p1', 'p2'])) &&
-      data.rematchVotes is list && data.rematchVotes.size() <= 2 &&
-      (data.rematchVotes.size() == 0 || (data.rematchVotes[0] is string && data.rematchVotes[0].size() == 2 && data.rematchVotes[0] in ['p1', 'p2'])) &&
-      (data.rematchVotes.size() < 2 || (data.rematchVotes[1] is string && data.rematchVotes[1].size() == 2 && data.rematchVotes[1] in ['p1', 'p2'])) &&
+      isValidArcadeRematchVotes(data.rematchVotes) &&
+      (!('teamMode' in data) || (data.teamMode is string && data.teamMode.size() == 3 && data.teamMode in ['1v1', '2v2', '3v3'])) &&
+      (!('team1Seats' in data) || isValidSeatList(data.team1Seats)) &&
+      (!('team2Seats' in data) || isValidSeatList(data.team2Seats)) &&
+      (!('participantUids' in data) || isValidParticipantList(data.participantUids)) &&
+      (!('team1TurnCount' in data) || (data.team1TurnCount is int && data.team1TurnCount >= 0 && data.team1TurnCount <= 1000)) &&
+      (!('team2TurnCount' in data) || (data.team2TurnCount is int && data.team2TurnCount >= 0 && data.team2TurnCount <= 1000)) &&
+      (!('activeSeatKind' in data) || (data.activeSeatKind is string && data.activeSeatKind.size() >= 3 && data.activeSeatKind.size() <= 8 && data.activeSeatKind in ['open', 'human', 'bot'])) &&
+      (!('activeSeatUid' in data) || data.activeSeatUid == null || (data.activeSeatUid is string && data.activeSeatUid.size() > 0 && data.activeSeatUid.size() <= 128)) &&
       data.createdAt is timestamp &&
       data.updatedAt is timestamp;
     }
@@ -163,7 +231,8 @@ service cloud.firestore {
     function isArcadeRoomParticipant(data) {
       return isSignedIn() && (
         data.p1AuthUid == request.auth.uid ||
-        data.p2AuthUid == request.auth.uid
+        data.p2AuthUid == request.auth.uid ||
+        ('participantUids' in data && request.auth.uid in data.participantUids)
       );
     }
 
@@ -437,7 +506,7 @@ service cloud.firestore {
         isValidChessRoom(incoming()) &&
         incoming().code == roomCode &&
         incoming().creatorAuthUid == request.auth.uid &&
-        incoming().status == 'waiting' &&
+        incoming().status in ['waiting', 'active'] &&
         incoming().moves.size() == 0 &&
         incoming().turn == 'w' &&
         incoming().whiteTimeMs == incoming().baseMs &&
@@ -449,8 +518,9 @@ service cloud.firestore {
         incoming().createdAt == request.time &&
         incoming().updatedAt == request.time &&
         (
-          (incoming().whiteAuthUid == request.auth.uid && incoming().blackAuthUid == null) ||
-          (incoming().blackAuthUid == request.auth.uid && incoming().whiteAuthUid == null)
+          incoming().whiteAuthUid == request.auth.uid ||
+          incoming().blackAuthUid == request.auth.uid ||
+          ('participantUids' in incoming() && request.auth.uid in incoming().participantUids)
         );
 
       allow update: if isSignedIn() &&
@@ -462,46 +532,66 @@ service cloud.firestore {
         incoming().timeControlId == existing().timeControlId &&
         incoming().baseMs == existing().baseMs &&
         incoming().incMs == existing().incMs &&
+        ((!('teamMode' in existing()) && !('teamMode' in incoming())) || ('teamMode' in existing() && 'teamMode' in incoming() && incoming().teamMode == existing().teamMode)) &&
         incoming().updatedAt == request.time &&
         (
-          // Action: Join Open Seat or Reconnect to Own Seat
+          // Action: Join Open Seat, Reconnect, Switch Team, or Manage Bots
           (
             existing().status != 'finished' &&
             incoming().diff(existing()).affectedKeys().hasOnly([
               'whiteAuthUid', 'whitePlayerId', 'whiteName',
               'blackAuthUid', 'blackPlayerId', 'blackName',
+              'whiteSeats', 'blackSeats', 'participantUids', 'activeSeatKind', 'activeSeatUid',
               'status', 'updatedAt'
             ]) &&
             (
-              (existing().whiteAuthUid == null && incoming().whiteAuthUid == request.auth.uid && incoming().blackAuthUid == existing().blackAuthUid) ||
-              (existing().blackAuthUid == null && incoming().blackAuthUid == request.auth.uid && incoming().whiteAuthUid == existing().whiteAuthUid) ||
-              (existing().whiteAuthUid == request.auth.uid && incoming().whiteAuthUid == request.auth.uid && incoming().blackAuthUid == existing().blackAuthUid) ||
-              (existing().blackAuthUid == request.auth.uid && incoming().blackAuthUid == request.auth.uid && incoming().whiteAuthUid == existing().whiteAuthUid)
+              // Seated participant managing roster/bots or leaving before first move
+              (
+                'participantUids' in existing() &&
+                request.auth.uid in existing().participantUids &&
+                'participantUids' in incoming() &&
+                (
+                  request.auth.uid in incoming().participantUids ||
+                  (existing().moves.size() == 0 && existing().participantUids.hasAll(incoming().participantUids))
+                )
+              ) ||
+              // New human joining an open/bot seat
+              (
+                'participantUids' in existing() &&
+                !(request.auth.uid in existing().participantUids) &&
+                'participantUids' in incoming() &&
+                request.auth.uid in incoming().participantUids &&
+                incoming().participantUids.hasAll(existing().participantUids) &&
+                incoming().participantUids.size() == existing().participantUids.size() + 1
+              ) ||
+              // Legacy 1v1 join/vacate path
+              (
+                !('participantUids' in existing()) &&
+                (
+                  (existing().whiteAuthUid == null && incoming().whiteAuthUid == request.auth.uid && incoming().blackAuthUid == existing().blackAuthUid) ||
+                  (existing().blackAuthUid == null && incoming().blackAuthUid == request.auth.uid && incoming().whiteAuthUid == existing().whiteAuthUid) ||
+                  (existing().whiteAuthUid == request.auth.uid && incoming().whiteAuthUid == request.auth.uid && incoming().blackAuthUid == existing().blackAuthUid) ||
+                  (existing().blackAuthUid == request.auth.uid && incoming().blackAuthUid == request.auth.uid && incoming().whiteAuthUid == existing().whiteAuthUid) ||
+                  (existing().moves.size() == 0 && existing().whiteAuthUid == request.auth.uid && incoming().whiteAuthUid == null && incoming().blackAuthUid == existing().blackAuthUid) ||
+                  (existing().moves.size() == 0 && existing().blackAuthUid == request.auth.uid && incoming().blackAuthUid == null && incoming().whiteAuthUid == existing().whiteAuthUid)
+                )
+              )
             )
           ) ||
-          // Action: Vacate Own Seat Before First Move
-          (
-            existing().status != 'finished' &&
-            existing().moves.size() == 0 &&
-            incoming().diff(existing()).affectedKeys().hasOnly([
-              'whiteAuthUid', 'whitePlayerId', 'whiteName',
-              'blackAuthUid', 'blackPlayerId', 'blackName',
-              'status', 'updatedAt'
-            ]) &&
-            (
-              (existing().whiteAuthUid == request.auth.uid && incoming().whiteAuthUid == null && incoming().blackAuthUid == existing().blackAuthUid) ||
-              (existing().blackAuthUid == request.auth.uid && incoming().blackAuthUid == null && incoming().whiteAuthUid == existing().whiteAuthUid)
-            )
-          ) ||
-          // Action: Active Turn Player Makes Exactly One Move
+          // Action: Active Turn Player (or Seated Participant for Bot Seat) Makes Exactly One Move
           (
             existing().status != 'finished' &&
             (
-              (existing().turn == 'w' && existing().whiteAuthUid == request.auth.uid) ||
-              (existing().turn == 'b' && existing().blackAuthUid == request.auth.uid)
+              ('activeSeatKind' in existing() && existing().activeSeatKind == 'bot' && isChessRoomParticipant(existing())) ||
+              ('activeSeatUid' in existing() && existing().activeSeatUid == request.auth.uid) ||
+              (!('activeSeatUid' in existing()) && (
+                (existing().turn == 'w' && existing().whiteAuthUid == request.auth.uid) ||
+                (existing().turn == 'b' && existing().blackAuthUid == request.auth.uid)
+              ))
             ) &&
             incoming().diff(existing()).affectedKeys().hasOnly([
-              'moves', 'turn', 'status', 'whiteTimeMs', 'blackTimeMs', 'clockAnchorMs', 'rematchVotes', 'updatedAt'
+              'moves', 'turn', 'status', 'whiteTimeMs', 'blackTimeMs', 'clockAnchorMs', 'rematchVotes',
+              'activeSeatKind', 'activeSeatUid', 'updatedAt'
             ]) &&
             incoming().moves.size() == existing().moves.size() + 1 &&
             incoming().moves[existing().moves.size()] is string &&
@@ -534,6 +624,7 @@ service cloud.firestore {
             incoming().diff(existing()).affectedKeys().hasOnly([
               'whiteAuthUid', 'whitePlayerId', 'whiteName',
               'blackAuthUid', 'blackPlayerId', 'blackName',
+              'whiteSeats', 'blackSeats', 'participantUids', 'activeSeatKind', 'activeSeatUid',
               'moves', 'turn', 'status', 'whiteTimeMs', 'blackTimeMs',
               'clockAnchorMs', 'resignedWinner', 'timeoutWinner', 'rematchVotes', 'updatedAt'
             ]) &&
@@ -547,8 +638,13 @@ service cloud.firestore {
             incoming().blackTimeMs == existing().baseMs &&
             incoming().clockAnchorMs == null &&
             (
-              (incoming().whiteAuthUid == existing().blackAuthUid && incoming().blackAuthUid == existing().whiteAuthUid) ||
-              (incoming().whiteAuthUid == existing().whiteAuthUid && incoming().blackAuthUid == existing().blackAuthUid)
+              (!('participantUids' in existing()) && (
+                (incoming().whiteAuthUid == existing().blackAuthUid && incoming().blackAuthUid == existing().whiteAuthUid) ||
+                (incoming().whiteAuthUid == existing().whiteAuthUid && incoming().blackAuthUid == existing().blackAuthUid)
+              )) ||
+              ('participantUids' in existing() && 'participantUids' in incoming() &&
+                incoming().participantUids.size() == existing().participantUids.size() &&
+                incoming().participantUids.hasAll(existing().participantUids))
             )
           )
         );
@@ -568,7 +664,7 @@ service cloud.firestore {
         isValidArcadeRoom(incoming()) &&
         incoming().code == roomCode &&
         incoming().creatorAuthUid == request.auth.uid &&
-        incoming().status == 'waiting' &&
+        incoming().status in ['waiting', 'active'] &&
         incoming().moves.size() == 0 &&
         incoming().turn == 'p1' &&
         incoming().winner == null &&
@@ -577,8 +673,9 @@ service cloud.firestore {
         incoming().createdAt == request.time &&
         incoming().updatedAt == request.time &&
         (
-          (incoming().p1AuthUid == request.auth.uid && incoming().p2AuthUid == null) ||
-          (incoming().p2AuthUid == request.auth.uid && incoming().p1AuthUid == null)
+          incoming().p1AuthUid == request.auth.uid ||
+          incoming().p2AuthUid == request.auth.uid ||
+          ('participantUids' in incoming() && request.auth.uid in incoming().participantUids)
         );
 
       allow update: if isSignedIn() &&
@@ -588,46 +685,66 @@ service cloud.firestore {
         incoming().gameType == existing().gameType &&
         incoming().creatorAuthUid == existing().creatorAuthUid &&
         incoming().createdAt == existing().createdAt &&
+        ((!('teamMode' in existing()) && !('teamMode' in incoming())) || ('teamMode' in existing() && 'teamMode' in incoming() && incoming().teamMode == existing().teamMode)) &&
         incoming().updatedAt == request.time &&
         (
-          // Action: Join Open Seat or Reconnect to Own Seat
+          // Action: Join Open Seat, Reconnect, Switch Team, or Manage Bots
           (
             existing().status != 'finished' &&
             incoming().diff(existing()).affectedKeys().hasOnly([
               'p1AuthUid', 'p1PlayerId', 'p1Name',
               'p2AuthUid', 'p2PlayerId', 'p2Name',
+              'team1Seats', 'team2Seats', 'participantUids', 'team1TurnCount', 'team2TurnCount', 'activeSeatKind', 'activeSeatUid',
               'status', 'updatedAt'
             ]) &&
             (
-              (existing().p1AuthUid == null && incoming().p1AuthUid == request.auth.uid && incoming().p2AuthUid == existing().p2AuthUid) ||
-              (existing().p2AuthUid == null && incoming().p2AuthUid == request.auth.uid && incoming().p1AuthUid == existing().p1AuthUid) ||
-              (existing().p1AuthUid == request.auth.uid && incoming().p1AuthUid == request.auth.uid && incoming().p2AuthUid == existing().p2AuthUid) ||
-              (existing().p2AuthUid == request.auth.uid && incoming().p2AuthUid == request.auth.uid && incoming().p1AuthUid == existing().p1AuthUid)
+              // Seated participant managing roster/bots or leaving before first move
+              (
+                'participantUids' in existing() &&
+                request.auth.uid in existing().participantUids &&
+                'participantUids' in incoming() &&
+                (
+                  request.auth.uid in incoming().participantUids ||
+                  (existing().moves.size() == 0 && existing().participantUids.hasAll(incoming().participantUids))
+                )
+              ) ||
+              // New human joining an open/bot seat
+              (
+                'participantUids' in existing() &&
+                !(request.auth.uid in existing().participantUids) &&
+                'participantUids' in incoming() &&
+                request.auth.uid in incoming().participantUids &&
+                incoming().participantUids.hasAll(existing().participantUids) &&
+                incoming().participantUids.size() == existing().participantUids.size() + 1
+              ) ||
+              // Legacy 1v1 join/vacate path
+              (
+                !('participantUids' in existing()) &&
+                (
+                  (existing().p1AuthUid == null && incoming().p1AuthUid == request.auth.uid && incoming().p2AuthUid == existing().p2AuthUid) ||
+                  (existing().p2AuthUid == null && incoming().p2AuthUid == request.auth.uid && incoming().p1AuthUid == existing().p1AuthUid) ||
+                  (existing().p1AuthUid == request.auth.uid && incoming().p1AuthUid == request.auth.uid && incoming().p2AuthUid == existing().p2AuthUid) ||
+                  (existing().p2AuthUid == request.auth.uid && incoming().p2AuthUid == request.auth.uid && incoming().p1AuthUid == existing().p1AuthUid) ||
+                  (existing().moves.size() == 0 && existing().p1AuthUid == request.auth.uid && incoming().p1AuthUid == null && incoming().p2AuthUid == existing().p2AuthUid) ||
+                  (existing().moves.size() == 0 && existing().p2AuthUid == request.auth.uid && incoming().p2AuthUid == null && incoming().p1AuthUid == existing().p1AuthUid)
+                )
+              )
             )
           ) ||
-          // Action: Vacate Own Seat Before First Move
-          (
-            existing().status != 'finished' &&
-            existing().moves.size() == 0 &&
-            incoming().diff(existing()).affectedKeys().hasOnly([
-              'p1AuthUid', 'p1PlayerId', 'p1Name',
-              'p2AuthUid', 'p2PlayerId', 'p2Name',
-              'status', 'updatedAt'
-            ]) &&
-            (
-              (existing().p1AuthUid == request.auth.uid && incoming().p1AuthUid == null && incoming().p2AuthUid == existing().p2AuthUid) ||
-              (existing().p2AuthUid == request.auth.uid && incoming().p2AuthUid == null && incoming().p1AuthUid == existing().p1AuthUid)
-            )
-          ) ||
-          // Action: Active Turn Player Makes Exactly One Move
+          // Action: Active Turn Player (or Seated Participant for Bot Seat) Makes Exactly One Move
           (
             existing().status != 'finished' &&
             (
-              (existing().turn == 'p1' && existing().p1AuthUid == request.auth.uid) ||
-              (existing().turn == 'p2' && existing().p2AuthUid == request.auth.uid)
+              ('activeSeatKind' in existing() && existing().activeSeatKind == 'bot' && isArcadeRoomParticipant(existing())) ||
+              ('activeSeatUid' in existing() && existing().activeSeatUid == request.auth.uid) ||
+              (!('activeSeatUid' in existing()) && (
+                (existing().turn == 'p1' && existing().p1AuthUid == request.auth.uid) ||
+                (existing().turn == 'p2' && existing().p2AuthUid == request.auth.uid)
+              ))
             ) &&
             incoming().diff(existing()).affectedKeys().hasOnly([
-              'moves', 'turn', 'status', 'winner', 'rematchVotes', 'updatedAt'
+              'moves', 'turn', 'status', 'winner', 'rematchVotes',
+              'team1TurnCount', 'team2TurnCount', 'activeSeatKind', 'activeSeatUid', 'updatedAt'
             ]) &&
             incoming().moves.size() == existing().moves.size() + 1 &&
             incoming().moves[existing().moves.size()] is string &&
@@ -658,6 +775,7 @@ service cloud.firestore {
             incoming().diff(existing()).affectedKeys().hasOnly([
               'p1AuthUid', 'p1PlayerId', 'p1Name',
               'p2AuthUid', 'p2PlayerId', 'p2Name',
+              'team1Seats', 'team2Seats', 'participantUids', 'team1TurnCount', 'team2TurnCount', 'activeSeatKind', 'activeSeatUid',
               'moves', 'turn', 'status', 'winner', 'resignedWinner', 'rematchVotes', 'updatedAt'
             ]) &&
             incoming().moves.size() == 0 &&
@@ -667,8 +785,13 @@ service cloud.firestore {
             incoming().resignedWinner == null &&
             incoming().rematchVotes.size() == 0 &&
             (
-              (incoming().p1AuthUid == existing().p2AuthUid && incoming().p2AuthUid == existing().p1AuthUid) ||
-              (incoming().p1AuthUid == existing().p1AuthUid && incoming().p2AuthUid == existing().p2AuthUid)
+              (!('participantUids' in existing()) && (
+                (incoming().p1AuthUid == existing().p2AuthUid && incoming().p2AuthUid == existing().p1AuthUid) ||
+                (incoming().p1AuthUid == existing().p1AuthUid && incoming().p2AuthUid == existing().p2AuthUid)
+              )) ||
+              ('participantUids' in existing() && 'participantUids' in incoming() &&
+                incoming().participantUids.size() == existing().participantUids.size() &&
+                incoming().participantUids.hasAll(existing().participantUids))
             )
           )
         );
