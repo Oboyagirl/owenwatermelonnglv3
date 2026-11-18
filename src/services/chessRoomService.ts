@@ -20,9 +20,7 @@ import {
 import { markRememberedLogin } from './cloudSaveService';
 import {
   applyMove,
-  chooseBotMove,
   createInitialState,
-  getBotById,
   getLegalMoves,
   getTimeControlById,
   hasOnlyInsufficientMaterialForSide
@@ -34,25 +32,6 @@ import type {
   PieceColor,
   PromotionPieceType
 } from '../utils/chessEngine';
-import {
-  areAllSeatsFilled,
-  clearBotSeats,
-  collectParticipantUids,
-  createEmptySeats,
-  createHumanSeat,
-  fillOpenSeatsWithChessBots,
-  findSeatForUser,
-  getActiveChessSeatIndex,
-  getBotRunnerUid,
-  getFirstHumanInSeats,
-  getTeamSize,
-  normalizeTeamMode,
-  sanitizeSeatList,
-  summarizeTeamDisplayName,
-  TeamMode,
-  TeamSeat,
-  TeamSeatKind
-} from '../utils/teamModes';
 
 const ROOM_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const CHESS_ROOMS_COLLECTION = 'chessRooms';
@@ -61,12 +40,6 @@ export interface FirestoreChessRoomDoc {
   code: string;
   creatorAuthUid: string;
   status: 'waiting' | 'active' | 'finished';
-  teamMode?: TeamMode;
-  whiteSeats?: TeamSeat[];
-  blackSeats?: TeamSeat[];
-  participantUids?: string[];
-  activeSeatKind?: TeamSeatKind;
-  activeSeatUid?: string | null;
   timeControlId: string;
   baseMs: number;
   incMs: number;
@@ -85,27 +58,19 @@ export interface FirestoreChessRoomDoc {
   clockAnchorMs: number | null;
   resignedWinner: PieceColor | null;
   timeoutWinner: PieceColor | 'draw' | null;
-  rematchVotes: string[];
+  rematchVotes: PieceColor[];
   createdAt: unknown;
   updatedAt: unknown;
 }
 
 export interface ChessRoomViewPayload {
   code: string;
-  teamMode: TeamMode;
   myColor: PieceColor | 'spectator';
-  mySeatIndex: number | null;
   state: ChessState;
   history: MoveRecord[];
   resignedWinner: PieceColor | null;
   timeoutWinner: PieceColor | 'draw' | null;
-  rematchVotes: string[];
-  participantUids: string[];
-  whiteSeats: TeamSeat[];
-  blackSeats: TeamSeat[];
-  activeSeatIndex: number;
-  activeSeat: TeamSeat | null;
-  botRunnerUid: string | null;
+  rematchVotes: PieceColor[];
   clock: {
     timeControlId: string;
     baseMs: number;
@@ -275,98 +240,19 @@ function isRoomDocGameOver(docData: FirestoreChessRoomDoc, state: ChessState): b
   );
 }
 
-function resolveChessDocSeats(docData: FirestoreChessRoomDoc): {
-  teamMode: TeamMode;
-  whiteSeats: TeamSeat[];
-  blackSeats: TeamSeat[];
-} {
-  const teamMode = normalizeTeamMode(docData.teamMode);
-  const teamSize = getTeamSize(teamMode);
-  const whiteSeats = sanitizeSeatList(
-    docData.whiteSeats,
-    teamSize,
-    docData.whiteAuthUid || docData.whitePlayerId
-      ? { uid: docData.whiteAuthUid, playerId: docData.whitePlayerId, name: docData.whiteName }
-      : null
-  );
-  const blackSeats = sanitizeSeatList(
-    docData.blackSeats,
-    teamSize,
-    docData.blackAuthUid || docData.blackPlayerId
-      ? { uid: docData.blackAuthUid, playerId: docData.blackPlayerId, name: docData.blackName }
-      : null
-  );
-  return { teamMode, whiteSeats, blackSeats };
-}
-
-function computeChessMetaFields(params: {
-  teamMode: TeamMode;
-  whiteSeats: TeamSeat[];
-  blackSeats: TeamSeat[];
-  turn: PieceColor;
-  moveCount: number;
-  gameEnded?: boolean;
-}) {
-  const teamSize = getTeamSize(params.teamMode);
-  const activeSeatIndex = getActiveChessSeatIndex(params.moveCount, params.turn, teamSize);
-  const activeList = params.turn === 'w' ? params.whiteSeats : params.blackSeats;
-  const activeSeat = activeList[activeSeatIndex] || null;
-  const participantUids = collectParticipantUids(params.whiteSeats, params.blackSeats);
-  const wLead = getFirstHumanInSeats(params.whiteSeats);
-  const bLead = getFirstHumanInSeats(params.blackSeats);
-  const status: FirestoreChessRoomDoc['status'] = params.gameEnded
-    ? 'finished'
-    : areAllSeatsFilled(params.whiteSeats, params.blackSeats)
-    ? 'active'
-    : 'waiting';
-
-  return {
-    teamMode: params.teamMode,
-    whiteSeats: params.whiteSeats,
-    blackSeats: params.blackSeats,
-    participantUids,
-    activeSeatKind: (activeSeat?.kind || 'open') as TeamSeatKind,
-    activeSeatUid: activeSeat?.kind === 'human' ? activeSeat.uid || null : null,
-    whiteAuthUid: wLead?.uid || null,
-    whitePlayerId: wLead?.playerId || null,
-    whiteName: params.whiteSeats.some(s => s.kind !== 'open')
-      ? summarizeTeamDisplayName(params.whiteSeats, 'White')
-      : null,
-    blackAuthUid: bLead?.uid || null,
-    blackPlayerId: bLead?.playerId || null,
-    blackName: params.blackSeats.some(s => s.kind !== 'open')
-      ? summarizeTeamDisplayName(params.blackSeats, 'Black')
-      : null,
-    status
-  };
-}
-
 export function roomDocToViewPayload(
   docData: FirestoreChessRoomDoc,
   currentAuthUid: string,
   playerId: string
 ): ChessRoomViewPayload {
   const { state, history } = decodeAndReplayMoves(docData.moves, docData.code);
-  const { teamMode, whiteSeats, blackSeats } = resolveChessDocSeats(docData);
-  const teamSize = getTeamSize(teamMode);
 
-  const match = findSeatForUser(whiteSeats, blackSeats, currentAuthUid, playerId);
-  const myColor: PieceColor | 'spectator' = match
-    ? match.side === 'A'
-      ? 'w'
-      : 'b'
-    : 'spectator';
-  const mySeatIndex = match ? match.index : null;
-
-  const activeSeatIndex = getActiveChessSeatIndex(history.length, state.turn, teamSize);
-  const activeList = state.turn === 'w' ? whiteSeats : blackSeats;
-  const activeSeat = activeList[activeSeatIndex] || null;
-  const participantUids = collectParticipantUids(whiteSeats, blackSeats);
-
-  const wLead = getFirstHumanInSeats(whiteSeats);
-  const bLead = getFirstHumanInSeats(blackSeats);
-  const wHasAny = whiteSeats.some(s => s.kind !== 'open');
-  const bHasAny = blackSeats.some(s => s.kind !== 'open');
+  let myColor: PieceColor | 'spectator' = 'spectator';
+  if (docData.whiteAuthUid === currentAuthUid || (docData.whitePlayerId && docData.whitePlayerId === playerId)) {
+    myColor = 'w';
+  } else if (docData.blackAuthUid === currentAuthUid || (docData.blackPlayerId && docData.blackPlayerId === playerId)) {
+    myColor = 'b';
+  }
 
   const now = Date.now();
   let whiteTimeMs = docData.whiteTimeMs;
@@ -389,20 +275,12 @@ export function roomDocToViewPayload(
 
   return {
     code: docData.code,
-    teamMode,
     myColor,
-    mySeatIndex,
     state,
     history,
     resignedWinner: docData.resignedWinner || null,
     timeoutWinner: docData.timeoutWinner || null,
     rematchVotes: Array.isArray(docData.rematchVotes) ? docData.rematchVotes : [],
-    participantUids,
-    whiteSeats,
-    blackSeats,
-    activeSeatIndex,
-    activeSeat,
-    botRunnerUid: getBotRunnerUid(participantUids, docData.creatorAuthUid),
     clock: {
       timeControlId: docData.timeControlId || 'none',
       baseMs: docData.baseMs || 0,
@@ -415,18 +293,18 @@ export function roomDocToViewPayload(
     },
     creatorAuthUid: docData.creatorAuthUid || undefined,
     players: {
-      w: wHasAny
+      w: docData.whiteAuthUid
         ? {
-            uid: wLead?.uid || undefined,
-            name: summarizeTeamDisplayName(whiteSeats, docData.whiteName || 'White'),
+            uid: docData.whiteAuthUid,
+            name: docData.whiteName || 'White',
             elo: docData.whiteElo || 1200,
             connected: true
           }
         : null,
-      b: bHasAny
+      b: docData.blackAuthUid
         ? {
-            uid: bLead?.uid || undefined,
-            name: summarizeTeamDisplayName(blackSeats, docData.blackName || 'Black'),
+            uid: docData.blackAuthUid,
+            name: docData.blackName || 'Black',
             elo: docData.blackElo || 1200,
             connected: true
           }
@@ -445,6 +323,11 @@ function isPermissionDeniedError(err: unknown): boolean {
   );
 }
 
+/**
+ * Ensures Firebase Auth has an active UID before interacting with Firestore chessRooms.
+ * Uses existing session if present, attempts anonymous sign-in silently, and raises
+ * ChessAuthRequiredError if Firebase requires explicit Google sign-in.
+ */
 export async function ensureChessFirebaseUid(): Promise<string> {
   if (auth.currentUser?.uid) {
     return auth.currentUser.uid;
@@ -515,15 +398,11 @@ export async function createFirestoreChessRoom(params: {
   playerName: string;
   preferredColor: 'w' | 'b' | 'random';
   timeControlId: string;
-  teamMode?: TeamMode;
-  fillBots?: boolean;
-  primaryBotId?: string;
 }): Promise<{ code: string; uid: string }> {
   const uid = await ensureChessFirebaseUid();
   const safeName = sanitizePlayerName(params.playerName);
   const safePlayerId = String(params.playerId || uid).trim().slice(0, 64) || uid;
   const tc = getTimeControlById(params.timeControlId || 'none');
-  const teamMode = normalizeTeamMode(params.teamMode);
   const resolvedColor: PieceColor =
     params.preferredColor === 'b'
       ? 'b'
@@ -532,29 +411,6 @@ export async function createFirestoreChessRoom(params: {
         ? 'w'
         : 'b'
       : 'w';
-
-  let whiteSeats = createEmptySeats(teamMode);
-  let blackSeats = createEmptySeats(teamMode);
-  const creatorSeat = createHumanSeat({ uid, playerId: safePlayerId, name: safeName });
-  if (resolvedColor === 'w') {
-    whiteSeats[0] = creatorSeat;
-  } else {
-    blackSeats[0] = creatorSeat;
-  }
-
-  if (params.fillBots) {
-    const filled = fillOpenSeatsWithChessBots(whiteSeats, blackSeats, params.primaryBotId || 'pixel');
-    whiteSeats = filled.whiteSeats;
-    blackSeats = filled.blackSeats;
-  }
-
-  const meta = computeChessMetaFields({
-    teamMode,
-    whiteSeats,
-    blackSeats,
-    turn: 'w',
-    moveCount: 0
-  });
 
   for (let attempt = 0; attempt < 8; attempt++) {
     const code = generateCandidateRoomCode();
@@ -572,11 +428,17 @@ export async function createFirestoreChessRoom(params: {
         const payload = {
           code,
           creatorAuthUid: uid,
-          ...meta,
+          status: 'waiting',
           timeControlId: tc.id.slice(0, 16),
           baseMs,
           incMs,
+          whiteAuthUid: resolvedColor === 'w' ? uid : null,
+          whitePlayerId: resolvedColor === 'w' ? safePlayerId : null,
+          whiteName: resolvedColor === 'w' ? safeName : null,
           whiteElo: 1200,
+          blackAuthUid: resolvedColor === 'b' ? uid : null,
+          blackPlayerId: resolvedColor === 'b' ? safePlayerId : null,
+          blackName: resolvedColor === 'b' ? safeName : null,
           blackElo: 1200,
           moves: [],
           turn: 'w',
@@ -612,7 +474,6 @@ export async function joinFirestoreChessRoom(params: {
   code: string;
   playerId: string;
   playerName: string;
-  preferredTeam?: PieceColor;
 }): Promise<{ code: string; uid: string; payload: ChessRoomViewPayload }> {
   const uid = await ensureChessFirebaseUid();
   const cleanCode = sanitizeRoomCode(params.code);
@@ -633,91 +494,67 @@ export async function joinFirestoreChessRoom(params: {
       }
 
       const data = snap.data() as FirestoreChessRoomDoc;
+
       if (data.status === 'finished') {
         return data;
       }
 
-      const { teamMode, whiteSeats, blackSeats } = resolveChessDocSeats(data);
-      const moveCount = Array.isArray(data.moves) ? data.moves.length : 0;
-
-      const existingMatch = findSeatForUser(whiteSeats, blackSeats, uid, safePlayerId);
-      if (existingMatch) {
-        if (existingMatch.side === 'A') {
-          whiteSeats[existingMatch.index] = createHumanSeat({ uid, playerId: safePlayerId, name: safeName });
-        } else {
-          blackSeats[existingMatch.index] = createHumanSeat({ uid, playerId: safePlayerId, name: safeName });
-        }
-        const meta = computeChessMetaFields({
-          teamMode,
-          whiteSeats,
-          blackSeats,
-          turn: data.turn,
-          moveCount
+      if (data.whiteAuthUid === uid) {
+        tx.update(roomRef, {
+          whitePlayerId: safePlayerId,
+          whiteName: safeName,
+          updatedAt: serverTimestamp()
         });
-        tx.update(roomRef, { ...meta, updatedAt: serverTimestamp() });
-        return { ...data, ...meta } as FirestoreChessRoomDoc;
+        return { ...data, whitePlayerId: safePlayerId, whiteName: safeName };
       }
 
-      const wOpen = whiteSeats.findIndex(s => s.kind === 'open');
-      const bOpen = blackSeats.findIndex(s => s.kind === 'open');
-      const wFilled = whiteSeats.filter(s => s.kind !== 'open').length;
-      const bFilled = blackSeats.filter(s => s.kind !== 'open').length;
-
-      let chosenColor: PieceColor | null = null;
-      let chosenIdx = -1;
-
-      if (params.preferredTeam === 'w' && wOpen >= 0) {
-        chosenColor = 'w';
-        chosenIdx = wOpen;
-      } else if (params.preferredTeam === 'b' && bOpen >= 0) {
-        chosenColor = 'b';
-        chosenIdx = bOpen;
-      } else if (wOpen >= 0 && bOpen >= 0) {
-        if (bFilled <= wFilled) {
-          chosenColor = 'b';
-          chosenIdx = bOpen;
-        } else {
-          chosenColor = 'w';
-          chosenIdx = wOpen;
-        }
-      } else if (wOpen >= 0) {
-        chosenColor = 'w';
-        chosenIdx = wOpen;
-      } else if (bOpen >= 0) {
-        chosenColor = 'b';
-        chosenIdx = bOpen;
-      } else if (moveCount === 0) {
-        const bBot = blackSeats.findIndex(s => s.kind === 'bot');
-        const wBot = whiteSeats.findIndex(s => s.kind === 'bot');
-        if (params.preferredTeam === 'w' && wBot >= 0) {
-          chosenColor = 'w';
-          chosenIdx = wBot;
-        } else if (bBot >= 0) {
-          chosenColor = 'b';
-          chosenIdx = bBot;
-        } else if (wBot >= 0) {
-          chosenColor = 'w';
-          chosenIdx = wBot;
-        }
+      if (data.blackAuthUid === uid) {
+        tx.update(roomRef, {
+          blackPlayerId: safePlayerId,
+          blackName: safeName,
+          updatedAt: serverTimestamp()
+        });
+        return { ...data, blackPlayerId: safePlayerId, blackName: safeName };
       }
 
-      if (!chosenColor || chosenIdx < 0) {
-        return data;
+      if (!data.whiteAuthUid) {
+        const nextStatus = data.blackAuthUid ? 'active' : 'waiting';
+        tx.update(roomRef, {
+          whiteAuthUid: uid,
+          whitePlayerId: safePlayerId,
+          whiteName: safeName,
+          status: nextStatus,
+          updatedAt: serverTimestamp()
+        });
+        return {
+          ...data,
+          whiteAuthUid: uid,
+          whitePlayerId: safePlayerId,
+          whiteName: safeName,
+          status: nextStatus
+        } as FirestoreChessRoomDoc;
       }
 
-      const newSeat = createHumanSeat({ uid, playerId: safePlayerId, name: safeName });
-      if (chosenColor === 'w') whiteSeats[chosenIdx] = newSeat;
-      else blackSeats[chosenIdx] = newSeat;
+      if (!data.blackAuthUid) {
+        const nextStatus = data.whiteAuthUid ? 'active' : 'waiting';
+        tx.update(roomRef, {
+          blackAuthUid: uid,
+          blackPlayerId: safePlayerId,
+          blackName: safeName,
+          status: nextStatus,
+          updatedAt: serverTimestamp()
+        });
+        return {
+          ...data,
+          blackAuthUid: uid,
+          blackPlayerId: safePlayerId,
+          blackName: safeName,
+          status: nextStatus
+        } as FirestoreChessRoomDoc;
+      }
 
-      const meta = computeChessMetaFields({
-        teamMode,
-        whiteSeats,
-        blackSeats,
-        turn: data.turn,
-        moveCount
-      });
-      tx.update(roomRef, { ...meta, updatedAt: serverTimestamp() });
-      return { ...data, ...meta } as FirestoreChessRoomDoc;
+      // Both seats occupied -> join as spectator (read-only)
+      return data;
     });
 
     latestRoomDocCache.set(cleanCode, finalDoc);
@@ -727,131 +564,6 @@ export async function joinFirestoreChessRoom(params: {
       uid,
       payload: roomDocToViewPayload(finalDoc, uid, safePlayerId)
     };
-  } catch (err) {
-    if (isPermissionDeniedError(err)) {
-      handleFirestoreError(err, OperationType.UPDATE, path);
-    }
-    throw err;
-  }
-}
-
-export async function switchFirestoreChessTeam(params: {
-  code: string;
-  playerId: string;
-  playerName: string;
-  targetColor: PieceColor;
-}): Promise<void> {
-  const uid = await ensureChessFirebaseUid();
-  const cleanCode = sanitizeRoomCode(params.code);
-  const roomRef = doc(db, CHESS_ROOMS_COLLECTION, cleanCode);
-  const path = `${CHESS_ROOMS_COLLECTION}/${cleanCode}`;
-  const safeName = sanitizePlayerName(params.playerName);
-  const safePlayerId = String(params.playerId || uid).trim().slice(0, 64) || uid;
-
-  try {
-    await runTransaction(db, async (tx) => {
-      const snap = await tx.get(roomRef);
-      if (!snap.exists()) return;
-      const data = snap.data() as FirestoreChessRoomDoc;
-      if (data.status === 'finished' || (data.moves?.length || 0) > 0) return;
-
-      const { teamMode, whiteSeats, blackSeats } = resolveChessDocSeats(data);
-      const current = findSeatForUser(whiteSeats, blackSeats, uid, safePlayerId);
-      const targetList = params.targetColor === 'w' ? whiteSeats : blackSeats;
-      const openIdx = targetList.findIndex(s => s.kind === 'open' || s.kind === 'bot');
-      if (openIdx < 0) return;
-
-      if (current) {
-        if ((current.side === 'A' ? 'w' : 'b') === params.targetColor) return;
-        if (current.side === 'A') {
-          whiteSeats[current.index] = { kind: 'open', uid: null, playerId: null, name: null, botId: null };
-        } else {
-          blackSeats[current.index] = { kind: 'open', uid: null, playerId: null, name: null, botId: null };
-        }
-      }
-
-      targetList[openIdx] = createHumanSeat({ uid, playerId: safePlayerId, name: safeName });
-      const meta = computeChessMetaFields({
-        teamMode,
-        whiteSeats,
-        blackSeats,
-        turn: data.turn,
-        moveCount: 0
-      });
-      tx.update(roomRef, { ...meta, updatedAt: serverTimestamp() });
-    });
-  } catch (err) {
-    if (isPermissionDeniedError(err)) {
-      handleFirestoreError(err, OperationType.UPDATE, path);
-    }
-    throw err;
-  }
-}
-
-export async function fillFirestoreChessBots(
-  code: string,
-  primaryBotId = 'pixel'
-): Promise<void> {
-  const uid = await ensureChessFirebaseUid();
-  const cleanCode = sanitizeRoomCode(code);
-  const roomRef = doc(db, CHESS_ROOMS_COLLECTION, cleanCode);
-  const path = `${CHESS_ROOMS_COLLECTION}/${cleanCode}`;
-
-  try {
-    await runTransaction(db, async (tx) => {
-      const snap = await tx.get(roomRef);
-      if (!snap.exists()) return;
-      const data = snap.data() as FirestoreChessRoomDoc;
-      if (data.status === 'finished') return;
-
-      const { teamMode, whiteSeats, blackSeats } = resolveChessDocSeats(data);
-      const participantUids = collectParticipantUids(whiteSeats, blackSeats);
-      if (!participantUids.includes(uid)) return;
-
-      const filled = fillOpenSeatsWithChessBots(whiteSeats, blackSeats, primaryBotId);
-      const meta = computeChessMetaFields({
-        teamMode,
-        whiteSeats: filled.whiteSeats,
-        blackSeats: filled.blackSeats,
-        turn: data.turn,
-        moveCount: Array.isArray(data.moves) ? data.moves.length : 0
-      });
-      tx.update(roomRef, { ...meta, updatedAt: serverTimestamp() });
-    });
-  } catch (err) {
-    if (isPermissionDeniedError(err)) {
-      handleFirestoreError(err, OperationType.UPDATE, path);
-    }
-    throw err;
-  }
-}
-
-export async function clearFirestoreChessBots(code: string): Promise<void> {
-  const uid = await ensureChessFirebaseUid();
-  const cleanCode = sanitizeRoomCode(code);
-  const roomRef = doc(db, CHESS_ROOMS_COLLECTION, cleanCode);
-  const path = `${CHESS_ROOMS_COLLECTION}/${cleanCode}`;
-
-  try {
-    await runTransaction(db, async (tx) => {
-      const snap = await tx.get(roomRef);
-      if (!snap.exists()) return;
-      const data = snap.data() as FirestoreChessRoomDoc;
-      if (data.status === 'finished' || (data.moves?.length || 0) > 0) return;
-
-      const { teamMode, whiteSeats, blackSeats } = resolveChessDocSeats(data);
-      const participantUids = collectParticipantUids(whiteSeats, blackSeats);
-      if (!participantUids.includes(uid)) return;
-
-      const meta = computeChessMetaFields({
-        teamMode,
-        whiteSeats: clearBotSeats(whiteSeats),
-        blackSeats: clearBotSeats(blackSeats),
-        turn: data.turn,
-        moveCount: 0
-      });
-      tx.update(roomRef, { ...meta, updatedAt: serverTimestamp() });
-    });
   } catch (err) {
     if (isPermissionDeniedError(err)) {
       handleFirestoreError(err, OperationType.UPDATE, path);
@@ -902,8 +614,7 @@ function computeMoveUpdatePayload(
   uid: string,
   move: ChessMove,
   expectedMoveIndex: number,
-  roomCode: string,
-  asBot = false
+  roomCode: string
 ):
   | { kind: 'noop' }
   | { kind: 'update'; fields: Record<string, unknown>; nextDoc: FirestoreChessRoomDoc } {
@@ -916,25 +627,9 @@ function computeMoveUpdatePayload(
     return { kind: 'noop' };
   }
 
-  const { teamMode, whiteSeats, blackSeats } = resolveChessDocSeats(data);
-  const teamSize = getTeamSize(teamMode);
-  const participantUids = collectParticipantUids(whiteSeats, blackSeats);
-  const activeIdx = getActiveChessSeatIndex(replayed.history.length, replayed.state.turn, teamSize);
-  const activeSeat = (replayed.state.turn === 'w' ? whiteSeats : blackSeats)[activeIdx] || null;
-
-  if (asBot) {
-    if (!activeSeat || activeSeat.kind !== 'bot') {
-      return { kind: 'noop' };
-    }
-    if (!participantUids.includes(uid)) {
-      throw new Error('Only room participants can step bot teammates.');
-    }
-  } else {
-    const fallbackUid = replayed.state.turn === 'w' ? data.whiteAuthUid : data.blackAuthUid;
-    const expectedUid = activeSeat ? (activeSeat.kind === 'human' ? activeSeat.uid : null) : fallbackUid;
-    if (expectedUid !== uid) {
-      throw new Error('Not your turn.');
-    }
+  const activeUid = replayed.state.turn === 'w' ? data.whiteAuthUid : data.blackAuthUid;
+  if (activeUid !== uid) {
+    throw new Error('Not your turn.');
   }
 
   const now = Math.round(Date.now());
@@ -1028,28 +723,20 @@ function computeMoveUpdatePayload(
 
   const nextStatus: FirestoreChessRoomDoc['status'] = gameEndedNow
     ? 'finished'
-    : areAllSeatsFilled(whiteSeats, blackSeats)
+    : data.whiteAuthUid && data.blackAuthUid
     ? 'active'
     : 'waiting';
 
-  const nextActiveIdx = getActiveChessSeatIndex(nextMoves.length, nextState.turn, teamSize);
-  const nextActiveSeat = (nextState.turn === 'w' ? whiteSeats : blackSeats)[nextActiveIdx] || null;
-
-  const fields: Record<string, unknown> = {
+  const fields = {
     moves: nextMoves,
     turn: nextState.turn,
     status: nextStatus,
     whiteTimeMs,
     blackTimeMs,
     clockAnchorMs: nextAnchorMs,
-    rematchVotes: [] as string[],
+    rematchVotes: [] as PieceColor[],
     updatedAt: serverTimestamp()
   };
-
-  if (data.teamMode || data.whiteSeats) {
-    fields.activeSeatKind = nextActiveSeat?.kind || 'open';
-    fields.activeSeatUid = nextActiveSeat?.kind === 'human' ? nextActiveSeat.uid || null : null;
-  }
 
   return {
     kind: 'update',
@@ -1062,13 +749,7 @@ function computeMoveUpdatePayload(
       whiteTimeMs,
       blackTimeMs,
       clockAnchorMs: nextAnchorMs,
-      rematchVotes: [],
-      ...(data.teamMode || data.whiteSeats
-        ? {
-            activeSeatKind: nextActiveSeat?.kind || 'open',
-            activeSeatUid: nextActiveSeat?.kind === 'human' ? nextActiveSeat.uid || null : null
-          }
-        : {})
+      rematchVotes: []
     }
   };
 }
@@ -1083,6 +764,8 @@ export async function sendFirestoreChessMove(params: {
   const roomRef = doc(db, CHESS_ROOMS_COLLECTION, cleanCode);
   const path = `${CHESS_ROOMS_COLLECTION}/${cleanCode}`;
 
+  // Fast single-RPC path: use cached live room snapshot + direct updateDoc
+  // (avoids 2 extra BeginTransaction + BatchGet round-trips per move while Firestore rules enforce turn & move count)
   const cachedDoc = latestRoomDocCache.get(cleanCode);
   if (cachedDoc && cachedDoc.moves.length === params.expectedMoveIndex) {
     const computed = computeMoveUpdatePayload(
@@ -1090,8 +773,7 @@ export async function sendFirestoreChessMove(params: {
       uid,
       params.move,
       params.expectedMoveIndex,
-      cleanCode,
-      false
+      cleanCode
     );
     if (computed.kind === 'noop') return;
 
@@ -1100,7 +782,7 @@ export async function sendFirestoreChessMove(params: {
       latestRoomDocCache.set(cleanCode, computed.nextDoc);
       return;
     } catch {
-      // Fall back to authoritative transaction
+      // Fall back to authoritative transaction if cache was stale or contended
     }
   }
 
@@ -1117,8 +799,7 @@ export async function sendFirestoreChessMove(params: {
         uid,
         params.move,
         params.expectedMoveIndex,
-        cleanCode,
-        false
+        cleanCode
       );
       if (computed.kind === 'noop') {
         committedDoc = data;
@@ -1138,63 +819,6 @@ export async function sendFirestoreChessMove(params: {
   }
 }
 
-export async function sendFirestoreChessBotMove(params: {
-  code: string;
-  expectedMoveIndex: number;
-}): Promise<void> {
-  const uid = await ensureChessFirebaseUid();
-  const cleanCode = sanitizeRoomCode(params.code);
-  const roomRef = doc(db, CHESS_ROOMS_COLLECTION, cleanCode);
-  const path = `${CHESS_ROOMS_COLLECTION}/${cleanCode}`;
-
-  try {
-    let committedDoc: FirestoreChessRoomDoc | null = null;
-    await runTransaction(db, async (tx) => {
-      const snap = await tx.get(roomRef);
-      if (!snap.exists()) return;
-      const data = snap.data() as FirestoreChessRoomDoc;
-      const replayed = decodeAndReplayMoves(data.moves, cleanCode);
-      if (replayed.history.length !== params.expectedMoveIndex) return;
-      if (isRoomDocGameOver(data, replayed.state)) return;
-
-      const { teamMode, whiteSeats, blackSeats } = resolveChessDocSeats(data);
-      const teamSize = getTeamSize(teamMode);
-      const activeIdx = getActiveChessSeatIndex(replayed.history.length, replayed.state.turn, teamSize);
-      const activeSeat = (replayed.state.turn === 'w' ? whiteSeats : blackSeats)[activeIdx];
-      if (!activeSeat || activeSeat.kind !== 'bot') return;
-
-      const bot = getBotById(activeSeat.botId || 'pixel');
-      const remainingMs =
-        data.baseMs > 0
-          ? replayed.state.turn === 'w'
-            ? data.whiteTimeMs
-            : data.blackTimeMs
-          : undefined;
-      const decision = chooseBotMove(replayed.state, bot, replayed.history, remainingMs);
-      if (!decision.move) return;
-
-      const computed = computeMoveUpdatePayload(
-        data,
-        uid,
-        decision.move,
-        params.expectedMoveIndex,
-        cleanCode,
-        true
-      );
-      if (computed.kind === 'noop') return;
-      tx.update(roomRef, computed.fields);
-      committedDoc = computed.nextDoc;
-    });
-    if (committedDoc) {
-      latestRoomDocCache.set(cleanCode, committedDoc);
-    }
-  } catch (err) {
-    if (isPermissionDeniedError(err)) {
-      handleFirestoreError(err, OperationType.UPDATE, path);
-    }
-  }
-}
-
 export async function claimFirestoreChessTimeout(code: string): Promise<void> {
   const uid = await ensureChessFirebaseUid();
   const cleanCode = sanitizeRoomCode(code);
@@ -1206,9 +830,7 @@ export async function claimFirestoreChessTimeout(code: string): Promise<void> {
       const snap = await tx.get(roomRef);
       if (!snap.exists()) return;
       const data = snap.data() as FirestoreChessRoomDoc;
-      const { whiteSeats, blackSeats } = resolveChessDocSeats(data);
-      const participants = collectParticipantUids(whiteSeats, blackSeats);
-      if (data.whiteAuthUid !== uid && data.blackAuthUid !== uid && !participants.includes(uid)) return;
+      if (data.whiteAuthUid !== uid && data.blackAuthUid !== uid) return;
 
       const replayed = decodeAndReplayMoves(data.moves);
       if (
@@ -1282,17 +904,8 @@ export async function resignFirestoreChessRoom(code: string): Promise<void> {
       const replayed = decodeAndReplayMoves(data.moves);
       if (isRoomDocGameOver(data, replayed.state)) return;
 
-      const { whiteSeats, blackSeats } = resolveChessDocSeats(data);
-      const match = findSeatForUser(whiteSeats, blackSeats, uid, null);
-      const myColor: PieceColor | null = match
-        ? match.side === 'A'
-          ? 'w'
-          : 'b'
-        : data.whiteAuthUid === uid
-        ? 'w'
-        : data.blackAuthUid === uid
-        ? 'b'
-        : null;
+      const myColor: PieceColor | null =
+        data.whiteAuthUid === uid ? 'w' : data.blackAuthUid === uid ? 'b' : null;
       if (!myColor) return;
 
       tx.update(roomRef, {
@@ -1324,66 +937,42 @@ export async function voteFirestoreChessRematch(code: string): Promise<void> {
       const replayed = decodeAndReplayMoves(data.moves);
 
       if (!isRoomDocGameOver(data, replayed.state)) return;
-      if (data.status !== 'finished') return;
 
-      const { teamMode, whiteSeats, blackSeats } = resolveChessDocSeats(data);
-      const match = findSeatForUser(whiteSeats, blackSeats, uid, null);
-      if (!match) return;
+      const myColor: PieceColor | null =
+        data.whiteAuthUid === uid ? 'w' : data.blackAuthUid === uid ? 'b' : null;
+      if (!myColor) return;
 
-      const myColor: PieceColor = match.side === 'A' ? 'w' : 'b';
-      const voteToken = teamMode === '1v1' && !data.teamMode ? myColor : `${myColor}:${match.index}`;
+      // Ensure status is recorded as 'finished' before rematch transition if somehow not yet marked
+      if (data.status !== 'finished') {
+        return;
+      }
 
       const existingVotes = Array.isArray(data.rematchVotes) ? data.rematchVotes : [];
-      const nextVotes = existingVotes.includes(voteToken)
+      const nextVotes = existingVotes.includes(myColor)
         ? existingVotes
-        : [...existingVotes, voteToken];
+        : [...existingVotes, myColor];
 
-      const participantUids = collectParticipantUids(whiteSeats, blackSeats);
-      const requiredVotes = Math.max(1, participantUids.length);
-
-      if (nextVotes.length >= requiredVotes) {
+      const bothPresent = Boolean(data.whiteAuthUid && data.blackAuthUid);
+      if ((bothPresent && nextVotes.length >= 2) || (!bothPresent && nextVotes.length >= 1)) {
         const baseMs = Math.max(0, Math.round(data.baseMs));
-        if (data.teamMode || data.whiteSeats) {
-          const meta = computeChessMetaFields({
-            teamMode,
-            whiteSeats: blackSeats,
-            blackSeats: whiteSeats,
-            turn: 'w',
-            moveCount: 0
-          });
-          tx.update(roomRef, {
-            ...meta,
-            moves: [],
-            turn: 'w',
-            whiteTimeMs: baseMs,
-            blackTimeMs: baseMs,
-            clockAnchorMs: null,
-            resignedWinner: null,
-            timeoutWinner: null,
-            rematchVotes: [],
-            updatedAt: serverTimestamp()
-          });
-        } else {
-          const bothPresent = Boolean(data.whiteAuthUid && data.blackAuthUid);
-          tx.update(roomRef, {
-            whiteAuthUid: data.blackAuthUid,
-            whitePlayerId: data.blackPlayerId,
-            whiteName: data.blackName,
-            blackAuthUid: data.whiteAuthUid,
-            blackPlayerId: data.whitePlayerId,
-            blackName: data.whiteName,
-            moves: [],
-            turn: 'w',
-            status: bothPresent ? 'active' : 'waiting',
-            whiteTimeMs: baseMs,
-            blackTimeMs: baseMs,
-            clockAnchorMs: null,
-            resignedWinner: null,
-            timeoutWinner: null,
-            rematchVotes: [],
-            updatedAt: serverTimestamp()
-          });
-        }
+        tx.update(roomRef, {
+          whiteAuthUid: data.blackAuthUid,
+          whitePlayerId: data.blackPlayerId,
+          whiteName: data.blackName,
+          blackAuthUid: data.whiteAuthUid,
+          blackPlayerId: data.whitePlayerId,
+          blackName: data.whiteName,
+          moves: [],
+          turn: 'w',
+          status: bothPresent ? 'active' : 'waiting',
+          whiteTimeMs: baseMs,
+          blackTimeMs: baseMs,
+          clockAnchorMs: null,
+          resignedWinner: null,
+          timeoutWinner: null,
+          rematchVotes: [],
+          updatedAt: serverTimestamp()
+        });
       } else if (nextVotes.length !== existingVotes.length) {
         tx.update(roomRef, {
           rematchVotes: nextVotes,
@@ -1417,24 +1006,7 @@ export async function leaveFirestoreChessRoom(code: string): Promise<void> {
       const fresh = freshSnap.data() as FirestoreChessRoomDoc;
       if (fresh.status === 'finished' || fresh.moves.length > 0) return;
 
-      if (fresh.teamMode || fresh.whiteSeats) {
-        const { teamMode, whiteSeats, blackSeats } = resolveChessDocSeats(fresh);
-        const match = findSeatForUser(whiteSeats, blackSeats, uid, null);
-        if (!match) return;
-        if (match.side === 'A') {
-          whiteSeats[match.index] = { kind: 'open', uid: null, playerId: null, name: null, botId: null };
-        } else {
-          blackSeats[match.index] = { kind: 'open', uid: null, playerId: null, name: null, botId: null };
-        }
-        const meta = computeChessMetaFields({
-          teamMode,
-          whiteSeats,
-          blackSeats,
-          turn: fresh.turn,
-          moveCount: 0
-        });
-        tx.update(roomRef, { ...meta, status: 'waiting', updatedAt: serverTimestamp() });
-      } else if (fresh.whiteAuthUid === uid) {
+      if (fresh.whiteAuthUid === uid) {
         tx.update(roomRef, {
           whiteAuthUid: null,
           whitePlayerId: null,
@@ -1487,7 +1059,7 @@ export function watchChessRoomSummary(
         status: data.status,
         turn: data.turn,
         moveCount: moves.length,
-        opponentJoined: Boolean(oppUid || oppName),
+        opponentJoined: Boolean(oppUid),
         opponentName: oppName || null
       });
     },
