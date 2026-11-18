@@ -1432,6 +1432,25 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                   <button
                     type="button"
                     onClick={() => {
+                      const nextMode = mode === 'ai' ? 'online' : 'ai';
+                      setMode(nextMode);
+                    }}
+                    className={`px-3 py-2 rounded-xl border text-xs font-extrabold flex items-center gap-1.5 cursor-pointer transition-colors ${
+                      mode === 'ai' ? 'text-black' : 'text-slate-100 hover:bg-white/10'
+                    }`}
+                    style={{
+                      backgroundColor: mode === 'ai' ? activeTheme.accent : activeTheme.bgSecondary,
+                      borderColor: mode === 'ai' ? activeTheme.accent : activeTheme.border
+                    }}
+                    title="Toggle playing minigames solo against 8 AI Bots"
+                  >
+                    <Bot className="w-3.5 h-3.5" />
+                    <span>{mode === 'ai' ? 'vs Bots: ON' : 'vs Bots'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
                       const pick = ARCADE_GAMES[Math.floor(Math.random() * ARCADE_GAMES.length)];
                       handleSelectGameType(pick.id);
                     }}

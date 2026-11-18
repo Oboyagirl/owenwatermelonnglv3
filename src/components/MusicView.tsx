@@ -436,13 +436,13 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                     }
                   }}
                   className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 border ${
-                    streamMode === 'apple' || activeStreamSource === 'apple'
+                    streamMode === 'apple'
                       ? 'bg-sky-500/20 text-sky-300 border-sky-400/40'
                       : 'text-slate-400 border-transparent hover:text-white'
                   }`}
-                  title="Toggle direct Apple CDN mode for school iPads where proxies are blocked"
+                  title="Switch between Full Audio streams and 30s Apple Preview fallback"
                 >
-                  {streamMode === 'apple' ? 'iPad Apple CDN: On' : 'Auto Unblock'}
+                  {streamMode === 'apple' ? '30s Preview Mode' : 'Full Audio'}
                 </button>
                 {currentTrack.spotifyId && (
                   <button
@@ -474,21 +474,24 @@ export const MusicView: React.FC<MusicViewProps> = ({ activeTheme }) => {
                   <span>{audioError}</span>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  {streamMode !== 'apple' && (
+                  {streamMode !== 'auto' && (
                     <button
                       type="button"
                       onClick={() => {
-                        setStreamMode('apple');
+                        setStreamMode('auto');
                         if (currentTrack) playTrack(currentTrack);
                       }}
-                      className="font-bold px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-200 border border-sky-400/30 hover:bg-sky-500/30 cursor-pointer whitespace-nowrap"
+                      className="font-bold px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 hover:bg-emerald-500/30 cursor-pointer whitespace-nowrap"
                     >
-                      Use iPad Apple CDN
+                      Use Full Audio
                     </button>
                   )}
                   <button
                     type="button"
-                    onClick={() => togglePlay()}
+                    onClick={() => {
+                      if (currentTrack) playTrack(currentTrack);
+                      else togglePlay();
+                    }}
                     className="font-semibold underline px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 cursor-pointer whitespace-nowrap"
                   >
                     Play / Retry

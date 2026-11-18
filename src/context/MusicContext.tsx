@@ -51,7 +51,7 @@ const MusicContext = createContext<MusicContextType | null>(null);
 const CUSTOM_MUSIC_KEY = 'owen_custom_music_list';
 const LIKED_MUSIC_KEY = 'owen_liked_music';
 const MUSIC_VOL_KEY = 'owen_music_volume';
-const STREAM_MODE_KEY = 'owen_music_stream_mode';
+const STREAM_MODE_KEY = 'owen_music_stream_mode_v2';
 const APPLE_CACHE_KEY = 'owen_apple_cdn_cache_v1';
 
 // Live Cloud Run proxy URL used when running from static hosts (e.g. GitHub Pages) where /api/* isn't local
@@ -91,11 +91,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const prevTrackRef = useRef<() => void>(() => {});
   const isPlayingRef = useRef<boolean>(false);
 
-  // Remember blocked upstreams in this session so subsequent songs don't stall waiting for blocked filters
-  const proxyBlockedRef = useRef<boolean>(false);
-  const archiveBlockedRef = useRef<boolean>(false);
-
-  // Apple iTunes CDN cache (unblocked on school iPads & works directly in Safari without proxy)
+  // Apple iTunes CDN cache (used only when user selects 30s Apple preview mode or all full URLs are blocked)
   const appleCacheRef = useRef<Record<string, string>>({});
   useEffect(() => {
     try {
@@ -279,21 +275,6 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     [persistAppleCacheEntry]
   );
 
-  // Pre-warm Apple CDN cache for current track + next 2 tracks in background so Safari taps are synchronous
-  useEffect(() => {
-    const indices = [
-      currentTrackIndex,
-      (currentTrackIndex + 1) % allTracks.length,
-      (currentTrackIndex + 2) % allTracks.length
-    ];
-    for (const idx of indices) {
-      const t = allTracks[idx];
-      if (t && !t.isCustom && !appleCacheRef.current[t.id] && !t.audioSrc.includes('audio-ssl.itunes.apple.com')) {
-        resolveAppleCdnUrl(t).catch(() => {});
-      }
-    }
-  }, [currentTrackIndex, allTracks, resolveAppleCdnUrl]);
-
   // Build ordered candidate URLs for a track (always puts synchronous unblocked option first!)
   const buildProxyUrl = useCallback((rawUrl: string, track: CustomTrack, base = '') => {
     return `${base}/api/music/proxy?url=${encodeURIComponent(rawUrl)}&artist=${encodeURIComponent(track.artist)}&title=${encodeURIComponent(track.title)}`;
@@ -337,6 +318,16 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } catch {}
   }, []);
 
+  const resolveFullRemoteUrl = useCallback((target: CustomTrack): string | null => {
+    const src = target.audioSrc;
+    if (!src) return null;
+    if (src.startsWith('http://') || src.startsWith('https://')) {
+      return src;
+    }
+    const cleanName = src.replace(/^(\.\/|\/)+/, '').replace(/^music\//, '');
+    return (albumSourceUrls as Record<string, string>)[cleanName] || null;
+  }, []);
+
   const getImmediatePlayUrl = useCallback(
     (target: CustomTrack): { url: string; source: ActiveStreamSource } | null => {
       const src = target.audioSrc;
@@ -358,20 +349,14 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (!mappedRemote) {
           return { url: resolveAssetUrl(src), source: 'local' };
         }
-        // Treat mappedRemote cleanly below
-        if (streamMode === 'apple' && appleCacheRef.current[target.id]) {
-          return { url: appleCacheRef.current[target.id], source: 'apple' };
-        }
-        if (detectStaticHost()) {
-          if (appleCacheRef.current[target.id] && proxyBlockedRef.current) {
+        if (streamMode === 'apple') {
+          if (appleCacheRef.current[target.id]) {
             return { url: appleCacheRef.current[target.id], source: 'apple' };
           }
-          if (!proxyBlockedRef.current) {
-            return { url: buildProxyUrl(mappedRemote, target, CLOUD_PROXY_BASE), source: 'proxy' };
-          }
-          return { url: mappedRemote, source: 'direct' };
+          return null;
         }
-        return { url: buildProxyUrl(mappedRemote, target, ''), source: 'proxy' };
+        const base = detectStaticHost() ? CLOUD_PROXY_BASE : '';
+        return { url: buildProxyUrl(mappedRemote, target, base), source: 'proxy' };
       }
 
       if (src.includes('audio-ssl.itunes.apple.com')) {
@@ -386,29 +371,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         return null; // Caller will async-resolve Apple URL
       }
 
-      const isStaticHost = detectStaticHost();
-      if (!isStaticHost) {
-        // Fullstack: proxy first (unblocked on school Wi-Fi because it streams from same origin)
-        if (!proxyBlockedRef.current) {
-          return { url: buildProxyUrl(src, target, ''), source: 'proxy' };
-        }
-        if (appleCacheRef.current[target.id]) {
-          return { url: appleCacheRef.current[target.id], source: 'apple' };
-        }
-        return { url: src, source: 'direct' };
-      }
-
-      // Static host (GitHub Pages): try Cloud Run proxy if healthy, else cached Apple CDN, else direct
-      if (!proxyBlockedRef.current) {
-        return { url: buildProxyUrl(src, target, CLOUD_PROXY_BASE), source: 'proxy' };
-      }
-      if (appleCacheRef.current[target.id]) {
-        return { url: appleCacheRef.current[target.id], source: 'apple' };
-      }
-      if (!archiveBlockedRef.current) {
-        return { url: src, source: 'direct' };
-      }
-      return null;
+      const base = detectStaticHost() ? CLOUD_PROXY_BASE : '';
+      return { url: buildProxyUrl(src, target, base), source: 'proxy' };
     },
     [streamMode, buildProxyUrl]
   );
@@ -463,41 +427,26 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setCurrentTrackIndex(foundIdx);
       }
 
-      // 1. Try immediate synchronous URL first (preserves iPad Safari user-gesture lock!)
+      // 1. Try immediate full-length stream first (/api/music/proxy or explicit mode)
       const immediate = getImmediatePlayUrl(target);
       if (immediate) {
         const result = await attemptAudioUrl(immediate.url, immediate.source, target, attemptId);
         if (playAttemptRef.current !== attemptId) return;
         if (result === 'ok') return;
         if (result === 'gesture') {
-          setAudioError(`Tap Play to start "${target.title}" on your iPad.`);
-          return;
-        }
-        // Mark failed channel to speed up subsequent songs
-        if (immediate.source === 'proxy') proxyBlockedRef.current = true;
-        if (immediate.source === 'direct' && target.audioSrc.includes('archive.org')) {
-          archiveBlockedRef.current = true;
-        }
-      }
-
-      // 2. Fallback: Resolve unblocked Apple iTunes CDN stream (works on ALL school iPads!)
-      const appleUrl = await resolveAppleCdnUrl(target);
-      if (playAttemptRef.current !== attemptId) return;
-
-      if (appleUrl) {
-        const appleResult = await attemptAudioUrl(appleUrl, 'apple', target, attemptId);
-        if (playAttemptRef.current !== attemptId) return;
-        if (appleResult === 'ok') return;
-        if (appleResult === 'gesture') {
-          // Apple stream is now loaded in audio.src! Next tap plays synchronously in 0ms.
-          setAudioError(`Unblocked iPad stream loaded for "${target.title}" — tap Play!`);
+          setAudioError(`Tap Play to start "${target.title}" on your device.`);
           return;
         }
       }
 
-      // 3. Last resort: direct URL if not tried yet
-      if (target.audioSrc.startsWith('http') && !archiveBlockedRef.current) {
-        const directRes = await attemptAudioUrl(target.audioSrc, 'direct', target, attemptId);
+      // 2. Fallback: Direct full-length Archive URL before ever downgrading to a 30s preview
+      const fullRemoteUrl = resolveFullRemoteUrl(target);
+      if (
+        streamMode !== 'apple' &&
+        fullRemoteUrl &&
+        !fullRemoteUrl.includes('audio-ssl.itunes.apple.com')
+      ) {
+        const directRes = await attemptAudioUrl(fullRemoteUrl, 'direct', target, attemptId);
         if (playAttemptRef.current !== attemptId) return;
         if (directRes === 'ok') return;
         if (directRes === 'gesture') {
@@ -506,10 +455,24 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
       }
 
+      // 3. Last-resort fallback: Apple iTunes CDN preview (only if full-length streams are blocked/unreachable or Apple mode chosen)
+      const appleUrl = await resolveAppleCdnUrl(target);
+      if (playAttemptRef.current !== attemptId) return;
+
+      if (appleUrl) {
+        const appleResult = await attemptAudioUrl(appleUrl, 'apple', target, attemptId);
+        if (playAttemptRef.current !== attemptId) return;
+        if (appleResult === 'ok') return;
+        if (appleResult === 'gesture') {
+          setAudioError(`Stream ready for "${target.title}" — tap Play!`);
+          return;
+        }
+      }
+
       setIsPlaying(false);
-      setAudioError(`Could not stream "${target.title}". Try switching to iPad Apple CDN or tapping retry.`);
+      setAudioError(`Could not stream "${target.title}". Tap Retry Full Audio to try again.`);
     },
-    [allTracks, getImmediatePlayUrl, attemptAudioUrl, resolveAppleCdnUrl]
+    [allTracks, streamMode, getImmediatePlayUrl, resolveFullRemoteUrl, attemptAudioUrl, resolveAppleCdnUrl]
   );
 
   const togglePlay = useCallback(async () => {
@@ -732,12 +695,33 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           const activeTrack = activeTrackRef.current || currentTrack;
           if (!activeTrack) return;
 
-          // If current stream failed, try recovering onto Apple iTunes CDN cleanly
-          if (!audio.src.includes('audio-ssl.itunes.apple.com')) {
-            if (audio.src.includes('/api/music/proxy')) {
-              proxyBlockedRef.current = true;
+          const attemptId = playAttemptRef.current;
+          const fullRemoteUrl = resolveFullRemoteUrl(activeTrack);
+
+          // 1. If proxy URL errored, try direct full-length URL before falling back to 30s preview
+          if (
+            audio.src.includes('/api/music/proxy') &&
+            fullRemoteUrl &&
+            !fullRemoteUrl.includes('audio-ssl.itunes.apple.com')
+          ) {
+            audio.src = fullRemoteUrl;
+            setActiveStreamSource('direct');
+            audio.load();
+            if (isPlayingRef.current) {
+              try {
+                await audio.play();
+                if (playAttemptRef.current === attemptId) {
+                  setIsPlaying(true);
+                  setAudioError(null);
+                }
+                return;
+              } catch {}
             }
-            const attemptId = playAttemptRef.current;
+            return;
+          }
+
+          // 2. Last-resort fallback onto Apple iTunes CDN preview
+          if (!audio.src.includes('audio-ssl.itunes.apple.com')) {
             const appleUrl = await resolveAppleCdnUrl(activeTrack);
             if (playAttemptRef.current !== attemptId) return;
 
@@ -754,7 +738,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                   })
                   .catch(() => {
                     setIsPlaying(false);
-                    setAudioError(`Unblocked iPad stream loaded for "${activeTrack.title}" — tap Play!`);
+                    setAudioError(`Stream ready for "${activeTrack.title}" — tap Play!`);
                   });
               }
               return;

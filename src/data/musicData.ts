@@ -412,7 +412,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 220,
     "cover": "./music/covers/new_west_those_eyes.jpg",
     "genre": "Indie Pop / Dream Pop",
-    "audioSrc": "https://archive.org/download/new-west-those-eyes-chapter-1/New%20West%20%20Those%20Eyes%20(Chapter%201%20).mp4",
+    "audioSrc": "https://archive.org/download/new-west-those-eyes-lyrics-mp-3-160-k.mp-3_202609/New%20West%20-%20Those%20Eyes%20(Lyrics)(MP3_160K).mp3.mpeg",
     "spotifyId": "5V2qgB03dY31bQ6y0h3EwE",
     "albumId": "album-those-eyes",
     "trackNumber": 1,
@@ -2230,7 +2230,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 378,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/bd/66/48/bd664829-e740-907c-f1b1-e886eb04383c/mzaf_2589743817157851735.plus.aac.p.m4a",
+    "audioSrc": "https://archive.org/download/Kanye_West_-_Live_from_VH1_Storytellers-2009/06-Say%20You%20Will%20%28Live%20From%20VH1%20Storytellers%29.mp3",
     "albumId": "album-808s",
     "trackNumber": 1,
     "hasLocalAudio": false
@@ -2245,7 +2245,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 263,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/45/74/33/4574338a-7a61-8e23-c83c-f0d1093cdc39/mzaf_7146393203303618033.plus.aac.p.m4a",
+    "audioSrc": "https://archive.org/download/Exclusive_Tunes_41_-_Biggy_Jiggy_Mixtapes/10%20Kanye%20West%20-%20Welcome%20To%20The%20Heartbreak%20%28Feat.%20Kid%20Cudi%29.mp3",
     "albumId": "album-808s",
     "trackNumber": 2,
     "hasLocalAudio": false
@@ -2260,7 +2260,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 211,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c3/2e/bb/c32ebbd5-9ed4-659e-161f-41e79ce1a0ad/mzaf_17099620641848520890.plus.aac.p.m4a",
+    "audioSrc": "https://archive.org/download/djspinzrhythmandswag3thanksgivingedition/VA-DJ_Spinz-Rhythm_And_Swag_3_%28Thanksgiving_Edition%29-%28Bootleg%29-2008-RAGEMP3/19-kanye_west-heartless.mp3",
     "albumId": "album-808s",
     "trackNumber": 3,
     "hasLocalAudio": false
@@ -2275,7 +2275,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 238,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/fa/69/4c/fa694c0f-c645-fd36-fa6a-8ae182e7ce86/mzaf_6111461460443869199.plus.aac.p.m4a",
+    "audioSrc": "https://archive.org/download/Kanye_West_-_Live_from_VH1_Storytellers-2009/04-Amazing%20%28Live%20From%20VH1%20Storytellers%29.mp3",
     "albumId": "album-808s",
     "trackNumber": 4,
     "hasLocalAudio": false
@@ -2290,7 +2290,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 270,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/cd/41/a0/cd41a029-144c-ef10-b945-5c29b0966552/mzaf_16533792012921979472.plus.aac.p.m4a",
+    "audioSrc": "https://archive.org/download/Kanye_West_-_Live_from_VH1_Storytellers-2009/10-Love%20Lockdown%20%28Live%20from%20VH1%20Storytellers%29.mp3",
     "albumId": "album-808s",
     "trackNumber": 5,
     "hasLocalAudio": false
@@ -2305,7 +2305,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 278,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4e/87/57/4e875781-339c-01cf-d737-089802a06c36/mzaf_11814102611167681551.plus.aac.p.m4a",
+    "audioSrc": "https://archive.org/download/Exclusive_Tunes_41_-_Biggy_Jiggy_Mixtapes/06%20Kanye%20West%20-%20Paranoid.mp3",
     "albumId": "album-808s",
     "trackNumber": 6,
     "hasLocalAudio": false
@@ -2320,7 +2320,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 274,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a8/f6/b6/a8f6b687-4440-fc78-bc46-5b2c602c1497/mzaf_9829547161811521638.plus.aac.p.m4a",
+    "audioSrc": "https://archive.org/download/Kanye_West_-_Live_from_VH1_Storytellers-2009/02-Robocop%20%28Live%20from%20VH1%20Storytellers%29.mp3",
     "albumId": "album-808s",
     "trackNumber": 7,
     "hasLocalAudio": false
@@ -2335,7 +2335,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 190,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/cb/0d/30/cb0d30a1-24b3-6983-a81f-c618264adb08/mzaf_16953060916766290616.plus.aac.p.m4a",
+    "audioSrc": "https://archive.org/download/808shbslrv/08-08.%20Street%20Lights.mp3",
     "albumId": "album-808s",
     "trackNumber": 8,
     "hasLocalAudio": false
@@ -2350,7 +2350,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 239,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0f/e0/72/0fe0720d-c41e-b556-67a8-9be3a997089f/mzaf_524758049107904390.plus.aac.p.m4a",
+    "audioSrc": "https://archive.org/download/808shbslrv/09-09.%20Bad%20News.mp3",
     "albumId": "album-808s",
     "trackNumber": 9,
     "hasLocalAudio": false
@@ -2365,7 +2365,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 258,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e9/07/44/e907443e-b810-fa3e-8f02-3831e0d6d20d/mzaf_15785536552927438628.plus.aac.p.m4a",
+    "audioSrc": "https://archive.org/download/Kanye_West_-_Live_from_VH1_Storytellers-2009/01-See%20You%20In%20My%20Nightmares%20%28Live%20From%20VH1%20Storytellers%29.mp3",
     "albumId": "album-808s",
     "trackNumber": 10,
     "hasLocalAudio": false
@@ -2380,7 +2380,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 164,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/dc/88/a7/dc88a7ef-ccd8-36d2-efea-24d376e575b9/mzaf_8988321132685600771.plus.aac.p.m4a",
+    "audioSrc": "https://archive.org/download/xxxl-2012/XXXL%20%D0%9B%D1%83%D1%87%D1%88%D0%B0%D1%8F%20%D0%BC%D1%83%D0%B7%D1%8B%D0%BA%D0%B0%20%D0%B4%D0%BB%D1%8F%20%D1%81%D0%B5%D0%BA%D1%81%D0%B0%20%282012%29/33.%20Kanye%20West%20-%20Coldest%20Winter.mp3",
     "albumId": "album-808s",
     "trackNumber": 11,
     "hasLocalAudio": false
@@ -2395,7 +2395,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 363,
     "cover": "./music/covers/kanye_808s.jpg",
     "genre": "Electropop / R&B",
-    "audioSrc": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/35/2c/9f/352c9f5e-708e-3398-87ff-9c019125095e/mzaf_11593560217716283670.plus.aac.p.m4a",
+    "audioSrc": "https://archive.org/download/808s-heartbreak-live-at-hollywood-bowl/808%C2%B4s%20%26%20Heartbreak%20%28Live%20at%20Hollywood%20Bowl%29.zip/808%D1%8Fs%20%26%20Heartbreak%20%28Live%20at%20Hollywood%20Bowl%29%2F12%20Pinnochio%20Story.mp3",
     "albumId": "album-808s",
     "trackNumber": 12,
     "hasLocalAudio": false
@@ -3100,7 +3100,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 274,
     "cover": "./music/covers/kendrick_not_like_us.jpg",
     "genre": "West Coast Hip Hop",
-    "audioSrc": "https://archive.org/download/not-like-us_202606/Not_Like_Us.mp4",
+    "audioSrc": "https://archive.org/download/not-like-us_202603/Not%20Like%20Us.mp3",
     "albumId": "album-not-like-us",
     "trackNumber": 1,
     "hasLocalAudio": true
@@ -3910,7 +3910,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 46,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/01%20Start.mp3",
+    "audioSrc": "https://archive.org/download/channel_ORANGE_CD/01%20Start.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 1,
     "hasLocalAudio": false
@@ -3925,7 +3925,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 200,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/02%20Thinkin%20Bout%20You.mp3",
+    "audioSrc": "https://archive.org/download/channel_ORANGE_CD/02%20Thinkin%20Bout%20You.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 2,
     "hasLocalAudio": false
@@ -3940,7 +3940,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 40,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/03%20Fertilizer.mp3",
+    "audioSrc": "https://archive.org/download/channel_ORANGE_CD/03%20Fertilizer.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 3,
     "hasLocalAudio": false
@@ -3955,7 +3955,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 148,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/04%20Sierra%20Leone.mp3",
+    "audioSrc": "https://archive.org/download/channel_ORANGE_CD/04%20Sierra%20Leone.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 4,
     "hasLocalAudio": false
@@ -3970,22 +3970,22 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 262,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/05%20Sweet%20Life.mp3",
+    "audioSrc": "https://archive.org/download/channel_ORANGE_CD/05%20Sweet%20Life.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 5,
     "hasLocalAudio": false
   },
   {
     "id": "album-channel-orange-track-6",
-    "title": "Lost",
+    "title": "Not Just Money",
     "artist": "Frank Ocean",
     "album": "Channel Orange",
     "year": 2012,
-    "duration": "3:54",
-    "durationSec": 234,
+    "duration": "1:00",
+    "durationSec": 60,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/06%20Not%20Just%20Money.mp3",
+    "audioSrc": "https://archive.org/download/channel_ORANGE_CD/06%20Not%20Just%20Money.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 6,
     "hasLocalAudio": false
@@ -4000,7 +4000,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 304,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/07%20Super%20Rich%20Kids.mp3",
+    "audioSrc": "https://archive.org/download/channel_ORANGE_CD/07%20Super%20Rich%20Kids.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 7,
     "hasLocalAudio": false
@@ -4015,7 +4015,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 184,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/08%20Pilot%20Jones.mp3",
+    "audioSrc": "https://archive.org/download/channel_ORANGE_CD/08%20Pilot%20Jones.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 8,
     "hasLocalAudio": false
@@ -4030,7 +4030,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 224,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/09%20Crack%20Rock.mp3",
+    "audioSrc": "https://archive.org/download/channel_ORANGE_CD/09%20Crack%20Rock.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 9,
     "hasLocalAudio": false
@@ -4045,7 +4045,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 592,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/10%20Pyramids.mp3",
+    "audioSrc": "https://archive.org/download/channel_ORANGE_CD/10%20Pyramids.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 10,
     "hasLocalAudio": false
@@ -4060,7 +4060,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 234,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/11%20Lost.mp3",
+    "audioSrc": "https://archive.org/download/channel_ORANGE_CD/11%20Lost.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 11,
     "hasLocalAudio": false
@@ -4075,7 +4075,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 76,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/12%20White.mp3",
+    "audioSrc": "https://archive.org/download/channel_ORANGE_CD/12%20White.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 12,
     "hasLocalAudio": false
@@ -4090,7 +4090,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 200,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/13%20Monks.mp3",
+    "audioSrc": "https://archive.org/download/channel_ORANGE_CD/13%20Monks.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 13,
     "hasLocalAudio": false
@@ -4105,7 +4105,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 175,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/14%20Bad%20Religion.mp3",
+    "audioSrc": "https://archive.org/download/channel_ORANGE_CD/14%20Bad%20Religion.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 14,
     "hasLocalAudio": false
@@ -4120,7 +4120,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 268,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/15%20Pink%20Matter.mp3",
+    "audioSrc": "https://archive.org/download/channel_ORANGE_CD/15%20Pink%20Matter.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 15,
     "hasLocalAudio": false
@@ -4135,7 +4135,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 194,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/16%20Forrest%20Gump.mp3",
+    "audioSrc": "https://archive.org/download/channel_ORANGE_CD/16%20Forrest%20Gump.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 16,
     "hasLocalAudio": false
@@ -4150,7 +4150,7 @@ export const REAL_MUSIC_CATALOG: MusicTrack[] = [
     "durationSec": 134,
     "cover": "./music/covers/frank_channel_orange.jpg",
     "genre": "R&B / Neo Soul",
-    "audioSrc": "https://archive.org/download/gs_frank-ocean-channel-orange/17%20End.mp3",
+    "audioSrc": "https://archive.org/download/channel_ORANGE_CD/17%20End%20-%20Golden%20Girl.mp3",
     "albumId": "album-channel-orange",
     "trackNumber": 17,
     "hasLocalAudio": false

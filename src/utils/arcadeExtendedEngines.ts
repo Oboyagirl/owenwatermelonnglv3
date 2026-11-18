@@ -37,6 +37,7 @@ import {
   SosGridState,
   TugOfWarState,
   WORDLE_5_WORDS,
+  WORD_CHAIN_BOT_DICT,
   WORD_CHAIN_SEEDS,
   WordChainState,
   WordleDuelState,
@@ -1078,13 +1079,27 @@ export function getExtendedLegalActions(state: ExtendedArcadeState): string[] {
   switch (state.gameType) {
     case 'pixel-guess':
       if (state.phase === 'pick') return state.wordChoices.map(w => `pw:${w}`);
-      if (state.phase === 'draw') return ['pd'];
-      return [];
+      if (state.phase === 'draw') {
+        if (state.grid.some(v => v !== 0)) return ['pd'];
+        const tmpl = PIXEL_BOT_TEMPLATES[state.word || 'heart'] || PIXEL_BOT_TEMPLATES.heart;
+        return [`pb:${tmpl.join('')}`, 'pd'];
+      }
+      return PIXEL_WORD_BANK
+        .filter(w => !state.guesses.some(g => g.text === w))
+        .map(w => `pg:${w}`);
 
     case 'emoji-charades':
       if (state.phase === 'pick') return state.promptChoices.map(p => `ew:${p}`);
-      if (state.phase === 'clue') return state.emojis.length > 0 ? ['es'] : [];
-      return [];
+      if (state.phase === 'clue') {
+        if (state.emojis.length > 0) return ['es'];
+        const match = EMOJI_CHARADES_LIST.find(e => e.answer === state.secret);
+        const clue = match ? match.sample : ['✨', '🎯', '❓'];
+        return [`ep:${clue.join('|')}`];
+      }
+      return EMOJI_CHARADES_LIST
+        .map(e => e.answer)
+        .filter(w => !state.guesses.some(g => g.text === w))
+        .map(w => `eg:${w}`);
 
     case 'nim':
     case 'misere-nim': {
@@ -1273,9 +1288,15 @@ export function getExtendedLegalActions(state: ExtendedArcadeState): string[] {
       return getKingsEscapeChaserMoves(state).map(m => `ke:${m.idx},${m.to[0]},${m.to[1]}`);
     }
 
-    case 'wordle-duel':
+    case 'wordle-duel': {
       if (state.phase === 'set') return WORDLE_5_WORDS.slice(0, 12).map(w => `wds:${w}`);
-      return [];
+      const used = new Set(state.guesses.map(g => g.word));
+      const cands = WORDLE_5_WORDS.filter(w => !used.has(w));
+      if (state.secret && !used.has(state.secret) && !cands.includes(state.secret)) {
+        cands.unshift(state.secret);
+      }
+      return (cands.length > 0 ? cands : [state.secret || 'melon']).map(w => `wdg:${w}`);
+    }
 
     case 'hangman-duel':
       if (state.phase === 'set') return HANGMAN_WORDS.slice(0, 12).map(w => `hms:${w}`);
@@ -1286,7 +1307,7 @@ export function getExtendedLegalActions(state: ExtendedArcadeState): string[] {
 
     case 'mastermind':
       if (state.phase === 'set') return ['mms:0123', 'mms:2415', 'mms:3502'];
-      return [];
+      return [`mmg:${(state.secret || [0, 1, 2, 3]).join('')}`, 'mmg:0123', 'mmg:1234', 'mmg:2345', 'mmg:3450'];
 
     case 'hilo-target': {
       const mid = Math.floor((state.lowBound + state.highBound) / 2);
@@ -1295,9 +1316,18 @@ export function getExtendedLegalActions(state: ExtendedArcadeState): string[] {
 
     case 'word-chain': {
       const used = new Set(state.words.map(w => w.word));
-      return WORD_CHAIN_SEEDS.filter(w => w.startsWith(state.requiredLetter) && !used.has(w)).map(
-        w => `wc:${w}`
+      const letter = state.requiredLetter || 'a';
+      const dict = WORD_CHAIN_BOT_DICT[letter] || [];
+      const cands = Array.from(new Set([...dict, ...WORD_CHAIN_SEEDS])).filter(
+        w => w.startsWith(letter) && !used.has(w)
       );
+      if (cands.length > 0) return cands.map(w => `wc:${w}`);
+      const fallbackSuffixes = ['eon', 'ova', 'est', 'ark', 'aze', 'ora', 'ion', 'urn', 'ix', 'aft'];
+      for (const suf of fallbackSuffixes) {
+        const w = `${letter}${suf}`;
+        if (!used.has(w)) return [`wc:${w}`];
+      }
+      return [`wc:${letter}alphabet`];
     }
 
     case 'blackjack-21':
@@ -1317,10 +1347,10 @@ export function getExtendedLegalActions(state: ExtendedArcadeState): string[] {
 
     case 'tug-of-war': {
       const avail = state.energy[state.turn];
-      const maxBid = Math.min(6, Math.max(1, avail));
+      if (avail <= 0) return ['tw:0'];
+      const maxBid = Math.min(6, avail);
       const res: string[] = [];
       for (let b = 1; b <= maxBid; b++) res.push(`tw:${b}`);
-      if (avail <= 0) res.push('tw:0');
       return res;
     }
 
@@ -3503,19 +3533,26 @@ export function pickExtendedBotAction(state: ExtendedArcadeState, botObj: Arcade
 
     case 'word-chain': {
       const used = new Set(state.words.map(w => w.word));
-      const pool = [
-        ...WORD_CHAIN_SEEDS,
-        'neon', 'night', 'notebook', 'kangaroo', 'orange', 'eagle', 'energy',
-        'yellow', 'whale', 'ember', 'rocket', 'tower', 'rainbow', 'wizard',
-        'dragon', 'ninja', 'avocado', 'ocean', 'island', 'diamond', 'dolphin',
-        'lemon', 'mango', 'opal', 'lantern', 'nectar', 'river', 'storm', 'melon'
-      ].filter(w => w[0] === state.requiredLetter && !used.has(w));
+      const letter = state.requiredLetter || 'a';
+      const dict = WORD_CHAIN_BOT_DICT[letter] || [];
+      const pool = Array.from(new Set([...dict, ...WORD_CHAIN_SEEDS])).filter(
+        w => w[0] === letter && !used.has(w)
+      );
       if (pool.length > 0) {
         pool.sort((a, b) => (diff === 'easy' ? a.length - b.length : b.length - a.length));
         return `wc:${pool[0]}`;
       }
-      const fallback = `${state.requiredLetter}eon`;
-      return `wc:${fallback}`;
+      const suffixes = ['eon', 'ova', 'est', 'ark', 'aze', 'ora', 'ion', 'urn', 'ix', 'aft'];
+      for (const suf of suffixes) {
+        const cand = `${letter}${suf}`;
+        if (!used.has(cand)) return `wc:${cand}`;
+      }
+      const codeAlpha = 'abcdefghijklmnopqrstuvwxyz';
+      for (let i = 0; i < 26; i++) {
+        const cand = `${letter}${codeAlpha[i]}a`;
+        if (!used.has(cand)) return `wc:${cand}`;
+      }
+      return `wc:${letter}win`;
     }
 
     case 'blackjack-21': {

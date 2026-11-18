@@ -167,6 +167,35 @@ export const WORD_CHAIN_SEEDS = [
   'apple', 'tiger', 'robot', 'planet', 'ocean', 'melon', 'spark', 'guitar', 'rocket', 'castle'
 ];
 
+export const WORD_CHAIN_BOT_DICT: Record<string, string[]> = {
+  a: ['apple', 'acorn', 'anchor', 'avocado', 'aurora', 'atlas', 'amber', 'arrow'],
+  b: ['banana', 'beacon', 'blossom', 'breeze', 'bridge', 'bronze', 'bubble', 'butter'],
+  c: ['castle', 'cactus', 'canyon', 'candle', 'comet', 'copper', 'coral', 'crystal'],
+  d: ['dragon', 'diamond', 'dolphin', 'desert', 'daisy', 'domino', 'drifter', 'dusk'],
+  e: ['eagle', 'ember', 'emerald', 'echo', 'engine', 'energy', 'eclipse', 'elm'],
+  f: ['flame', 'falcon', 'forest', 'fossil', 'fountain', 'frost', 'fruit', 'feather'],
+  g: ['guitar', 'galaxy', 'garden', 'glacier', 'golden', 'grape', 'griffin', 'gravity'],
+  h: ['harbor', 'horizon', 'honey', 'hammer', 'harvest', 'helmet', 'hazel', 'hydra'],
+  i: ['island', 'icicle', 'ignite', 'indigo', 'ivory', 'iris', 'impact', 'igloo'],
+  j: ['jungle', 'jasper', 'jester', 'jigsaw', 'journey', 'jupiter', 'jewel', 'juniper'],
+  k: ['kangaroo', 'kayak', 'kettle', 'kingdom', 'kite', 'knight', 'koala', 'krypton'],
+  l: ['lantern', 'lemon', 'leopard', 'lightning', 'lotus', 'lunar', 'lagoon', 'lapis'],
+  m: ['melon', 'mango', 'marble', 'meadow', 'meteor', 'mirror', 'mountain', 'mystic'],
+  n: ['nectar', 'neon', 'night', 'ninja', 'notebook', 'nebula', 'north', 'nugget'],
+  o: ['ocean', 'olive', 'opal', 'orange', 'orbit', 'orchid', 'otter', 'oasis'],
+  p: ['planet', 'panda', 'peach', 'pebble', 'penguin', 'phoenix', 'piano', 'prism'],
+  q: ['quartz', 'queen', 'quest', 'quiver', 'quokka', 'quasar', 'quiet', 'quill'],
+  r: ['robot', 'rocket', 'rainbow', 'river', 'ruby', 'radar', 'raven', 'ripple'],
+  s: ['spark', 'safari', 'sapphire', 'shadow', 'silver', 'solar', 'starlight', 'storm'],
+  t: ['tiger', 'temple', 'thunder', 'topaz', 'tornado', 'tower', 'treasure', 'tulip'],
+  u: ['umbrella', 'unicorn', 'union', 'uplift', 'uranium', 'urban', 'utopia', 'ultraviolet'],
+  v: ['valley', 'velvet', 'venus', 'vertex', 'violet', 'volcano', 'vortex', 'voyage'],
+  w: ['whale', 'walnut', 'waterfall', 'whisper', 'willow', 'winter', 'wizard', 'wonder'],
+  x: ['xenon', 'xylem', 'xylophone', 'xerox', 'xenia', 'xeric'],
+  y: ['yellow', 'yacht', 'yonder', 'yogurt', 'yarrow', 'yeast', 'young', 'yucca'],
+  z: ['zebra', 'zenith', 'zephyr', 'zero', 'zigzag', 'zinc', 'zodiac', 'zombie']
+};
+
 // ---------------- 30 EXTENDED STATE DEFINITIONS ----------------
 
 export interface PixelGuessState {

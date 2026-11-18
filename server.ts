@@ -369,6 +369,7 @@ async function startServer() {
       return cleanUpstream;
     }
     const cleanPath = urlOrPath.split('?')[0].split('#')[0].toLowerCase();
+    if (cleanPath.includes('.mp3')) return 'audio/mpeg';
     if (cleanPath.endsWith('.m4a') || cleanPath.endsWith('.mp4')) return 'audio/mp4';
     if (cleanPath.endsWith('.aac')) return 'audio/aac';
     if (cleanPath.endsWith('.ogg') || cleanPath.endsWith('.oga')) return 'audio/ogg';
@@ -447,6 +448,9 @@ async function startServer() {
 
       if (sourceUrl) {
         const targetDiskPath = path.join(primaryMusicDir, cleanFilename);
+        const connectAc = new AbortController();
+        const connectTimer = setTimeout(() => connectAc.abort(), 15000);
+        req.on('close', () => connectAc.abort());
         try {
           const clientRange = req.headers.range;
           const fetchHeaders: Record<string, string> = {
@@ -458,8 +462,9 @@ async function startServer() {
           const remoteRes = await fetch(sourceUrl, {
             headers: fetchHeaders,
             redirect: 'follow',
-            signal: AbortSignal.timeout(20000)
+            signal: connectAc.signal
           });
+          clearTimeout(connectTimer);
 
           if (remoteRes.ok || remoteRes.status === 206) {
             const contentType = inferAudioContentType(sourceUrl, remoteRes.headers.get('content-type'));
@@ -479,6 +484,12 @@ async function startServer() {
 
             if (remoteRes.body) {
               const nodeStream = Readable.fromWeb(remoteRes.body as any);
+              req.on('close', () => {
+                try { nodeStream.destroy(); } catch {}
+              });
+              nodeStream.on('error', () => {
+                if (!res.headersSent) res.status(502).end();
+              });
               nodeStream.pipe(res);
 
               if (!fs.existsSync(targetDiskPath)) {
@@ -498,6 +509,7 @@ async function startServer() {
             }
           }
         } catch (err: any) {
+          clearTimeout(connectTimer);
           console.warn(`[STREAM FALLBACK ERROR] for ${cleanFilename}:`, err.message);
         }
       }
@@ -583,6 +595,72 @@ async function startServer() {
     return res.json({ streamUrl, source: 'apple-cdn' });
   });
 
+  const pendingRemoteCaches = new Map<string, Promise<string | null>>();
+
+  const getCachedRemotePath = (targetUrl: string): string => {
+    const hash = crypto.createHash('sha1').update(targetUrl).digest('hex');
+    const clean = targetUrl.split('?')[0].split('#')[0].toLowerCase();
+    const ext = clean.includes('.mp3')
+      ? '.mp3'
+      : clean.endsWith('.m4a')
+      ? '.m4a'
+      : clean.endsWith('.mp4')
+      ? '.mp4'
+      : clean.endsWith('.ogg')
+      ? '.ogg'
+      : '.mp3';
+    return path.join(cacheMusicDir, `remote_${hash}${ext}`);
+  };
+
+  const cacheRemoteUrlToDisk = async (targetUrl: string): Promise<string | null> => {
+    const dest = getCachedRemotePath(targetUrl);
+    try {
+      if (fs.existsSync(dest) && fs.statSync(dest).size > 20000) {
+        return dest;
+      }
+    } catch {}
+
+    const existing = pendingRemoteCaches.get(dest);
+    if (existing) return existing;
+
+    const job = (async (): Promise<string | null> => {
+      const tmp = `${dest}.${process.pid}.${Date.now()}.tmp`;
+      const connectAc = new AbortController();
+      const connectTimer = setTimeout(() => connectAc.abort(), 15000);
+      try {
+        if (!fs.existsSync(cacheMusicDir)) {
+          fs.mkdirSync(cacheMusicDir, { recursive: true });
+        }
+        const dlRes = await fetch(targetUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1',
+            'Accept': '*/*'
+          },
+          redirect: 'follow',
+          signal: connectAc.signal
+        });
+        clearTimeout(connectTimer);
+        if (!dlRes.ok || !dlRes.body) return null;
+        const arr = Buffer.from(await dlRes.arrayBuffer());
+        if (arr.byteLength < 10000) return null;
+        fs.writeFileSync(tmp, arr);
+        fs.renameSync(tmp, dest);
+        return dest;
+      } catch {
+        clearTimeout(connectTimer);
+        try {
+          if (fs.existsSync(tmp)) fs.unlinkSync(tmp);
+        } catch {}
+        return null;
+      } finally {
+        pendingRemoteCaches.delete(dest);
+      }
+    })();
+
+    pendingRemoteCaches.set(dest, job);
+    return job;
+  };
+
   const handleMusicProxyRequest = async (req: express.Request, res: express.Response) => {
     setAudioCorsHeaders(res);
 
@@ -590,6 +668,7 @@ async function startServer() {
     const local = String(req.query.local || '').trim();
     const artist = String(req.query.artist || '').trim();
     const title = String(req.query.title || '').trim();
+    const allowPreview = req.query.allowPreview === '1';
     const isHead = req.method === 'HEAD';
 
     if (local) {
@@ -601,6 +680,14 @@ async function startServer() {
     }
 
     const streamRemote = async (targetUrl: string): Promise<boolean> => {
+      const cachedPath = getCachedRemotePath(targetUrl);
+      try {
+        if (fs.existsSync(cachedPath) && fs.statSync(cachedPath).size > 20000) {
+          await streamAudioFile(cachedPath, req, res);
+          return true;
+        }
+      } catch {}
+
       const clientRange = req.headers.range;
       const fetchHeaders: Record<string, string> = {
         'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1',
@@ -610,14 +697,38 @@ async function startServer() {
         fetchHeaders['Range'] = clientRange;
       }
 
-      const remoteRes = await fetch(targetUrl, {
-        method: isHead ? 'HEAD' : 'GET',
-        headers: fetchHeaders,
-        redirect: 'follow',
-        signal: AbortSignal.timeout(15000)
-      });
+      const connectAc = new AbortController();
+      const connectTimer = setTimeout(() => connectAc.abort(), 14000);
+      const onReqClose = () => {
+        try { connectAc.abort(); } catch {}
+      };
+      req.on('close', onReqClose);
+
+      let remoteRes: Response;
+      try {
+        remoteRes = await fetch(targetUrl, {
+          method: isHead ? 'HEAD' : 'GET',
+          headers: fetchHeaders,
+          redirect: 'follow',
+          signal: connectAc.signal
+        });
+      } finally {
+        clearTimeout(connectTimer);
+      }
 
       if (!remoteRes.ok && remoteRes.status !== 206) {
+        return false;
+      }
+
+      // If client asked for a byte range (e.g. Safari bytes=0-1 or scrubber seek) and upstream returned 200
+      // without Content-Range (common for ZIP-extracted MP3s on Archive.org), cache locally once so byte-ranges work cleanly!
+      if (!isHead && clientRange && remoteRes.status === 200 && !remoteRes.headers.get('content-range')) {
+        try { await remoteRes.body?.cancel(); } catch {}
+        const diskPath = await cacheRemoteUrlToDisk(targetUrl);
+        if (diskPath) {
+          await streamAudioFile(diskPath, req, res);
+          return true;
+        }
         return false;
       }
 
@@ -679,11 +790,11 @@ async function startServer() {
         const ok = await streamRemote(remoteUrl);
         if (ok) return;
       } catch (proxyErr) {
-        console.warn('Direct proxy failed, attempting Apple CDN fallback:', remoteUrl);
+        console.warn('Direct proxy failed for URL:', remoteUrl);
       }
 
-      // Automatic unblocked server fallback via Apple iTunes CDN
-      if (title) {
+      // Only downgrade to 30-second Apple CDN preview when explicitly requested by client
+      if (allowPreview && title) {
         try {
           const appleUrl = await findUnblockedAppleStream(artist, title);
           if (appleUrl) {
@@ -699,8 +810,8 @@ async function startServer() {
       return;
     }
 
-    // If only artist & title supplied (no remoteUrl), resolve & stream Apple CDN
-    if (title) {
+    // If only artist & title supplied (no remoteUrl), resolve & stream Apple CDN only when explicitly requested
+    if (allowPreview && title) {
       const appleUrl = await findUnblockedAppleStream(artist, title);
       if (appleUrl && (await streamRemote(appleUrl))) {
         return;
@@ -858,11 +969,19 @@ Example format:
   attachChessRoomServer(httpServer, app);
   attachArcadeRoomServer(httpServer, app);
 
-  const isDev = process.env.npm_lifecycle_event === 'dev' || 
-                process.env.NODE_ENV === 'development' || 
-                process.argv.includes('--dev');
+  const runningUnderTsx =
+    process.execArgv.some(a => a.includes('tsx')) ||
+    process.argv.some(a => a.endsWith('server.ts'));
+  const isDev =
+    process.env.npm_lifecycle_event === 'dev' ||
+    process.env.NODE_ENV === 'development' ||
+    process.argv.includes('--dev') ||
+    runningUnderTsx;
   const hasDist = fs.existsSync(path.resolve('dist/index.html'));
-  const isProduction = process.env.NODE_ENV === 'production' || (!isDev && hasDist);
+  const isProduction =
+    process.env.NODE_ENV === 'production' ||
+    process.env.npm_lifecycle_event === 'start' ||
+    (!isDev && hasDist);
 
   if (isProduction && hasDist) {
     if (fs.existsSync(path.resolve('dist/assets'))) {

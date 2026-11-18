@@ -1158,7 +1158,9 @@ export function getLegalArcadeActions(state: ArcadeState): string[] {
         return state.wordChoices.map(w => `dw:${w}`);
       }
       if (state.phase === 'draw') {
-        return state.strokes.length > 0 ? ['dp'] : [];
+        if (state.strokes.length > 0) return ['dp'];
+        const targetStrokes = BOT_DRAW_PATHS[state.word || ''] || BOT_DRAW_PATHS.house;
+        return [serializeDrawStrokeAction(targetStrokes[0])];
       }
       return state.word ? [`dg:${state.word}`, 'dq'] : ['dq'];
     }
@@ -2810,8 +2812,7 @@ export function pickBotArcadeAction(
   state: ArcadeState,
   botOrId?: ArcadeBot | string
 ): string | null {
-  const legal = getLegalArcadeActions(state);
-  if (legal.length === 0) return null;
+  if (state.winner) return null;
 
   const botProfile =
     typeof botOrId === 'string'
@@ -2824,6 +2825,43 @@ export function pickBotArcadeAction(
   if (isExtendedArcadeGameType(state.gameType)) {
     return pickExtendedBotAction(state as ExtendedArcadeState, botProfile);
   }
+
+  // Handle draw-guess explicitly so easy bots still draw real strokes and guess words instead of forfeiting
+  if (state.gameType === 'draw-guess') {
+    if (state.phase === 'pick') {
+      const known = state.wordChoices.filter(w => Boolean(BOT_DRAW_PATHS[w]));
+      return `dw:${pickRandom(known.length > 0 ? known : state.wordChoices)}`;
+    }
+    if (state.phase === 'draw') {
+      const targetStrokes = BOT_DRAW_PATHS[state.word || ''] || BOT_DRAW_PATHS.house;
+      const idx = state.strokes.length;
+      if (idx < targetStrokes.length) {
+        return serializeDrawStrokeAction(targetStrokes[idx]);
+      }
+      return 'dp';
+    }
+    const secret = state.word || 'house';
+    const attempt = state.guesses.length;
+    const hitChance =
+      difficulty === 'expert'
+        ? attempt === 0 ? 0.82 : 0.96
+        : difficulty === 'hard'
+        ? attempt === 0 ? 0.62 : 0.88
+        : difficulty === 'medium'
+        ? attempt === 0 ? 0.38 : attempt === 1 ? 0.68 : 0.82
+        : attempt === 0 ? 0.22 : attempt === 1 ? 0.42 : 0.58;
+
+    if (Math.random() < hitChance) {
+      return `dg:${secret}`;
+    }
+    const decoys = DRAW_WORD_BANK.filter(
+      w => w !== secret && !state.guesses.some(g => g.text === w)
+    );
+    return `dg:${pickRandom(decoys.length > 0 ? decoys : DRAW_WORD_BANK)}`;
+  }
+
+  const legal = getLegalArcadeActions(state);
+  if (legal.length === 0) return null;
 
   // Sprout / Sunny Chips (easy): casual play with ~42% relaxed/playful randomness
   if (difficulty === 'easy') {
@@ -3072,40 +3110,6 @@ export function pickBotArcadeAction(
       }
       const pref = ['i:4', 'i:0', 'i:2', 'i:6', 'i:8', 'i:1', 'i:3', 'i:5', 'i:7'];
       return pref.find(p => legal.includes(p)) || legal[0];
-    }
-
-    case 'draw-guess': {
-      if (state.phase === 'pick') {
-        const known = state.wordChoices.filter(w => Boolean(BOT_DRAW_PATHS[w]));
-        return `dw:${pickRandom(known.length > 0 ? known : state.wordChoices)}`;
-      }
-      if (state.phase === 'draw') {
-        const targetStrokes = BOT_DRAW_PATHS[state.word || ''] || BOT_DRAW_PATHS.house;
-        const idx = state.strokes.length;
-        if (idx < targetStrokes.length) {
-          return serializeDrawStrokeAction(targetStrokes[idx]);
-        }
-        return 'dp';
-      }
-      // Bot guessing
-      const secret = state.word || 'house';
-      const attempt = state.guesses.length;
-      const hitChance =
-        difficulty === 'expert'
-          ? attempt === 0 ? 0.82 : 0.96
-          : difficulty === 'hard'
-          ? attempt === 0 ? 0.62 : 0.88
-          : difficulty === 'medium'
-          ? attempt === 0 ? 0.38 : attempt === 1 ? 0.68 : 0.82
-          : attempt === 0 ? 0.22 : attempt === 1 ? 0.42 : 0.58;
-
-      if (Math.random() < hitChance) {
-        return `dg:${secret}`;
-      }
-      const decoys = DRAW_WORD_BANK.filter(
-        w => w !== secret && !state.guesses.some(g => g.text === w)
-      );
-      return `dg:${pickRandom(decoys.length > 0 ? decoys : DRAW_WORD_BANK)}`;
     }
 
     case 'battleship': {

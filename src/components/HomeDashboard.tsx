@@ -16,6 +16,7 @@ import {
 import { Game } from '../types/game';
 import { resolveAssetUrl } from '../services/gamesStore';
 import { ThemeConfig } from '../services/themeStore';
+import { HomeParticleCanvas } from './HomeParticleCanvas';
 
 interface HomeDashboardProps {
   onNavigateTab: (tab: 'home' | 'games' | 'apps' | 'music' | 'chess' | 'rooms' | 'tools' | 'saved') => void;
@@ -65,8 +66,9 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
   const border = activeTheme?.border || 'rgba(255, 255, 255, 0.1)';
 
   return (
-    <div className="flex-1 flex flex-col min-h-screen text-slate-100 p-4 md:p-8 lg:p-12">
-      <div className="max-w-6xl mx-auto w-full flex flex-col gap-10">
+    <div className="relative overflow-hidden flex-1 flex flex-col min-h-screen text-slate-100 p-4 md:p-8 lg:p-12">
+      <HomeParticleCanvas accent={accent} />
+      <div className="relative z-10 max-w-6xl mx-auto w-full flex flex-col gap-10">
         
         {/* Top Clock & Brand Greeting */}
         <div className="flex flex-col items-center text-center gap-3 pt-4 md:pt-8 animate-fadeIn">
