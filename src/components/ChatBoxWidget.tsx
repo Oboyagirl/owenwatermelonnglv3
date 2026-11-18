@@ -20,7 +20,9 @@ import {
   Pin,
   PinOff,
   Gamepad2,
-  Play
+  Play,
+  Maximize2,
+  Minimize2
 } from 'lucide-react';
 import { signInAnonymously } from 'firebase/auth';
 import { auth, ensureAuthPersistence, backupFirebaseAuthSession } from '../services/firebase';
@@ -102,12 +104,32 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
   onTogglePinOpen
 }) => {
   const [isBarHidden, setIsBarHidden] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setIsBarHidden(false);
+    } else {
+      setIsFullscreen(false);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || !isFullscreen) return;
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      const activeEl = document.activeElement as HTMLElement | null;
+      const tag = (activeEl?.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || activeEl?.isContentEditable) {
+        return;
+      }
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      setIsFullscreen(false);
+    };
+    window.addEventListener('keydown', handleEsc, true);
+    return () => window.removeEventListener('keydown', handleEsc, true);
+  }, [isOpen, isFullscreen]);
   const { user, profile, isAuthReady, loginGoogle, authError, clearAuthError } = useAuth();
   const isFirebaseConnected = Boolean(user?.uid && auth.currentUser && auth.currentUser.uid === user.uid);
 
@@ -482,6 +504,7 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
       }).catch(() => {});
 
       setShowInvitePicker(false);
+      setIsFullscreen(false);
       setChatNotice(`Invited ${activePartner.displayName} to ${gameOption.gameTitle}!`);
       window.setTimeout(() => setChatNotice(null), 2600);
       openGameRoom(gameOption.gameKind === 'chess' ? 'chess' : 'rooms', code);
@@ -595,17 +618,23 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
 
   return (
     <div
-      className={`fixed ${sideClass} z-50 w-[calc(100vw-2rem)] sm:w-[390px] h-[480px] rounded-2xl border shadow-2xl flex flex-col overflow-hidden backdrop-blur-xl animate-fadeIn transition-all duration-300`}
+      className={
+        isFullscreen
+          ? 'fixed inset-0 z-[70] w-screen h-[100dvh] rounded-none border-0 shadow-2xl flex flex-col overflow-hidden backdrop-blur-xl animate-fadeIn transition-all duration-300'
+          : `fixed ${sideClass} z-50 w-[calc(100vw-2rem)] sm:w-[390px] h-[480px] rounded-2xl border shadow-2xl flex flex-col overflow-hidden backdrop-blur-xl animate-fadeIn transition-all duration-300`
+      }
       style={{
-        bottom: `${bottomOffsetPx}px`,
-        maxHeight: `calc(100vh - ${bottomOffsetPx + 16}px)`,
+        bottom: isFullscreen ? undefined : `${bottomOffsetPx}px`,
+        maxHeight: isFullscreen ? undefined : `calc(100vh - ${bottomOffsetPx + 16}px)`,
         backgroundColor: bgPrimary,
-        borderColor: isPinnedOpen ? accentColor : borderColor
+        borderColor: isFullscreen ? undefined : isPinnedOpen ? accentColor : borderColor
       }}
     >
       {/* Top Header */}
       <div
-        className="px-3.5 py-2.5 border-b flex items-center justify-between gap-2 shrink-0"
+        className={`border-b flex items-center justify-between gap-2 shrink-0 ${
+          isFullscreen ? 'px-4 sm:px-6 py-3' : 'px-3.5 py-2.5'
+        }`}
         style={{ backgroundColor: bgHeader, borderColor }}
       >
         <div className="flex items-center gap-2.5 min-w-0">
@@ -676,7 +705,24 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
           )}
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => setIsFullscreen((v) => !v)}
+            className={`p-1.5 rounded-lg border transition-colors cursor-pointer flex items-center gap-1 text-[10px] font-bold ${
+              isFullscreen
+                ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-200'
+                : 'border-transparent text-slate-400 hover:text-white hover:bg-white/10'
+            }`}
+            title={isFullscreen ? 'Exit fullscreen chatbox (Esc)' : 'Expand chatbox to fullscreen'}
+            aria-label={isFullscreen ? 'Exit fullscreen chatbox' : 'Expand chatbox to fullscreen'}
+          >
+            {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+            {isFullscreen && <span className="hidden sm:inline">Exit Full</span>}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setIsFullscreen(false);
+              onClose();
+            }}
             className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
             title="Minimize chatbox"
           >
@@ -685,6 +731,7 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
           <button
             type="button"
             onClick={() => {
+              setIsFullscreen(false);
               setIsBarHidden(true);
               onClose();
             }}
@@ -775,7 +822,7 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
         <>
           {/* Mode Tabs */}
           {!activePartner && (
-            <div className="px-3 pt-2.5 pb-1 shrink-0">
+            <div className={`shrink-0 ${isFullscreen ? 'px-4 sm:px-6 pt-3 pb-1 max-w-4xl w-full mx-auto' : 'px-3 pt-2.5 pb-1'}`}>
               <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-black/40 border border-white/10">
                 <button
                   type="button"
@@ -810,9 +857,10 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
             <div className="flex-1 flex flex-col min-h-0">
               {/* Partner Bar */}
               <div
-                className="px-3 py-2 border-b flex items-center justify-between gap-2 shrink-0"
+                className={`border-b shrink-0 ${isFullscreen ? 'px-4 sm:px-6 py-2.5' : 'px-3 py-2'}`}
                 style={{ backgroundColor: bgCard, borderColor }}
               >
+                <div className={`flex items-center justify-between gap-2 w-full ${isFullscreen ? 'max-w-4xl mx-auto' : ''}`}>
                 <div className="flex items-center gap-2 min-w-0">
                   <button
                     type="button"
@@ -869,6 +917,7 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
                     </button>
                   )}
                 </div>
+                </div>
               </div>
 
               {/* 1-Click Direct Game Challenge Picker */}
@@ -900,7 +949,7 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
                       className="w-full pl-7 pr-2.5 py-1 rounded-lg border border-white/10 bg-black/40 text-[11px] text-white placeholder-slate-500 focus:outline-none focus:border-sky-400"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-1.5 max-h-48 overflow-y-auto pr-0.5">
+                  <div className={`grid gap-1.5 overflow-y-auto pr-0.5 ${isFullscreen ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 max-h-64' : 'grid-cols-2 max-h-48'}`}>
                     {(!inviteSearch.trim() || 'chess'.includes(inviteSearch.trim().toLowerCase())) && (
                       <button
                         type="button"
@@ -950,7 +999,7 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
               )}
 
               {/* Messages Feed */}
-              <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2.5">
+              <div className={`flex-1 overflow-y-auto flex flex-col gap-2.5 ${isFullscreen ? 'p-4 sm:p-6 max-w-4xl w-full mx-auto' : 'p-3'}`}>
                 {displayedMessages.length === 0 ? (
                   <div className="flex-1 flex flex-col items-center justify-center text-center text-xs text-slate-400 px-6">
                     <MessageCircle className="w-8 h-8 text-slate-600 mb-2" />
@@ -962,10 +1011,12 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
                     return (
                       <div
                         key={msg.id}
-                        className={`flex flex-col max-w-[82%] ${isMine ? 'self-end items-end' : 'self-start items-start'}`}
+                        className={`flex flex-col ${isFullscreen ? 'max-w-[70%]' : 'max-w-[82%]'} ${isMine ? 'self-end items-end' : 'self-start items-start'}`}
                       >
                         <div
-                          className={`px-3 py-2 rounded-2xl text-xs leading-relaxed break-words select-text ${
+                          className={`px-3 py-2 rounded-2xl leading-relaxed break-words select-text ${
+                            isFullscreen ? 'text-sm px-4 py-2.5' : 'text-xs'
+                          } ${
                             isMine
                               ? 'text-black font-medium rounded-br-sm'
                               : 'bg-white/10 text-slate-100 border border-white/10 rounded-bl-sm'
@@ -987,9 +1038,10 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
               {/* Composer */}
               <form
                 onSubmit={handleSendMessage}
-                className="p-2.5 border-t flex items-center gap-2 shrink-0"
+                className={`border-t flex items-center gap-2 shrink-0 ${isFullscreen ? 'px-4 sm:px-6 py-3' : 'p-2.5'}`}
                 style={{ backgroundColor: bgHeader, borderColor }}
               >
+                <div className={`flex items-center gap-2 w-full ${isFullscreen ? 'max-w-4xl mx-auto' : ''}`}>
                 <input
                   type="text"
                   value={messageInput}
@@ -1007,11 +1059,12 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
                 >
                   <Send className="w-4 h-4" />
                 </button>
+                </div>
               </form>
             </div>
           ) : activeTab === 'chats' ? (
             /* Friends & Recent Threads View */
-            <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-4">
+            <div className={`flex-1 overflow-y-auto flex flex-col gap-4 ${isFullscreen ? 'p-4 sm:p-6 max-w-4xl w-full mx-auto' : 'p-3'}`}>
               {/* Pending Game Invites */}
               {incomingInvites.length > 0 && (
                 <div className="flex flex-col gap-1.5">
@@ -1038,7 +1091,10 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
                       <div className="flex items-center gap-1 shrink-0">
                         <button
                           type="button"
-                          onClick={() => void acceptGameInvite(inv)}
+                          onClick={() => {
+                            setIsFullscreen(false);
+                            void acceptGameInvite(inv);
+                          }}
                           className="px-2.5 py-1 rounded-lg bg-sky-400 hover:bg-sky-300 text-black font-extrabold text-[11px] flex items-center gap-1 cursor-pointer"
                         >
                           <Play className="w-2.5 h-2.5 fill-current" />
@@ -1221,7 +1277,7 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
             </div>
           ) : (
             /* Add People (Live Firebase Directory + Friend Code Lookup) */
-            <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-3">
+            <div className={`flex-1 overflow-y-auto flex flex-col gap-3 ${isFullscreen ? 'p-4 sm:p-6 max-w-4xl w-full mx-auto' : 'p-3'}`}>
               <form onSubmit={handleLookupAndAdd} className="flex items-center gap-1.5 shrink-0">
                 <div className="relative flex-1">
                   <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
