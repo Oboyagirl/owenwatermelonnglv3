@@ -31,7 +31,8 @@ const AppsView = lazy(() => import('./components/AppsView').then(m => ({ default
 const MusicView = lazy(() => import('./components/MusicView').then(m => ({ default: m.MusicView })));
 const ChessView = lazy(() => import('./components/ChessView').then(m => ({ default: m.ChessView })));
 const MultiplayerArcadeView = lazy(() => import('./components/MultiplayerArcadeView').then(m => ({ default: m.MultiplayerArcadeView })));
-import { Heart, Gamepad2, ExternalLink, RotateCcw, Search, Sparkles, Flame, Globe, Bot, X, Shuffle } from 'lucide-react';
+import { GameAuthGate } from './components/GameAuthGate';
+import { Heart, Gamepad2, ExternalLink, RotateCcw, Search, Sparkles, Flame, Globe, Bot, X, Shuffle, Lock, LogIn } from 'lucide-react';
 
 export function isOwenWatermelonOG(game: Game): boolean {
   if (!game) return false;
@@ -164,7 +165,7 @@ export default function App() {
     updateCustomTheme, 
     resetCustomTheme 
   } = useThemeStore();
-  const { user, hasRememberedSession } = useAuth();
+  const { user, hasRememberedSession, isSignedIn, isAuthReady } = useAuth();
 
   // Root background and theme variables setup
   useEffect(() => {
@@ -234,6 +235,8 @@ export default function App() {
   });
   const [onlineChatCount, setOnlineChatCount] = useState(0);
   const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(false);
+  const [pendingAuthGame, setPendingAuthGame] = useState<Game | null>(null);
+  const [isGameAuthModalOpen, setIsGameAuthModalOpen] = useState(false);
 
   const toggleChatPinnedOpen = () => {
     setIsChatPinnedOpen(prev => {
@@ -450,7 +453,30 @@ export default function App() {
     handleSelectSpace('games');
   };
 
+  useEffect(() => {
+    if (isSignedIn && pendingAuthGame) {
+      const gameToLaunch = pendingAuthGame;
+      setPendingAuthGame(null);
+      setIsGameAuthModalOpen(false);
+      setSelectedGame(gameToLaunch);
+      recordPlay(gameToLaunch.id);
+      handleSelectSpace('games');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [isSignedIn, pendingAuthGame]);
+
+  useEffect(() => {
+    if (isAuthReady && !isSignedIn) {
+      setSelectedGame(null);
+    }
+  }, [isAuthReady, isSignedIn, setSelectedGame]);
+
   const handleSelectGame = (game: Game) => {
+    if (!isSignedIn) {
+      setPendingAuthGame(game);
+      setIsGameAuthModalOpen(true);
+      return;
+    }
     setSelectedGame(game);
     recordPlay(game.id);
     handleSelectSpace('games');
@@ -574,6 +600,15 @@ export default function App() {
     }
 
     if (space === 'chess') {
+      if (!isSignedIn) {
+        return (
+          <GameAuthGate
+            activeTheme={activeTheme}
+            spaceLabel="Chess Studio"
+            description="Sign in with Google to play Chess against AI bots, local players, or online friends."
+          />
+        );
+      }
       return (
         <Suspense fallback={<div className="flex-1 flex items-center justify-center p-8 text-xs text-slate-400">Loading Chess Studio...</div>}>
           <ChessView activeTheme={activeTheme} />
@@ -582,6 +617,15 @@ export default function App() {
     }
 
     if (space === 'rooms') {
+      if (!isSignedIn) {
+        return (
+          <GameAuthGate
+            activeTheme={activeTheme}
+            spaceLabel="42 Minigames Arcade"
+            description="Sign in with Google to play all 42 minigames against bots or challenge online friends."
+          />
+        );
+      }
       return (
         <Suspense fallback={<div className="flex-1 flex items-center justify-center p-8 text-xs text-slate-400">Loading Multiplayer Rooms...</div>}>
           <MultiplayerArcadeView activeTheme={activeTheme} />
@@ -665,7 +709,7 @@ export default function App() {
         className="flex-1 flex flex-col min-h-screen text-slate-100 p-4 md:p-6 lg:p-8"
         style={{ backgroundColor: activeTheme.bgPrimary }}
       >
-        {selectedGame ? (
+        {selectedGame && isSignedIn ? (
           <Suspense fallback={<div className="flex-1 flex items-center justify-center p-8 text-xs text-slate-400">Loading Game Player...</div>}>
             <GamePlayer
               game={selectedGame}
@@ -679,8 +723,63 @@ export default function App() {
               onOpenMusicSpace={() => handleSelectSpace('music')}
             />
           </Suspense>
+        ) : selectedGame && !isSignedIn ? (
+          <GameAuthGate
+            activeTheme={activeTheme}
+            pendingGameTitle={selectedGame.title}
+          />
         ) : (
           <div className="max-w-7xl mx-auto w-full flex flex-col gap-8">
+            {!isSignedIn && (
+              <div
+                className="p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg"
+                style={{
+                  backgroundColor: activeTheme.bgCard,
+                  borderColor: activeTheme.borderActive
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center border shrink-0"
+                    style={{
+                      backgroundColor: activeTheme.accentBadge,
+                      borderColor: activeTheme.borderActive,
+                      color: activeTheme.accent
+                    }}
+                  >
+                    <Lock className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-extrabold text-white">
+                      {isAuthReady ? 'Sign in required to play games' : 'Checking your sign-in session...'}
+                    </h2>
+                    <p className="text-xs text-slate-400">
+                      {isAuthReady
+                        ? 'Sign in with Google before launching games. You will stay signed in automatically across updates.'
+                        : 'Restoring your saved Google account automatically.'}
+                    </p>
+                  </div>
+                </div>
+                {isAuthReady && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPendingAuthGame(null);
+                      setIsGameAuthModalOpen(true);
+                    }}
+                    className="px-4 py-2.5 rounded-xl font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md cursor-pointer transition-transform hover:scale-105 shrink-0"
+                    style={{
+                      backgroundColor: activeTheme.accent,
+                      color: activeTheme.accentText || '#000000'
+                    }}
+                  >
+                    <LogIn className="w-4 h-4" />
+                    <span>Sign in with Google</span>
+                  </button>
+                )}
+              </div>
+            )}
+
             {/* Header Title & Search */}
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex flex-col gap-1 w-full md:w-auto">
@@ -780,6 +879,7 @@ export default function App() {
                   isFavorite={favorites.includes(game.id)}
                   activeTheme={activeTheme}
                   priority={index < 24}
+                  requiresAuth={!isSignedIn}
                 />
               ))}
             </div>
@@ -994,6 +1094,19 @@ export default function App() {
 
       {/* Global Real-Time Notifications (Texts, Turns, & Game Invites) */}
       <NotificationToasts activeTheme={activeTheme} />
+
+      {/* Sign-In Required Modal when trying to play a game while signed out */}
+      {!isSignedIn && isGameAuthModalOpen && (
+        <GameAuthGate
+          isModal
+          onCloseModal={() => {
+            setIsGameAuthModalOpen(false);
+            setPendingAuthGame(null);
+          }}
+          pendingGameTitle={pendingAuthGame?.title}
+          activeTheme={activeTheme}
+        />
+      )}
       </div>
     </NotificationProvider>
   );

@@ -1,20 +1,15 @@
 import React, { useState } from 'react';
 import {
   X,
-  User as UserIcon,
   LogIn,
   LogOut,
-  Save,
-  Check,
-  Sparkles,
   Cloud,
   Gamepad2,
   Trash2,
-  Smartphone,
   Laptop,
-  Monitor,
   ShieldCheck,
-  Edit2
+  Edit2,
+  Lock
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { ThemeConfig } from '../services/themeStore';
@@ -42,14 +37,12 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
     saves, 
     deviceLabel, 
     isAuthReady,
-    isGuest,
+    isSignedIn,
     isCloudSynced,
-    hasRememberedSession,
     rememberedAccount,
     authError,
     clearAuthError,
     loginGoogle, 
-    loginGuest, 
     logout, 
     updateGamerProfile, 
     deleteSave 
@@ -57,13 +50,11 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
 
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState('');
-  const [guestNameInput, setGuestNameInput] = useState('');
-  const [selectedAvatar, setSelectedAvatar] = useState('melon_classic');
   const [isUpdating, setIsUpdating] = useState(false);
 
   if (!isOpen) return null;
 
-  const isLoggedIn = Boolean(user || (profile && hasRememberedSession));
+  const isLoggedIn = isSignedIn;
   const currentAvatar = AVATAR_PRESETS.find(a => a.id === (profile?.avatarId || 'melon_classic')) || AVATAR_PRESETS[0];
 
   const handleStartEditName = () => {
@@ -83,7 +74,6 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
   };
 
   const handleSelectAvatar = async (avatarId: string) => {
-    setSelectedAvatar(avatarId);
     if (isLoggedIn) {
       await updateGamerProfile({ avatarId });
     }
@@ -96,19 +86,6 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
       await loginGoogle();
     } catch {
       // authError is set in AuthContext for UI display
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  const handleCreateGuest = async () => {
-    setIsUpdating(true);
-    clearAuthError();
-    try {
-      await loginGuest(guestNameInput);
-      setGuestNameInput('');
-    } catch (e) {
-      console.error(e);
     } finally {
       setIsUpdating(false);
     }
@@ -234,10 +211,10 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                     )}
                     <div className="flex flex-wrap items-center gap-2 mt-1">
                       <span className="text-xs text-slate-400">
-                        {user?.email || rememberedAccount?.email || (isGuest ? 'Device Profile (Guest)' : 'Synced Account')}
+                        {user?.email || rememberedAccount?.email || 'Synced Account'}
                       </span>
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                        {saves.length} {isCloudSynced && !isGuest ? 'Cloud + Device Saves' : 'Device Vault Saves'}
+                        {saves.length} {isCloudSynced ? 'Cloud + Device Saves' : 'Device Vault Saves'}
                       </span>
                       <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-sky-500/15 text-sky-300 border border-sky-500/25">
                         Auto Stay Signed In
@@ -247,7 +224,7 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
-                  {(isGuest || !isCloudSynced) && (
+                  {!isCloudSynced && (
                     <button
                       onClick={handleGoogleSignIn}
                       disabled={isUpdating}
@@ -255,7 +232,7 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                       style={{ backgroundColor: theme.accent, color: theme.accentText }}
                     >
                       <LogIn className="w-3.5 h-3.5" />
-                      <span>{isGuest ? 'Link Google Sync' : 'Reconnect Google Sync'}</span>
+                      <span>Reconnect Google Sync</span>
                     </button>
                   )}
                   <button
@@ -297,43 +274,25 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
               style={{ backgroundColor: theme.bgCard, borderColor: theme.border }}
             >
               <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto text-3xl shadow-lg border border-emerald-500/30">
-                🍉
+                <Lock className="w-7 h-7" style={{ color: theme.accent }} />
               </div>
               <div className="max-w-md mx-auto">
-                <h4 className="text-lg font-bold text-white">Cloud Saves for Different People & Devices</h4>
-                <p className="text-xs text-slate-400 mt-1">
-                  Create a gamer profile or sign in with Google so all your game saves, high scores, and favorites stay synced between your school Chromebook, phone, and home PC!
+                <h4 className="text-lg font-bold text-white">Sign In Required to Play Games</h4>
+                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                  Everyone must sign in with Google to play games, join Chess & Minigame rooms, and sync cloud saves across school Chromebooks, phones, and home PCs. You stay signed in automatically across updates!
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <div className="flex items-center justify-center pt-2">
                 <button
                   onClick={handleGoogleSignIn}
                   disabled={isUpdating}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="px-6 py-3 rounded-xl text-xs font-extrabold transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 hover:scale-105"
                   style={{ backgroundColor: theme.accent, color: theme.accentText }}
                 >
                   <LogIn className="w-4 h-4" />
                   <span>{isUpdating ? 'Signing In...' : 'Sign In with Google'}</span>
                 </button>
-
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <input
-                    type="text"
-                    value={guestNameInput}
-                    onChange={(e) => setGuestNameInput(e.target.value)}
-                    placeholder="Custom Gamer Tag..."
-                    className="px-3 py-2 text-xs bg-black/40 border rounded-xl text-white focus:outline-none w-36"
-                    style={{ borderColor: theme.border }}
-                  />
-                  <button
-                    onClick={handleCreateGuest}
-                    disabled={isUpdating}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer whitespace-nowrap disabled:opacity-50"
-                  >
-                    {isUpdating ? 'Creating...' : 'Quick Guest Profile'}
-                  </button>
-                </div>
               </div>
             </div>
           )}

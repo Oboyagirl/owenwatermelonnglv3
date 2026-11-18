@@ -66,7 +66,7 @@ export const Sidebar: React.FC<OwenSidebarProps> = ({
   activeTheme,
   totalGames
 }) => {
-  const { profile } = useAuth();
+  const { profile, isSignedIn, isAuthReady } = useAuth();
   const currentAvatar = AVATAR_PRESETS.find(a => a.id === (profile?.avatarId || 'melon_classic')) || AVATAR_PRESETS[0];
 
   const NAV_ITEMS = [
@@ -314,10 +314,13 @@ export const Sidebar: React.FC<OwenSidebarProps> = ({
           {!isCollapsed && (
             <div className="flex flex-col text-left truncate">
               <span className="truncate text-[11px] font-bold text-white">
-                {profile?.displayName || 'Guest Player'}
+                {isSignedIn ? (profile?.displayName || 'Player') : !isAuthReady ? 'Checking Session...' : 'Not Signed In'}
               </span>
-              <span className="truncate text-[9px] text-slate-500 font-mono">
-                Cloud Sync Active
+              <span
+                className="truncate text-[9px] font-mono"
+                style={{ color: isSignedIn ? '#10b981' : '#f59e0b' }}
+              >
+                {isSignedIn ? 'Signed In · Cloud Sync' : 'Sign in to Play Games'}
               </span>
             </div>
           )}

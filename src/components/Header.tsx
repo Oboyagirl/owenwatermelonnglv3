@@ -69,7 +69,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [inputValue, setInputValue] = useState(omnibarValue);
   const isGithubPages = typeof window !== 'undefined' && Boolean(window.location?.hostname?.endsWith('github.io'));
-  const { profile } = useAuth();
+  const { profile, isSignedIn, isAuthReady } = useAuth();
   const { currentTrack, isPlaying, togglePlay, nextTrack } = useMusic();
   const currentAvatar = AVATAR_PRESETS.find(a => a.id === (profile?.avatarId || 'melon_classic')) || AVATAR_PRESETS[0];
 
@@ -328,19 +328,35 @@ export const Header: React.FC<HeaderProps> = ({
           <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono bg-black/40 rounded border border-white/10 text-slate-300">Esc</kbd>
         </button>
 
-        {/* Profile Avatar */}
+        {/* Profile Avatar / Sign In Prompt */}
         {onOpenAccountModal && (
-          <button
-            onClick={onOpenAccountModal}
-            className="w-8 h-8 rounded-xl border flex items-center justify-center text-sm shadow-md transition-all cursor-pointer hover:scale-105 ml-1"
-            style={{
-              backgroundColor: activeTheme?.accentBadge || 'rgba(6, 182, 212, 0.2)',
-              borderColor: activeTheme?.borderActive || accentColor
-            }}
-            title="User Account"
-          >
-            {currentAvatar.icon || '🍉'}
-          </button>
+          isSignedIn ? (
+            <button
+              onClick={onOpenAccountModal}
+              className="w-8 h-8 rounded-xl border flex items-center justify-center text-sm shadow-md transition-all cursor-pointer hover:scale-105 ml-1"
+              style={{
+                backgroundColor: activeTheme?.accentBadge || 'rgba(6, 182, 212, 0.2)',
+                borderColor: activeTheme?.borderActive || accentColor
+              }}
+              title="Signed-In Account & Cloud Saves"
+            >
+              {currentAvatar.icon || '🍉'}
+            </button>
+          ) : (
+            <button
+              onClick={onOpenAccountModal}
+              className="px-3 py-1.5 rounded-xl border flex items-center gap-1.5 text-xs font-extrabold shadow-md transition-all cursor-pointer hover:scale-105 ml-1 shrink-0"
+              style={{
+                backgroundColor: accentColor,
+                borderColor: accentColor,
+                color: activeTheme?.accentText || '#000000'
+              }}
+              title="Sign in with Google to play games"
+            >
+              <Lock className="w-3.5 h-3.5" />
+              <span>{!isAuthReady ? 'Checking...' : 'Sign In'}</span>
+            </button>
+          )
         )}
       </div>
     </header>

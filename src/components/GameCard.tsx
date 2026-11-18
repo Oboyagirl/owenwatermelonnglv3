@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Heart, Star } from 'lucide-react';
+import { Play, Heart, Star, Lock } from 'lucide-react';
 import { Game } from '../types/game';
 import { resolveAssetUrl } from '../services/gamesStore';
 import { ThemeConfig, THEMES } from '../services/themeStore';
@@ -35,6 +35,7 @@ interface GameCardProps {
   onPlay: (game: Game) => void;
   activeTheme?: ThemeConfig;
   priority?: boolean;
+  requiresAuth?: boolean;
 }
 
 export const GameCard: React.FC<GameCardProps> = ({
@@ -43,7 +44,8 @@ export const GameCard: React.FC<GameCardProps> = ({
   onToggleFavorite,
   onPlay,
   activeTheme = THEMES.original,
-  priority = false
+  priority = false,
+  requiresAuth = false
 }) => {
   const resolvedThumb = game.thumbnail ? resolveAssetUrl(game.thumbnail) : '';
   const isPrecached = Boolean(resolvedThumb && LOADED_IMAGE_CACHE.has(resolvedThumb));
@@ -131,7 +133,7 @@ export const GameCard: React.FC<GameCardProps> = ({
           <Heart className={`w-3.5 h-3.5 ${isFavorite ? 'fill-current' : ''}`} />
         </button>
 
-        {/* Play Overlay Button on Hover */}
+        {/* Play / Sign-In Overlay Button on Hover */}
         <div className={`absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0'} pointer-events-none`}>
           <div 
             className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform"
@@ -140,7 +142,11 @@ export const GameCard: React.FC<GameCardProps> = ({
               color: activeTheme.accentText
             }}
           >
-            <Play className="w-5 h-5 fill-current ml-0.5" />
+            {requiresAuth ? (
+              <Lock className="w-4 h-4" />
+            ) : (
+              <Play className="w-5 h-5 fill-current ml-0.5" />
+            )}
           </div>
         </div>
       </div>
@@ -190,8 +196,17 @@ export const GameCard: React.FC<GameCardProps> = ({
             className="font-semibold transition-colors flex items-center gap-1"
             style={{ color: activeTheme.accent }}
           >
-            <span>Play</span>
-            <Play className="w-2.5 h-2.5 fill-current" />
+            {requiresAuth ? (
+              <>
+                <Lock className="w-2.5 h-2.5" />
+                <span>Sign in</span>
+              </>
+            ) : (
+              <>
+                <span>Play</span>
+                <Play className="w-2.5 h-2.5 fill-current" />
+              </>
+            )}
           </span>
         </div>
       </div>

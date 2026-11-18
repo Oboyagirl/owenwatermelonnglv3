@@ -40,6 +40,7 @@ interface AuthContextType {
   saves: GameSave[];
   deviceLabel: string;
   isAuthReady: boolean;
+  isSignedIn: boolean;
   isGuest: boolean;
   isCloudSynced: boolean;
   hasRememberedSession: boolean;
@@ -527,6 +528,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
   const isGuest = user ? user.isAnonymous : rememberedState.mode !== 'google';
   const isCloudSynced = Boolean(user && auth.currentUser && auth.currentUser.uid === user.uid);
+  const isSignedIn = Boolean(user && auth.currentUser && auth.currentUser.uid === user.uid && !user.isAnonymous);
 
   return (
     <AuthContext.Provider
@@ -536,6 +538,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         saves,
         deviceLabel,
         isAuthReady,
+        isSignedIn,
         isGuest,
         isCloudSynced,
         hasRememberedSession,
@@ -567,6 +570,7 @@ export const useAuth = (): AuthContextType => {
       saves: [],
       deviceLabel: 'School Device',
       isAuthReady: true,
+      isSignedIn: false,
       isGuest: true,
       isCloudSynced: false,
       hasRememberedSession: false,
