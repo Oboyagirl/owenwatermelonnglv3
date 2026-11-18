@@ -960,6 +960,182 @@
         "createdAt",
         "updatedAt"
       ]
+    },
+    "callSession": {
+      "title": "WebRTC Call Session",
+      "description": "Peer-to-peer WebRTC voice and video call signaling session between two signed-in users",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique call document ID",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "callerUid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the call initiator",
+          "maxLength": 128
+        },
+        "callerName": {
+          "type": "string",
+          "description": "Display name of the call initiator",
+          "maxLength": 64
+        },
+        "callerAvatarId": {
+          "type": "string",
+          "description": "Avatar preset ID of the call initiator",
+          "maxLength": 64
+        },
+        "calleeUid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the call recipient",
+          "maxLength": 128
+        },
+        "calleeName": {
+          "type": "string",
+          "description": "Display name of the call recipient",
+          "maxLength": 64
+        },
+        "calleeAvatarId": {
+          "type": "string",
+          "description": "Avatar preset ID of the call recipient",
+          "maxLength": 64
+        },
+        "participantUids": {
+          "type": "array",
+          "description": "Exact two-element array [callerUid, calleeUid]"
+        },
+        "mediaType": {
+          "type": "string",
+          "description": "Call media mode (voice or video)",
+          "enum": ["audio", "video"],
+          "maxLength": 16
+        },
+        "status": {
+          "type": "string",
+          "description": "Call signaling lifecycle state",
+          "enum": ["ringing", "active", "ended", "declined", "missed"],
+          "maxLength": 16
+        },
+        "offer": {
+          "type": "object",
+          "description": "WebRTC SDP offer map { type, sdp }"
+        },
+        "answer": {
+          "type": "object",
+          "description": "Nullable WebRTC SDP answer map { type, sdp }"
+        },
+        "callerMuted": {
+          "type": "boolean",
+          "description": "Whether caller microphone is currently muted"
+        },
+        "calleeMuted": {
+          "type": "boolean",
+          "description": "Whether callee microphone is currently muted"
+        },
+        "callerCameraOn": {
+          "type": "boolean",
+          "description": "Whether caller camera is currently enabled"
+        },
+        "calleeCameraOn": {
+          "type": "boolean",
+          "description": "Whether callee camera is currently enabled"
+        },
+        "roomCode": {
+          "type": "string",
+          "description": "Optional associated online chess/arcade room code",
+          "maxLength": 16
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of call initiation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of latest signaling update"
+        }
+      },
+      "required": [
+        "id",
+        "callerUid",
+        "callerName",
+        "callerAvatarId",
+        "calleeUid",
+        "calleeName",
+        "calleeAvatarId",
+        "participantUids",
+        "mediaType",
+        "status",
+        "offer",
+        "answer",
+        "callerMuted",
+        "calleeMuted",
+        "callerCameraOn",
+        "calleeCameraOn",
+        "roomCode",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "callIceCandidate": {
+      "title": "WebRTC ICE Candidate",
+      "description": "Immutable WebRTC ICE candidate message belonging to an active call session",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique ICE candidate document ID",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "callId": {
+          "type": "string",
+          "description": "Parent call session ID",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "senderUid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the ICE candidate sender",
+          "maxLength": 128
+        },
+        "participantUids": {
+          "type": "array",
+          "description": "Exact two-element array [callerUid, calleeUid] mirrored from parent call"
+        },
+        "candidate": {
+          "type": "string",
+          "description": "Serialized WebRTC ICE candidate string",
+          "maxLength": 2048
+        },
+        "sdpMid": {
+          "type": "string",
+          "description": "Nullable media stream identification tag",
+          "maxLength": 32
+        },
+        "sdpMLineIndex": {
+          "type": "integer",
+          "description": "Nullable media description index"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of ICE candidate emission"
+        }
+      },
+      "required": [
+        "id",
+        "callId",
+        "senderUid",
+        "participantUids",
+        "candidate",
+        "sdpMid",
+        "sdpMLineIndex",
+        "createdAt"
+      ]
     }
   },
   "firestore": {
@@ -1022,6 +1198,18 @@
         "$ref": "#/entities/gameInvite"
       },
       "description": "Direct friend game invites for 1-click joining without typing room codes"
+    },
+    "/calls/{callId}": {
+      "schema": {
+        "$ref": "#/entities/callSession"
+      },
+      "description": "Real-time peer-to-peer WebRTC voice and video call signaling sessions"
+    },
+    "/calls/{callId}/candidates/{candidateId}": {
+      "schema": {
+        "$ref": "#/entities/callIceCandidate"
+      },
+      "description": "WebRTC ICE candidates for an active peer-to-peer call session"
     }
   }
 }
