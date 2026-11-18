@@ -227,7 +227,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               🕹️
             </div>
             <span className="text-xs md:text-sm font-bold text-white group-hover:text-pink-300">Minigames</span>
-            <span className="text-[10px] text-slate-400">42 Minigames</span>
+            <span className="text-[10px] text-slate-400">72 Minigames</span>
           </button>
 
           <button

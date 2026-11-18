@@ -621,8 +621,8 @@ export default function App() {
         return (
           <GameAuthGate
             activeTheme={activeTheme}
-            spaceLabel="42 Minigames Arcade"
-            description="Sign in with Google to play all 42 minigames against bots or challenge online friends."
+            spaceLabel="72 Minigames Arcade"
+            description="Sign in with Google to play all 72 minigames against bots or challenge online friends."
           />
         );
       }

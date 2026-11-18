@@ -41,6 +41,7 @@ import { AVATAR_PRESETS } from '../services/cloudSaveService';
 import { isProfileOnlineNow } from '../services/chatService';
 import { sendGameInvite } from '../services/inviteService';
 import { ExtendedArcadeBoard } from './ExtendedArcadeBoards';
+import { Batch2ArcadeBoard } from './Batch2ArcadeBoards';
 import {
   ARCADE_BOTS,
   ARCADE_GAMES,
@@ -54,6 +55,7 @@ import {
   BATTLESHIP_SIZES,
   BattleshipShipSpec,
   BattleshipState,
+  Batch2ArcadeState,
   CheckersState,
   Connect4State,
   DRAW_BRUSH_SIZES,
@@ -78,6 +80,7 @@ import {
   getCheckersLegalMoves,
   getReversiFlips,
   getShipCells,
+  isBatch2ArcadeGameType,
   isExtendedArcadeGameType,
   pickArcadeBotVoiceline,
   pickBotArcadeAction,
@@ -1852,6 +1855,25 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
               {isExtendedArcadeGameType(gameState.gameType) && (
                 <ExtendedArcadeBoard
                   state={gameState as ExtendedArcadeState}
+                  canAct={canActNow}
+                  viewerRole={
+                    mode === 'online'
+                      ? mySeat === 'p1' || mySeat === 'p2'
+                        ? mySeat
+                        : 'spectator'
+                      : mode === 'ai'
+                      ? humanSeat
+                      : 'local'
+                  }
+                  p1Name={p1Display}
+                  p2Name={p2Display}
+                  onAction={performAction}
+                />
+              )}
+
+              {isBatch2ArcadeGameType(gameState.gameType) && (
+                <Batch2ArcadeBoard
+                  state={gameState as Batch2ArcadeState}
                   canAct={canActNow}
                   viewerRole={
                     mode === 'online'

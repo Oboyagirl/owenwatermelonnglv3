@@ -6,7 +6,9 @@ import {
   ArcadeGameType,
   ArcadePlayer,
   ArcadeWinner,
+  BATCH2_ARCADE_GAMES,
   BaseArcadeGameType,
+  Batch2ArcadeState,
   EXTENDED_ARCADE_GAMES,
   ExtendedArcadeGameType,
   ExtendedArcadeState
@@ -18,6 +20,13 @@ import {
   isExtendedArcadeGameType,
   pickExtendedBotAction
 } from './arcadeExtendedEngines';
+import {
+  applyBatch2ArcadeAction,
+  createBatch2InitialState,
+  getBatch2LegalActions,
+  isBatch2ArcadeGameType,
+  pickBatch2BotAction
+} from './arcadeBatch2Engines';
 
 export * from './arcadeExtendedTypes';
 export {
@@ -31,6 +40,13 @@ export {
   formatCardLabel,
   scoreYachtCategory
 } from './arcadeExtendedEngines';
+export {
+  isBatch2ArcadeGameType,
+  createBatch2InitialState,
+  getBatch2LegalActions,
+  applyBatch2ArcadeAction,
+  pickBatch2BotAction
+} from './arcadeBatch2Engines';
 
 export const BASE_ARCADE_GAMES: ArcadeGameMeta[] = [
   {
@@ -179,7 +195,11 @@ export const BASE_ARCADE_GAMES: ArcadeGameMeta[] = [
   }
 ];
 
-export const ARCADE_GAMES: ArcadeGameMeta[] = [...BASE_ARCADE_GAMES, ...EXTENDED_ARCADE_GAMES];
+export const ARCADE_GAMES: ArcadeGameMeta[] = [
+  ...BASE_ARCADE_GAMES,
+  ...EXTENDED_ARCADE_GAMES,
+  ...BATCH2_ARCADE_GAMES
+];
 
 export function isValidArcadeGameType(val: unknown): val is ArcadeGameType {
   return ARCADE_GAMES.some(g => g.id === val);
@@ -386,7 +406,8 @@ export type ArcadeState =
   | BattleshipState
   | MemoryMatchState
   | DiceDuelState
-  | ExtendedArcadeState;
+  | ExtendedArcadeState
+  | Batch2ArcadeState;
 
 export interface ApplyArcadeResult {
   valid: boolean;
@@ -400,6 +421,9 @@ export interface ApplyArcadeResult {
 export function createInitialArcadeState(gameType: ArcadeGameType): ArcadeState {
   if (isExtendedArcadeGameType(gameType)) {
     return createExtendedInitialState(gameType);
+  }
+  if (isBatch2ArcadeGameType(gameType)) {
+    return createBatch2InitialState(gameType);
   }
   switch (gameType) {
     case 'connect4':
@@ -1071,6 +1095,9 @@ export function getLegalArcadeActions(state: ArcadeState): string[] {
   if (isExtendedArcadeGameType(state.gameType)) {
     return getExtendedLegalActions(state as ExtendedArcadeState);
   }
+  if (isBatch2ArcadeGameType(state.gameType)) {
+    return getBatch2LegalActions(state as Batch2ArcadeState);
+  }
 
   switch (state.gameType) {
     case 'connect4': {
@@ -1210,6 +1237,9 @@ export function applyArcadeAction(state: ArcadeState, rawAction: string): ApplyA
   if (state.winner) return invalid;
   if (isExtendedArcadeGameType(state.gameType)) {
     return applyExtendedArcadeAction(state as ExtendedArcadeState, action);
+  }
+  if (isBatch2ArcadeGameType(state.gameType)) {
+    return applyBatch2ArcadeAction(state as Batch2ArcadeState, action);
   }
 
   const opp: ArcadePlayer = state.turn === 'p1' ? 'p2' : 'p1';
@@ -2824,6 +2854,9 @@ export function pickBotArcadeAction(
 
   if (isExtendedArcadeGameType(state.gameType)) {
     return pickExtendedBotAction(state as ExtendedArcadeState, botProfile);
+  }
+  if (isBatch2ArcadeGameType(state.gameType)) {
+    return pickBatch2BotAction(state as Batch2ArcadeState, botProfile);
   }
 
   // Handle draw-guess explicitly so easy bots still draw real strokes and guess words instead of forfeiting

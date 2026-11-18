@@ -1,3 +1,12 @@
+import {
+  BATCH2_ARCADE_GAMES,
+  Batch2ArcadeGameType,
+  Batch2ArcadeState
+} from './arcadeBatch2Types';
+
+export { BATCH2_ARCADE_GAMES };
+export type { Batch2ArcadeGameType, Batch2ArcadeState };
+
 export type BaseArcadeGameType =
   | 'connect4'
   | 'checkers'
@@ -44,7 +53,7 @@ export type ExtendedArcadeGameType =
   | 'mines-duel'
   | 'sos-grid';
 
-export type ArcadeGameType = BaseArcadeGameType | ExtendedArcadeGameType;
+export type ArcadeGameType = BaseArcadeGameType | ExtendedArcadeGameType | Batch2ArcadeGameType;
 export type ArcadePlayer = 'p1' | 'p2';
 export type ArcadeWinner = ArcadePlayer | 'draw' | null;
 export type ArcadeBotDifficulty = 'easy' | 'medium' | 'hard' | 'expert';
