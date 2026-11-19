@@ -22,12 +22,15 @@ import {
   Gamepad2,
   Play,
   Maximize2,
-  Minimize2
+  Minimize2,
+  Phone,
+  Video
 } from 'lucide-react';
 import { signInAnonymously } from 'firebase/auth';
 import { auth, ensureAuthPersistence, backupFirebaseAuthSession } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
+import { useCall } from '../context/CallContext';
 import { AVATAR_PRESETS, markRememberedLogin } from '../services/cloudSaveService';
 import { ThemeConfig, THEMES } from '../services/themeStore';
 import { ARCADE_GAMES, ArcadeGameType } from '../utils/arcadeEngines';
@@ -150,6 +153,7 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
     acceptGameInvite,
     declineGameInvite
   } = useNotifications();
+  const { startCall, callPhase } = useCall();
 
   const [activeTab, setActiveTab] = useState<'chats' | 'people'>('chats');
   const [discoverable, setDiscoverable] = useState<boolean>(() => getDiscoverablePreference());
@@ -894,6 +898,40 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
                 <div className="flex items-center gap-1 shrink-0">
                   <button
                     type="button"
+                    disabled={callPhase !== 'idle'}
+                    onClick={() =>
+                      void startCall({
+                        peerUid: activePartner.userId,
+                        peerName: activePartnerLiveProfile?.displayName || activePartner.displayName,
+                        peerAvatarId: activePartnerLiveProfile?.avatarId || activePartner.avatarId,
+                        mode: 'audio',
+                        contextLabel: 'Direct Voice Call'
+                      })
+                    }
+                    className="p-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/35 text-emerald-300 cursor-pointer disabled:opacity-40"
+                    title={`Voice call ${activePartner.displayName}`}
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={callPhase !== 'idle'}
+                    onClick={() =>
+                      void startCall({
+                        peerUid: activePartner.userId,
+                        peerName: activePartnerLiveProfile?.displayName || activePartner.displayName,
+                        peerAvatarId: activePartnerLiveProfile?.avatarId || activePartner.avatarId,
+                        mode: 'video',
+                        contextLabel: 'Direct Video Call'
+                      })
+                    }
+                    className="p-1.5 rounded-lg bg-violet-500/15 hover:bg-violet-500/25 border border-violet-500/35 text-violet-300 cursor-pointer disabled:opacity-40"
+                    title={`Video call ${activePartner.displayName}`}
+                  >
+                    <Video className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => setShowInvitePicker((v) => !v)}
                     className={`px-2 py-1 rounded-lg border text-[11px] font-bold flex items-center gap-1 cursor-pointer transition-colors ${
                       showInvitePicker
@@ -945,7 +983,7 @@ export const ChatBoxWidget: React.FC<ChatBoxWidgetProps> = ({
                       type="text"
                       value={inviteSearch}
                       onChange={(e) => setInviteSearch(e.target.value)}
-                      placeholder="Filter 43 minigames & chess..."
+                      placeholder={`Filter ${ARCADE_GAMES.length} minigames & chess...`}
                       className="w-full pl-7 pr-2.5 py-1 rounded-lg border border-white/10 bg-black/40 text-[11px] text-white placeholder-slate-500 focus:outline-none focus:border-sky-400"
                     />
                   </div>

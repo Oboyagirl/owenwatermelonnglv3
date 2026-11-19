@@ -19,7 +19,7 @@ import { ThemeConfig } from '../services/themeStore';
 import { HomeParticleCanvas } from './HomeParticleCanvas';
 
 interface HomeDashboardProps {
-  onNavigateTab: (tab: 'home' | 'games' | 'apps' | 'music' | 'chess' | 'rooms' | 'tools' | 'saved') => void;
+  onNavigateTab: (tab: 'home' | 'games' | 'apps' | 'music' | 'chess' | 'rooms' | 'leaderboard' | 'tools' | 'saved') => void;
   onSelectGame: (game: Game) => void;
   featuredGames: Game[];
   trendingGames: Game[];
@@ -162,7 +162,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
         </div>
 
         {/* Quick Spaces Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 md:gap-4">
           <button
             onClick={() => onNavigateTab('games')}
             className="group p-4 md:p-5 rounded-2xl border transition-all duration-300 flex flex-col items-center text-center gap-2.5 cursor-pointer shadow-lg hover:-translate-y-1"
@@ -228,6 +228,21 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             </div>
             <span className="text-xs md:text-sm font-bold text-white group-hover:text-pink-300">Minigames</span>
             <span className="text-[10px] text-slate-400">72 Minigames</span>
+          </button>
+
+          <button
+            onClick={() => onNavigateTab('leaderboard')}
+            className="group p-4 md:p-5 rounded-2xl border transition-all duration-300 flex flex-col items-center text-center gap-2.5 cursor-pointer shadow-lg hover:-translate-y-1"
+            style={{
+              backgroundColor: cardBg,
+              borderColor: border
+            }}
+          >
+            <div className="w-12 h-12 rounded-2xl bg-yellow-500/20 text-yellow-300 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+              🏆
+            </div>
+            <span className="text-xs md:text-sm font-bold text-white group-hover:text-yellow-300">Leaderboard</span>
+            <span className="text-[10px] text-slate-400">ELO Rankings</span>
           </button>
 
           <button

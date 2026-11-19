@@ -31,15 +31,23 @@ import {
   Dices,
   Anchor,
   ArrowLeft,
-  Search
+  Search,
+  Phone,
+  Video
 } from 'lucide-react';
 import { ThemeConfig } from '../services/themeStore';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
+import { useCall } from '../context/CallContext';
 import { auth } from '../services/firebase';
 import { AVATAR_PRESETS } from '../services/cloudSaveService';
 import { isProfileOnlineNow } from '../services/chatService';
 import { sendGameInvite } from '../services/inviteService';
+import {
+  SettledEloResult,
+  buildMatchId,
+  settleOnlinePvpMatchElo
+} from '../services/leaderboardService';
 import { ExtendedArcadeBoard } from './ExtendedArcadeBoards';
 import { Batch2ArcadeBoard } from './Batch2ArcadeBoards';
 import {
@@ -92,30 +100,16 @@ import {
   ArcadeAuthRequiredError,
   ArcadeRoomViewPayload,
   clearArcadeRoomCache,
-  clearFirestoreArcadeBots,
   createFirestoreArcadeRoom,
-  fillFirestoreArcadeBots,
   joinFirestoreArcadeRoom,
   leaveFirestoreArcadeRoom,
   resignFirestoreArcadeRoom,
   sanitizeArcadeRoomCode,
-  sendFirestoreArcadeBotMove,
   sendFirestoreArcadeMove,
   signInGoogleForArcade,
   subscribeFirestoreArcadeRoom,
-  switchFirestoreArcadeTeam,
   voteFirestoreArcadeRematch
 } from '../services/arcadeRoomService';
-import {
-  TeamMode,
-  TeamSeat,
-  createBotSeat,
-  createHumanSeat,
-  getActiveArcadeSeatIndex,
-  getTeamSize,
-  normalizeTeamMode,
-  pickArcadeSquadBots
-} from '../utils/teamModes';
 
 interface MultiplayerArcadeViewProps {
   activeTheme: ThemeConfig;
@@ -132,19 +126,6 @@ interface OnlinePlayersInfo {
 
 const SELECTED_GAME_KEY = 'owen_arcade_selected_game_v1';
 const SELECTED_BOT_KEY = 'owen_arcade_bot_id_v1';
-const SELECTED_TEAM_MODE_KEY = 'owen_arcade_team_mode_v1';
-
-interface OnlineTeamMeta {
-  teamMode: TeamMode;
-  mySeatIndex: number | null;
-  team1Seats: TeamSeat[];
-  team2Seats: TeamSeat[];
-  teamTurnCounts: { p1: number; p2: number };
-  activeSeatIndex: number;
-  activeSeat: TeamSeat | null;
-  botRunnerUid: string | null;
-  participantUids: string[];
-}
 
 const DIFFICULTY_LABELS: Record<ArcadeBotDifficulty, string> = {
   easy: 'Beginner',
@@ -243,22 +224,11 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
     pickArcadeBotVoiceline(getArcadeBotById(selectedBotId), 'start')
   );
 
-  const [teamMode, setTeamMode] = useState<TeamMode>(() => {
-    try {
-      return normalizeTeamMode(localStorage.getItem(SELECTED_TEAM_MODE_KEY));
-    } catch {
-      return '1v1';
-    }
-  });
-  const [aiSquadMode, setAiSquadMode] = useState<'allies' | 'solo'>('allies');
-  const [fillRoomWithBots, setFillRoomWithBots] = useState<boolean>(false);
-
   const [mode, setMode] = useState<PlayMode>('online');
   const [humanSeat, setHumanSeat] = useState<ArcadePlayer>('p1');
   const [seatPref, setSeatPref] = useState<SeatPref>('p1');
   const [gameState, setGameState] = useState<ArcadeState>(() => createInitialArcadeState(selectedGame));
   const [moves, setMoves] = useState<string[]>([]);
-  const [localTeamTurnCounts, setLocalTeamTurnCounts] = useState<{ p1: number; p2: number }>({ p1: 0, p2: 0 });
   const [resignedWinner, setResignedWinner] = useState<ArcadePlayer | null>(null);
 
   // Online room state
@@ -273,8 +243,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const [mySeat, setMySeat] = useState<ArcadePlayer | 'spectator' | null>(null);
   const [players, setPlayers] = useState<OnlinePlayersInfo>({ p1: null, p2: null });
-  const [onlineTeamMeta, setOnlineTeamMeta] = useState<OnlineTeamMeta | null>(null);
-  const [rematchVotes, setRematchVotes] = useState<string[]>([]);
+  const [rematchVotes, setRematchVotes] = useState<ArcadePlayer[]>([]);
   const [connStatus, setConnStatus] = useState<ConnStatus>('disconnected');
   const [onlineError, setOnlineError] = useState<string | null>(null);
   const [onlineAuthNeeded, setOnlineAuthNeeded] = useState(false);
@@ -406,17 +375,6 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
 
       const nextMoves = Array.isArray(msg.moves) ? msg.moves : [];
       const endedByEvent = Boolean(msg.resignedWinner) || msg.state.winner !== null;
-      const syncedTeamMeta: OnlineTeamMeta = {
-        teamMode: normalizeTeamMode(msg.teamMode),
-        mySeatIndex: typeof msg.mySeatIndex === 'number' ? msg.mySeatIndex : null,
-        team1Seats: Array.isArray(msg.team1Seats) ? msg.team1Seats : [],
-        team2Seats: Array.isArray(msg.team2Seats) ? msg.team2Seats : [],
-        teamTurnCounts: msg.teamTurnCounts || { p1: 0, p2: 0 },
-        activeSeatIndex: typeof msg.activeSeatIndex === 'number' ? msg.activeSeatIndex : 0,
-        activeSeat: msg.activeSeat || null,
-        botRunnerUid: msg.botRunnerUid || null,
-        participantUids: Array.isArray(msg.participantUids) ? msg.participantUids : []
-      };
 
       const pending = pendingMoveRef.current;
       if (pending && pending.code === msg.code) {
@@ -424,7 +382,6 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
           // Ignore stale snapshot before our optimistic write lands
           setMySeat(msg.mySeat || 'spectator');
           setPlayers(msg.players || { p1: null, p2: null });
-          setOnlineTeamMeta(syncedTeamMeta);
           setRematchVotes(Array.isArray(msg.rematchVotes) ? msg.rematchVotes : []);
           return;
         }
@@ -437,6 +394,9 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
 
       lastRoomRef.current = msg.code;
       lastMoveLenRef.current = nextMoves.length;
+      if (roomChanged || (nextMoves.length === 0 && prevLen > 0)) {
+        setLastEloResult(null);
+      }
 
       setRoomCode(msg.code);
       setViewStage('play');
@@ -446,7 +406,6 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
       } catch {}
       setMySeat(msg.mySeat || 'spectator');
       setPlayers(msg.players || { p1: null, p2: null });
-      setOnlineTeamMeta(syncedTeamMeta);
       setRematchVotes(Array.isArray(msg.rematchVotes) ? msg.rematchVotes : []);
       setGameState(msg.state);
       setMoves(nextMoves);
@@ -467,7 +426,6 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
           if (
             (msg.mySeat === 'p1' || msg.mySeat === 'p2') &&
             msg.state.turn === msg.mySeat &&
-            (!msg.teamMode || msg.teamMode === '1v1' || msg.mySeatIndex === msg.activeSeatIndex) &&
             typeof document !== 'undefined' &&
             document.visibilityState === 'hidden'
           ) {
@@ -521,10 +479,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
           gameType: targetGame,
           playerId,
           playerName: playerName.trim() || 'Player',
-          preferredSeat: seatPref,
-          teamMode,
-          fillBots: fillRoomWithBots,
-          primaryBotId: selectedBotId
+          preferredSeat: seatPref
         });
         pendingAuthActionRef.current = null;
         startFirestoreSub(code, uid);
@@ -539,7 +494,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         }
       }
     },
-    [playerId, playerName, seatPref, teamMode, fillRoomWithBots, selectedBotId, closeWs, closeFirestore, startFirestoreSub]
+    [playerId, playerName, seatPref, closeWs, closeFirestore, startFirestoreSub]
   );
 
   const joinViaFirestore = useCallback(
@@ -568,11 +523,12 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
           setOnlineAuthNeeded(true);
           setOnlineError(err.message);
         } else {
+          setTrackedArcadeRoom(null);
           setOnlineError(err instanceof Error ? err.message : `Could not join room "${cleanCode}".`);
         }
       }
     },
-    [playerId, playerName, closeWs, closeFirestore, applyOnlineSync, startFirestoreSub]
+    [playerId, playerName, closeWs, closeFirestore, applyOnlineSync, startFirestoreSub, setTrackedArcadeRoom]
   );
 
   const connectAndSendWs = useCallback(
@@ -692,10 +648,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
             gameType: gType,
             playerId,
             playerName: playerName.trim() || 'Player',
-            preferredSeat: seatPref,
-            teamMode,
-            fillBots: fillRoomWithBots,
-            primaryBotId: selectedBotId
+            preferredSeat: seatPref
           },
           () => {
             createViaFirestore(gType);
@@ -705,7 +658,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         createViaFirestore(gType);
       }
     },
-    [selectedGame, playerId, playerName, seatPref, teamMode, fillRoomWithBots, selectedBotId, connectAndSendWs, createViaFirestore]
+    [selectedGame, playerId, playerName, seatPref, connectAndSendWs, createViaFirestore]
   );
 
   const handleJoinRoom = useCallback(
@@ -738,60 +691,6 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
     [joinCodeInput, playerId, playerName, connectAndSendWs, joinViaFirestore]
   );
 
-  const handleSwitchOnlineTeam = useCallback(
-    (targetTeam: ArcadePlayer) => {
-      if (!roomCode) return;
-      if (activeTransportRef.current === 'ws') {
-        connectAndSendWs({
-          type: 'room:switch_team',
-          code: roomCode,
-          playerId,
-          playerName: playerName.trim() || 'Player',
-          targetTeam
-        });
-      } else {
-        void switchFirestoreArcadeTeam({
-          code: roomCode,
-          playerId,
-          playerName: playerName.trim() || 'Player',
-          targetTeam
-        }).catch(err => setOnlineError(err instanceof Error ? err.message : 'Could not switch team.'));
-      }
-    },
-    [roomCode, playerId, playerName, connectAndSendWs]
-  );
-
-  const handleFillOnlineBots = useCallback(() => {
-    if (!roomCode) return;
-    if (activeTransportRef.current === 'ws') {
-      connectAndSendWs({
-        type: 'room:fill_bots',
-        code: roomCode,
-        playerId,
-        primaryBotId: selectedBotId
-      });
-    } else {
-      void fillFirestoreArcadeBots(roomCode, selectedBotId).catch(err =>
-        setOnlineError(err instanceof Error ? err.message : 'Could not fill bot seats.')
-      );
-    }
-  }, [roomCode, playerId, selectedBotId, connectAndSendWs]);
-
-  const handleClearOnlineBots = useCallback(() => {
-    if (!roomCode) return;
-    if (activeTransportRef.current === 'ws') {
-      connectAndSendWs({
-        type: 'room:clear_bots',
-        code: roomCode,
-        playerId
-      });
-    } else {
-      void clearFirestoreArcadeBots(roomCode).catch(err =>
-        setOnlineError(err instanceof Error ? err.message : 'Could not clear bots.')
-      );
-    }
-  }, [roomCode, playerId, connectAndSendWs]);
-
   const handleLeaveRoom = useCallback(() => {
     const leavingCode = roomCode;
     setTrackedArcadeRoom(null);
@@ -811,14 +710,13 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
     setRoomCode(null);
     setMySeat(null);
     setPlayers({ p1: null, p2: null });
-    setOnlineTeamMeta(null);
     setRematchVotes([]);
     setOnlineError(null);
     setResignedWinner(null);
     setGameState(createInitialArcadeState(selectedGame));
     setMoves([]);
-    setLocalTeamTurnCounts({ p1: 0, p2: 0 });
     setCheckersFrom(null);
+    setLastEloResult(null);
   }, [roomCode, playerId, selectedGame, closeWs, closeFirestore, setTrackedArcadeRoom]);
 
   const handleSelectGameType = (gameType: ArcadeGameType) => {
@@ -834,7 +732,6 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
       setResignedWinner(null);
       setGameState(createInitialArcadeState(gameType));
       setMoves([]);
-      setLocalTeamTurnCounts({ p1: 0, p2: 0 });
       setCheckersFrom(null);
       setBotQuote(prev => pickArcadeBotVoiceline(selectedBot, 'start', prev));
     }
@@ -903,6 +800,8 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         gameType: gameState.gameType,
         gameTitle: getArcadeGameMeta(gameState.gameType).name
       });
+    } else if (activeWinner) {
+      setTrackedArcadeRoom(null);
     }
   }, [mode, roomCode, mySeat, resignedWinner, gameState.winner, gameState.gameType, setTrackedArcadeRoom]);
 
@@ -1051,10 +950,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
           gameType: selectedGame,
           playerId,
           playerName: playerName.trim() || profile?.displayName || user?.displayName || 'Player',
-          preferredSeat: seatPref,
-          teamMode,
-          fillBots: false,
-          primaryBotId: selectedBotId
+          preferredSeat: seatPref
         });
         roomToShare = created.code;
         senderUid = created.uid;
@@ -1120,21 +1016,10 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
   ) => {
     setGameState(createInitialArcadeState(nextGameType));
     setMoves([]);
-    setLocalTeamTurnCounts({ p1: 0, p2: 0 });
     setResignedWinner(null);
     setCheckersFrom(null);
     setHumanSeat(nextHumanSeat);
     setBotQuote(prev => pickArcadeBotVoiceline(botOverride, 'start', prev));
-  };
-
-  const handleSelectTeamMode = (nextFormat: TeamMode) => {
-    setTeamMode(nextFormat);
-    try {
-      localStorage.setItem(SELECTED_TEAM_MODE_KEY, nextFormat);
-    } catch {}
-    if (mode !== 'online') {
-      resetLocalMatch(selectedGame, humanSeat);
-    }
   };
 
   const handleSelectBot = (bot: ArcadeBot) => {
@@ -1148,112 +1033,23 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
   const effectiveWinner = resignedWinner || gameState.winner;
   const isGameOver = Boolean(effectiveWinner);
   const botSeat: ArcadePlayer = humanSeat === 'p1' ? 'p2' : 'p1';
-  const myResolvedDisplayName =
-    (playerName && playerName !== 'Player' ? playerName.trim() : '') ||
-    profile?.displayName ||
-    user?.displayName ||
-    'You';
-
-  const effectiveTeamMode: TeamMode =
-    mode === 'online' && roomCode && onlineTeamMeta ? onlineTeamMeta.teamMode : teamMode;
-  const effectiveTeamSize = getTeamSize(effectiveTeamMode);
-
-  const { localTeam1Seats, localTeam2Seats } = useMemo(() => {
-    if (mode === 'pvp') {
-      const makePvpSeats = (prefix: string) =>
-        Array.from({ length: effectiveTeamSize }, (_, idx) =>
-          createHumanSeat({
-            name:
-              effectiveTeamSize === 1
-                ? prefix
-                : `${prefix === 'Player 1' ? 'T1' : 'T2'} · P${idx + 1}`
-          })
-        );
-      return {
-        localTeam1Seats: makePvpSeats('Player 1'),
-        localTeam2Seats: makePvpSeats('Player 2')
-      };
-    }
-
-    const enemyBots = pickArcadeSquadBots(selectedBot.id, effectiveTeamSize);
-    const allyBots = pickArcadeSquadBots(
-      selectedBot.id,
-      Math.max(0, effectiveTeamSize - 1),
-      enemyBots.map(b => b.id)
-    );
-
-    const buildHumanTeam = () => {
-      const list: TeamSeat[] = [
-        createHumanSeat({ uid: myFirebaseUid || null, playerId, name: myResolvedDisplayName })
-      ];
-      for (let i = 1; i < effectiveTeamSize; i++) {
-        if (aiSquadMode === 'allies') {
-          list.push(createBotSeat(allyBots[i - 1] || enemyBots[i % enemyBots.length]));
-        } else {
-          list.push(createHumanSeat({ uid: myFirebaseUid || null, playerId, name: myResolvedDisplayName }));
-        }
-      }
-      return list;
-    };
-
-    const enemySeats = enemyBots.map(b => createBotSeat(b));
-    return humanSeat === 'p1'
-      ? { localTeam1Seats: buildHumanTeam(), localTeam2Seats: enemySeats }
-      : { localTeam1Seats: enemySeats, localTeam2Seats: buildHumanTeam() };
-  }, [
-    mode,
-    effectiveTeamSize,
-    selectedBot.id,
-    myFirebaseUid,
-    playerId,
-    myResolvedDisplayName,
-    aiSquadMode,
-    humanSeat
-  ]);
-
-  const activeTeam1Seats =
-    mode === 'online' && roomCode && onlineTeamMeta && onlineTeamMeta.team1Seats.length > 0
-      ? onlineTeamMeta.team1Seats
-      : localTeam1Seats;
-  const activeTeam2Seats =
-    mode === 'online' && roomCode && onlineTeamMeta && onlineTeamMeta.team2Seats.length > 0
-      ? onlineTeamMeta.team2Seats
-      : localTeam2Seats;
-
-  const activeTeamTurnCounts =
-    mode === 'online' && roomCode && onlineTeamMeta
-      ? onlineTeamMeta.teamTurnCounts
-      : localTeamTurnCounts;
-
-  const activeSeatIndex =
-    mode === 'online' && roomCode && onlineTeamMeta
-      ? onlineTeamMeta.activeSeatIndex
-      : getActiveArcadeSeatIndex(activeTeamTurnCounts, gameState.turn, effectiveTeamSize);
-
-  const activeSeatList = gameState.turn === 'p1' ? activeTeam1Seats : activeTeam2Seats;
-  const activeSeat: TeamSeat | null =
-    mode === 'online' && roomCode && onlineTeamMeta
-      ? onlineTeamMeta.activeSeat
-      : activeSeatList[activeSeatIndex] || null;
 
   const canActNow =
     !isGameOver &&
     (mode === 'pvp'
       ? true
       : mode === 'ai'
-      ? activeSeat?.kind === 'human'
-      : Boolean(roomCode) &&
-        (mySeat === 'p1' || mySeat === 'p2') &&
-        gameState.turn === mySeat &&
-        (!onlineTeamMeta ||
-          (onlineTeamMeta.mySeatIndex !== null &&
-            onlineTeamMeta.mySeatIndex === onlineTeamMeta.activeSeatIndex &&
-            onlineTeamMeta.activeSeat?.kind === 'human')));
+      ? gameState.turn === humanSeat
+      : Boolean(roomCode) && (mySeat === 'p1' || mySeat === 'p2') && gameState.turn === mySeat);
 
   // Execute any validated move with 0ms local latency across all 3 modes
   const performAction = useCallback(
     (action: string) => {
-      if (!canActNow) return;
+      if (isGameOver) return;
+      if (mode === 'ai' && gameState.turn !== humanSeat) return;
+      if (mode === 'online') {
+        if (!roomCode || (mySeat !== 'p1' && mySeat !== 'p2') || gameState.turn !== mySeat) return;
+      }
 
       const res = applyArcadeAction(gameState, action);
       if (!res.valid) return;
@@ -1280,12 +1076,6 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
       // Optimistic local state update (0ms input delay)
       setGameState(res.nextState);
       setMoves(nextMoves);
-      if (res.nextState.turn !== prevState.turn) {
-        setLocalTeamTurnCounts(prev => ({
-          ...prev,
-          [prevState.turn]: prev[prevState.turn] + 1
-        }));
-      }
 
       if (res.nextState.gameType === 'checkers') {
         setCheckersFrom(res.nextState.chainFrom);
@@ -1329,26 +1119,25 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
       }
     },
     [
-      canActNow,
+      isGameOver,
       mode,
       gameState,
       moves,
       humanSeat,
       selectedBot,
       roomCode,
+      mySeat,
       playerId,
       playSfx,
       connectAndSendWs
     ]
   );
 
-  // Selected AI Bot & Ally Bot turn automation across all 72 minigames (1v1 / 2v2 / 3v3)
+  // Selected AI Bot turn automation across all 8 arcade games
   useEffect(() => {
-    if (mode !== 'ai' || isGameOver || !activeSeat || activeSeat.kind !== 'bot') return;
-    const actingBot = getArcadeBotById(activeSeat.botId || selectedBot.id);
-    const actingSide = gameState.turn;
+    if (mode !== 'ai' || isGameOver || gameState.turn !== botSeat) return;
     const timer = window.setTimeout(() => {
-      const act = pickBotArcadeAction(gameState, actingBot);
+      const act = pickBotArcadeAction(gameState, selectedBot);
       if (!act) return;
       const res = applyArcadeAction(gameState, act);
       if (!res.valid) return;
@@ -1361,7 +1150,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         }
       } else if (res.extraTurn) {
         playSfx('bonus');
-        setBotQuote(prev => pickArcadeBotVoiceline(actingBot, 'bonus', prev));
+        setBotQuote(prev => pickArcadeBotVoiceline(selectedBot, 'bonus', prev));
       } else if (res.capturedOrScored) {
         playSfx('capture');
       } else {
@@ -1369,38 +1158,9 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
       }
       setGameState(res.nextState);
       setMoves(prev => [...prev, act]);
-      if (res.nextState.turn !== actingSide) {
-        setLocalTeamTurnCounts(prev => ({
-          ...prev,
-          [actingSide]: prev[actingSide] + 1
-        }));
-      }
-    }, 280);
+    }, 260);
     return () => window.clearTimeout(timer);
-  }, [mode, isGameOver, activeSeat, gameState, botSeat, humanSeat, selectedBot, playSfx]);
-
-  // Firestore online room bot-seat runner (designated to room creator / first human participant)
-  useEffect(() => {
-    if (
-      mode !== 'online' ||
-      !roomCode ||
-      activeTransportRef.current !== 'firestore' ||
-      isGameOver ||
-      !onlineTeamMeta ||
-      onlineTeamMeta.activeSeat?.kind !== 'bot' ||
-      !myFirebaseUid ||
-      onlineTeamMeta.botRunnerUid !== myFirebaseUid
-    ) {
-      return;
-    }
-    const timer = window.setTimeout(() => {
-      void sendFirestoreArcadeBotMove({
-        code: roomCode,
-        expectedMoveIndex: moves.length
-      });
-    }, 340);
-    return () => window.clearTimeout(timer);
-  }, [mode, roomCode, isGameOver, onlineTeamMeta, myFirebaseUid, moves.length]);
+  }, [mode, isGameOver, gameState, botSeat, humanSeat, selectedBot, playSfx]);
 
   const handleCopy = (text: string, type: 'code' | 'link') => {
     try {
@@ -1421,8 +1181,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         });
       }
     } else {
-      const losingSide: ArcadePlayer = mode === 'ai' ? humanSeat : gameState.turn;
-      setResignedWinner(losingSide === 'p1' ? 'p2' : 'p1');
+      setResignedWinner(gameState.turn === 'p1' ? 'p2' : 'p1');
       playSfx('win');
     }
   };
@@ -1477,17 +1236,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
   }, [mode, players.p2, activeArcadeRoomInvite, myFirebaseUid, mySeat, playerName, resolvePersonByUid]);
 
   const p1Display =
-    effectiveTeamMode !== '1v1'
-      ? mode === 'online'
-        ? players.p1?.name || 'Team 1'
-        : mode === 'ai'
-        ? humanSeat === 'p1'
-          ? aiSquadMode === 'allies'
-            ? `${myResolvedDisplayName} + Bots`
-            : `${myResolvedDisplayName} (Solo)`
-          : `${selectedBot.name} Squad`
-        : `Team 1 (${effectiveTeamMode.split('v')[0]})`
-      : mode === 'online'
+    mode === 'online'
       ? players.p1
         ? p1Resolved?.name || players.p1.name
         : mySeat === 'p1'
@@ -1497,22 +1246,12 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         : 'Waiting for P1...'
       : mode === 'ai'
       ? humanSeat === 'p1'
-        ? myResolvedDisplayName
+        ? `${(playerName && playerName !== 'Player' ? playerName : '') || profile?.displayName || user?.displayName || 'You'}`
         : botLabel
       : `Player 1 (${meta.p1Label})`;
 
   const p2Display =
-    effectiveTeamMode !== '1v1'
-      ? mode === 'online'
-        ? players.p2?.name || 'Team 2'
-        : mode === 'ai'
-        ? humanSeat === 'p2'
-          ? aiSquadMode === 'allies'
-            ? `${myResolvedDisplayName} + Bots`
-            : `${myResolvedDisplayName} (Solo)`
-          : `${selectedBot.name} Squad`
-        : `Team 2 (${effectiveTeamMode.split('v')[1]})`
-      : mode === 'online'
+    mode === 'online'
       ? players.p2
         ? p2Resolved?.name || players.p2.name
         : mySeat === 'p2'
@@ -1522,7 +1261,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         : 'Waiting for P2...'
       : mode === 'ai'
       ? humanSeat === 'p2'
-        ? myResolvedDisplayName
+        ? `${(playerName && playerName !== 'Player' ? playerName : '') || profile?.displayName || user?.displayName || 'You'}`
         : botLabel
       : `Player 2 (${meta.p2Label})`;
 
@@ -1544,81 +1283,125 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         : selectedBot.avatar
       : null;
 
-  const activeSeatDisplay = useMemo(() => {
-    if (!activeSeat) return gameState.turn === 'p1' ? p1Display : p2Display;
-    if (activeSeat.kind === 'bot') {
-      const b = getArcadeBotById(activeSeat.botId);
-      return `${b.avatar} ${b.name}`;
+  const { navigateSpace } = useNotifications();
+  const { startCall, callPhase } = useCall();
+  const [lastEloResult, setLastEloResult] = useState<SettledEloResult | null>(null);
+  const settledArcadeMatchRef = useRef<Set<string>>(new Set());
+
+  const onlineOpponentCallTarget = useMemo(() => {
+    if (mode !== 'online' || !roomCode) return null;
+    if (mySeat !== 'p1' && mySeat !== 'p2') return null;
+    const oppSeat = mySeat === 'p1' ? players.p2 : players.p1;
+    const resolved = mySeat === 'p1' ? p2Resolved : p1Resolved;
+    const uid = oppSeat?.uid || '';
+    if (!uid || uid === myFirebaseUid) return null;
+    const dirMatch = directoryProfiles.find(p => p.userId === uid);
+    const contactMatch = contacts.find(c => c.contactUid === uid);
+    return {
+      uid,
+      name: resolved?.name || oppSeat?.name || 'Opponent',
+      avatarId: dirMatch?.avatarId || contactMatch?.avatarId || 'melon_classic'
+    };
+  }, [mode, roomCode, mySeat, players.p1, players.p2, p1Resolved, p2Resolved, myFirebaseUid, directoryProfiles, contacts]);
+
+  // Automatically record PvP ELO ratings when an online Firestore arcade match ends
+  useEffect(() => {
+    if (
+      !isGameOver ||
+      mode !== 'online' ||
+      !roomCode ||
+      activeTransportRef.current !== 'firestore'
+    ) {
+      return;
     }
-    if (activeSeat.kind === 'human') {
-      return activeSeat.uid
-        ? resolvePersonByUid(activeSeat.uid, activeSeat.name).name
-        : activeSeat.name || (gameState.turn === 'p1' ? p1Display : p2Display);
-    }
-    return 'Open Seat';
-  }, [activeSeat, gameState.turn, p1Display, p2Display, resolvePersonByUid]);
+    const p1Uid = players.p1?.uid || '';
+    const p2Uid = players.p2?.uid || '';
+    if (!p1Uid || !p2Uid || p1Uid === p2Uid) return;
+    if (myFirebaseUid !== p1Uid && myFirebaseUid !== p2Uid) return;
+
+    const finalWinner = (resignedWinner || gameState.winner || 'draw') as 'p1' | 'p2' | 'draw';
+    const matchId = buildMatchId({
+      sourceType: 'arcadeRoom',
+      roomCode,
+      moveCount: moves.length,
+      winnerSeat: finalWinner,
+      p1Uid,
+      p2Uid,
+      movesSample: moves.slice(-4).join('|')
+    });
+
+    if (settledArcadeMatchRef.current.has(matchId)) return;
+    settledArcadeMatchRef.current.add(matchId);
+
+    const p1Dir = directoryProfiles.find(p => p.userId === p1Uid);
+    const p2Dir = directoryProfiles.find(p => p.userId === p2Uid);
+
+    void settleOnlinePvpMatchElo({
+      matchId,
+      sourceType: 'arcadeRoom',
+      roomCode,
+      gameKind: 'arcade',
+      gameType: gameState.gameType,
+      gameTitle: meta.name,
+      p1Uid,
+      p1Name: players.p1?.name || p1Dir?.displayName || 'Player 1',
+      p1AvatarId: (p1Uid === myFirebaseUid ? profile?.avatarId : p1Dir?.avatarId) || 'melon_classic',
+      p2Uid,
+      p2Name: players.p2?.name || p2Dir?.displayName || 'Player 2',
+      p2AvatarId: (p2Uid === myFirebaseUid ? profile?.avatarId : p2Dir?.avatarId) || 'melon_classic',
+      winnerSeat: finalWinner
+    })
+      .then(res => {
+        if (res) setLastEloResult(res);
+      })
+      .catch(() => {});
+  }, [
+    isGameOver,
+    mode,
+    roomCode,
+    players.p1?.uid,
+    players.p1?.name,
+    players.p2?.uid,
+    players.p2?.name,
+    myFirebaseUid,
+    resignedWinner,
+    gameState.winner,
+    gameState.gameType,
+    meta.name,
+    moves,
+    directoryProfiles,
+    profile?.avatarId
+  ]);
 
   const statusHeadline = useMemo(() => {
     if (effectiveWinner === 'draw') return 'Match Drawn!';
     if (effectiveWinner === 'p1') return `${p1Display} Wins!`;
     if (effectiveWinner === 'p2') return `${p2Display} Wins!`;
-    if (mode === 'online' && roomCode) {
-      const filledTotal =
-        activeTeam1Seats.filter(s => s.kind !== 'open').length +
-        activeTeam2Seats.filter(s => s.kind !== 'open').length;
-      const neededTotal = effectiveTeamSize * 2;
-      if (filledTotal < neededTotal && activeSeat?.kind === 'open') {
-        return `Waiting for player (${filledTotal}/${neededTotal} seated)`;
-      }
+    if (mode === 'online' && roomCode && (!players.p1 || !players.p2)) {
+      return `Room ${roomCode} ready — share code to start!`;
     }
     if (gameState.gameType === 'checkers' && gameState.chainFrom) {
-      return `${activeSeatDisplay} has a mandatory multi-jump!`;
+      return `${gameState.turn === 'p1' ? p1Display : p2Display} has a mandatory multi-jump!`;
     }
     if (gameState.gameType === 'reversi' && gameState.passedLastTurn) {
-      return `No valid flips — ${activeSeatDisplay} goes again!`;
+      return `Opponent had no valid flips — ${gameState.turn === 'p1' ? p1Display : p2Display} goes again!`;
     }
     if (gameState.gameType === 'mancala' && gameState.extraTurn) {
-      return `Store landing! ${activeSeatDisplay} gets an extra turn!`;
+      return `Store landing! ${gameState.turn === 'p1' ? p1Display : p2Display} gets an extra turn!`;
     }
     if (mode === 'online' && (mySeat === 'p1' || mySeat === 'p2')) {
-      return canActNow
-        ? 'Your Turn — Instant Move'
-        : `Turn: ${activeSeatDisplay}`;
+      return gameState.turn === mySeat ? 'Your Turn — Instant Move' : `Waiting for ${gameState.turn === 'p1' ? p1Display : p2Display}...`;
     }
-    return `${activeSeatDisplay}’s Turn`;
-  }, [
-    effectiveWinner,
-    p1Display,
-    p2Display,
-    mode,
-    roomCode,
-    activeTeam1Seats,
-    activeTeam2Seats,
-    effectiveTeamSize,
-    activeSeat,
-    gameState,
-    activeSeatDisplay,
-    mySeat,
-    canActNow
-  ]);
+    return `${gameState.turn === 'p1' ? p1Display : p2Display}’s Turn`;
+  }, [effectiveWinner, p1Display, p2Display, mode, roomCode, players, gameState, mySeat]);
 
   const inviteUrl = useMemo(() => {
     if (!roomCode || typeof window === 'undefined') return '';
     return `${window.location.origin}${window.location.pathname}?arcadeRoom=${roomCode}`;
   }, [roomCode]);
 
-  const myVoteToken =
-    mySeat === 'p1' || mySeat === 'p2'
-      ? `${mySeat}:${onlineTeamMeta?.mySeatIndex ?? 0}`
-      : null;
   const hasVotedRematch =
-    mode === 'online' &&
-    (mySeat === 'p1' || mySeat === 'p2') &&
-    (rematchVotes.includes(mySeat) || (myVoteToken ? rematchVotes.includes(myVoteToken) : false));
-  const requiredRematchVotes =
-    mode === 'online' && onlineTeamMeta && onlineTeamMeta.participantUids.length > 0
-      ? onlineTeamMeta.participantUids.length
-      : 2;
+    mode === 'online' && (mySeat === 'p1' || mySeat === 'p2') && rematchVotes.includes(mySeat);
 
   const hubCategories: ('All' | ArcadeGameCategory)[] = [
     'All',
@@ -1722,35 +1505,11 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                     </span>
                   </div>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    Pick any minigame to play 1v1, 2v2, or 3v3 Team Relay — team up with friends or battle AI bot squads.
+                    Pick any minigame below to open its arena, invite friends with 1 click, or battle {ARCADE_BOTS.length} AI bots.
                   </p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                  {/* Match Format Selector: 1v1 | 2v2 | 3v3 */}
-                  <div
-                    className="flex items-center p-1 rounded-xl border gap-0.5"
-                    style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
-                    title="Select Match Format"
-                  >
-                    {(['1v1', '2v2', '3v3'] as TeamMode[]).map(fmt => {
-                      const active = teamMode === fmt;
-                      return (
-                        <button
-                          key={fmt}
-                          type="button"
-                          onClick={() => handleSelectTeamMode(fmt)}
-                          className={`px-2.5 py-1.5 rounded-lg text-[11px] font-black cursor-pointer transition-all ${
-                            active ? 'text-black shadow' : 'text-slate-300 hover:text-white'
-                          }`}
-                          style={{ backgroundColor: active ? activeTheme.accent : undefined }}
-                        >
-                          {fmt}
-                        </button>
-                      );
-                    })}
-                  </div>
-
                   {/* Quick Room Code Join right from All Minigames */}
                   <form
                     onSubmit={e => {
@@ -1791,7 +1550,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                       backgroundColor: mode === 'ai' ? activeTheme.accent : activeTheme.bgSecondary,
                       borderColor: mode === 'ai' ? activeTheme.accent : activeTheme.border
                     }}
-                    title="Toggle playing minigames solo or with teammates against AI Bots"
+                    title="Toggle playing minigames solo against 8 AI Bots"
                   >
                     <Bot className="w-3.5 h-3.5" />
                     <span>{mode === 'ai' ? 'vs Bots: ON' : 'vs Bots'}</span>
@@ -1808,6 +1567,17 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                   >
                     <Shuffle className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
                     <span>Random</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => navigateSpace('leaderboard')}
+                    className="px-3 py-2 rounded-xl border text-xs font-extrabold text-amber-300 hover:bg-white/10 flex items-center gap-1.5 cursor-pointer"
+                    style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
+                    title="View PvP ELO Leaderboard"
+                  >
+                    <Trophy className="w-3.5 h-3.5" />
+                    <span>Leaderboard</span>
                   </button>
 
                   <button
@@ -1994,6 +1764,55 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
           </div>
 
           <div className="flex items-center gap-1.5 shrink-0">
+            {onlineOpponentCallTarget && (
+              <>
+                <button
+                  type="button"
+                  disabled={callPhase !== 'idle'}
+                  onClick={() =>
+                    void startCall({
+                      peerUid: onlineOpponentCallTarget.uid,
+                      peerName: onlineOpponentCallTarget.name,
+                      peerAvatarId: onlineOpponentCallTarget.avatarId,
+                      mode: 'audio',
+                      contextLabel: `${meta.name} · Room ${roomCode}`
+                    })
+                  }
+                  className="px-2.5 py-2 rounded-xl border bg-emerald-500/15 hover:bg-emerald-500/25 border-emerald-500/35 text-emerald-300 text-xs font-bold flex items-center gap-1 cursor-pointer disabled:opacity-40"
+                  title={`Voice call ${onlineOpponentCallTarget.name}`}
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Call</span>
+                </button>
+                <button
+                  type="button"
+                  disabled={callPhase !== 'idle'}
+                  onClick={() =>
+                    void startCall({
+                      peerUid: onlineOpponentCallTarget.uid,
+                      peerName: onlineOpponentCallTarget.name,
+                      peerAvatarId: onlineOpponentCallTarget.avatarId,
+                      mode: 'video',
+                      contextLabel: `${meta.name} · Room ${roomCode}`
+                    })
+                  }
+                  className="px-2.5 py-2 rounded-xl border bg-violet-500/15 hover:bg-violet-500/25 border-violet-500/35 text-violet-300 text-xs font-bold flex items-center gap-1 cursor-pointer disabled:opacity-40"
+                  title={`Video call ${onlineOpponentCallTarget.name}`}
+                >
+                  <Video className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Video</span>
+                </button>
+              </>
+            )}
+            <button
+              type="button"
+              onClick={() => navigateSpace('leaderboard')}
+              className="p-2 rounded-xl border text-amber-300 hover:text-amber-200 hover:bg-white/10 transition-colors cursor-pointer"
+              style={{ borderColor: activeTheme.border }}
+              title="Open PvP ELO Leaderboard"
+            >
+              <Trophy className="w-4 h-4" />
+            </button>
             <button
               onClick={() => setSoundEnabled(s => !s)}
               className="p-2 rounded-xl border text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
@@ -2020,114 +1839,47 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
             className="lg:col-span-8 rounded-2xl border p-3 md:p-4 shadow-2xl flex flex-col gap-3"
             style={{ backgroundColor: activeTheme.bgCard, borderColor: activeTheme.border }}
           >
-            {/* Compact Player Versus Header + 2v2 / 3v3 Squad Strip */}
-            <div className="flex flex-col gap-2 pb-2 border-b" style={{ borderColor: activeTheme.border }}>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex items-center gap-2 min-w-0 flex-wrap">
-                  {effectiveTeamMode !== '1v1' && (
-                    <span
-                      className="px-2 py-0.5 rounded-md border text-[10px] font-black font-mono uppercase shrink-0"
-                      style={{
-                        backgroundColor: activeTheme.accentBadge,
-                        borderColor: activeTheme.borderActive,
-                        color: activeTheme.accent
-                      }}
-                    >
-                      {effectiveTeamMode} Relay
-                    </span>
-                  )}
-                  <div
-                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all ${
-                      !isGameOver && gameState.turn === 'p1' ? 'ring-2 ring-emerald-400/70 text-white' : 'text-slate-300'
-                    }`}
-                    style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
-                  >
-                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
-                    {p1Avatar && <span className="shrink-0">{p1Avatar}</span>}
-                    <span className="truncate max-w-[140px]">{p1Display}</span>
-                    {mySeat === 'p1' && mode === 'online' && <span className="text-[9px] font-mono text-emerald-400">YOU</span>}
-                  </div>
-
-                  <span className="text-[10px] font-extrabold text-slate-500 uppercase">VS</span>
-
-                  <div
-                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all ${
-                      !isGameOver && gameState.turn === 'p2' ? 'ring-2 ring-amber-400/70 text-white' : 'text-slate-300'
-                    }`}
-                    style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
-                  >
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0" />
-                    {p2Avatar && <span className="shrink-0">{p2Avatar}</span>}
-                    <span className="truncate max-w-[140px]">{p2Display}</span>
-                    {mySeat === 'p2' && mode === 'online' && <span className="text-[9px] font-mono text-emerald-400">YOU</span>}
-                  </div>
-
-                  {mode === 'online' && activeArcadeRoomInvite && (
-                    <span className="text-[10px] font-semibold text-sky-300 bg-sky-500/10 border border-sky-400/25 px-2 py-0.5 rounded-md truncate">
-                      {activeArcadeRoomInvite.fromUid === myFirebaseUid
-                        ? `Invited ${resolvePersonByUid(activeArcadeRoomInvite.toUid, activeArcadeRoomInvite.toName).name}`
-                        : `Invited by ${resolvePersonByUid(activeArcadeRoomInvite.fromUid, activeArcadeRoomInvite.fromName).name}`}
-                    </span>
-                  )}
+            {/* Compact Player Versus Header */}
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b" style={{ borderColor: activeTheme.border }}>
+              <div className="flex items-center gap-2 min-w-0 flex-wrap">
+                <div
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all ${
+                    !isGameOver && gameState.turn === 'p1' ? 'ring-2 ring-emerald-400/70 text-white' : 'text-slate-300'
+                  }`}
+                  style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
+                >
+                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
+                  {p1Avatar && <span className="shrink-0">{p1Avatar}</span>}
+                  <span className="truncate max-w-[130px]">{p1Display}</span>
+                  {mySeat === 'p1' && mode === 'online' && <span className="text-[9px] font-mono text-emerald-400">YOU</span>}
                 </div>
 
-                <div className="flex items-center gap-2 text-xs font-bold">
-                  <span className="text-slate-200">{statusHeadline}</span>
+                <span className="text-[10px] font-extrabold text-slate-500 uppercase">VS</span>
+
+                <div
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all ${
+                    !isGameOver && gameState.turn === 'p2' ? 'ring-2 ring-amber-400/70 text-white' : 'text-slate-300'
+                  }`}
+                  style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
+                >
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0" />
+                  {p2Avatar && <span className="shrink-0">{p2Avatar}</span>}
+                  <span className="truncate max-w-[130px]">{p2Display}</span>
+                  {mySeat === 'p2' && mode === 'online' && <span className="text-[9px] font-mono text-emerald-400">YOU</span>}
                 </div>
+
+                {mode === 'online' && activeArcadeRoomInvite && (
+                  <span className="text-[10px] font-semibold text-sky-300 bg-sky-500/10 border border-sky-400/25 px-2 py-0.5 rounded-md truncate">
+                    {activeArcadeRoomInvite.fromUid === myFirebaseUid
+                      ? `Invited ${resolvePersonByUid(activeArcadeRoomInvite.toUid, activeArcadeRoomInvite.toName).name}`
+                      : `Invited by ${resolvePersonByUid(activeArcadeRoomInvite.fromUid, activeArcadeRoomInvite.fromName).name}`}
+                  </span>
+                )}
               </div>
 
-              {effectiveTeamSize > 1 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[11px]">
-                  {(
-                    [
-                      { side: 'p1' as ArcadePlayer, label: 'Team 1', seats: activeTeam1Seats, dotClass: 'bg-rose-500' },
-                      { side: 'p2' as ArcadePlayer, label: 'Team 2', seats: activeTeam2Seats, dotClass: 'bg-amber-400' }
-                    ] as const
-                  ).map(group => {
-                    const teamTurnIdx = activeTeamTurnCounts[group.side] % effectiveTeamSize;
-                    return (
-                      <div
-                        key={group.side}
-                        className="flex flex-wrap items-center gap-1 px-2 py-1 rounded-lg border bg-black/20"
-                        style={{ borderColor: gameState.turn === group.side ? activeTheme.borderActive : activeTheme.border }}
-                      >
-                        <span className={`w-2 h-2 rounded-full ${group.dotClass} shrink-0`} />
-                        {group.seats.map((seat, idx) => {
-                          const isActiveSlot = !isGameOver && gameState.turn === group.side && teamTurnIdx === idx;
-                          const isNextSlot = !isGameOver && gameState.turn !== group.side && teamTurnIdx === idx;
-                          const isMyOnlineSeat = mode === 'online' && mySeat === group.side && onlineTeamMeta?.mySeatIndex === idx;
-                          const botMeta = seat.kind === 'bot' ? getArcadeBotById(seat.botId) : null;
-                          const label =
-                            seat.kind === 'bot'
-                              ? `${botMeta?.avatar || '🤖'} ${botMeta?.name || seat.name || 'Bot'}`
-                              : seat.kind === 'human'
-                              ? seat.uid
-                                ? resolvePersonByUid(seat.uid, seat.name).name
-                                : seat.name || `P${idx + 1}`
-                              : 'Open';
-                          return (
-                            <span
-                              key={`${group.side}-${idx}`}
-                              className={`px-1.5 py-0.5 rounded border text-[10px] font-bold flex items-center gap-1 truncate max-w-[125px] ${
-                                isActiveSlot
-                                  ? 'bg-emerald-500/20 border-emerald-400 text-white'
-                                  : isNextSlot
-                                  ? 'bg-white/10 border-white/25 text-slate-200'
-                                  : seat.kind === 'open'
-                                  ? 'bg-black/25 border-dashed border-slate-600 text-slate-500'
-                                  : 'bg-black/30 border-white/10 text-slate-300'
-                              }`}
-                            >
-                              <span className="truncate">{label}</span>
-                              {isMyOnlineSeat && <span className="text-[8px] font-mono text-emerald-400">YOU</span>}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+              <div className="flex items-center gap-2 text-xs font-bold">
+                <span className="text-slate-200">{statusHeadline}</span>
+              </div>
             </div>
 
             {/* Game Canvas / Board Stage */}
@@ -2306,12 +2058,37 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
 
             {/* Bottom Match Action Strip */}
             <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t text-xs" style={{ borderColor: activeTheme.border }}>
-              <div className="flex items-center gap-2 text-slate-400">
+              <div className="flex items-center gap-2 text-slate-400 flex-wrap">
                 <span className="font-mono">Moves: {moves.length}</span>
                 {mode === 'online' && roomCode && (
                   <span className="font-mono text-emerald-400">
                     · {connStatus === 'connected' ? 'Live Sync' : 'Syncing...'}
                   </span>
+                )}
+                {isGameOver && mode === 'online' && lastEloResult && (
+                  <button
+                    type="button"
+                    onClick={() => navigateSpace('leaderboard')}
+                    className="px-2.5 py-0.5 rounded-lg border font-mono font-extrabold text-[11px] flex items-center gap-1 cursor-pointer hover:brightness-110"
+                    style={{
+                      backgroundColor:
+                        lastEloResult.myCategoryDelta >= 0
+                          ? 'rgba(16, 185, 129, 0.16)'
+                          : 'rgba(244, 63, 94, 0.16)',
+                      borderColor:
+                        lastEloResult.myCategoryDelta >= 0
+                          ? 'rgba(16, 185, 129, 0.45)'
+                          : 'rgba(244, 63, 94, 0.45)',
+                      color: lastEloResult.myCategoryDelta >= 0 ? '#6ee7b7' : '#fda4af'
+                    }}
+                  >
+                    <Trophy className="w-3 h-3" />
+                    <span>
+                      Arcade ELO: {lastEloResult.myNewCategoryElo} (
+                      {lastEloResult.myCategoryDelta >= 0 ? '+' : ''}
+                      {lastEloResult.myCategoryDelta})
+                    </span>
+                  </button>
                 )}
               </div>
 
@@ -2337,9 +2114,9 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                     <span>
                       {mode === 'online'
                         ? hasVotedRematch
-                          ? `Rematch Ready (${rematchVotes.length}/${requiredRematchVotes})`
+                          ? `Rematch Ready (${rematchVotes.length}/2)`
                           : rematchVotes.length > 0
-                          ? `Accept Rematch (${rematchVotes.length}/${requiredRematchVotes})`
+                          ? `Accept Rematch (${rematchVotes.length}/2)`
                           : 'Vote Rematch'
                         : 'Play Again'}
                     </span>
@@ -2403,42 +2180,9 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                 style={{ backgroundColor: mode === 'pvp' ? activeTheme.accent : undefined }}
               >
                 <Users className="w-3.5 h-3.5" />
-                <span>{teamMode === '1v1' ? 'Local 2P' : `Local ${teamMode}`}</span>
+                <span>Local 2P</span>
               </button>
             </div>
-
-            {/* Match Format Selector (1v1 / 2v2 / 3v3) when not inside an active online room */}
-            {!(mode === 'online' && roomCode) && (
-              <div
-                className="px-2.5 py-2 rounded-xl border flex items-center justify-between gap-2"
-                style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
-              >
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  Team Mode
-                </span>
-                <div className="grid grid-cols-3 gap-1 flex-1 max-w-[190px]">
-                  {(['1v1', '2v2', '3v3'] as TeamMode[]).map(fmt => {
-                    const active = teamMode === fmt;
-                    return (
-                      <button
-                        key={fmt}
-                        type="button"
-                        onClick={() => handleSelectTeamMode(fmt)}
-                        className={`py-1 rounded-lg border text-[11px] font-black cursor-pointer transition-all ${
-                          active ? 'text-black' : 'text-slate-300 hover:text-white'
-                        }`}
-                        style={{
-                          backgroundColor: active ? activeTheme.accent : 'rgba(0,0,0,0.2)',
-                          borderColor: active ? activeTheme.accent : activeTheme.border
-                        }}
-                      >
-                        {fmt}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
 
             {/* Online Room Code Lobby / Active Room Panel */}
             {mode === 'online' && (
@@ -2478,7 +2222,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                     {/* Seat Preference for Create */}
                     <div>
                       <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
-                        Starting Team ({teamMode})
+                        Starting Seat ({meta.name})
                       </span>
                       <div className="grid grid-cols-3 gap-1.5">
                         {(['p1', 'p2', 'random'] as SeatPref[]).map(opt => (
@@ -2493,31 +2237,11 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                               borderColor: seatPref === opt ? activeTheme.borderActive : activeTheme.border
                             }}
                           >
-                            {opt === 'p1' ? `T1 (${meta.p1Label})` : opt === 'p2' ? `T2 (${meta.p2Label})` : 'Random'}
+                            {opt === 'p1' ? `P1 (${meta.p1Label})` : opt === 'p2' ? `P2 (${meta.p2Label})` : 'Random'}
                           </button>
                         ))}
                       </div>
                     </div>
-
-                    {teamMode !== '1v1' && (
-                      <button
-                        type="button"
-                        onClick={() => setFillRoomWithBots(v => !v)}
-                        className="px-3 py-2 rounded-xl border flex items-center justify-between text-xs font-bold cursor-pointer transition-colors"
-                        style={{
-                          backgroundColor: fillRoomWithBots ? activeTheme.accentBadge : activeTheme.bgSecondary,
-                          borderColor: fillRoomWithBots ? activeTheme.borderActive : activeTheme.border
-                        }}
-                      >
-                        <span className="flex items-center gap-1.5 text-slate-200">
-                          <Bot className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
-                          <span>Fill empty slots with AI bots</span>
-                        </span>
-                        <span className={fillRoomWithBots ? 'text-emerald-400 font-mono' : 'text-slate-400 font-mono'}>
-                          {fillRoomWithBots ? 'ON' : 'OFF'}
-                        </span>
-                      </button>
-                    )}
 
                     <button
                       onClick={() => handleCreateRoom(selectedGame)}
@@ -2527,7 +2251,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                     >
                       {connStatus === 'connecting'
                         ? 'Connecting Room...'
-                        : `Create ${teamMode} ${meta.name} Room`}
+                        : `Create ${meta.name} Room Code`}
                     </button>
 
                     <div className="flex items-center gap-2 pt-2 border-t" style={{ borderColor: activeTheme.border }}>
@@ -2556,100 +2280,48 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                     className="p-3 rounded-xl border flex flex-col gap-2.5"
                     style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.borderActive }}
                   >
-                    {(() => {
-                      const filledCount =
-                        activeTeam1Seats.filter(s => s.kind !== 'open').length +
-                        activeTeam2Seats.filter(s => s.kind !== 'open').length;
-                      const totalCount = effectiveTeamSize * 2;
-                      const hasOpenSeats = filledCount < totalCount;
-                      const hasBotSeats = [...activeTeam1Seats, ...activeTeam2Seats].some(s => s.kind === 'bot');
-                      const canSwitchTeam = moves.length === 0 && (mySeat === 'p1' || mySeat === 'p2');
-                      const otherTeam: ArcadePlayer = mySeat === 'p1' ? 'p2' : 'p1';
-                      const otherSeats = otherTeam === 'p1' ? activeTeam1Seats : activeTeam2Seats;
-                      const otherHasRoom = otherSeats.some(s => s.kind === 'open' || s.kind === 'bot');
-                      return (
-                        <>
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                              Active {effectiveTeamMode} Room
-                            </span>
-                            <span className="text-[10px] font-mono text-emerald-400">
-                              {filledCount}/{totalCount} Seated
-                            </span>
-                          </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        Active Room Code
+                      </span>
+                      <span className="text-[10px] font-mono text-emerald-400">
+                        {players.p1 && players.p2 ? '2/2 Seated' : '1/2 Waiting'}
+                      </span>
+                    </div>
 
-                          <div className="flex items-center justify-between gap-2 bg-black/30 px-3 py-2 rounded-xl border border-white/10">
-                            <span className="font-mono text-xl font-black tracking-[0.22em] text-white">
-                              {roomCode}
-                            </span>
-                            <div className="flex items-center gap-1.5">
-                              <button
-                                onClick={() => handleCopy(roomCode, 'code')}
-                                className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white cursor-pointer"
-                                title="Copy room code"
-                              >
-                                {copiedType === 'code' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                              </button>
-                              <button
-                                onClick={() => handleCopy(inviteUrl, 'link')}
-                                className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white cursor-pointer"
-                                title="Copy invite link"
-                              >
-                                {copiedType === 'link' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Link2 className="w-3.5 h-3.5" />}
-                              </button>
-                            </div>
-                          </div>
+                    <div className="flex items-center justify-between gap-2 bg-black/30 px-3 py-2 rounded-xl border border-white/10">
+                      <span className="font-mono text-xl font-black tracking-[0.22em] text-white">
+                        {roomCode}
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => handleCopy(roomCode, 'code')}
+                          className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white cursor-pointer"
+                          title="Copy room code"
+                        >
+                          {copiedType === 'code' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        </button>
+                        <button
+                          onClick={() => handleCopy(inviteUrl, 'link')}
+                          className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white cursor-pointer"
+                          title="Copy invite link"
+                        >
+                          {copiedType === 'link' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Link2 className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
+                    </div>
 
-                          {(hasOpenSeats || (hasBotSeats && moves.length === 0) || (canSwitchTeam && otherHasRoom)) && (
-                            <div className="flex flex-wrap gap-1.5">
-                              {canSwitchTeam && otherHasRoom && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleSwitchOnlineTeam(otherTeam)}
-                                  className="flex-1 py-1.5 px-2.5 rounded-lg border text-[11px] font-bold text-white hover:bg-white/10 cursor-pointer"
-                                  style={{ borderColor: activeTheme.border }}
-                                >
-                                  Switch to Team {otherTeam === 'p1' ? '1' : '2'}
-                                </button>
-                              )}
-                              {hasOpenSeats && (
-                                <button
-                                  type="button"
-                                  onClick={handleFillOnlineBots}
-                                  className="flex-1 py-1.5 px-2.5 rounded-lg border text-[11px] font-extrabold text-black cursor-pointer hover:brightness-110 flex items-center justify-center gap-1"
-                                  style={{ backgroundColor: activeTheme.accent, borderColor: activeTheme.accent }}
-                                >
-                                  <Bot className="w-3 h-3" />
-                                  <span>Fill w/ Bots</span>
-                                </button>
-                              )}
-                              {hasBotSeats && moves.length === 0 && (
-                                <button
-                                  type="button"
-                                  onClick={handleClearOnlineBots}
-                                  className="py-1.5 px-2.5 rounded-lg border text-[11px] font-bold text-slate-300 hover:text-white hover:bg-white/10 cursor-pointer"
-                                  style={{ borderColor: activeTheme.border }}
-                                >
-                                  Clear Bots
-                                </button>
-                              )}
-                            </div>
-                          )}
+                    <p className="text-[11px] text-slate-400 leading-snug">
+                      Works cross-device between GitHub Pages and AI Studio! Share the 6-letter code or invite link.
+                    </p>
 
-                          <p className="text-[11px] text-slate-400 leading-snug">
-                            Friends can join with this code before move 1 or fill open slots with AI bots anytime.
-                          </p>
-
-                          <button
-                            onClick={handleLeaveRoom}
-                            className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl border border-rose-500/30 text-rose-300 hover:bg-rose-500/15 text-xs font-bold cursor-pointer"
-                          >
-                            <LogOut className="w-3.5 h-3.5" />
-                            <span>Leave Room</span>
-                          </button>
-                        </>
-                      );
-                    })()}
+                    <button
+                      onClick={handleLeaveRoom}
+                      className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl border border-rose-500/30 text-rose-300 hover:bg-rose-500/15 text-xs font-bold cursor-pointer"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Leave Room</span>
+                    </button>
                   </div>
                 )}
 
@@ -2696,7 +2368,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                 )}
 
                 {/* 1-Click Direct Friend Invites (No Code Needed) */}
-                {(!roomCode || [...activeTeam1Seats, ...activeTeam2Seats].some(s => s.kind === 'open')) && invitableArcadePlayers.length > 0 && (
+                {(!roomCode || !(players.p1 && players.p2)) && invitableArcadePlayers.length > 0 && (
                   <div
                     className="p-2.5 rounded-xl border flex flex-col gap-1.5"
                     style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
@@ -2758,7 +2430,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
               </div>
             )}
 
-            {/* Multi-Bot AI Opponent & Team Squad Selector */}
+            {/* Multi-Bot AI Opponent Selector */}
             {mode === 'ai' && (
               <div className="flex flex-col gap-2">
                 {/* Active Bot Quote Card */}
@@ -2789,37 +2461,6 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                     </p>
                   </div>
                 </div>
-
-                {teamMode !== '1v1' && (
-                  <div className="grid grid-cols-2 gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => setAiSquadMode('allies')}
-                      className={`py-1.5 px-2 rounded-xl border text-[11px] font-bold cursor-pointer ${
-                        aiSquadMode === 'allies' ? 'text-white' : 'text-slate-400 hover:text-white'
-                      }`}
-                      style={{
-                        backgroundColor: aiSquadMode === 'allies' ? activeTheme.accentBadge : activeTheme.bgSecondary,
-                        borderColor: aiSquadMode === 'allies' ? activeTheme.borderActive : activeTheme.border
-                      }}
-                    >
-                      You + Ally Bots vs Bots
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setAiSquadMode('solo')}
-                      className={`py-1.5 px-2 rounded-xl border text-[11px] font-bold cursor-pointer ${
-                        aiSquadMode === 'solo' ? 'text-white' : 'text-slate-400 hover:text-white'
-                      }`}
-                      style={{
-                        backgroundColor: aiSquadMode === 'solo' ? activeTheme.accentBadge : activeTheme.bgSecondary,
-                        borderColor: aiSquadMode === 'solo' ? activeTheme.borderActive : activeTheme.border
-                      }}
-                    >
-                      Solo vs {getTeamSize(teamMode)} Bots
-                    </button>
-                  </div>
-                )}
 
                 {/* Difficulty Tier Filter + Random Bot */}
                 <div className="flex items-center gap-1">
