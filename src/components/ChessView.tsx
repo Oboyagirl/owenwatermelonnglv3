@@ -33,23 +33,15 @@ import {
   Activity,
   Gamepad2,
   Play,
-  Send,
-  Phone,
-  Video
+  Send
 } from 'lucide-react';
 import { ThemeConfig } from '../services/themeStore';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
-import { useCall } from '../context/CallContext';
 import { auth } from '../services/firebase';
 import { AVATAR_PRESETS } from '../services/cloudSaveService';
 import { isProfileOnlineNow } from '../services/chatService';
 import { sendGameInvite } from '../services/inviteService';
-import {
-  SettledEloResult,
-  buildMatchId,
-  settleOnlinePvpMatchElo
-} from '../services/leaderboardService';
 import {
   AnalysisLine,
   BotMoveDecision,
@@ -86,16 +78,30 @@ import {
   ChessAuthRequiredError,
   ChessRoomViewPayload,
   claimFirestoreChessTimeout,
+  clearFirestoreChessBots,
   createFirestoreChessRoom,
+  fillFirestoreChessBots,
   joinFirestoreChessRoom,
   leaveFirestoreChessRoom,
   resignFirestoreChessRoom,
   sanitizeRoomCode,
+  sendFirestoreChessBotMove,
   sendFirestoreChessMove,
   signInGoogleForChess,
   subscribeFirestoreChessRoom,
+  switchFirestoreChessTeam,
   voteFirestoreChessRematch
 } from '../services/chessRoomService';
+import {
+  TeamMode,
+  TeamSeat,
+  createBotSeat,
+  createHumanSeat,
+  getActiveChessSeatIndex,
+  getTeamSize,
+  normalizeTeamMode,
+  pickChessSquadBots
+} from '../utils/teamModes';
 
 interface ChessViewProps {
   activeTheme: ThemeConfig;
@@ -145,6 +151,18 @@ interface BoardPalette {
 
 const CHESS_PALETTE_STORAGE_KEY = 'owen_chess_board_palette';
 const CHESS_ACTIVE_MATCH_KEY = 'owen_chess_active_match_v1';
+const CHESS_TEAM_MODE_KEY = 'owen_chess_team_mode_v1';
+
+interface OnlineChessTeamMeta {
+  teamMode: TeamMode;
+  mySeatIndex: number | null;
+  whiteSeats: TeamSeat[];
+  blackSeats: TeamSeat[];
+  activeSeatIndex: number;
+  activeSeat: TeamSeat | null;
+  botRunnerUid: string | null;
+  participantUids: string[];
+}
 
 const BOARD_PALETTES: BoardPalette[] = [
   {
@@ -523,6 +541,15 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
 
   // Match Configuration
   const [mode, setMode] = useState<GameMode>(() => initialRestoredMatch?.mode || 'ai');
+  const [teamMode, setTeamMode] = useState<TeamMode>(() => {
+    try {
+      return normalizeTeamMode(localStorage.getItem(CHESS_TEAM_MODE_KEY));
+    } catch {
+      return '1v1';
+    }
+  });
+  const [aiSquadMode, setAiSquadMode] = useState<'allies' | 'solo'>('allies');
+  const [fillRoomWithBots, setFillRoomWithBots] = useState<boolean>(false);
   const [selectedBotId, setSelectedBotId] = useState<string>(() => initialRestoredMatch?.selectedBotId || 'clara');
   const [botTierFilter, setBotTierFilter] = useState<'all' | ChessBot['difficulty']>('all');
   const [sidePref, setSidePref] = useState<PlayerSidePref>(() => initialRestoredMatch?.sidePref || 'w');
@@ -630,7 +657,8 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
   const [onlineRoomCode, setOnlineRoomCode] = useState<string | null>(null);
   const [onlineMyColor, setOnlineMyColor] = useState<PieceColor | 'spectator'>('w');
   const [onlinePlayers, setOnlinePlayers] = useState<OnlineRoomPlayers>({ w: null, b: null });
-  const [onlineRematchVotes, setOnlineRematchVotes] = useState<PieceColor[]>([]);
+  const [onlineTeamMeta, setOnlineTeamMeta] = useState<OnlineChessTeamMeta | null>(null);
+  const [onlineRematchVotes, setOnlineRematchVotes] = useState<string[]>([]);
   const [joinCodeInput, setJoinCodeInput] = useState('');
   const [onlineError, setOnlineError] = useState<string | null>(null);
   const [onlineAuthNeeded, setOnlineAuthNeeded] = useState(false);
@@ -853,6 +881,84 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
 
   const aiColor: PieceColor = humanColor === 'w' ? 'b' : 'w';
 
+  const myChessUid =
+    user?.uid && auth.currentUser?.uid === user.uid ? user.uid : auth.currentUser?.uid || '';
+  const myResolvedChessName =
+    (playerName && playerName !== 'Player' ? playerName.trim() : '') ||
+    profile?.displayName ||
+    user?.displayName ||
+    'You';
+
+  const effectiveTeamMode: TeamMode =
+    mode === 'online' && onlineRoomCode && onlineTeamMeta ? onlineTeamMeta.teamMode : teamMode;
+  const effectiveTeamSize = getTeamSize(effectiveTeamMode);
+
+  const { localWhiteSeats, localBlackSeats } = useMemo(() => {
+    if (mode === 'pvp') {
+      const makeSeats = (teamLabel: string) =>
+        Array.from({ length: effectiveTeamSize }, (_, i) =>
+          createHumanSeat({
+            name: effectiveTeamSize === 1 ? teamLabel : `${teamLabel} P${i + 1}`
+          })
+        );
+      return { localWhiteSeats: makeSeats('White'), localBlackSeats: makeSeats('Black') };
+    }
+
+    const enemyBots = pickChessSquadBots(selectedBot.id, effectiveTeamSize);
+    const allyBots = pickChessSquadBots(
+      selectedBot.id,
+      Math.max(0, effectiveTeamSize - 1),
+      enemyBots.map(b => b.id)
+    );
+
+    const buildHumanTeam = () => {
+      const list: TeamSeat[] = [
+        createHumanSeat({ uid: myChessUid || null, playerId, name: myResolvedChessName })
+      ];
+      for (let i = 1; i < effectiveTeamSize; i++) {
+        if (aiSquadMode === 'allies') {
+          list.push(createBotSeat(allyBots[i - 1] || enemyBots[i % enemyBots.length]));
+        } else {
+          list.push(createHumanSeat({ uid: myChessUid || null, playerId, name: myResolvedChessName }));
+        }
+      }
+      return list;
+    };
+
+    const enemySeats = enemyBots.map(b => createBotSeat(b));
+    return humanColor === 'w'
+      ? { localWhiteSeats: buildHumanTeam(), localBlackSeats: enemySeats }
+      : { localWhiteSeats: enemySeats, localBlackSeats: buildHumanTeam() };
+  }, [
+    mode,
+    effectiveTeamSize,
+    selectedBot.id,
+    myChessUid,
+    playerId,
+    myResolvedChessName,
+    aiSquadMode,
+    humanColor
+  ]);
+
+  const activeWhiteSeats =
+    mode === 'online' && onlineRoomCode && onlineTeamMeta && onlineTeamMeta.whiteSeats.length > 0
+      ? onlineTeamMeta.whiteSeats
+      : localWhiteSeats;
+  const activeBlackSeats =
+    mode === 'online' && onlineRoomCode && onlineTeamMeta && onlineTeamMeta.blackSeats.length > 0
+      ? onlineTeamMeta.blackSeats
+      : localBlackSeats;
+
+  const activeSeatIndex =
+    mode === 'online' && onlineRoomCode && onlineTeamMeta
+      ? onlineTeamMeta.activeSeatIndex
+      : getActiveChessSeatIndex(moveHistory.length, gameState.turn, effectiveTeamSize);
+
+  const activeSeat: TeamSeat | null =
+    mode === 'online' && onlineRoomCode && onlineTeamMeta
+      ? onlineTeamMeta.activeSeat
+      : (gameState.turn === 'w' ? activeWhiteSeats : activeBlackSeats)[activeSeatIndex] || null;
+
   const playerControlledColor: PieceColor | null =
     mode === 'ai'
       ? humanColor
@@ -866,16 +972,21 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     (mode === 'pvp'
       ? true
       : mode === 'ai'
-      ? gameState.turn === humanColor
+      ? activeSeat?.kind === 'human'
       : Boolean(onlineRoomCode) &&
         (onlineMyColor === 'w' || onlineMyColor === 'b') &&
-        gameState.turn === onlineMyColor);
+        gameState.turn === onlineMyColor &&
+        (!onlineTeamMeta ||
+          (onlineTeamMeta.mySeatIndex !== null &&
+            onlineTeamMeta.mySeatIndex === onlineTeamMeta.activeSeatIndex &&
+            onlineTeamMeta.activeSeat?.kind === 'human')));
 
   const canPremove =
     !isGameOver &&
     (viewPly === null || viewPly === moveHistory.length) &&
     playerControlledColor !== null &&
     gameState.turn !== playerControlledColor &&
+    (effectiveTeamSize === 1 || (mode === 'ai' && aiSquadMode === 'solo')) &&
     (mode === 'ai' || (mode === 'online' && Boolean(onlineRoomCode)));
 
   const speakAsBot = useCallback(
@@ -918,6 +1029,16 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       const endedByEvent =
         Boolean(msg.resignedWinner) ||
         Boolean(msg.timeoutWinner || msg.clock?.timeoutWinner);
+      const syncedTeamMeta: OnlineChessTeamMeta = {
+        teamMode: normalizeTeamMode(msg.teamMode),
+        mySeatIndex: typeof msg.mySeatIndex === 'number' ? msg.mySeatIndex : null,
+        whiteSeats: Array.isArray(msg.whiteSeats) ? msg.whiteSeats : [],
+        blackSeats: Array.isArray(msg.blackSeats) ? msg.blackSeats : [],
+        activeSeatIndex: typeof msg.activeSeatIndex === 'number' ? msg.activeSeatIndex : 0,
+        activeSeat: msg.activeSeat || null,
+        botRunnerUid: msg.botRunnerUid || null,
+        participantUids: Array.isArray(msg.participantUids) ? msg.participantUids : []
+      };
 
       const pending = pendingOnlineMoveRef.current;
       if (pending && pending.code === msg.code) {
@@ -925,6 +1046,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
           // Ignore stale pre-move snapshot while our optimistic move is in flight
           setOnlineMyColor(msg.myColor || 'spectator');
           setOnlinePlayers(msg.players || { w: null, b: null });
+          setOnlineTeamMeta(syncedTeamMeta);
           setOnlineRematchVotes(Array.isArray(msg.rematchVotes) ? msg.rematchVotes : []);
           return;
         }
@@ -947,6 +1069,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       setOnlineRoomCode(msg.code);
       setOnlineMyColor(msg.myColor || 'spectator');
       setOnlinePlayers(msg.players || { w: null, b: null });
+      setOnlineTeamMeta(syncedTeamMeta);
       setOnlineRematchVotes(Array.isArray(msg.rematchVotes) ? msg.rematchVotes : []);
       setGameState(nextState);
       setMoveHistory(nextHistory);
@@ -1068,7 +1191,10 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
         playerId,
         playerName: playerName.trim() || 'Player',
         preferredColor: sidePref,
-        timeControlId
+        timeControlId,
+        teamMode,
+        fillBots: fillRoomWithBots,
+        primaryBotId: selectedBotId
       });
       pendingAuthActionRef.current = null;
       startFirestoreRoomSubscription(code, uid);
@@ -1089,6 +1215,9 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     playerName,
     sidePref,
     timeControlId,
+    teamMode,
+    fillRoomWithBots,
+    selectedBotId,
     closeWebSocket,
     closeFirestoreRoom,
     startFirestoreRoomSubscription
@@ -1120,7 +1249,6 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
           setOnlineAuthNeeded(true);
           setOnlineError(err.message);
         } else {
-          setTrackedChessRoom(null);
           setOnlineError(
             err instanceof Error ? err.message : `Could not join room "${cleanCode}".`
           );
@@ -1133,8 +1261,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       closeWebSocket,
       closeFirestoreRoom,
       applyOnlineRoomSync,
-      startFirestoreRoomSubscription,
-      setTrackedChessRoom
+      startFirestoreRoomSubscription
     ]
   );
 
@@ -1321,8 +1448,6 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       !isGameOver
     ) {
       setTrackedChessRoom({ code: onlineRoomCode, mySide: onlineMyColor });
-    } else if (isGameOver) {
-      setTrackedChessRoom(null);
     }
   }, [mode, onlineRoomCode, onlineMyColor, isGameOver, setTrackedChessRoom]);
 
@@ -1363,7 +1488,10 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
           playerId,
           playerName: playerName.trim() || 'Player',
           preferredColor: sidePref,
-          timeControlId
+          timeControlId,
+          teamMode,
+          fillBots: fillRoomWithBots,
+          primaryBotId: selectedBotId
         },
         () => {
           void createOnlineViaFirestore();
@@ -1397,6 +1525,57 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     }
   };
 
+  const handleSwitchOnlineSide = (targetColor: PieceColor) => {
+    if (!onlineRoomCode) return;
+    if (activeTransportRef.current === 'ws') {
+      connectAndSendWs({
+        type: 'room:switch_team',
+        code: onlineRoomCode,
+        playerId,
+        playerName: playerName.trim() || 'Player',
+        targetColor
+      });
+    } else {
+      void switchFirestoreChessTeam({
+        code: onlineRoomCode,
+        playerId,
+        playerName: playerName.trim() || 'Player',
+        targetColor
+      }).catch(err => setOnlineError(err instanceof Error ? err.message : 'Could not switch team.'));
+    }
+  };
+
+  const handleFillOnlineBots = () => {
+    if (!onlineRoomCode) return;
+    if (activeTransportRef.current === 'ws') {
+      connectAndSendWs({
+        type: 'room:fill_bots',
+        code: onlineRoomCode,
+        playerId,
+        primaryBotId: selectedBotId
+      });
+    } else {
+      void fillFirestoreChessBots(onlineRoomCode, selectedBotId).catch(err =>
+        setOnlineError(err instanceof Error ? err.message : 'Could not fill bot seats.')
+      );
+    }
+  };
+
+  const handleClearOnlineBots = () => {
+    if (!onlineRoomCode) return;
+    if (activeTransportRef.current === 'ws') {
+      connectAndSendWs({
+        type: 'room:clear_bots',
+        code: onlineRoomCode,
+        playerId
+      });
+    } else {
+      void clearFirestoreChessBots(onlineRoomCode).catch(err =>
+        setOnlineError(err instanceof Error ? err.message : 'Could not clear bots.')
+      );
+    }
+  };
+
   const handleLeaveRoom = () => {
     const codeToLeave = onlineRoomCode;
     setTrackedChessRoom(null);
@@ -1419,11 +1598,11 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     setOnlineRoomCode(null);
     setOnlineTimeControlId(null);
     setOnlinePlayers({ w: null, b: null });
+    setOnlineTeamMeta(null);
     setOnlineRematchVotes([]);
     setOnlineError(null);
     setOnlineAuthNeeded(false);
     setWsStatus('disconnected');
-    setLastEloResult(null);
     setPremove(null);
     setPremoveFrom(null);
     setGameState(createInitialState());
@@ -1582,7 +1761,10 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
           playerId,
           playerName: playerName.trim() || profile?.displayName || user?.displayName || 'Player',
           preferredColor: sidePref,
-          timeControlId
+          timeControlId,
+          teamMode,
+          fillBots: false,
+          primaryBotId: selectedBotId
         });
         roomToShare = created.code;
         senderUid = created.uid;
@@ -2025,24 +2207,25 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     speakAsBot
   ]);
 
-  // Trigger AI turn automatically when it's AI's move
+  // Trigger AI / Ally Bot turn automatically when active seat is a bot
   useEffect(() => {
-    if (mode !== 'ai' || isGameOver || gameState.turn !== aiColor) {
+    if (mode !== 'ai' || isGameOver || !activeSeat || activeSeat.kind !== 'bot') {
       setIsAIThinking(false);
       return;
     }
 
+    const actingBot = getBotById(activeSeat.botId || selectedBot.id);
     setIsAIThinking(true);
     const botClockMs =
       effectiveTimeControl.baseMs > 0
-        ? aiColor === 'w'
+        ? gameState.turn === 'w'
           ? clockAnchorRef.current.whiteMs
           : clockAnchorRef.current.blackMs
         : undefined;
     const baseDelay =
-      selectedBot.difficulty === 'easy'
+      actingBot.difficulty === 'easy'
         ? 280
-        : selectedBot.difficulty === 'medium'
+        : actingBot.difficulty === 'medium'
         ? 350
         : 400;
     const delayMs =
@@ -2051,7 +2234,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
         : baseDelay;
 
     const timer = window.setTimeout(() => {
-      const decision = chooseBotMove(gameState, selectedBot, moveHistory, botClockMs);
+      const decision = chooseBotMove(gameState, actingBot, moveHistory, botClockMs);
       setIsAIThinking(false);
       if (decision.move) {
         commitMove(decision.move, decision);
@@ -2062,13 +2245,36 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
   }, [
     mode,
     isGameOver,
+    activeSeat,
     gameState,
-    aiColor,
-    selectedBot,
+    selectedBot.id,
     moveHistory,
     effectiveTimeControl.baseMs,
     commitMove
   ]);
+
+  // Firestore online room bot-seat runner (designated to creator / first seated human)
+  useEffect(() => {
+    if (
+      mode !== 'online' ||
+      !onlineRoomCode ||
+      activeTransportRef.current !== 'firestore' ||
+      isGameOver ||
+      !onlineTeamMeta ||
+      onlineTeamMeta.activeSeat?.kind !== 'bot' ||
+      !myChessUid ||
+      onlineTeamMeta.botRunnerUid !== myChessUid
+    ) {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      void sendFirestoreChessBotMove({
+        code: onlineRoomCode,
+        expectedMoveIndex: moveHistory.length
+      });
+    }, 350);
+    return () => window.clearTimeout(timer);
+  }, [mode, onlineRoomCode, isGameOver, onlineTeamMeta, myChessUid, moveHistory.length]);
 
   // Execute queued premove automatically when turn arrives for playerControlledColor
   useEffect(() => {
@@ -2495,6 +2701,16 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     }
   };
 
+  const handleSelectTeamMode = (nextFormat: TeamMode) => {
+    setTeamMode(nextFormat);
+    try {
+      localStorage.setItem(CHESS_TEAM_MODE_KEY, nextFormat);
+    } catch {}
+    if (mode !== 'online') {
+      startNewGame(mode, sidePref, selectedBot, timeControlId);
+    }
+  };
+
   // Reconstruct full timeline of states for Move Explorer & Optional Analysis
   const timelineStates = useMemo(() => {
     const list: ChessState[] = [createInitialState()];
@@ -2663,6 +2879,12 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     color: PieceColor
   ): { name: string; elo: number | null; connected?: boolean; avatarIcon?: string | null } => {
     if (mode === 'pvp') {
+      if (effectiveTeamSize > 1) {
+        return {
+          name: color === 'w' ? `Team White (${effectiveTeamMode.split('v')[0]})` : `Team Black (${effectiveTeamMode.split('v')[1]})`,
+          elo: null
+        };
+      }
       return {
         name: color === 'w' ? 'Player 1 (White)' : 'Player 2 (Black)',
         elo: null
@@ -2703,6 +2925,14 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
         };
       }
       const isMe = onlineMyColor === color;
+      if (effectiveTeamSize > 1) {
+        return {
+          name: seat.name || (color === 'w' ? 'White Squad' : 'Black Squad'),
+          elo: null,
+          connected: seat.connected,
+          avatarIcon: isMe ? resolveAvatarIcon(profile?.avatarId) : null
+        };
+      }
       const resolved = resolvePersonByUid(seat.uid, seat.name);
       return {
         name: isMe ? `${resolved.name} (You)` : resolved.name,
@@ -2711,24 +2941,31 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
         avatarIcon: resolved.avatarIcon
       };
     }
+    if (effectiveTeamSize > 1) {
+      if (color === humanColor) {
+        return {
+          name:
+            aiSquadMode === 'allies'
+              ? `${myResolvedChessName} + Bots`
+              : `${myResolvedChessName} (Solo)`,
+          elo: 1200,
+          avatarIcon: resolveAvatarIcon(profile?.avatarId)
+        };
+      }
+      return {
+        name: `${selectedBot.name} Squad`,
+        elo: selectedBot.rating
+      };
+    }
     if (color === humanColor) {
       return {
-        name:
-          (playerName && playerName !== 'Player' ? playerName.trim() : '') ||
-          profile?.displayName ||
-          user?.displayName ||
-          'You',
+        name: myResolvedChessName,
         elo: 1200,
         avatarIcon: resolveAvatarIcon(profile?.avatarId)
       };
     }
     return { name: selectedBot.name, elo: selectedBot.rating };
   };
-
-  const { startCall, callPhase } = useCall();
-  const { navigateSpace } = useNotifications();
-  const [lastEloResult, setLastEloResult] = useState<SettledEloResult | null>(null);
-  const settledChessMatchRef = useRef<Set<string>>(new Set());
 
   const onlineOpponentInfo = useMemo(() => {
     if (mode !== 'online' || !onlineRoomCode) return null;
@@ -2737,17 +2974,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       const oppSeat = oppColor === 'w' ? onlinePlayers.w : onlinePlayers.b;
       if (oppSeat) {
         const person = resolvePersonByUid(oppSeat.uid, oppSeat.name);
-        return {
-          uid: oppSeat.uid || '',
-          name: person.name,
-          avatarIcon: person.avatarIcon,
-          avatarId:
-            directoryProfiles.find(p => p.userId === oppSeat.uid)?.avatarId ||
-            contacts.find(c => c.contactUid === oppSeat.uid)?.avatarId ||
-            'melon_classic',
-          seated: true,
-          color: oppColor
-        };
+        return { name: person.name, avatarIcon: person.avatarIcon, seated: true, color: oppColor };
       }
       if (activeChessRoomInvite) {
         const peerUid =
@@ -2759,111 +2986,11 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
             ? activeChessRoomInvite.toName
             : activeChessRoomInvite.fromName;
         const person = resolvePersonByUid(peerUid, peerName);
-        return {
-          uid: peerUid || '',
-          name: person.name,
-          avatarIcon: person.avatarIcon,
-          avatarId:
-            directoryProfiles.find(p => p.userId === peerUid)?.avatarId ||
-            contacts.find(c => c.contactUid === peerUid)?.avatarId ||
-            'melon_classic',
-          seated: false,
-          color: oppColor
-        };
+        return { name: person.name, avatarIcon: person.avatarIcon, seated: false, color: oppColor };
       }
     }
     return null;
-  }, [
-    mode,
-    onlineRoomCode,
-    onlineMyColor,
-    onlinePlayers,
-    activeChessRoomInvite,
-    myFirebaseUid,
-    resolvePersonByUid,
-    directoryProfiles,
-    contacts
-  ]);
-
-  // Automatically record online PvP Chess results & ELO ratings when a room match ends
-  useEffect(() => {
-    if (
-      !isGameOver ||
-      mode !== 'online' ||
-      !onlineRoomCode ||
-      activeTransportRef.current !== 'firestore'
-    ) {
-      return;
-    }
-    const wUid = onlinePlayers.w?.uid || '';
-    const bUid = onlinePlayers.b?.uid || '';
-    if (!wUid || !bUid || wUid === bUid) return;
-    if (myFirebaseUid !== wUid && myFirebaseUid !== bUid) return;
-
-    const winnerSide: 'w' | 'b' | 'draw' =
-      resignedWinner ||
-      (timeoutWinner === 'draw' ? 'draw' : timeoutWinner) ||
-      (gameState.status === 'checkmate' && gameState.winner ? gameState.winner : 'draw');
-    const winnerSeat: 'p1' | 'p2' | 'draw' =
-      winnerSide === 'w' ? 'p1' : winnerSide === 'b' ? 'p2' : 'draw';
-
-    const matchId = buildMatchId({
-      sourceType: 'chessRoom',
-      roomCode: onlineRoomCode,
-      moveCount: moveHistory.length,
-      winnerSeat,
-      p1Uid: wUid,
-      p2Uid: bUid,
-      movesSample: moveHistory
-        .slice(-4)
-        .map(m => m.san)
-        .join('')
-    });
-
-    if (settledChessMatchRef.current.has(matchId)) return;
-    settledChessMatchRef.current.add(matchId);
-
-    const wDir = directoryProfiles.find(p => p.userId === wUid);
-    const bDir = directoryProfiles.find(p => p.userId === bUid);
-    const wName = onlinePlayers.w?.name || wDir?.displayName || 'White';
-    const bName = onlinePlayers.b?.name || bDir?.displayName || 'Black';
-
-    void settleOnlinePvpMatchElo({
-      matchId,
-      sourceType: 'chessRoom',
-      roomCode: onlineRoomCode,
-      gameKind: 'chess',
-      gameType: 'chess',
-      gameTitle: 'Chess',
-      p1Uid: wUid,
-      p1Name: wName,
-      p1AvatarId: (wUid === myFirebaseUid ? profile?.avatarId : wDir?.avatarId) || 'melon_classic',
-      p2Uid: bUid,
-      p2Name: bName,
-      p2AvatarId: (bUid === myFirebaseUid ? profile?.avatarId : bDir?.avatarId) || 'melon_classic',
-      winnerSeat
-    })
-      .then(res => {
-        if (res) setLastEloResult(res);
-      })
-      .catch(() => {});
-  }, [
-    isGameOver,
-    mode,
-    onlineRoomCode,
-    onlinePlayers.w?.uid,
-    onlinePlayers.w?.name,
-    onlinePlayers.b?.uid,
-    onlinePlayers.b?.name,
-    myFirebaseUid,
-    resignedWinner,
-    timeoutWinner,
-    gameState.status,
-    gameState.winner,
-    moveHistory,
-    directoryProfiles,
-    profile?.avatarId
-  ]);
+  }, [mode, onlineRoomCode, onlineMyColor, onlinePlayers, activeChessRoomInvite, myFirebaseUid, resolvePersonByUid]);
 
   const getEndBannerCopy = () => {
     const wName = getPlayerInfo('w').name.replace(/ \(You\)$/, '');
@@ -2945,16 +3072,24 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     return { title: 'Game Over', subtitle: '' };
   };
 
-  // Clean, compact player strip with Elo beside name + inline captured material + Chess Clock
+  // Clean, compact player strip with Elo beside name + Team 2v2/3v3 Squad Row + Clock
   const renderPlayerStrip = (color: PieceColor) => {
     const isTurn = isViewingLive && !isGameOver && gameState.turn === color;
-    const isBotHere = mode === 'ai' && color === aiColor;
-    const isThinkingHere = isViewingLive && isBotHere && isAIThinking;
+    const isBotTeamHead = mode === 'ai' && color === aiColor;
+    const isThinkingHere =
+      isViewingLive &&
+      isTurn &&
+      ((mode === 'ai' && isAIThinking) ||
+        (mode === 'online' && onlineTeamMeta?.activeSeat?.kind === 'bot'));
     const capturedPieces = color === 'w' ? material.capturedByWhite : material.capturedByBlack;
     const advantage = color === 'w' ? material.whiteAdvantage : material.blackAdvantage;
     const inCheck = displayedState.inCheckColor === color && displayedState.status !== 'checkmate';
     const info = getPlayerInfo(color);
     const hasPremoveHere = isViewingLive && Boolean(premove) && playerControlledColor === color;
+    const teamSeats = color === 'w' ? activeWhiteSeats : activeBlackSeats;
+    const teamSeatIdx = getActiveChessSeatIndex(moveHistory.length, color, effectiveTeamSize);
+    const activeBotInTeam =
+      teamSeats[teamSeatIdx]?.kind === 'bot' ? getBotById(teamSeats[teamSeatIdx].botId || selectedBot.id) : null;
 
     const showClock = effectiveTimeControl.baseMs > 0;
     const clockMs = color === 'w' ? whiteTimeMs : blackTimeMs;
@@ -2964,150 +3099,191 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
 
     return (
       <div
-        className="w-full px-2.5 py-1.5 rounded-lg border flex items-center justify-between gap-2 transition-colors"
+        className="w-full px-2.5 py-1.5 rounded-lg border flex flex-col gap-1 transition-colors"
         style={{
           backgroundColor: isTurn ? activeTheme.bgCard : activeTheme.bgSecondary,
           borderColor: isTurn ? activeTheme.borderActive : activeTheme.border
         }}
       >
-        <div className="flex items-center gap-2 min-w-0">
-          <div
-            className="w-7 h-7 rounded-md border flex items-center justify-center shrink-0 text-sm relative"
-            style={{
-              backgroundColor: isBotHere
-                ? `${selectedBot.accentColor}22`
-                : info.avatarIcon
-                ? 'rgba(15, 23, 42, 0.7)'
-                : color === 'w'
-                ? '#e2e8f0'
-                : '#0f172a',
-              borderColor: isTurn
-                ? isBotHere
-                  ? selectedBot.accentColor
-                  : activeTheme.accent
-                : 'rgba(255,255,255,0.14)'
-            }}
-          >
-            {isBotHere ? (
-              <span aria-hidden="true">{selectedBot.avatar}</span>
-            ) : info.avatarIcon ? (
-              <span aria-hidden="true">{info.avatarIcon}</span>
-            ) : (
-              <ChessPieceSvg piece={{ color, type: 'k' }} className="w-5 h-5" />
-            )}
-          </div>
-
-          <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
-            <span
-              className={`w-2.5 h-2.5 rounded-full shrink-0 border ${
-                color === 'w' ? 'bg-slate-100 border-slate-400' : 'bg-slate-900 border-slate-500'
-              }`}
-              title={color === 'w' ? 'White pieces' : 'Black pieces'}
-            />
-            <span className="text-xs font-bold text-white truncate max-w-[150px]">
-              {info.name}
-            </span>
-            {info.elo !== null && (
-              <span
-                className="text-[11px] font-mono font-bold tabular-nums shrink-0"
-                style={{
-                  color: isBotHere ? selectedBot.accentColor : '#94a3b8'
-                }}
-              >
-                ({info.elo})
-              </span>
-            )}
-            {inCheck && (
-              <span className="px-1 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[9px] font-extrabold shrink-0 leading-none">
-                CHECK
-              </span>
-            )}
-            {isThinkingHere && (
-              <span
-                className="text-[10px] font-semibold shrink-0"
-                style={{ color: selectedBot.accentColor }}
-              >
-                thinking...
-              </span>
-            )}
-            {hasPremoveHere && (
-              <button
-                type="button"
-                onClick={() => {
-                  setPremove(null);
-                  setPremoveFrom(null);
-                }}
-                className="px-1.5 py-0.5 rounded bg-rose-500/20 border border-rose-500/40 text-rose-300 text-[9px] font-bold flex items-center gap-0.5 cursor-pointer hover:bg-rose-500/30 shrink-0 leading-none"
-                title="Click to cancel premove"
-              >
-                <span>Premove</span>
-                <X className="w-2.5 h-2.5" />
-              </button>
-            )}
-            {capturedPieces.length > 0 && (
-              <div className="flex items-center gap-0.5 ml-1">
-                {capturedPieces.slice(0, 10).map((cp, idx) => (
-                  <div key={`${cp.type}-${idx}`} className="w-3 h-3 -mr-0.5">
-                    <ChessPieceSvg piece={cp} className="w-3 h-3" />
-                  </div>
-                ))}
-                {capturedPieces.length > 10 && (
-                  <span className="text-[9px] text-slate-400 ml-0.5">+{capturedPieces.length - 10}</span>
-                )}
-                {advantage > 0 && (
-                  <span className="text-[10px] font-mono font-bold text-slate-300 ml-1 tabular-nums">
-                    +{advantage}
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-1.5 shrink-0">
-          {mode === 'online' && info.connected === false && onlineRoomCode && (
-            <span className="text-[10px] font-semibold text-amber-400">offline</span>
-          )}
-          {showClock ? (
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <div
-              className={`px-2 py-0.5 rounded-md border font-mono text-xs font-extrabold tabular-nums flex items-center gap-1 transition-colors ${
-                isFlagged
-                  ? 'bg-rose-600/30 border-rose-500 text-rose-200'
-                  : isLowTime && isClockActive
-                  ? 'bg-rose-500/25 border-rose-400 text-rose-100 animate-pulse'
-                  : isClockActive
-                  ? 'text-white shadow-sm'
-                  : 'text-slate-400 bg-black/25'
-              }`}
+              className="w-7 h-7 rounded-md border flex items-center justify-center shrink-0 text-sm relative"
               style={{
-                backgroundColor:
-                  isClockActive && !isLowTime && !isFlagged ? activeTheme.accentBadge : undefined,
-                borderColor:
-                  isClockActive && !isLowTime && !isFlagged
-                    ? activeTheme.borderActive
-                    : !isFlagged && !isLowTime
-                    ? activeTheme.border
-                    : undefined
-              }}
-              aria-label={`${color === 'w' ? 'White' : 'Black'} clock`}
-            >
-              <Clock className="w-3 h-3 opacity-80" />
-              <span>{formatClockMs(clockMs)}</span>
-            </div>
-          ) : (
-            <span
-              className="w-2 h-2 rounded-sm transition-opacity"
-              style={{
-                backgroundColor: isTurn
-                  ? isBotHere
+                backgroundColor: isBotTeamHead
+                  ? `${selectedBot.accentColor}22`
+                  : info.avatarIcon
+                  ? 'rgba(15, 23, 42, 0.7)'
+                  : color === 'w'
+                  ? '#e2e8f0'
+                  : '#0f172a',
+                borderColor: isTurn
+                  ? isBotTeamHead
                     ? selectedBot.accentColor
                     : activeTheme.accent
-                  : 'rgba(148,163,184,0.22)'
+                  : 'rgba(255,255,255,0.14)'
               }}
-              aria-label={isTurn ? 'Active turn' : 'Waiting'}
-            />
-          )}
+            >
+              {isBotTeamHead ? (
+                <span aria-hidden="true">{selectedBot.avatar}</span>
+              ) : info.avatarIcon ? (
+                <span aria-hidden="true">{info.avatarIcon}</span>
+              ) : (
+                <ChessPieceSvg piece={{ color, type: 'k' }} className="w-5 h-5" />
+              )}
+            </div>
+
+            <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
+              <span
+                className={`w-2.5 h-2.5 rounded-full shrink-0 border ${
+                  color === 'w' ? 'bg-slate-100 border-slate-400' : 'bg-slate-900 border-slate-500'
+                }`}
+                title={color === 'w' ? 'White pieces' : 'Black pieces'}
+              />
+              <span className="text-xs font-bold text-white truncate max-w-[150px]">
+                {info.name}
+              </span>
+              {info.elo !== null && (
+                <span
+                  className="text-[11px] font-mono font-bold tabular-nums shrink-0"
+                  style={{
+                    color: isBotTeamHead ? selectedBot.accentColor : '#94a3b8'
+                  }}
+                >
+                  ({info.elo})
+                </span>
+              )}
+              {inCheck && (
+                <span className="px-1 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[9px] font-extrabold shrink-0 leading-none">
+                  CHECK
+                </span>
+              )}
+              {isThinkingHere && (
+                <span
+                  className="text-[10px] font-semibold shrink-0"
+                  style={{ color: activeBotInTeam?.accentColor || selectedBot.accentColor }}
+                >
+                  {activeBotInTeam ? `${activeBotInTeam.name} thinking...` : 'thinking...'}
+                </span>
+              )}
+              {hasPremoveHere && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPremove(null);
+                    setPremoveFrom(null);
+                  }}
+                  className="px-1.5 py-0.5 rounded bg-rose-500/20 border border-rose-500/40 text-rose-300 text-[9px] font-bold flex items-center gap-0.5 cursor-pointer hover:bg-rose-500/30 shrink-0 leading-none"
+                  title="Click to cancel premove"
+                >
+                  <span>Premove</span>
+                  <X className="w-2.5 h-2.5" />
+                </button>
+              )}
+              {capturedPieces.length > 0 && (
+                <div className="flex items-center gap-0.5 ml-1">
+                  {capturedPieces.slice(0, 10).map((cp, idx) => (
+                    <div key={`${cp.type}-${idx}`} className="w-3 h-3 -mr-0.5">
+                      <ChessPieceSvg piece={cp} className="w-3 h-3" />
+                    </div>
+                  ))}
+                  {capturedPieces.length > 10 && (
+                    <span className="text-[9px] text-slate-400 ml-0.5">+{capturedPieces.length - 10}</span>
+                  )}
+                  {advantage > 0 && (
+                    <span className="text-[10px] font-mono font-bold text-slate-300 ml-1 tabular-nums">
+                      +{advantage}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            {mode === 'online' && info.connected === false && onlineRoomCode && effectiveTeamSize === 1 && (
+              <span className="text-[10px] font-semibold text-amber-400">offline</span>
+            )}
+            {showClock ? (
+              <div
+                className={`px-2 py-0.5 rounded-md border font-mono text-xs font-extrabold tabular-nums flex items-center gap-1 transition-colors ${
+                  isFlagged
+                    ? 'bg-rose-600/30 border-rose-500 text-rose-200'
+                    : isLowTime && isClockActive
+                    ? 'bg-rose-500/25 border-rose-400 text-rose-100 animate-pulse'
+                    : isClockActive
+                    ? 'text-white shadow-sm'
+                    : 'text-slate-400 bg-black/25'
+                }`}
+                style={{
+                  backgroundColor:
+                    isClockActive && !isLowTime && !isFlagged ? activeTheme.accentBadge : undefined,
+                  borderColor:
+                    isClockActive && !isLowTime && !isFlagged
+                      ? activeTheme.borderActive
+                      : !isFlagged && !isLowTime
+                      ? activeTheme.border
+                      : undefined
+                }}
+                aria-label={`${color === 'w' ? 'White' : 'Black'} clock`}
+              >
+                <Clock className="w-3 h-3 opacity-80" />
+                <span>{formatClockMs(clockMs)}</span>
+              </div>
+            ) : (
+              <span
+                className="w-2 h-2 rounded-sm transition-opacity"
+                style={{
+                  backgroundColor: isTurn
+                    ? isBotTeamHead
+                      ? selectedBot.accentColor
+                      : activeTheme.accent
+                    : 'rgba(148,163,184,0.22)'
+                }}
+                aria-label={isTurn ? 'Active turn' : 'Waiting'}
+              />
+            )}
+          </div>
         </div>
+
+        {effectiveTeamSize > 1 && (
+          <div className="flex flex-wrap items-center gap-1 pt-1 border-t border-white/10">
+            <span className="text-[9px] font-mono uppercase text-slate-400 mr-0.5">
+              {effectiveTeamMode}
+            </span>
+            {teamSeats.map((seat, idx) => {
+              const isSlotActive = !isGameOver && isTurn && teamSeatIdx === idx;
+              const isSlotNext = !isGameOver && !isTurn && teamSeatIdx === idx;
+              const isMySeat = mode === 'online' && onlineMyColor === color && onlineTeamMeta?.mySeatIndex === idx;
+              const botMeta = seat.kind === 'bot' ? getBotById(seat.botId || selectedBot.id) : null;
+              const label =
+                seat.kind === 'bot'
+                  ? `${botMeta?.avatar || '🤖'} ${botMeta?.name || seat.name || 'Bot'}`
+                  : seat.kind === 'human'
+                  ? seat.uid
+                    ? resolvePersonByUid(seat.uid, seat.name).name
+                    : seat.name || `P${idx + 1}`
+                  : 'Open';
+              return (
+                <span
+                  key={`${color}-seat-${idx}`}
+                  className={`px-1.5 py-0.5 rounded border text-[10px] font-bold flex items-center gap-1 truncate max-w-[115px] ${
+                    isSlotActive
+                      ? 'bg-emerald-500/20 border-emerald-400 text-white'
+                      : isSlotNext
+                      ? 'bg-white/10 border-white/25 text-slate-200'
+                      : seat.kind === 'open'
+                      ? 'bg-black/25 border-dashed border-slate-600 text-slate-500'
+                      : 'bg-black/25 border-white/10 text-slate-300'
+                  }`}
+                >
+                  <span className="truncate">{label}</span>
+                  {isMySeat && <span className="text-[8px] font-mono text-emerald-400">YOU</span>}
+                </span>
+              );
+            })}
+          </div>
+        )}
       </div>
     );
   };
@@ -3115,9 +3291,18 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
   const rows = isFlipped ? [7, 6, 5, 4, 3, 2, 1, 0] : [0, 1, 2, 3, 4, 5, 6, 7];
   const cols = isFlipped ? [7, 6, 5, 4, 3, 2, 1, 0] : [0, 1, 2, 3, 4, 5, 6, 7];
   const endBanner = getEndBannerCopy();
+  const myChessVoteToken =
+    onlineMyColor === 'w' || onlineMyColor === 'b'
+      ? `${onlineMyColor}:${onlineTeamMeta?.mySeatIndex ?? 0}`
+      : null;
   const hasVotedRematch =
     (onlineMyColor === 'w' || onlineMyColor === 'b') &&
-    onlineRematchVotes.includes(onlineMyColor);
+    (onlineRematchVotes.includes(onlineMyColor) ||
+      (myChessVoteToken ? onlineRematchVotes.includes(myChessVoteToken) : false));
+  const requiredRematchVotes =
+    mode === 'online' && onlineTeamMeta && onlineTeamMeta.participantUids.length > 0
+      ? onlineTeamMeta.participantUids.length
+      : 2;
 
   return (
     <div
@@ -3214,44 +3399,6 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                       <span className="truncate">{onlineOpponentInfo.name}</span>
                     </span>
                   )}
-                  {onlineOpponentInfo?.uid && onlineOpponentInfo.uid !== myFirebaseUid && (
-                    <div className="flex items-center gap-1 shrink-0">
-                      <button
-                        type="button"
-                        disabled={callPhase !== 'idle'}
-                        onClick={() =>
-                          void startCall({
-                            peerUid: onlineOpponentInfo.uid,
-                            peerName: onlineOpponentInfo.name,
-                            peerAvatarId: onlineOpponentInfo.avatarId,
-                            mode: 'audio',
-                            contextLabel: `Chess · Room ${onlineRoomCode}`
-                          })
-                        }
-                        className="p-1 rounded-md bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/35 text-emerald-300 cursor-pointer disabled:opacity-40"
-                        title={`Voice call ${onlineOpponentInfo.name}`}
-                      >
-                        <Phone className="w-3 h-3" />
-                      </button>
-                      <button
-                        type="button"
-                        disabled={callPhase !== 'idle'}
-                        onClick={() =>
-                          void startCall({
-                            peerUid: onlineOpponentInfo.uid,
-                            peerName: onlineOpponentInfo.name,
-                            peerAvatarId: onlineOpponentInfo.avatarId,
-                            mode: 'video',
-                            contextLabel: `Chess · Room ${onlineRoomCode}`
-                          })
-                        }
-                        className="p-1 rounded-md bg-violet-500/15 hover:bg-violet-500/25 border border-violet-500/35 text-violet-300 cursor-pointer disabled:opacity-40"
-                        title={`Video call ${onlineOpponentInfo.name}`}
-                      >
-                        <Video className="w-3 h-3" />
-                      </button>
-                    </div>
-                  )}
                   {activeChessRoomInvite && (
                     <span className="text-[10px] font-semibold text-sky-300 truncate">
                       {activeChessRoomInvite.fromUid === myFirebaseUid
@@ -3275,19 +3422,6 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
             </div>
 
             <div className="flex items-center gap-1 shrink-0">
-              <button
-                type="button"
-                onClick={() => navigateSpace('leaderboard')}
-                className="px-2 py-1 rounded-md border text-[10px] font-bold text-amber-300 hover:text-amber-200 hover:bg-white/5 cursor-pointer flex items-center gap-1"
-                style={{
-                  backgroundColor: activeTheme.bgSecondary,
-                  borderColor: activeTheme.border
-                }}
-                title="Open PvP ELO Leaderboard"
-              >
-                <Trophy className="w-3 h-3" />
-                <span className="hidden sm:inline">Ranks</span>
-              </button>
               <button
                 type="button"
                 onClick={() => setAnalysisEnabled(a => !a)}
@@ -3730,31 +3864,6 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                     </div>
                     <h3 className="text-lg font-extrabold text-white">{endBanner.title}</h3>
                     <p className="text-xs text-slate-300 leading-relaxed">{endBanner.subtitle}</p>
-                    {mode === 'online' && lastEloResult && (
-                      <button
-                        type="button"
-                        onClick={() => navigateSpace('leaderboard')}
-                        className="px-3 py-1 rounded-xl border text-[11px] font-mono font-extrabold flex items-center gap-1.5 cursor-pointer hover:brightness-110"
-                        style={{
-                          backgroundColor:
-                            lastEloResult.myCategoryDelta >= 0
-                              ? 'rgba(16, 185, 129, 0.16)'
-                              : 'rgba(244, 63, 94, 0.16)',
-                          borderColor:
-                            lastEloResult.myCategoryDelta >= 0
-                              ? 'rgba(16, 185, 129, 0.45)'
-                              : 'rgba(244, 63, 94, 0.45)',
-                          color: lastEloResult.myCategoryDelta >= 0 ? '#6ee7b7' : '#fda4af'
-                        }}
-                      >
-                        <Trophy className="w-3 h-3" />
-                        <span>
-                          Chess ELO: {lastEloResult.myNewCategoryElo} (
-                          {lastEloResult.myCategoryDelta >= 0 ? '+' : ''}
-                          {lastEloResult.myCategoryDelta})
-                        </span>
-                      </button>
-                    )}
                     <div className="flex items-center gap-2.5 w-full mt-2">
                       {mode === 'online' ? (
                         onlineMyColor !== 'spectator' && (
@@ -3767,9 +3876,9 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                           >
                             <RefreshCw className="w-3.5 h-3.5" />
                             {hasVotedRematch
-                              ? `Waiting (${onlineRematchVotes.length}/2)`
+                              ? `Waiting (${onlineRematchVotes.length}/${requiredRematchVotes})`
                               : onlineRematchVotes.length > 0
-                              ? 'Accept Rematch (1/2)'
+                              ? `Accept Rematch (${onlineRematchVotes.length}/${requiredRematchVotes})`
                               : 'Rematch'}
                           </button>
                         )
@@ -3971,7 +4080,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
               style={{ backgroundColor: mode === 'pvp' ? activeTheme.accent : undefined }}
             >
               <Users className="w-3 h-3" />
-              2P Local
+              {teamMode === '1v1' ? '2P Local' : `Local ${teamMode}`}
             </button>
             <button
               type="button"
@@ -3985,6 +4094,42 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
               Room Code
             </button>
           </div>
+
+          {/* Format Toggle (1v1 / 2v2 / 3v3 Team Relay) */}
+          {(mode !== 'online' || !onlineRoomCode) && (
+            <div
+              className="px-2 py-1 rounded-lg border flex items-center justify-between gap-2"
+              style={{
+                backgroundColor: activeTheme.bgSecondary,
+                borderColor: activeTheme.border
+              }}
+            >
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 shrink-0">
+                Format
+              </span>
+              <div className="grid grid-cols-3 gap-1 flex-1">
+                {(['1v1', '2v2', '3v3'] as TeamMode[]).map(fmt => {
+                  const active = teamMode === fmt;
+                  return (
+                    <button
+                      key={fmt}
+                      type="button"
+                      onClick={() => handleSelectTeamMode(fmt)}
+                      className={`py-0.5 rounded border text-[10px] font-extrabold cursor-pointer transition-colors ${
+                        active ? 'text-black' : 'text-slate-300 hover:text-white'
+                      }`}
+                      style={{
+                        backgroundColor: active ? activeTheme.accent : 'rgba(0,0,0,0.2)',
+                        borderColor: active ? activeTheme.accent : activeTheme.border
+                      }}
+                    >
+                      {fmt}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Live Detected Opening Card (compact single row) */}
           <div
@@ -4113,6 +4258,37 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                   </p>
                 </div>
               </div>
+
+              {teamMode !== '1v1' && (
+                <div className="grid grid-cols-2 gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setAiSquadMode('allies')}
+                    className={`py-1 px-2 rounded border text-[10px] font-bold cursor-pointer ${
+                      aiSquadMode === 'allies' ? 'text-black' : 'text-slate-300 hover:text-white'
+                    }`}
+                    style={{
+                      backgroundColor: aiSquadMode === 'allies' ? activeTheme.accent : activeTheme.bgSecondary,
+                      borderColor: aiSquadMode === 'allies' ? activeTheme.accent : activeTheme.border
+                    }}
+                  >
+                    You + Ally Bots vs Bots
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAiSquadMode('solo')}
+                    className={`py-1 px-2 rounded border text-[10px] font-bold cursor-pointer ${
+                      aiSquadMode === 'solo' ? 'text-black' : 'text-slate-300 hover:text-white'
+                    }`}
+                    style={{
+                      backgroundColor: aiSquadMode === 'solo' ? activeTheme.accent : activeTheme.bgSecondary,
+                      borderColor: aiSquadMode === 'solo' ? activeTheme.accent : activeTheme.border
+                    }}
+                  >
+                    Solo vs {getTeamSize(teamMode)} Bots
+                  </button>
+                </div>
+              )}
 
               {/* Filter Tiers + Random + Play As on a tight bar */}
               <div className="flex items-center gap-1">
@@ -4317,6 +4493,26 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                     </div>
                   </div>
 
+                  {teamMode !== '1v1' && (
+                    <button
+                      type="button"
+                      onClick={() => setFillRoomWithBots(v => !v)}
+                      className="px-2.5 py-1.5 rounded border flex items-center justify-between text-[11px] font-bold cursor-pointer transition-colors"
+                      style={{
+                        backgroundColor: fillRoomWithBots ? activeTheme.accentBadge : 'rgba(0,0,0,0.2)',
+                        borderColor: fillRoomWithBots ? activeTheme.borderActive : activeTheme.border
+                      }}
+                    >
+                      <span className="flex items-center gap-1.5 text-slate-200">
+                        <Bot className="w-3 h-3" style={{ color: activeTheme.accent }} />
+                        <span>Pre-fill empty seats with AI bots</span>
+                      </span>
+                      <span className={fillRoomWithBots ? 'text-emerald-400 font-mono' : 'text-slate-400 font-mono'}>
+                        {fillRoomWithBots ? 'ON' : 'OFF'}
+                      </span>
+                    </button>
+                  )}
+
                   <button
                     type="button"
                     onClick={handleCreateRoom}
@@ -4324,7 +4520,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                     className="w-full py-1.5 px-3 rounded-lg text-black font-extrabold text-xs cursor-pointer shadow-sm hover:opacity-95 disabled:opacity-60"
                     style={{ backgroundColor: activeTheme.accent }}
                   >
-                    {wsStatus === 'connecting' ? 'Connecting...' : 'Create Room Code'}
+                    {wsStatus === 'connecting' ? 'Connecting...' : `Create ${teamMode} Room Code`}
                   </button>
 
                   <div className="flex items-center gap-1.5 pt-1 border-t border-white/10">
@@ -4359,60 +4555,112 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                     borderColor: activeTheme.borderActive
                   }}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <div>
-                      <div className="text-[10px] text-slate-400">Room Code</div>
-                      <div className="text-lg font-mono font-extrabold tracking-widest text-white select-all">
-                        {onlineRoomCode}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => handleCopyRoom('code')}
-                        className="px-2 py-1 rounded border text-[10px] font-bold text-slate-200 hover:bg-white/10 cursor-pointer flex items-center gap-1"
-                        style={{ borderColor: activeTheme.border }}
-                        title="Copy Room Code"
-                      >
-                        {copiedType === 'code' ? (
-                          <Check className="w-3 h-3 text-emerald-400" />
-                        ) : (
-                          <Copy className="w-3 h-3" />
-                        )}
-                        <span>{copiedType === 'code' ? 'Copied' : 'Code'}</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleCopyRoom('link')}
-                        className="px-2 py-1 rounded border text-[10px] font-bold text-slate-200 hover:bg-white/10 cursor-pointer flex items-center gap-1"
-                        style={{ borderColor: activeTheme.border }}
-                        title="Copy Direct Invite Link"
-                      >
-                        {copiedType === 'link' ? (
-                          <Check className="w-3 h-3 text-emerald-400" />
-                        ) : (
-                          <Link2 className="w-3 h-3" />
-                        )}
-                        <span>{copiedType === 'link' ? 'Copied' : 'Link'}</span>
-                      </button>
-                    </div>
-                  </div>
+                  {(() => {
+                    const filledCount =
+                      activeWhiteSeats.filter(s => s.kind !== 'open').length +
+                      activeBlackSeats.filter(s => s.kind !== 'open').length;
+                    const totalCount = effectiveTeamSize * 2;
+                    const hasOpen = filledCount < totalCount;
+                    const hasBots = [...activeWhiteSeats, ...activeBlackSeats].some(s => s.kind === 'bot');
+                    const canSwitch = moveHistory.length === 0 && (onlineMyColor === 'w' || onlineMyColor === 'b');
+                    const otherColor: PieceColor = onlineMyColor === 'w' ? 'b' : 'w';
+                    const otherList = otherColor === 'w' ? activeWhiteSeats : activeBlackSeats;
+                    const otherHasRoom = otherList.some(s => s.kind === 'open' || s.kind === 'bot');
+                    return (
+                      <>
+                        <div className="flex items-center justify-between gap-2">
+                          <div>
+                            <div className="text-[10px] text-slate-400">
+                              {effectiveTeamMode} Room Code
+                            </div>
+                            <div className="text-lg font-mono font-extrabold tracking-widest text-white select-all">
+                              {onlineRoomCode}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => handleCopyRoom('code')}
+                              className="px-2 py-1 rounded border text-[10px] font-bold text-slate-200 hover:bg-white/10 cursor-pointer flex items-center gap-1"
+                              style={{ borderColor: activeTheme.border }}
+                              title="Copy Room Code"
+                            >
+                              {copiedType === 'code' ? (
+                                <Check className="w-3 h-3 text-emerald-400" />
+                              ) : (
+                                <Copy className="w-3 h-3" />
+                              )}
+                              <span>{copiedType === 'code' ? 'Copied' : 'Code'}</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyRoom('link')}
+                              className="px-2 py-1 rounded border text-[10px] font-bold text-slate-200 hover:bg-white/10 cursor-pointer flex items-center gap-1"
+                              style={{ borderColor: activeTheme.border }}
+                              title="Copy Direct Invite Link"
+                            >
+                              {copiedType === 'link' ? (
+                                <Check className="w-3 h-3 text-emerald-400" />
+                              ) : (
+                                <Link2 className="w-3 h-3" />
+                              )}
+                              <span>{copiedType === 'link' ? 'Copied' : 'Link'}</span>
+                            </button>
+                          </div>
+                        </div>
 
-                  <div className="text-[10px] text-slate-300 flex items-center justify-between pt-1 border-t border-white/10">
-                    <span>
-                      {onlinePlayers.w && onlinePlayers.b
-                        ? 'Both players connected'
-                        : 'Waiting for friend to join...'}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={handleLeaveRoom}
-                      className="text-rose-400 hover:text-rose-300 font-bold flex items-center gap-1 cursor-pointer"
-                    >
-                      <LogOut className="w-3 h-3" />
-                      Leave
-                    </button>
-                  </div>
+                        {(hasOpen || (hasBots && moveHistory.length === 0) || (canSwitch && otherHasRoom)) && (
+                          <div className="flex flex-wrap gap-1 pt-1 border-t border-white/10">
+                            {canSwitch && otherHasRoom && (
+                              <button
+                                type="button"
+                                onClick={() => handleSwitchOnlineSide(otherColor)}
+                                className="flex-1 py-1 px-2 rounded border text-[10px] font-bold text-white hover:bg-white/10 cursor-pointer"
+                                style={{ borderColor: activeTheme.border }}
+                              >
+                                Switch to {otherColor === 'w' ? 'White' : 'Black'}
+                              </button>
+                            )}
+                            {hasOpen && (
+                              <button
+                                type="button"
+                                onClick={handleFillOnlineBots}
+                                className="flex-1 py-1 px-2 rounded border text-[10px] font-extrabold text-black cursor-pointer hover:brightness-110 flex items-center justify-center gap-1"
+                                style={{ backgroundColor: activeTheme.accent, borderColor: activeTheme.accent }}
+                              >
+                                <Bot className="w-3 h-3" />
+                                <span>Fill w/ Bots</span>
+                              </button>
+                            )}
+                            {hasBots && moveHistory.length === 0 && (
+                              <button
+                                type="button"
+                                onClick={handleClearOnlineBots}
+                                className="py-1 px-2 rounded border text-[10px] font-bold text-slate-300 hover:text-white hover:bg-white/10 cursor-pointer"
+                                style={{ borderColor: activeTheme.border }}
+                              >
+                                Clear Bots
+                              </button>
+                            )}
+                          </div>
+                        )}
+
+                        <div className="text-[10px] text-slate-300 flex items-center justify-between pt-1 border-t border-white/10">
+                          <span>
+                            {filledCount}/{totalCount} seated
+                          </span>
+                          <button
+                            type="button"
+                            onClick={handleLeaveRoom}
+                            className="text-rose-400 hover:text-rose-300 font-bold flex items-center gap-1 cursor-pointer"
+                          >
+                            <LogOut className="w-3 h-3" />
+                            Leave
+                          </button>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
               )}
 
@@ -4456,7 +4704,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
               )}
 
               {/* 1-Click Direct Friend Invites (No Code Needed) */}
-              {(!onlineRoomCode || !(onlinePlayers.w && onlinePlayers.b)) && invitableChessPlayers.length > 0 && (
+              {(!onlineRoomCode || [...activeWhiteSeats, ...activeBlackSeats].some(s => s.kind === 'open')) && invitableChessPlayers.length > 0 && (
                 <div
                   className="p-2 rounded-lg border flex flex-col gap-1.5"
                   style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
@@ -4599,7 +4847,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                     style={{ backgroundColor: activeTheme.accent }}
                   >
                     {hasVotedRematch
-                      ? `Wait (${onlineRematchVotes.length}/2)`
+                      ? `Wait (${onlineRematchVotes.length}/${requiredRematchVotes})`
                       : 'Rematch'}
                   </button>
                 )

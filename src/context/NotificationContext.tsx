@@ -30,7 +30,7 @@ import type { PieceColor } from '../utils/chessEngine';
 import type { ArcadeGameType, ArcadePlayer } from '../utils/arcadeEngines';
 import { getArcadeGameMeta } from '../utils/arcadeEngines';
 
-export type AppSpaceType = 'home' | 'games' | 'apps' | 'music' | 'chess' | 'rooms' | 'leaderboard' | 'tools' | 'saved';
+export type AppSpaceType = 'home' | 'games' | 'apps' | 'music' | 'chess' | 'rooms' | 'tools' | 'saved';
 
 export interface ChatPeerTarget {
   userId: string;
@@ -88,7 +88,6 @@ interface NotificationContextValue {
   setTrackedArcadeRoom: (room: TrackedArcadeRoom | null) => void;
   openChatWithPeer: (peer: ChatPeerTarget) => void;
   openGameRoom: (space: 'chess' | 'rooms', code?: string) => void;
-  navigateSpace: (space: AppSpaceType) => void;
   acceptGameInvite: (invite: GameInvite) => Promise<void>;
   declineGameInvite: (invite: GameInvite) => Promise<void>;
   pushTurnToast: (params: { space: 'chess' | 'rooms'; title: string; body: string; roomCode?: string }) => void;
@@ -604,7 +603,6 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       setTrackedArcadeRoom,
       openChatWithPeer,
       openGameRoom,
-      navigateSpace: onNavigateSpace,
       acceptGameInvite,
       declineGameInvite,
       pushTurnToast
@@ -628,7 +626,6 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       setTrackedArcadeRoom,
       openChatWithPeer,
       openGameRoom,
-      onNavigateSpace,
       acceptGameInvite,
       declineGameInvite,
       pushTurnToast

@@ -1,8 +1,4 @@
 import {
-  BATCH2_ARCADE_GAMES,
-  EXTENDED_ARCADE_GAMES
-} from './arcadeExtendedTypes.ts';
-import type {
   ArcadeBot,
   ArcadeBotDifficulty,
   ArcadeGameCategory,
@@ -10,84 +6,29 @@ import type {
   ArcadeGameType,
   ArcadePlayer,
   ArcadeWinner,
+  BATCH2_ARCADE_GAMES,
   BaseArcadeGameType,
   Batch2ArcadeState,
+  EXTENDED_ARCADE_GAMES,
   ExtendedArcadeGameType,
   ExtendedArcadeState
-} from './arcadeExtendedTypes.ts';
+} from './arcadeExtendedTypes';
 import {
   applyExtendedArcadeAction,
   createExtendedInitialState,
   getExtendedLegalActions,
   isExtendedArcadeGameType,
   pickExtendedBotAction
-} from './arcadeExtendedEngines.ts';
+} from './arcadeExtendedEngines';
 import {
   applyBatch2ArcadeAction,
   createBatch2InitialState,
   getBatch2LegalActions,
   isBatch2ArcadeGameType,
   pickBatch2BotAction
-} from './arcadeBatch2Engines.ts';
+} from './arcadeBatch2Engines';
 
-export {
-  BATCH2_ARCADE_GAMES,
-  PIXEL_DRAW_COLORS,
-  PIXEL_WORD_BANK,
-  EMOJI_CHARADES_LIST,
-  EMOJI_PALETTE,
-  WORDLE_5_WORDS,
-  HANGMAN_WORDS,
-  MASTERMIND_COLORS,
-  WORD_CHAIN_SEEDS,
-  WORD_CHAIN_BOT_DICT,
-  EXTENDED_ARCADE_GAMES
-} from './arcadeExtendedTypes.ts';
-export type {
-  Batch2ArcadeGameType,
-  Batch2ArcadeState,
-  BaseArcadeGameType,
-  ExtendedArcadeGameType,
-  ArcadeGameType,
-  ArcadePlayer,
-  ArcadeWinner,
-  ArcadeBotDifficulty,
-  ArcadeGameCategory,
-  ArcadeGameMeta,
-  ArcadeBot,
-  PixelGuessState,
-  EmojiCharadesState,
-  NimState,
-  MisereNimState,
-  ChompState,
-  HexState,
-  GridLink4State,
-  OrderChaosState,
-  MisereTTTState,
-  Gravity5State,
-  SnortState,
-  ColClashState,
-  DomineeringState,
-  CramState,
-  ObstructionState,
-  AtaxxState,
-  BreakthroughState,
-  KingsEscapeState,
-  WordleDuelState,
-  HangmanDuelState,
-  MastermindState,
-  HiLoTargetState,
-  WordChainState,
-  Blackjack21State,
-  YachtDiceState,
-  TugOfWarState,
-  RpsChoice,
-  RpsArenaState,
-  PenaltyKickState,
-  MinesDuelState,
-  SosGridState,
-  ExtendedArcadeState
-} from './arcadeExtendedTypes.ts';
+export * from './arcadeExtendedTypes';
 export {
   isExtendedArcadeGameType,
   createExtendedInitialState,
@@ -98,14 +39,14 @@ export {
   cardValue21,
   formatCardLabel,
   scoreYachtCategory
-} from './arcadeExtendedEngines.ts';
+} from './arcadeExtendedEngines';
 export {
   isBatch2ArcadeGameType,
   createBatch2InitialState,
   getBatch2LegalActions,
   applyBatch2ArcadeAction,
   pickBatch2BotAction
-} from './arcadeBatch2Engines.ts';
+} from './arcadeBatch2Engines';
 
 export const BASE_ARCADE_GAMES: ArcadeGameMeta[] = [
   {
