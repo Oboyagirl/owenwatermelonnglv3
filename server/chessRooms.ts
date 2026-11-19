@@ -3,7 +3,9 @@ import type express from 'express';
 import { WebSocketServer, WebSocket } from 'ws';
 import {
   applyMove,
+  chooseBotMove,
   createInitialState,
+  getBotById,
   getLegalMoves,
   getTimeControlById,
   hasOnlyInsufficientMaterialForSide
@@ -15,8 +17,21 @@ import type {
   PieceColor,
   PromotionPieceType
 } from '../src/utils/chessEngine.ts';
+import {
+  areAllSeatsFilled,
+  clearBotSeats,
+  collectParticipantUids,
+  createEmptySeats,
+  createHumanSeat,
+  fillOpenSeatsWithChessBots,
+  getActiveChessSeatIndex,
+  getTeamSize,
+  normalizeTeamMode,
+  summarizeTeamDisplayName
+} from '../src/utils/teamModes.ts';
+import type { TeamMode, TeamSeat } from '../src/utils/teamModes.ts';
 
-interface RoomSeat {
+interface WsChessSlot {
   id: string;
   name: string;
   elo: number;
@@ -25,10 +40,12 @@ interface RoomSeat {
 
 interface ChessRoom {
   code: string;
+  teamMode: TeamMode;
   state: ChessState;
   history: MoveRecord[];
-  white: RoomSeat | null;
-  black: RoomSeat | null;
+  whiteSeats: TeamSeat[];
+  blackSeats: TeamSeat[];
+  sockets: Map<string, WsChessSlot>;
   spectators: Map<string, WebSocket>;
   resignedWinner: PieceColor | null;
   timeoutWinner: PieceColor | 'draw' | null;
@@ -38,7 +55,8 @@ interface ChessRoom {
   whiteTimeMs: number;
   blackTimeMs: number;
   clockLastTickAt: number | null;
-  rematchVotes: Set<PieceColor>;
+  rematchVotes: Set<string>;
+  botTimer: ReturnType<typeof setTimeout> | null;
   createdAt: number;
   lastActivityAt: number;
 }
@@ -79,6 +97,33 @@ function isRoomGameOver(room: ChessRoom): boolean {
     room.state.status === 'draw_fifty_move' ||
     room.state.status === 'draw_insufficient_material'
   );
+}
+
+function findChessHumanSeat(
+  room: ChessRoom,
+  playerId: string
+): { color: PieceColor; index: number; seat: TeamSeat } | null {
+  for (let i = 0; i < room.whiteSeats.length; i++) {
+    const s = room.whiteSeats[i];
+    if (s.kind === 'human' && (s.playerId === playerId || s.uid === playerId)) {
+      return { color: 'w', index: i, seat: s };
+    }
+  }
+  for (let i = 0; i < room.blackSeats.length; i++) {
+    const s = room.blackSeats[i];
+    if (s.kind === 'human' && (s.playerId === playerId || s.uid === playerId)) {
+      return { color: 'b', index: i, seat: s };
+    }
+  }
+  return null;
+}
+
+function getAllChessHumanIds(room: ChessRoom): string[] {
+  const ids = new Set<string>();
+  for (const s of [...room.whiteSeats, ...room.blackSeats]) {
+    if (s.kind === 'human' && s.playerId) ids.add(s.playerId);
+  }
+  return Array.from(ids);
 }
 
 function syncRoomClockNow(room: ChessRoom, now: number): boolean {
@@ -125,15 +170,17 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
 
   const wss = new WebSocketServer({ noServer: true });
 
-  // Clean up idle rooms after 45 minutes of inactivity
   setInterval(() => {
     const cutoff = Date.now() - 45 * 60 * 1000;
     for (const [code, room] of rooms.entries()) {
-      const hasOpenSocket =
-        room.white?.ws?.readyState === WebSocket.OPEN ||
-        room.black?.ws?.readyState === WebSocket.OPEN ||
-        Array.from(room.spectators.values()).some(s => s.readyState === WebSocket.OPEN);
-      if (!hasOpenSocket && room.lastActivityAt < cutoff) {
+      const hasOpenHuman = Array.from(room.sockets.values()).some(
+        s => s.ws?.readyState === WebSocket.OPEN
+      );
+      const hasOpenSpec = Array.from(room.spectators.values()).some(
+        s => s.readyState === WebSocket.OPEN
+      );
+      if (!hasOpenHuman && !hasOpenSpec && room.lastActivityAt < cutoff) {
+        if (room.botTimer) clearTimeout(room.botTimer);
         rooms.delete(code);
       }
     }
@@ -149,19 +196,23 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
     return res.json({
       exists: true,
       code: room.code,
+      teamMode: room.teamMode,
       timeControlId: room.timeControlId,
-      hasWhite: Boolean(room.white),
-      hasBlack: Boolean(room.black),
+      hasWhite: room.whiteSeats.some(s => s.kind !== 'open'),
+      hasBlack: room.blackSeats.some(s => s.kind !== 'open'),
       moveCount: room.history.length
     });
   });
 
   const buildSyncPayload = (room: ChessRoom, recipientPlayerId?: string) => {
-    let myColor: PieceColor | 'spectator' = 'spectator';
-    if (recipientPlayerId) {
-      if (room.white?.id === recipientPlayerId) myColor = 'w';
-      else if (room.black?.id === recipientPlayerId) myColor = 'b';
-    }
+    const teamSize = getTeamSize(room.teamMode);
+    const match = recipientPlayerId ? findChessHumanSeat(room, recipientPlayerId) : null;
+    const myColor: PieceColor | 'spectator' = match ? match.color : 'spectator';
+    const mySeatIndex = match ? match.index : null;
+    const activeSeatIndex = getActiveChessSeatIndex(room.history.length, room.state.turn, teamSize);
+    const activeSeat =
+      (room.state.turn === 'w' ? room.whiteSeats : room.blackSeats)[activeSeatIndex] || null;
+
     const now = Date.now();
     let whiteTimeMs = room.whiteTimeMs;
     let blackTimeMs = room.blackTimeMs;
@@ -180,15 +231,32 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
       }
     }
 
+    const wFilled = room.whiteSeats.some(s => s.kind !== 'open');
+    const bFilled = room.blackSeats.some(s => s.kind !== 'open');
+    const wConnected = room.whiteSeats.some(
+      s => s.kind === 'bot' || (s.kind === 'human' && s.playerId && room.sockets.get(s.playerId)?.ws?.readyState === WebSocket.OPEN)
+    );
+    const bConnected = room.blackSeats.some(
+      s => s.kind === 'bot' || (s.kind === 'human' && s.playerId && room.sockets.get(s.playerId)?.ws?.readyState === WebSocket.OPEN)
+    );
+
     return {
       type: 'room:sync',
       code: room.code,
+      teamMode: room.teamMode,
       myColor,
+      mySeatIndex,
       state: room.state,
       history: room.history,
       resignedWinner: room.resignedWinner,
       timeoutWinner: room.timeoutWinner,
       rematchVotes: Array.from(room.rematchVotes),
+      participantUids: collectParticipantUids(room.whiteSeats, room.blackSeats),
+      whiteSeats: room.whiteSeats,
+      blackSeats: room.blackSeats,
+      activeSeatIndex,
+      activeSeat,
+      botRunnerUid: null,
       clock: {
         timeControlId: room.timeControlId,
         baseMs: room.baseMs,
@@ -200,18 +268,18 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
         timeoutWinner: room.timeoutWinner
       },
       players: {
-        w: room.white
+        w: wFilled
           ? {
-              name: room.white.name,
-              elo: room.white.elo,
-              connected: room.white.ws?.readyState === WebSocket.OPEN
+              name: summarizeTeamDisplayName(room.whiteSeats, 'White'),
+              elo: 1200,
+              connected: wConnected
             }
           : null,
-        b: room.black
+        b: bFilled
           ? {
-              name: room.black.name,
-              elo: room.black.elo,
-              connected: room.black.ws?.readyState === WebSocket.OPEN
+              name: summarizeTeamDisplayName(room.blackSeats, 'Black'),
+              elo: 1200,
+              connected: bConnected
             }
           : null
       }
@@ -227,18 +295,72 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
   };
 
   const broadcastRoom = (room: ChessRoom) => {
-    if (room.white?.ws) {
-      sendJson(room.white.ws, buildSyncPayload(room, room.white.id));
-    }
-    if (room.black?.ws) {
-      sendJson(room.black.ws, buildSyncPayload(room, room.black.id));
+    for (const [pId, slot] of room.sockets.entries()) {
+      if (slot.ws) {
+        sendJson(slot.ws, buildSyncPayload(room, pId));
+      }
     }
     for (const [specId, ws] of room.spectators.entries()) {
       sendJson(ws, buildSyncPayload(room, specId));
     }
+    scheduleBotTurnIfNeeded(room);
   };
 
-  // Authoritative 250ms timeout watcher for active timed rooms
+  const scheduleBotTurnIfNeeded = (room: ChessRoom) => {
+    if (room.botTimer) {
+      clearTimeout(room.botTimer);
+      room.botTimer = null;
+    }
+    if (isRoomGameOver(room) || !areAllSeatsFilled(room.whiteSeats, room.blackSeats)) {
+      return;
+    }
+    const teamSize = getTeamSize(room.teamMode);
+    const activeIdx = getActiveChessSeatIndex(room.history.length, room.state.turn, teamSize);
+    const activeSeat = (room.state.turn === 'w' ? room.whiteSeats : room.blackSeats)[activeIdx];
+    if (!activeSeat || activeSeat.kind !== 'bot') return;
+
+    room.botTimer = setTimeout(() => {
+      room.botTimer = null;
+      const now = Date.now();
+      if (syncRoomClockNow(room, now)) {
+        broadcastRoom(room);
+        return;
+      }
+      if (isRoomGameOver(room) || !areAllSeatsFilled(room.whiteSeats, room.blackSeats)) return;
+      const idxNow = getActiveChessSeatIndex(room.history.length, room.state.turn, teamSize);
+      const seatNow = (room.state.turn === 'w' ? room.whiteSeats : room.blackSeats)[idxNow];
+      if (!seatNow || seatNow.kind !== 'bot') return;
+
+      const bot = getBotById(seatNow.botId || 'pixel');
+      const remainingMs =
+        room.baseMs > 0
+          ? room.state.turn === 'w'
+            ? room.whiteTimeMs
+            : room.blackTimeMs
+          : undefined;
+      const decision = chooseBotMove(room.state, bot, room.history, remainingMs);
+      if (!decision.move) return;
+
+      const moverColor = room.state.turn;
+      const wasClockRunning = room.history.length >= 1 && room.clockLastTickAt !== null;
+      const { nextState, record } = applyMove(room.state, decision.move);
+      room.state = nextState;
+      room.history = [...room.history, record];
+      room.rematchVotes.clear();
+      room.lastActivityAt = now;
+
+      if (room.baseMs > 0) {
+        if (wasClockRunning && room.incMs > 0) {
+          if (moverColor === 'w') room.whiteTimeMs += room.incMs;
+          else room.blackTimeMs += room.incMs;
+        }
+        room.clockLastTickAt = isRoomGameOver(room) ? null : now;
+      }
+
+      broadcastRoom(room);
+    }, 360);
+  };
+
   setInterval(() => {
     const now = Date.now();
     for (const room of rooms.values()) {
@@ -263,17 +385,16 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
       return;
     }
     let changed = false;
-    if (room.white?.ws === ws) {
-      room.white.ws = null;
-      changed = true;
-    }
-    if (room.black?.ws === ws) {
-      room.black.ws = null;
-      changed = true;
-    }
-    if (meta.playerId && room.spectators.get(meta.playerId) === ws) {
-      room.spectators.delete(meta.playerId);
-      changed = true;
+    if (meta.playerId) {
+      const slot = room.sockets.get(meta.playerId);
+      if (slot && slot.ws === ws) {
+        slot.ws = null;
+        changed = true;
+      }
+      if (room.spectators.get(meta.playerId) === ws) {
+        room.spectators.delete(meta.playerId);
+        changed = true;
+      }
     }
     wsMeta.delete(ws);
     if (changed) {
@@ -319,7 +440,8 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
         detachFromCurrentRoom(ws);
         const code = generateRoomCode(rooms);
         const playerName = sanitizeName(msg.playerName);
-        const pref =
+        const teamMode: TeamMode = normalizeTeamMode(msg.teamMode);
+        const pref: PieceColor =
           msg.preferredColor === 'b'
             ? 'b'
             : msg.preferredColor === 'random'
@@ -330,13 +452,34 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
         const tc = getTimeControlById(
           typeof msg.timeControlId === 'string' ? msg.timeControlId : 'none'
         );
-        const seat: RoomSeat = { id: playerId, name: playerName, elo: 1200, ws };
+
+        let whiteSeats = createEmptySeats(teamMode);
+        let blackSeats = createEmptySeats(teamMode);
+        const creatorSeat = createHumanSeat({ uid: null, playerId, name: playerName });
+        if (pref === 'w') whiteSeats[0] = creatorSeat;
+        else blackSeats[0] = creatorSeat;
+
+        if (msg.fillBots) {
+          const filled = fillOpenSeatsWithChessBots(
+            whiteSeats,
+            blackSeats,
+            typeof msg.primaryBotId === 'string' ? msg.primaryBotId : 'pixel'
+          );
+          whiteSeats = filled.whiteSeats;
+          blackSeats = filled.blackSeats;
+        }
+
+        const sockets = new Map<string, WsChessSlot>();
+        sockets.set(playerId, { id: playerId, name: playerName, elo: 1200, ws });
+
         const room: ChessRoom = {
           code,
+          teamMode,
           state: createInitialState(),
           history: [],
-          white: pref === 'w' ? seat : null,
-          black: pref === 'b' ? seat : null,
+          whiteSeats,
+          blackSeats,
+          sockets,
           spectators: new Map(),
           resignedWinner: null,
           timeoutWinner: null,
@@ -347,6 +490,7 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
           blackTimeMs: tc.baseMs,
           clockLastTickAt: null,
           rematchVotes: new Set(),
+          botTimer: null,
           createdAt: Date.now(),
           lastActivityAt: Date.now()
         };
@@ -370,18 +514,59 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
         const playerName = sanitizeName(msg.playerName);
         room.lastActivityAt = Date.now();
 
-        if (room.white?.id === playerId) {
-          room.white.ws = ws;
-          room.white.name = playerName;
-        } else if (room.black?.id === playerId) {
-          room.black.ws = ws;
-          room.black.name = playerName;
-        } else if (!room.white) {
-          room.white = { id: playerId, name: playerName, elo: 1200, ws };
-        } else if (!room.black) {
-          room.black = { id: playerId, name: playerName, elo: 1200, ws };
+        const existing = findChessHumanSeat(room, playerId);
+        if (existing) {
+          existing.seat.name = playerName;
+          room.sockets.set(playerId, { id: playerId, name: playerName, elo: 1200, ws });
         } else {
-          room.spectators.set(playerId, ws);
+          const wOpen = room.whiteSeats.findIndex(s => s.kind === 'open');
+          const bOpen = room.blackSeats.findIndex(s => s.kind === 'open');
+          const wFilled = room.whiteSeats.filter(s => s.kind !== 'open').length;
+          const bFilled = room.blackSeats.filter(s => s.kind !== 'open').length;
+
+          let chosenColor: PieceColor | null = null;
+          let chosenIdx = -1;
+
+          if (msg.preferredTeam === 'w' && wOpen >= 0) {
+            chosenColor = 'w';
+            chosenIdx = wOpen;
+          } else if (msg.preferredTeam === 'b' && bOpen >= 0) {
+            chosenColor = 'b';
+            chosenIdx = bOpen;
+          } else if (wOpen >= 0 && bOpen >= 0) {
+            if (bFilled <= wFilled) {
+              chosenColor = 'b';
+              chosenIdx = bOpen;
+            } else {
+              chosenColor = 'w';
+              chosenIdx = wOpen;
+            }
+          } else if (wOpen >= 0) {
+            chosenColor = 'w';
+            chosenIdx = wOpen;
+          } else if (bOpen >= 0) {
+            chosenColor = 'b';
+            chosenIdx = bOpen;
+          } else if (room.history.length === 0) {
+            const bBot = room.blackSeats.findIndex(s => s.kind === 'bot');
+            const wBot = room.whiteSeats.findIndex(s => s.kind === 'bot');
+            if (bBot >= 0) {
+              chosenColor = 'b';
+              chosenIdx = bBot;
+            } else if (wBot >= 0) {
+              chosenColor = 'w';
+              chosenIdx = wBot;
+            }
+          }
+
+          if (chosenColor && chosenIdx >= 0) {
+            const seat = createHumanSeat({ uid: null, playerId, name: playerName });
+            if (chosenColor === 'w') room.whiteSeats[chosenIdx] = seat;
+            else room.blackSeats[chosenIdx] = seat;
+            room.sockets.set(playerId, { id: playerId, name: playerName, elo: 1200, ws });
+          } else {
+            room.spectators.set(playerId, ws);
+          }
         }
 
         wsMeta.set(ws, { roomCode: code, playerId });
@@ -394,10 +579,16 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
         const code = sanitizeRoomCode(msg.code || meta?.roomCode);
         const room = rooms.get(code);
         if (room) {
-          if (room.white?.id === playerId && room.history.length === 0) room.white = null;
-          else if (room.white?.id === playerId) room.white.ws = null;
-          if (room.black?.id === playerId && room.history.length === 0) room.black = null;
-          else if (room.black?.id === playerId) room.black.ws = null;
+          const match = findChessHumanSeat(room, playerId);
+          if (match && room.history.length === 0) {
+            const open = { kind: 'open' as const, uid: null, playerId: null, name: null, botId: null };
+            if (match.color === 'w') room.whiteSeats[match.index] = open;
+            else room.blackSeats[match.index] = open;
+            room.sockets.delete(playerId);
+          } else {
+            const slot = room.sockets.get(playerId);
+            if (slot) slot.ws = null;
+          }
           room.spectators.delete(playerId);
           broadcastRoom(room);
         }
@@ -412,17 +603,65 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
         return;
       }
 
+      if (msg.type === 'room:switch_team') {
+        if (isRoomGameOver(room) || room.history.length > 0) return;
+        const targetColor: PieceColor = msg.targetColor === 'b' ? 'b' : 'w';
+        const current = findChessHumanSeat(room, playerId);
+        const targetList = targetColor === 'w' ? room.whiteSeats : room.blackSeats;
+        const openIdx = targetList.findIndex(s => s.kind === 'open' || s.kind === 'bot');
+        if (openIdx < 0) return;
+        if (current && current.color === targetColor) return;
+
+        const playerName = sanitizeName(msg.playerName || current?.seat.name);
+        if (current) {
+          const open = { kind: 'open' as const, uid: null, playerId: null, name: null, botId: null };
+          if (current.color === 'w') room.whiteSeats[current.index] = open;
+          else room.blackSeats[current.index] = open;
+        }
+        targetList[openIdx] = createHumanSeat({ uid: null, playerId, name: playerName });
+        room.sockets.set(playerId, { id: playerId, name: playerName, elo: 1200, ws });
+        room.spectators.delete(playerId);
+        room.lastActivityAt = Date.now();
+        broadcastRoom(room);
+        return;
+      }
+
+      if (msg.type === 'room:fill_bots') {
+        if (isRoomGameOver(room)) return;
+        const match = findChessHumanSeat(room, playerId);
+        if (!match) return;
+        const filled = fillOpenSeatsWithChessBots(
+          room.whiteSeats,
+          room.blackSeats,
+          typeof msg.primaryBotId === 'string' ? msg.primaryBotId : 'pixel'
+        );
+        room.whiteSeats = filled.whiteSeats;
+        room.blackSeats = filled.blackSeats;
+        room.lastActivityAt = Date.now();
+        broadcastRoom(room);
+        return;
+      }
+
+      if (msg.type === 'room:clear_bots') {
+        if (isRoomGameOver(room) || room.history.length > 0) return;
+        const match = findChessHumanSeat(room, playerId);
+        if (!match) return;
+        room.whiteSeats = clearBotSeats(room.whiteSeats);
+        room.blackSeats = clearBotSeats(room.blackSeats);
+        room.lastActivityAt = Date.now();
+        broadcastRoom(room);
+        return;
+      }
+
       if (msg.type === 'room:move') {
         const now = Date.now();
         room.lastActivityAt = now;
 
-        // Deduct active player's elapsed clock first; if flagged, reject move & broadcast timeout
         if (syncRoomClockNow(room, now)) {
           broadcastRoom(room);
           return;
         }
 
-        // Idempotent guard if client resends move from stale moveIndex
         if (typeof msg.moveIndex === 'number' && msg.moveIndex !== room.history.length) {
           sendJson(ws, buildSyncPayload(room, playerId));
           return;
@@ -431,8 +670,11 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
           sendJson(ws, buildSyncPayload(room, playerId));
           return;
         }
-        const activeSeat = room.state.turn === 'w' ? room.white : room.black;
-        if (!activeSeat || activeSeat.id !== playerId) {
+
+        const teamSize = getTeamSize(room.teamMode);
+        const activeIdx = getActiveChessSeatIndex(room.history.length, room.state.turn, teamSize);
+        const activeSeat = (room.state.turn === 'w' ? room.whiteSeats : room.blackSeats)[activeIdx];
+        if (!activeSeat || activeSeat.kind !== 'human' || activeSeat.playerId !== playerId) {
           sendJson(ws, { type: 'room:error', message: 'Not your turn.' });
           sendJson(ws, buildSyncPayload(room, playerId));
           return;
@@ -467,16 +709,11 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
         room.rematchVotes.clear();
 
         if (room.baseMs > 0) {
-          // Award increment for completed moves once the clock is active (after move 1 or when running)
           if (wasClockRunning && room.incMs > 0) {
             if (moverColor === 'w') room.whiteTimeMs += room.incMs;
             else room.blackTimeMs += room.incMs;
           }
-          if (isRoomGameOver(room)) {
-            room.clockLastTickAt = null;
-          } else {
-            room.clockLastTickAt = now;
-          }
+          room.clockLastTickAt = isRoomGameOver(room) ? null : now;
         }
 
         broadcastRoom(room);
@@ -485,30 +722,29 @@ export function attachChessRoomServer(httpServer: http.Server, app: express.Expr
 
       if (msg.type === 'room:resign') {
         if (isRoomGameOver(room)) return;
-        const resignColor: PieceColor | null =
-          room.white?.id === playerId ? 'w' : room.black?.id === playerId ? 'b' : null;
-        if (!resignColor) return;
+        const match = findChessHumanSeat(room, playerId);
+        if (!match) return;
         room.lastActivityAt = Date.now();
-        room.resignedWinner = resignColor === 'w' ? 'b' : 'w';
+        room.resignedWinner = match.color === 'w' ? 'b' : 'w';
         room.clockLastTickAt = null;
         broadcastRoom(room);
         return;
       }
 
       if (msg.type === 'room:rematch') {
-        const myColor: PieceColor | null =
-          room.white?.id === playerId ? 'w' : room.black?.id === playerId ? 'b' : null;
-        if (!myColor) return;
+        const match = findChessHumanSeat(room, playerId);
+        if (!match) return;
         room.lastActivityAt = Date.now();
-        room.rematchVotes.add(myColor);
+        const voteToken =
+          room.teamMode === '1v1' ? match.color : `${match.color}:${match.index}`;
+        room.rematchVotes.add(voteToken);
 
-        const bothPresent = Boolean(room.white && room.black);
-        if ((bothPresent && room.rematchVotes.size >= 2) || (!bothPresent && room.rematchVotes.size >= 1)) {
-          // Swap sides cleanly for rematch
-          const oldW = room.white;
-          const oldB = room.black;
-          room.white = oldB;
-          room.black = oldW;
+        const humanIds = getAllChessHumanIds(room);
+        const requiredVotes = Math.max(1, humanIds.length);
+        if (room.rematchVotes.size >= requiredVotes) {
+          const oldW = room.whiteSeats;
+          room.whiteSeats = room.blackSeats;
+          room.blackSeats = oldW;
           room.state = createInitialState();
           room.history = [];
           room.resignedWinner = null;

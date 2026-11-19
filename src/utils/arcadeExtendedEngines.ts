@@ -1,4 +1,13 @@
 import {
+  EMOJI_CHARADES_LIST,
+  HANGMAN_WORDS,
+  MASTERMIND_COLORS,
+  PIXEL_WORD_BANK,
+  WORDLE_5_WORDS,
+  WORD_CHAIN_BOT_DICT,
+  WORD_CHAIN_SEEDS
+} from './arcadeExtendedTypes.ts';
+import type {
   ArcadeBot,
   ArcadePlayer,
   ArcadeWinner,
@@ -9,18 +18,15 @@ import {
   ColClashState,
   CramState,
   DomineeringState,
-  EMOJI_CHARADES_LIST,
   EmojiCharadesState,
   ExtendedArcadeGameType,
   ExtendedArcadeState,
   Gravity5State,
   GridLink4State,
-  HANGMAN_WORDS,
   HangmanDuelState,
   HexState,
   HiLoTargetState,
   KingsEscapeState,
-  MASTERMIND_COLORS,
   MastermindState,
   MinesDuelState,
   MisereNimState,
@@ -28,7 +34,6 @@ import {
   NimState,
   ObstructionState,
   OrderChaosState,
-  PIXEL_WORD_BANK,
   PenaltyKickState,
   PixelGuessState,
   RpsArenaState,
@@ -36,13 +41,10 @@ import {
   SnortState,
   SosGridState,
   TugOfWarState,
-  WORDLE_5_WORDS,
-  WORD_CHAIN_BOT_DICT,
-  WORD_CHAIN_SEEDS,
   WordChainState,
   WordleDuelState,
   YachtDiceState
-} from './arcadeExtendedTypes';
+} from './arcadeExtendedTypes.ts';
 
 export interface ExtendedApplyResult {
   valid: boolean;

@@ -14,7 +14,8 @@ import {
   Palette, 
   Home,
   Crown,
-  Swords
+  Swords,
+  Trophy
 } from 'lucide-react';
 import { ThemeConfig } from '../services/themeStore';
 import { triggerPanic } from '../data/cloakPresets';
@@ -25,13 +26,13 @@ export interface TabItem {
   id: string;
   title: string;
   icon?: string;
-  spaceType: 'home' | 'games' | 'apps' | 'music' | 'chess' | 'rooms' | 'tools' | 'saved';
+  spaceType: 'home' | 'games' | 'apps' | 'music' | 'chess' | 'rooms' | 'leaderboard' | 'tools' | 'saved';
   url?: string;
 }
 
 interface OwenSidebarProps {
-  activeSpace: 'home' | 'games' | 'apps' | 'music' | 'chess' | 'rooms' | 'tools' | 'saved';
-  onSelectSpace: (space: 'home' | 'games' | 'apps' | 'music' | 'chess' | 'rooms' | 'tools' | 'saved') => void;
+  activeSpace: 'home' | 'games' | 'apps' | 'music' | 'chess' | 'rooms' | 'leaderboard' | 'tools' | 'saved';
+  onSelectSpace: (space: 'home' | 'games' | 'apps' | 'music' | 'chess' | 'rooms' | 'leaderboard' | 'tools' | 'saved') => void;
   tabs: TabItem[];
   activeTabId: string;
   onSelectTab: (id: string) => void;
@@ -74,6 +75,7 @@ export const Sidebar: React.FC<OwenSidebarProps> = ({
     { id: 'games', label: 'Games', icon: Gamepad2, emoji: '🎮' },
     { id: 'chess', label: 'Chess', icon: Crown, emoji: '♟️' },
     { id: 'rooms', label: 'Minigames', icon: Swords, emoji: '🕹️' },
+    { id: 'leaderboard', label: 'Leaderboard', icon: Trophy, emoji: '🏆' },
     { id: 'apps', label: 'Apps', icon: LayoutGrid, emoji: '📱' },
     { id: 'music', label: 'Music', icon: Radio, emoji: '🎵' },
     { id: 'tools', label: 'Cloaker', icon: ShieldCheck, emoji: '🛠️' },

@@ -4,15 +4,30 @@ import { WebSocketServer, WebSocket } from 'ws';
 import {
   applyArcadeAction,
   createInitialArcadeState,
-  isValidArcadeGameType
+  getArcadeBotById,
+  isValidArcadeGameType,
+  pickBotArcadeAction
 } from '../src/utils/arcadeEngines.ts';
 import type {
   ArcadeGameType,
   ArcadePlayer,
   ArcadeState
 } from '../src/utils/arcadeEngines.ts';
+import {
+  areAllSeatsFilled,
+  clearBotSeats,
+  collectParticipantUids,
+  createEmptySeats,
+  createHumanSeat,
+  fillOpenSeatsWithArcadeBots,
+  getActiveArcadeSeatIndex,
+  getTeamSize,
+  normalizeTeamMode,
+  summarizeTeamDisplayName
+} from '../src/utils/teamModes.ts';
+import type { TeamMode, TeamSeat } from '../src/utils/teamModes.ts';
 
-interface ArcadeSeat {
+interface WsHumanSlot {
   id: string;
   name: string;
   ws: WebSocket | null;
@@ -21,13 +36,17 @@ interface ArcadeSeat {
 interface ArcadeRoom {
   code: string;
   gameType: ArcadeGameType;
+  teamMode: TeamMode;
   state: ArcadeState;
   moves: string[];
-  p1: ArcadeSeat | null;
-  p2: ArcadeSeat | null;
+  team1Seats: TeamSeat[];
+  team2Seats: TeamSeat[];
+  teamTurnCounts: { p1: number; p2: number };
+  sockets: Map<string, WsHumanSlot>;
   spectators: Map<string, WebSocket>;
   resignedWinner: ArcadePlayer | null;
-  rematchVotes: Set<ArcadePlayer>;
+  rematchVotes: Set<string>;
+  botTimer: ReturnType<typeof setTimeout> | null;
   createdAt: number;
   lastActivityAt: number;
 }
@@ -62,21 +81,50 @@ function isRoomGameOver(room: ArcadeRoom): boolean {
   return Boolean(room.resignedWinner) || room.state.winner !== null;
 }
 
+function findHumanSeat(
+  room: ArcadeRoom,
+  playerId: string
+): { team: ArcadePlayer; index: number; seat: TeamSeat } | null {
+  for (let i = 0; i < room.team1Seats.length; i++) {
+    const s = room.team1Seats[i];
+    if (s.kind === 'human' && (s.playerId === playerId || s.uid === playerId)) {
+      return { team: 'p1', index: i, seat: s };
+    }
+  }
+  for (let i = 0; i < room.team2Seats.length; i++) {
+    const s = room.team2Seats[i];
+    if (s.kind === 'human' && (s.playerId === playerId || s.uid === playerId)) {
+      return { team: 'p2', index: i, seat: s };
+    }
+  }
+  return null;
+}
+
+function getAllHumanIdsInRoom(room: ArcadeRoom): string[] {
+  const ids = new Set<string>();
+  for (const s of [...room.team1Seats, ...room.team2Seats]) {
+    if (s.kind === 'human' && s.playerId) ids.add(s.playerId);
+  }
+  return Array.from(ids);
+}
+
 export function attachArcadeRoomServer(httpServer: http.Server, app: express.Express) {
   const rooms = new Map<string, ArcadeRoom>();
   const wsMeta = new WeakMap<WebSocket, { roomCode?: string; playerId?: string }>();
 
   const wss = new WebSocketServer({ noServer: true });
 
-  // Clean up idle rooms after 45 minutes of inactivity
   setInterval(() => {
     const cutoff = Date.now() - 45 * 60 * 1000;
     for (const [code, room] of rooms.entries()) {
-      const hasOpenSocket =
-        room.p1?.ws?.readyState === WebSocket.OPEN ||
-        room.p2?.ws?.readyState === WebSocket.OPEN ||
-        Array.from(room.spectators.values()).some(s => s.readyState === WebSocket.OPEN);
-      if (!hasOpenSocket && room.lastActivityAt < cutoff) {
+      const hasOpenHuman = Array.from(room.sockets.values()).some(
+        s => s.ws?.readyState === WebSocket.OPEN
+      );
+      const hasOpenSpec = Array.from(room.spectators.values()).some(
+        s => s.readyState === WebSocket.OPEN
+      );
+      if (!hasOpenHuman && !hasOpenSpec && room.lastActivityAt < cutoff) {
+        if (room.botTimer) clearTimeout(room.botTimer);
         rooms.delete(code);
       }
     }
@@ -93,39 +141,63 @@ export function attachArcadeRoomServer(httpServer: http.Server, app: express.Exp
       exists: true,
       code: room.code,
       gameType: room.gameType,
-      hasP1: Boolean(room.p1),
-      hasP2: Boolean(room.p2),
+      teamMode: room.teamMode,
+      hasP1: room.team1Seats.some(s => s.kind !== 'open'),
+      hasP2: room.team2Seats.some(s => s.kind !== 'open'),
       moveCount: room.moves.length
     });
   });
 
   const buildSyncPayload = (room: ArcadeRoom, recipientPlayerId?: string) => {
-    let mySeat: ArcadePlayer | 'spectator' = 'spectator';
-    if (recipientPlayerId) {
-      if (room.p1?.id === recipientPlayerId) mySeat = 'p1';
-      else if (room.p2?.id === recipientPlayerId) mySeat = 'p2';
-    }
+    const teamSize = getTeamSize(room.teamMode);
+    const match = recipientPlayerId ? findHumanSeat(room, recipientPlayerId) : null;
+    const mySeat: ArcadePlayer | 'spectator' = match ? match.team : 'spectator';
+    const mySeatIndex = match ? match.index : null;
+    const activeSeatIndex = getActiveArcadeSeatIndex(
+      room.teamTurnCounts,
+      room.state.turn,
+      teamSize
+    );
+    const activeSeatList = room.state.turn === 'p1' ? room.team1Seats : room.team2Seats;
+    const activeSeat = activeSeatList[activeSeatIndex] || null;
+    const p1Filled = room.team1Seats.some(s => s.kind !== 'open');
+    const p2Filled = room.team2Seats.some(s => s.kind !== 'open');
+    const p1HasConnected = room.team1Seats.some(
+      s => s.kind === 'bot' || (s.kind === 'human' && s.playerId && room.sockets.get(s.playerId)?.ws?.readyState === WebSocket.OPEN)
+    );
+    const p2HasConnected = room.team2Seats.some(
+      s => s.kind === 'bot' || (s.kind === 'human' && s.playerId && room.sockets.get(s.playerId)?.ws?.readyState === WebSocket.OPEN)
+    );
 
     return {
       type: 'room:sync',
       code: room.code,
       gameType: room.gameType,
+      teamMode: room.teamMode,
       mySeat,
+      mySeatIndex,
       state: room.state,
       moves: room.moves,
       resignedWinner: room.resignedWinner,
       rematchVotes: Array.from(room.rematchVotes),
+      participantUids: collectParticipantUids(room.team1Seats, room.team2Seats),
+      team1Seats: room.team1Seats,
+      team2Seats: room.team2Seats,
+      teamTurnCounts: room.teamTurnCounts,
+      activeSeatIndex,
+      activeSeat,
+      botRunnerUid: null,
       players: {
-        p1: room.p1
+        p1: p1Filled
           ? {
-              name: room.p1.name,
-              connected: room.p1.ws?.readyState === WebSocket.OPEN
+              name: summarizeTeamDisplayName(room.team1Seats, 'Team 1'),
+              connected: p1HasConnected
             }
           : null,
-        p2: room.p2
+        p2: p2Filled
           ? {
-              name: room.p2.name,
-              connected: room.p2.ws?.readyState === WebSocket.OPEN
+              name: summarizeTeamDisplayName(room.team2Seats, 'Team 2'),
+              connected: p2HasConnected
             }
           : null
       }
@@ -141,15 +213,52 @@ export function attachArcadeRoomServer(httpServer: http.Server, app: express.Exp
   };
 
   const broadcastRoom = (room: ArcadeRoom) => {
-    if (room.p1?.ws) {
-      sendJson(room.p1.ws, buildSyncPayload(room, room.p1.id));
-    }
-    if (room.p2?.ws) {
-      sendJson(room.p2.ws, buildSyncPayload(room, room.p2.id));
+    for (const [pId, slot] of room.sockets.entries()) {
+      if (slot.ws) {
+        sendJson(slot.ws, buildSyncPayload(room, pId));
+      }
     }
     for (const [specId, ws] of room.spectators.entries()) {
       sendJson(ws, buildSyncPayload(room, specId));
     }
+    scheduleBotTurnIfNeeded(room);
+  };
+
+  const scheduleBotTurnIfNeeded = (room: ArcadeRoom) => {
+    if (room.botTimer) {
+      clearTimeout(room.botTimer);
+      room.botTimer = null;
+    }
+    if (isRoomGameOver(room) || !areAllSeatsFilled(room.team1Seats, room.team2Seats)) {
+      return;
+    }
+    const teamSize = getTeamSize(room.teamMode);
+    const activeIdx = getActiveArcadeSeatIndex(room.teamTurnCounts, room.state.turn, teamSize);
+    const activeSeat = (room.state.turn === 'p1' ? room.team1Seats : room.team2Seats)[activeIdx];
+    if (!activeSeat || activeSeat.kind !== 'bot') return;
+
+    room.botTimer = setTimeout(() => {
+      room.botTimer = null;
+      if (isRoomGameOver(room) || !areAllSeatsFilled(room.team1Seats, room.team2Seats)) return;
+      const idxNow = getActiveArcadeSeatIndex(room.teamTurnCounts, room.state.turn, teamSize);
+      const seatNow = (room.state.turn === 'p1' ? room.team1Seats : room.team2Seats)[idxNow];
+      if (!seatNow || seatNow.kind !== 'bot') return;
+
+      const bot = getArcadeBotById(seatNow.botId);
+      const action = pickBotArcadeAction(room.state, bot);
+      if (!action) return;
+      const prevTurn = room.state.turn;
+      const res = applyArcadeAction(room.state, action);
+      if (!res.valid) return;
+
+      room.state = res.nextState;
+      room.moves = [...room.moves, action];
+      if (res.nextState.turn !== prevTurn) {
+        room.teamTurnCounts[prevTurn] += 1;
+      }
+      room.lastActivityAt = Date.now();
+      broadcastRoom(room);
+    }, 340);
   };
 
   const detachFromCurrentRoom = (ws: WebSocket) => {
@@ -161,17 +270,16 @@ export function attachArcadeRoomServer(httpServer: http.Server, app: express.Exp
       return;
     }
     let changed = false;
-    if (room.p1?.ws === ws) {
-      room.p1.ws = null;
-      changed = true;
-    }
-    if (room.p2?.ws === ws) {
-      room.p2.ws = null;
-      changed = true;
-    }
-    if (meta.playerId && room.spectators.get(meta.playerId) === ws) {
-      room.spectators.delete(meta.playerId);
-      changed = true;
+    if (meta.playerId) {
+      const slot = room.sockets.get(meta.playerId);
+      if (slot && slot.ws === ws) {
+        slot.ws = null;
+        changed = true;
+      }
+      if (room.spectators.get(meta.playerId) === ws) {
+        room.spectators.delete(meta.playerId);
+        changed = true;
+      }
     }
     wsMeta.delete(ws);
     if (changed) {
@@ -216,6 +324,7 @@ export function attachArcadeRoomServer(httpServer: http.Server, app: express.Exp
         const gameType: ArcadeGameType = isValidArcadeGameType(msg.gameType)
           ? msg.gameType
           : 'connect4';
+        const teamMode: TeamMode = normalizeTeamMode(msg.teamMode);
         const code = generateRoomCode(rooms);
         const playerName = sanitizeName(msg.playerName);
         const pref: ArcadePlayer =
@@ -226,17 +335,40 @@ export function attachArcadeRoomServer(httpServer: http.Server, app: express.Exp
               ? 'p1'
               : 'p2'
             : 'p1';
-        const seat: ArcadeSeat = { id: playerId, name: playerName, ws };
+
+        let team1Seats = createEmptySeats(teamMode);
+        let team2Seats = createEmptySeats(teamMode);
+        const creatorSeat = createHumanSeat({ uid: null, playerId, name: playerName });
+        if (pref === 'p1') team1Seats[0] = creatorSeat;
+        else team2Seats[0] = creatorSeat;
+
+        if (msg.fillBots) {
+          const filled = fillOpenSeatsWithArcadeBots(
+            team1Seats,
+            team2Seats,
+            typeof msg.primaryBotId === 'string' ? msg.primaryBotId : 'orbit-bot'
+          );
+          team1Seats = filled.team1Seats;
+          team2Seats = filled.team2Seats;
+        }
+
+        const sockets = new Map<string, WsHumanSlot>();
+        sockets.set(playerId, { id: playerId, name: playerName, ws });
+
         const room: ArcadeRoom = {
           code,
           gameType,
+          teamMode,
           state: createInitialArcadeState(gameType),
           moves: [],
-          p1: pref === 'p1' ? seat : null,
-          p2: pref === 'p2' ? seat : null,
+          team1Seats,
+          team2Seats,
+          teamTurnCounts: { p1: 0, p2: 0 },
+          sockets,
           spectators: new Map(),
           resignedWinner: null,
           rematchVotes: new Set(),
+          botTimer: null,
           createdAt: Date.now(),
           lastActivityAt: Date.now()
         };
@@ -260,18 +392,59 @@ export function attachArcadeRoomServer(httpServer: http.Server, app: express.Exp
         const playerName = sanitizeName(msg.playerName);
         room.lastActivityAt = Date.now();
 
-        if (room.p1?.id === playerId) {
-          room.p1.ws = ws;
-          room.p1.name = playerName;
-        } else if (room.p2?.id === playerId) {
-          room.p2.ws = ws;
-          room.p2.name = playerName;
-        } else if (!room.p1) {
-          room.p1 = { id: playerId, name: playerName, ws };
-        } else if (!room.p2) {
-          room.p2 = { id: playerId, name: playerName, ws };
+        const existing = findHumanSeat(room, playerId);
+        if (existing) {
+          existing.seat.name = playerName;
+          room.sockets.set(playerId, { id: playerId, name: playerName, ws });
         } else {
-          room.spectators.set(playerId, ws);
+          const t1Open = room.team1Seats.findIndex(s => s.kind === 'open');
+          const t2Open = room.team2Seats.findIndex(s => s.kind === 'open');
+          const t1Filled = room.team1Seats.filter(s => s.kind !== 'open').length;
+          const t2Filled = room.team2Seats.filter(s => s.kind !== 'open').length;
+
+          let chosenTeam: ArcadePlayer | null = null;
+          let chosenIdx = -1;
+
+          if (msg.preferredTeam === 'p1' && t1Open >= 0) {
+            chosenTeam = 'p1';
+            chosenIdx = t1Open;
+          } else if (msg.preferredTeam === 'p2' && t2Open >= 0) {
+            chosenTeam = 'p2';
+            chosenIdx = t2Open;
+          } else if (t1Open >= 0 && t2Open >= 0) {
+            if (t2Filled <= t1Filled) {
+              chosenTeam = 'p2';
+              chosenIdx = t2Open;
+            } else {
+              chosenTeam = 'p1';
+              chosenIdx = t1Open;
+            }
+          } else if (t1Open >= 0) {
+            chosenTeam = 'p1';
+            chosenIdx = t1Open;
+          } else if (t2Open >= 0) {
+            chosenTeam = 'p2';
+            chosenIdx = t2Open;
+          } else if (room.moves.length === 0) {
+            const t2Bot = room.team2Seats.findIndex(s => s.kind === 'bot');
+            const t1Bot = room.team1Seats.findIndex(s => s.kind === 'bot');
+            if (t2Bot >= 0) {
+              chosenTeam = 'p2';
+              chosenIdx = t2Bot;
+            } else if (t1Bot >= 0) {
+              chosenTeam = 'p1';
+              chosenIdx = t1Bot;
+            }
+          }
+
+          if (chosenTeam && chosenIdx >= 0) {
+            const seat = createHumanSeat({ uid: null, playerId, name: playerName });
+            if (chosenTeam === 'p1') room.team1Seats[chosenIdx] = seat;
+            else room.team2Seats[chosenIdx] = seat;
+            room.sockets.set(playerId, { id: playerId, name: playerName, ws });
+          } else {
+            room.spectators.set(playerId, ws);
+          }
         }
 
         wsMeta.set(ws, { roomCode: code, playerId });
@@ -284,10 +457,16 @@ export function attachArcadeRoomServer(httpServer: http.Server, app: express.Exp
         const code = sanitizeRoomCode(msg.code || meta?.roomCode);
         const room = rooms.get(code);
         if (room) {
-          if (room.p1?.id === playerId && room.moves.length === 0) room.p1 = null;
-          else if (room.p1?.id === playerId) room.p1.ws = null;
-          if (room.p2?.id === playerId && room.moves.length === 0) room.p2 = null;
-          else if (room.p2?.id === playerId) room.p2.ws = null;
+          const match = findHumanSeat(room, playerId);
+          if (match && room.moves.length === 0) {
+            const open = { kind: 'open' as const, uid: null, playerId: null, name: null, botId: null };
+            if (match.team === 'p1') room.team1Seats[match.index] = open;
+            else room.team2Seats[match.index] = open;
+            room.sockets.delete(playerId);
+          } else {
+            const slot = room.sockets.get(playerId);
+            if (slot) slot.ws = null;
+          }
           room.spectators.delete(playerId);
           broadcastRoom(room);
         }
@@ -299,6 +478,56 @@ export function attachArcadeRoomServer(httpServer: http.Server, app: express.Exp
       const room = rooms.get(code);
       if (!room) {
         sendJson(ws, { type: 'room:error', message: 'Room session expired or missing.' });
+        return;
+      }
+
+      if (msg.type === 'room:switch_team') {
+        if (isRoomGameOver(room) || room.moves.length > 0) return;
+        const targetTeam: ArcadePlayer = msg.targetTeam === 'p2' ? 'p2' : 'p1';
+        const current = findHumanSeat(room, playerId);
+        const targetList = targetTeam === 'p1' ? room.team1Seats : room.team2Seats;
+        const openIdx = targetList.findIndex(s => s.kind === 'open' || s.kind === 'bot');
+        if (openIdx < 0) return;
+        if (current && current.team === targetTeam) return;
+
+        const playerName = sanitizeName(msg.playerName || current?.seat.name);
+        if (current) {
+          const open = { kind: 'open' as const, uid: null, playerId: null, name: null, botId: null };
+          if (current.team === 'p1') room.team1Seats[current.index] = open;
+          else room.team2Seats[current.index] = open;
+        }
+        targetList[openIdx] = createHumanSeat({ uid: null, playerId, name: playerName });
+        room.sockets.set(playerId, { id: playerId, name: playerName, ws });
+        room.spectators.delete(playerId);
+        room.lastActivityAt = Date.now();
+        broadcastRoom(room);
+        return;
+      }
+
+      if (msg.type === 'room:fill_bots') {
+        if (isRoomGameOver(room)) return;
+        const match = findHumanSeat(room, playerId);
+        if (!match) return;
+        const filled = fillOpenSeatsWithArcadeBots(
+          room.team1Seats,
+          room.team2Seats,
+          typeof msg.primaryBotId === 'string' ? msg.primaryBotId : 'orbit-bot'
+        );
+        room.team1Seats = filled.team1Seats;
+        room.team2Seats = filled.team2Seats;
+        room.lastActivityAt = Date.now();
+        broadcastRoom(room);
+        return;
+      }
+
+      if (msg.type === 'room:clear_bots') {
+        if (isRoomGameOver(room) || room.moves.length > 0) return;
+        const match = findHumanSeat(room, playerId);
+        if (!match) return;
+        room.team1Seats = clearBotSeats(room.team1Seats);
+        room.team2Seats = clearBotSeats(room.team2Seats);
+        room.lastActivityAt = Date.now();
+        broadcastRoom(room);
         return;
       }
 
@@ -314,14 +543,17 @@ export function attachArcadeRoomServer(httpServer: http.Server, app: express.Exp
           return;
         }
 
-        const activeSeat = room.state.turn === 'p1' ? room.p1 : room.p2;
-        if (!activeSeat || activeSeat.id !== playerId) {
+        const teamSize = getTeamSize(room.teamMode);
+        const activeIdx = getActiveArcadeSeatIndex(room.teamTurnCounts, room.state.turn, teamSize);
+        const activeSeat = (room.state.turn === 'p1' ? room.team1Seats : room.team2Seats)[activeIdx];
+        if (!activeSeat || activeSeat.kind !== 'human' || activeSeat.playerId !== playerId) {
           sendJson(ws, { type: 'room:error', message: 'Not your turn.' });
           sendJson(ws, buildSyncPayload(room, playerId));
           return;
         }
 
         const action = String(msg.action || '').trim().slice(0, 800);
+        const prevTurn = room.state.turn;
         const res = applyArcadeAction(room.state, action);
         if (!res.valid) {
           sendJson(ws, { type: 'room:error', message: 'Illegal move rejected by server.' });
@@ -331,6 +563,9 @@ export function attachArcadeRoomServer(httpServer: http.Server, app: express.Exp
 
         room.state = res.nextState;
         room.moves = [...room.moves, action];
+        if (res.nextState.turn !== prevTurn) {
+          room.teamTurnCounts[prevTurn] += 1;
+        }
         room.rematchVotes.clear();
         broadcastRoom(room);
         return;
@@ -338,30 +573,31 @@ export function attachArcadeRoomServer(httpServer: http.Server, app: express.Exp
 
       if (msg.type === 'room:resign') {
         if (isRoomGameOver(room)) return;
-        const mySeat: ArcadePlayer | null =
-          room.p1?.id === playerId ? 'p1' : room.p2?.id === playerId ? 'p2' : null;
-        if (!mySeat) return;
+        const match = findHumanSeat(room, playerId);
+        if (!match) return;
         room.lastActivityAt = Date.now();
-        room.resignedWinner = mySeat === 'p1' ? 'p2' : 'p1';
+        room.resignedWinner = match.team === 'p1' ? 'p2' : 'p1';
         broadcastRoom(room);
         return;
       }
 
       if (msg.type === 'room:rematch') {
-        const mySeat: ArcadePlayer | null =
-          room.p1?.id === playerId ? 'p1' : room.p2?.id === playerId ? 'p2' : null;
-        if (!mySeat) return;
+        const match = findHumanSeat(room, playerId);
+        if (!match) return;
         room.lastActivityAt = Date.now();
-        room.rematchVotes.add(mySeat);
+        const voteToken =
+          room.teamMode === '1v1' ? match.team : `${match.team}:${match.index}`;
+        room.rematchVotes.add(voteToken);
 
-        const bothPresent = Boolean(room.p1 && room.p2);
-        if ((bothPresent && room.rematchVotes.size >= 2) || (!bothPresent && room.rematchVotes.size >= 1)) {
-          const oldP1 = room.p1;
-          const oldP2 = room.p2;
-          room.p1 = oldP2;
-          room.p2 = oldP1;
+        const humanIds = getAllHumanIdsInRoom(room);
+        const requiredVotes = Math.max(1, humanIds.length);
+        if (room.rematchVotes.size >= requiredVotes) {
+          const oldTeam1 = room.team1Seats;
+          room.team1Seats = room.team2Seats;
+          room.team2Seats = oldTeam1;
           room.state = createInitialArcadeState(room.gameType);
           room.moves = [];
+          room.teamTurnCounts = { p1: 0, p2: 0 };
           room.resignedWinner = null;
           room.rematchVotes.clear();
         }

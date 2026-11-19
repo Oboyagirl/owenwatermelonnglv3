@@ -31,15 +31,23 @@ import {
   Dices,
   Anchor,
   ArrowLeft,
-  Search
+  Search,
+  Phone,
+  Video
 } from 'lucide-react';
 import { ThemeConfig } from '../services/themeStore';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
+import { useCall } from '../context/CallContext';
 import { auth } from '../services/firebase';
 import { AVATAR_PRESETS } from '../services/cloudSaveService';
 import { isProfileOnlineNow } from '../services/chatService';
 import { sendGameInvite } from '../services/inviteService';
+import {
+  SettledEloResult,
+  buildMatchId,
+  settleOnlinePvpMatchElo
+} from '../services/leaderboardService';
 import { ExtendedArcadeBoard } from './ExtendedArcadeBoards';
 import { Batch2ArcadeBoard } from './Batch2ArcadeBoards';
 import {
@@ -386,6 +394,9 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
 
       lastRoomRef.current = msg.code;
       lastMoveLenRef.current = nextMoves.length;
+      if (roomChanged || (nextMoves.length === 0 && prevLen > 0)) {
+        setLastEloResult(null);
+      }
 
       setRoomCode(msg.code);
       setViewStage('play');
@@ -512,11 +523,12 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
           setOnlineAuthNeeded(true);
           setOnlineError(err.message);
         } else {
+          setTrackedArcadeRoom(null);
           setOnlineError(err instanceof Error ? err.message : `Could not join room "${cleanCode}".`);
         }
       }
     },
-    [playerId, playerName, closeWs, closeFirestore, applyOnlineSync, startFirestoreSub]
+    [playerId, playerName, closeWs, closeFirestore, applyOnlineSync, startFirestoreSub, setTrackedArcadeRoom]
   );
 
   const connectAndSendWs = useCallback(
@@ -704,6 +716,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
     setGameState(createInitialArcadeState(selectedGame));
     setMoves([]);
     setCheckersFrom(null);
+    setLastEloResult(null);
   }, [roomCode, playerId, selectedGame, closeWs, closeFirestore, setTrackedArcadeRoom]);
 
   const handleSelectGameType = (gameType: ArcadeGameType) => {
@@ -787,6 +800,8 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         gameType: gameState.gameType,
         gameTitle: getArcadeGameMeta(gameState.gameType).name
       });
+    } else if (activeWinner) {
+      setTrackedArcadeRoom(null);
     }
   }, [mode, roomCode, mySeat, resignedWinner, gameState.winner, gameState.gameType, setTrackedArcadeRoom]);
 
@@ -1268,6 +1283,96 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         : selectedBot.avatar
       : null;
 
+  const { navigateSpace } = useNotifications();
+  const { startCall, callPhase } = useCall();
+  const [lastEloResult, setLastEloResult] = useState<SettledEloResult | null>(null);
+  const settledArcadeMatchRef = useRef<Set<string>>(new Set());
+
+  const onlineOpponentCallTarget = useMemo(() => {
+    if (mode !== 'online' || !roomCode) return null;
+    if (mySeat !== 'p1' && mySeat !== 'p2') return null;
+    const oppSeat = mySeat === 'p1' ? players.p2 : players.p1;
+    const resolved = mySeat === 'p1' ? p2Resolved : p1Resolved;
+    const uid = oppSeat?.uid || '';
+    if (!uid || uid === myFirebaseUid) return null;
+    const dirMatch = directoryProfiles.find(p => p.userId === uid);
+    const contactMatch = contacts.find(c => c.contactUid === uid);
+    return {
+      uid,
+      name: resolved?.name || oppSeat?.name || 'Opponent',
+      avatarId: dirMatch?.avatarId || contactMatch?.avatarId || 'melon_classic'
+    };
+  }, [mode, roomCode, mySeat, players.p1, players.p2, p1Resolved, p2Resolved, myFirebaseUid, directoryProfiles, contacts]);
+
+  // Automatically record PvP ELO ratings when an online Firestore arcade match ends
+  useEffect(() => {
+    if (
+      !isGameOver ||
+      mode !== 'online' ||
+      !roomCode ||
+      activeTransportRef.current !== 'firestore'
+    ) {
+      return;
+    }
+    const p1Uid = players.p1?.uid || '';
+    const p2Uid = players.p2?.uid || '';
+    if (!p1Uid || !p2Uid || p1Uid === p2Uid) return;
+    if (myFirebaseUid !== p1Uid && myFirebaseUid !== p2Uid) return;
+
+    const finalWinner = (resignedWinner || gameState.winner || 'draw') as 'p1' | 'p2' | 'draw';
+    const matchId = buildMatchId({
+      sourceType: 'arcadeRoom',
+      roomCode,
+      moveCount: moves.length,
+      winnerSeat: finalWinner,
+      p1Uid,
+      p2Uid,
+      movesSample: moves.slice(-4).join('|')
+    });
+
+    if (settledArcadeMatchRef.current.has(matchId)) return;
+    settledArcadeMatchRef.current.add(matchId);
+
+    const p1Dir = directoryProfiles.find(p => p.userId === p1Uid);
+    const p2Dir = directoryProfiles.find(p => p.userId === p2Uid);
+
+    void settleOnlinePvpMatchElo({
+      matchId,
+      sourceType: 'arcadeRoom',
+      roomCode,
+      gameKind: 'arcade',
+      gameType: gameState.gameType,
+      gameTitle: meta.name,
+      p1Uid,
+      p1Name: players.p1?.name || p1Dir?.displayName || 'Player 1',
+      p1AvatarId: (p1Uid === myFirebaseUid ? profile?.avatarId : p1Dir?.avatarId) || 'melon_classic',
+      p2Uid,
+      p2Name: players.p2?.name || p2Dir?.displayName || 'Player 2',
+      p2AvatarId: (p2Uid === myFirebaseUid ? profile?.avatarId : p2Dir?.avatarId) || 'melon_classic',
+      winnerSeat: finalWinner
+    })
+      .then(res => {
+        if (res) setLastEloResult(res);
+      })
+      .catch(() => {});
+  }, [
+    isGameOver,
+    mode,
+    roomCode,
+    players.p1?.uid,
+    players.p1?.name,
+    players.p2?.uid,
+    players.p2?.name,
+    myFirebaseUid,
+    resignedWinner,
+    gameState.winner,
+    gameState.gameType,
+    meta.name,
+    moves,
+    directoryProfiles,
+    profile?.avatarId
+  ]);
+
   const statusHeadline = useMemo(() => {
     if (effectiveWinner === 'draw') return 'Match Drawn!';
     if (effectiveWinner === 'p1') return `${p1Display} Wins!`;
@@ -1466,6 +1571,17 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
 
                   <button
                     type="button"
+                    onClick={() => navigateSpace('leaderboard')}
+                    className="px-3 py-2 rounded-xl border text-xs font-extrabold text-amber-300 hover:bg-white/10 flex items-center gap-1.5 cursor-pointer"
+                    style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
+                    title="View PvP ELO Leaderboard"
+                  >
+                    <Trophy className="w-3.5 h-3.5" />
+                    <span>Leaderboard</span>
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={() => setSoundEnabled(s => !s)}
                     className="p-2 rounded-xl border text-slate-300 hover:text-white hover:bg-white/10 cursor-pointer"
                     style={{ borderColor: activeTheme.border }}
@@ -1648,6 +1764,55 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
           </div>
 
           <div className="flex items-center gap-1.5 shrink-0">
+            {onlineOpponentCallTarget && (
+              <>
+                <button
+                  type="button"
+                  disabled={callPhase !== 'idle'}
+                  onClick={() =>
+                    void startCall({
+                      peerUid: onlineOpponentCallTarget.uid,
+                      peerName: onlineOpponentCallTarget.name,
+                      peerAvatarId: onlineOpponentCallTarget.avatarId,
+                      mode: 'audio',
+                      contextLabel: `${meta.name} · Room ${roomCode}`
+                    })
+                  }
+                  className="px-2.5 py-2 rounded-xl border bg-emerald-500/15 hover:bg-emerald-500/25 border-emerald-500/35 text-emerald-300 text-xs font-bold flex items-center gap-1 cursor-pointer disabled:opacity-40"
+                  title={`Voice call ${onlineOpponentCallTarget.name}`}
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Call</span>
+                </button>
+                <button
+                  type="button"
+                  disabled={callPhase !== 'idle'}
+                  onClick={() =>
+                    void startCall({
+                      peerUid: onlineOpponentCallTarget.uid,
+                      peerName: onlineOpponentCallTarget.name,
+                      peerAvatarId: onlineOpponentCallTarget.avatarId,
+                      mode: 'video',
+                      contextLabel: `${meta.name} · Room ${roomCode}`
+                    })
+                  }
+                  className="px-2.5 py-2 rounded-xl border bg-violet-500/15 hover:bg-violet-500/25 border-violet-500/35 text-violet-300 text-xs font-bold flex items-center gap-1 cursor-pointer disabled:opacity-40"
+                  title={`Video call ${onlineOpponentCallTarget.name}`}
+                >
+                  <Video className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Video</span>
+                </button>
+              </>
+            )}
+            <button
+              type="button"
+              onClick={() => navigateSpace('leaderboard')}
+              className="p-2 rounded-xl border text-amber-300 hover:text-amber-200 hover:bg-white/10 transition-colors cursor-pointer"
+              style={{ borderColor: activeTheme.border }}
+              title="Open PvP ELO Leaderboard"
+            >
+              <Trophy className="w-4 h-4" />
+            </button>
             <button
               onClick={() => setSoundEnabled(s => !s)}
               className="p-2 rounded-xl border text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
@@ -1893,12 +2058,37 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
 
             {/* Bottom Match Action Strip */}
             <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t text-xs" style={{ borderColor: activeTheme.border }}>
-              <div className="flex items-center gap-2 text-slate-400">
+              <div className="flex items-center gap-2 text-slate-400 flex-wrap">
                 <span className="font-mono">Moves: {moves.length}</span>
                 {mode === 'online' && roomCode && (
                   <span className="font-mono text-emerald-400">
                     · {connStatus === 'connected' ? 'Live Sync' : 'Syncing...'}
                   </span>
+                )}
+                {isGameOver && mode === 'online' && lastEloResult && (
+                  <button
+                    type="button"
+                    onClick={() => navigateSpace('leaderboard')}
+                    className="px-2.5 py-0.5 rounded-lg border font-mono font-extrabold text-[11px] flex items-center gap-1 cursor-pointer hover:brightness-110"
+                    style={{
+                      backgroundColor:
+                        lastEloResult.myCategoryDelta >= 0
+                          ? 'rgba(16, 185, 129, 0.16)'
+                          : 'rgba(244, 63, 94, 0.16)',
+                      borderColor:
+                        lastEloResult.myCategoryDelta >= 0
+                          ? 'rgba(16, 185, 129, 0.45)'
+                          : 'rgba(244, 63, 94, 0.45)',
+                      color: lastEloResult.myCategoryDelta >= 0 ? '#6ee7b7' : '#fda4af'
+                    }}
+                  >
+                    <Trophy className="w-3 h-3" />
+                    <span>
+                      Arcade ELO: {lastEloResult.myNewCategoryElo} (
+                      {lastEloResult.myCategoryDelta >= 0 ? '+' : ''}
+                      {lastEloResult.myCategoryDelta})
+                    </span>
+                  </button>
                 )}
               </div>
 

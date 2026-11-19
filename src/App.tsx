@@ -15,6 +15,8 @@ import { FloatingMusicPlayer } from './components/FloatingMusicPlayer';
 import { ChatBoxWidget } from './components/ChatBoxWidget';
 import { NotificationToasts } from './components/NotificationToasts';
 import { NotificationProvider } from './context/NotificationContext';
+import { CallProvider } from './context/CallContext';
+import { CallOverlay } from './components/CallOverlay';
 import { useGamesStore } from './services/gamesStore';
 import { useSiteSettingsStore } from './services/siteSettingsStore';
 import { useThemeStore } from './services/themeStore';
@@ -31,6 +33,7 @@ const AppsView = lazy(() => import('./components/AppsView').then(m => ({ default
 const MusicView = lazy(() => import('./components/MusicView').then(m => ({ default: m.MusicView })));
 const ChessView = lazy(() => import('./components/ChessView').then(m => ({ default: m.ChessView })));
 const MultiplayerArcadeView = lazy(() => import('./components/MultiplayerArcadeView').then(m => ({ default: m.MultiplayerArcadeView })));
+const LeaderboardView = lazy(() => import('./components/LeaderboardView').then(m => ({ default: m.LeaderboardView })));
 import { GameAuthGate } from './components/GameAuthGate';
 import { Heart, Gamepad2, ExternalLink, RotateCcw, Search, Sparkles, Flame, Globe, Bot, X, Shuffle, Lock, LogIn } from 'lucide-react';
 
@@ -143,7 +146,7 @@ const APP_CATEGORIES = [
   'Casual'
 ];
 
-type SpaceType = 'home' | 'games' | 'apps' | 'music' | 'chess' | 'rooms' | 'tools' | 'saved';
+type SpaceType = 'home' | 'games' | 'apps' | 'music' | 'chess' | 'rooms' | 'leaderboard' | 'tools' | 'saved';
 
 export default function App() {
   const {
@@ -375,6 +378,7 @@ export default function App() {
         music: '🎵',
         chess: '♟️',
         rooms: '🕹️',
+        leaderboard: '🏆',
         tools: '🛠️',
         saved: '💾'
       };
@@ -385,6 +389,7 @@ export default function App() {
         music: 'Music',
         chess: 'Chess',
         rooms: 'Minigames',
+        leaderboard: 'Leaderboard',
         tools: 'Tab Cloaker',
         saved: 'Cloud Saves'
       };
@@ -629,6 +634,23 @@ export default function App() {
       return (
         <Suspense fallback={<div className="flex-1 flex items-center justify-center p-8 text-xs text-slate-400">Loading Multiplayer Rooms...</div>}>
           <MultiplayerArcadeView activeTheme={activeTheme} />
+        </Suspense>
+      );
+    }
+
+    if (space === 'leaderboard') {
+      if (!isSignedIn) {
+        return (
+          <GameAuthGate
+            activeTheme={activeTheme}
+            spaceLabel="PvP ELO Leaderboards"
+            description="Sign in with Google to view live player rankings, ELO standings, and match history."
+          />
+        );
+      }
+      return (
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center p-8 text-xs text-slate-400">Loading Leaderboards...</div>}>
+          <LeaderboardView activeTheme={activeTheme} />
         </Suspense>
       );
     }
@@ -908,15 +930,16 @@ export default function App() {
   const splitTab = tabs.find(t => t.id === splitTabId);
 
   return (
-    <NotificationProvider
-      activeSpace={activeSpace}
-      onNavigateSpace={handleSelectSpace}
-      onOpenChat={() => setIsChatOpen(true)}
-    >
-      <div 
-        className="h-screen w-screen text-slate-100 flex overflow-hidden font-sans select-none"
-        style={{ backgroundColor: activeTheme.bgPrimary }}
+    <CallProvider>
+      <NotificationProvider
+        activeSpace={activeSpace}
+        onNavigateSpace={handleSelectSpace}
+        onOpenChat={() => setIsChatOpen(true)}
       >
+        <div 
+          className="h-screen w-screen text-slate-100 flex overflow-hidden font-sans select-none"
+          style={{ backgroundColor: activeTheme.bgPrimary }}
+        >
       {/* Background Starfield */}
       <StarfieldBackground
         speedMultiplier={siteSettings.starSpeed}
@@ -1095,6 +1118,9 @@ export default function App() {
       {/* Global Real-Time Notifications (Texts, Turns, & Game Invites) */}
       <NotificationToasts activeTheme={activeTheme} />
 
+      {/* Global Peer-to-Peer WebRTC Voice & Video Call Overlay */}
+      <CallOverlay activeTheme={activeTheme} />
+
       {/* Sign-In Required Modal when trying to play a game while signed out */}
       {!isSignedIn && isGameAuthModalOpen && (
         <GameAuthGate
@@ -1107,7 +1133,8 @@ export default function App() {
           activeTheme={activeTheme}
         />
       )}
-      </div>
-    </NotificationProvider>
+        </div>
+      </NotificationProvider>
+    </CallProvider>
   );
 }

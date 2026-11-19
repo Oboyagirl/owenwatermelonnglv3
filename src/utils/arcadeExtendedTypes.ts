@@ -1,8 +1,5 @@
-import {
-  BATCH2_ARCADE_GAMES,
-  Batch2ArcadeGameType,
-  Batch2ArcadeState
-} from './arcadeBatch2Types';
+import { BATCH2_ARCADE_GAMES } from './arcadeBatch2Types.ts';
+import type { Batch2ArcadeGameType, Batch2ArcadeState } from './arcadeBatch2Types.ts';
 
 export { BATCH2_ARCADE_GAMES };
 export type { Batch2ArcadeGameType, Batch2ArcadeState };

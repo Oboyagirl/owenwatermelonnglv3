@@ -894,6 +894,420 @@
         "createdAt",
         "updatedAt"
       ]
+    },
+    "callSession": {
+      "title": "Voice/Video Call Session",
+      "description": "WebRTC signaling session between two authenticated Firebase users",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique call session identifier",
+          "maxLength": 128
+        },
+        "callerUid": {
+          "type": "string",
+          "description": "Firebase Auth UID of caller",
+          "maxLength": 128
+        },
+        "callerName": {
+          "type": "string",
+          "description": "Display name of caller",
+          "maxLength": 64
+        },
+        "callerAvatarId": {
+          "type": "string",
+          "description": "Avatar preset ID of caller",
+          "maxLength": 64
+        },
+        "calleeUid": {
+          "type": "string",
+          "description": "Firebase Auth UID of callee",
+          "maxLength": 128
+        },
+        "calleeName": {
+          "type": "string",
+          "description": "Display name of callee",
+          "maxLength": 64
+        },
+        "calleeAvatarId": {
+          "type": "string",
+          "description": "Avatar preset ID of callee",
+          "maxLength": 64
+        },
+        "participantUids": {
+          "type": "array",
+          "description": "Bounded two-element array [callerUid, calleeUid]"
+        },
+        "mode": {
+          "type": "string",
+          "description": "Media mode (audio or video)",
+          "enum": ["audio", "video"],
+          "maxLength": 8
+        },
+        "status": {
+          "type": "string",
+          "description": "Call signaling lifecycle state",
+          "enum": ["ringing", "active", "ended", "declined", "missed"],
+          "maxLength": 16
+        },
+        "contextLabel": {
+          "type": "string",
+          "description": "Optional context label (e.g. Direct Call, Chess Room, Minigame) or null",
+          "maxLength": 80
+        },
+        "sdpOffer": {
+          "type": "string",
+          "description": "Serialized WebRTC SDP offer",
+          "maxLength": 24000
+        },
+        "sdpAnswer": {
+          "type": "string",
+          "description": "Serialized WebRTC SDP answer or null",
+          "maxLength": 24000
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of call creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update"
+        },
+        "endedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when call terminated or null"
+        }
+      },
+      "required": [
+        "id",
+        "callerUid",
+        "callerName",
+        "callerAvatarId",
+        "calleeUid",
+        "calleeName",
+        "calleeAvatarId",
+        "participantUids",
+        "mode",
+        "status",
+        "contextLabel",
+        "sdpOffer",
+        "sdpAnswer",
+        "createdAt",
+        "updatedAt",
+        "endedAt"
+      ]
+    },
+    "callCandidate": {
+      "title": "WebRTC ICE Candidate",
+      "description": "Trickle ICE candidate exchanged inside a call session",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Candidate document ID",
+          "maxLength": 128
+        },
+        "fromUid": {
+          "type": "string",
+          "description": "Sender Firebase Auth UID",
+          "maxLength": 128
+        },
+        "toUid": {
+          "type": "string",
+          "description": "Recipient Firebase Auth UID",
+          "maxLength": 128
+        },
+        "type": {
+          "type": "string",
+          "description": "Candidate signaling role",
+          "enum": ["offer-ice", "answer-ice", "ice"],
+          "maxLength": 16
+        },
+        "candidate": {
+          "type": "string",
+          "description": "Serialized RTCIceCandidate JSON payload",
+          "maxLength": 4096
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of candidate creation"
+        }
+      },
+      "required": ["id", "fromUid", "toUid", "type", "candidate", "createdAt"]
+    },
+    "leaderboardProfile": {
+      "title": "Player Leaderboard & ELO Profile",
+      "description": "Public non-PII PvP ELO ratings and match statistics for signed-in players",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID",
+          "maxLength": 128
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Public gamer display name",
+          "maxLength": 64
+        },
+        "avatarId": {
+          "type": "string",
+          "description": "Avatar preset ID",
+          "maxLength": 64
+        },
+        "isListed": {
+          "type": "boolean",
+          "description": "Whether the player appears on public rankings"
+        },
+        "overallElo": {
+          "type": "number",
+          "description": "Combined PvP ELO rating"
+        },
+        "chessElo": {
+          "type": "number",
+          "description": "Online Chess ELO rating"
+        },
+        "arcadeElo": {
+          "type": "number",
+          "description": "Online Arcade Minigames ELO rating"
+        },
+        "bestElo": {
+          "type": "number",
+          "description": "Peak recorded ELO rating"
+        },
+        "totalMatches": {
+          "type": "number",
+          "description": "Total completed PvP matches"
+        },
+        "wins": {
+          "type": "number",
+          "description": "Total PvP wins"
+        },
+        "losses": {
+          "type": "number",
+          "description": "Total PvP losses"
+        },
+        "draws": {
+          "type": "number",
+          "description": "Total PvP draws"
+        },
+        "chessMatches": {
+          "type": "number",
+          "description": "Total Chess PvP matches"
+        },
+        "chessWins": {
+          "type": "number",
+          "description": "Total Chess PvP wins"
+        },
+        "arcadeMatches": {
+          "type": "number",
+          "description": "Total Arcade PvP matches"
+        },
+        "arcadeWins": {
+          "type": "number",
+          "description": "Total Arcade PvP wins"
+        },
+        "winStreak": {
+          "type": "number",
+          "description": "Current active win streak"
+        },
+        "bestWinStreak": {
+          "type": "number",
+          "description": "Longest recorded win streak"
+        },
+        "lastMatchId": {
+          "type": "string",
+          "description": "ID of most recently settled match or null",
+          "maxLength": 128
+        },
+        "lastGameTitle": {
+          "type": "string",
+          "description": "Title of last played game or null",
+          "maxLength": 64
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of profile creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update"
+        }
+      },
+      "required": [
+        "userId",
+        "displayName",
+        "avatarId",
+        "isListed",
+        "overallElo",
+        "chessElo",
+        "arcadeElo",
+        "bestElo",
+        "totalMatches",
+        "wins",
+        "losses",
+        "draws",
+        "chessMatches",
+        "chessWins",
+        "arcadeMatches",
+        "arcadeWins",
+        "winStreak",
+        "bestWinStreak",
+        "lastMatchId",
+        "lastGameTitle",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "matchRecord": {
+      "title": "PvP Match ELO Settlement Record",
+      "description": "Immutable completed PvP match result with canonical ELO rating changes",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Deterministic match record ID",
+          "maxLength": 128
+        },
+        "sourceType": {
+          "type": "string",
+          "description": "Origin room collection",
+          "enum": ["chessRoom", "arcadeRoom"],
+          "maxLength": 16
+        },
+        "roomCode": {
+          "type": "string",
+          "description": "Source room code",
+          "minLength": 4,
+          "maxLength": 8,
+          "pattern": "^[A-Z0-9]+$"
+        },
+        "gameKind": {
+          "type": "string",
+          "description": "Match category (chess or arcade)",
+          "enum": ["chess", "arcade"],
+          "maxLength": 16
+        },
+        "gameType": {
+          "type": "string",
+          "description": "Specific game identifier",
+          "maxLength": 32
+        },
+        "gameTitle": {
+          "type": "string",
+          "description": "Human-readable game title",
+          "maxLength": 64
+        },
+        "p1Uid": {
+          "type": "string",
+          "description": "Player 1 / White Firebase Auth UID",
+          "maxLength": 128
+        },
+        "p1Name": {
+          "type": "string",
+          "description": "Player 1 / White display name",
+          "maxLength": 64
+        },
+        "p1AvatarId": {
+          "type": "string",
+          "description": "Player 1 / White avatar preset ID",
+          "maxLength": 64
+        },
+        "p2Uid": {
+          "type": "string",
+          "description": "Player 2 / Black Firebase Auth UID",
+          "maxLength": 128
+        },
+        "p2Name": {
+          "type": "string",
+          "description": "Player 2 / Black display name",
+          "maxLength": 64
+        },
+        "p2AvatarId": {
+          "type": "string",
+          "description": "Player 2 / Black avatar preset ID",
+          "maxLength": 64
+        },
+        "winnerSeat": {
+          "type": "string",
+          "description": "Winning seat or draw",
+          "enum": ["p1", "p2", "draw"],
+          "maxLength": 8
+        },
+        "p1Delta": {
+          "type": "number",
+          "description": "Overall ELO delta for Player 1"
+        },
+        "p2Delta": {
+          "type": "number",
+          "description": "Overall ELO delta for Player 2"
+        },
+        "p1EloAfter": {
+          "type": "number",
+          "description": "Overall ELO for Player 1 after match"
+        },
+        "p2EloAfter": {
+          "type": "number",
+          "description": "Overall ELO for Player 2 after match"
+        },
+        "p1CatDelta": {
+          "type": "number",
+          "description": "Category ELO delta for Player 1"
+        },
+        "p2CatDelta": {
+          "type": "number",
+          "description": "Category ELO delta for Player 2"
+        },
+        "p1CatEloAfter": {
+          "type": "number",
+          "description": "Category ELO for Player 1 after match"
+        },
+        "p2CatEloAfter": {
+          "type": "number",
+          "description": "Category ELO for Player 2 after match"
+        },
+        "isPublic": {
+          "type": "boolean",
+          "description": "Whether this match appears in public match history"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of match settlement"
+        }
+      },
+      "required": [
+        "id",
+        "sourceType",
+        "roomCode",
+        "gameKind",
+        "gameType",
+        "gameTitle",
+        "p1Uid",
+        "p1Name",
+        "p1AvatarId",
+        "p2Uid",
+        "p2Name",
+        "p2AvatarId",
+        "winnerSeat",
+        "p1Delta",
+        "p2Delta",
+        "p1EloAfter",
+        "p2EloAfter",
+        "p1CatDelta",
+        "p2CatDelta",
+        "p1CatEloAfter",
+        "p2CatEloAfter",
+        "isPublic",
+        "createdAt"
+      ]
     }
   },
   "firestore": {
@@ -956,6 +1370,30 @@
         "$ref": "#/entities/gameInvite"
       },
       "description": "Direct friend game invites for 1-click joining without typing room codes"
+    },
+    "/callSessions/{callId}": {
+      "schema": {
+        "$ref": "#/entities/callSession"
+      },
+      "description": "Peer-to-peer WebRTC signaling sessions for voice and video calls"
+    },
+    "/callSessions/{callId}/candidates/{candidateId}": {
+      "schema": {
+        "$ref": "#/entities/callCandidate"
+      },
+      "description": "Trickle ICE candidates for a WebRTC call session"
+    },
+    "/leaderboardProfiles/{userId}": {
+      "schema": {
+        "$ref": "#/entities/leaderboardProfile"
+      },
+      "description": "Public non-PII player ELO ratings and leaderboard standings"
+    },
+    "/matchRecords/{matchId}": {
+      "schema": {
+        "$ref": "#/entities/matchRecord"
+      },
+      "description": "Immutable completed PvP match results and ELO deltas"
     }
   }
 }

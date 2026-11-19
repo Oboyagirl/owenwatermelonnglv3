@@ -33,15 +33,23 @@ import {
   Activity,
   Gamepad2,
   Play,
-  Send
+  Send,
+  Phone,
+  Video
 } from 'lucide-react';
 import { ThemeConfig } from '../services/themeStore';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
+import { useCall } from '../context/CallContext';
 import { auth } from '../services/firebase';
 import { AVATAR_PRESETS } from '../services/cloudSaveService';
 import { isProfileOnlineNow } from '../services/chatService';
 import { sendGameInvite } from '../services/inviteService';
+import {
+  SettledEloResult,
+  buildMatchId,
+  settleOnlinePvpMatchElo
+} from '../services/leaderboardService';
 import {
   AnalysisLine,
   BotMoveDecision,
@@ -1112,6 +1120,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
           setOnlineAuthNeeded(true);
           setOnlineError(err.message);
         } else {
+          setTrackedChessRoom(null);
           setOnlineError(
             err instanceof Error ? err.message : `Could not join room "${cleanCode}".`
           );
@@ -1124,7 +1133,8 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       closeWebSocket,
       closeFirestoreRoom,
       applyOnlineRoomSync,
-      startFirestoreRoomSubscription
+      startFirestoreRoomSubscription,
+      setTrackedChessRoom
     ]
   );
 
@@ -1311,6 +1321,8 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       !isGameOver
     ) {
       setTrackedChessRoom({ code: onlineRoomCode, mySide: onlineMyColor });
+    } else if (isGameOver) {
+      setTrackedChessRoom(null);
     }
   }, [mode, onlineRoomCode, onlineMyColor, isGameOver, setTrackedChessRoom]);
 
@@ -1411,6 +1423,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     setOnlineError(null);
     setOnlineAuthNeeded(false);
     setWsStatus('disconnected');
+    setLastEloResult(null);
     setPremove(null);
     setPremoveFrom(null);
     setGameState(createInitialState());
@@ -2712,6 +2725,11 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     return { name: selectedBot.name, elo: selectedBot.rating };
   };
 
+  const { startCall, callPhase } = useCall();
+  const { navigateSpace } = useNotifications();
+  const [lastEloResult, setLastEloResult] = useState<SettledEloResult | null>(null);
+  const settledChessMatchRef = useRef<Set<string>>(new Set());
+
   const onlineOpponentInfo = useMemo(() => {
     if (mode !== 'online' || !onlineRoomCode) return null;
     if (onlineMyColor === 'w' || onlineMyColor === 'b') {
@@ -2719,7 +2737,17 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       const oppSeat = oppColor === 'w' ? onlinePlayers.w : onlinePlayers.b;
       if (oppSeat) {
         const person = resolvePersonByUid(oppSeat.uid, oppSeat.name);
-        return { name: person.name, avatarIcon: person.avatarIcon, seated: true, color: oppColor };
+        return {
+          uid: oppSeat.uid || '',
+          name: person.name,
+          avatarIcon: person.avatarIcon,
+          avatarId:
+            directoryProfiles.find(p => p.userId === oppSeat.uid)?.avatarId ||
+            contacts.find(c => c.contactUid === oppSeat.uid)?.avatarId ||
+            'melon_classic',
+          seated: true,
+          color: oppColor
+        };
       }
       if (activeChessRoomInvite) {
         const peerUid =
@@ -2731,11 +2759,111 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
             ? activeChessRoomInvite.toName
             : activeChessRoomInvite.fromName;
         const person = resolvePersonByUid(peerUid, peerName);
-        return { name: person.name, avatarIcon: person.avatarIcon, seated: false, color: oppColor };
+        return {
+          uid: peerUid || '',
+          name: person.name,
+          avatarIcon: person.avatarIcon,
+          avatarId:
+            directoryProfiles.find(p => p.userId === peerUid)?.avatarId ||
+            contacts.find(c => c.contactUid === peerUid)?.avatarId ||
+            'melon_classic',
+          seated: false,
+          color: oppColor
+        };
       }
     }
     return null;
-  }, [mode, onlineRoomCode, onlineMyColor, onlinePlayers, activeChessRoomInvite, myFirebaseUid, resolvePersonByUid]);
+  }, [
+    mode,
+    onlineRoomCode,
+    onlineMyColor,
+    onlinePlayers,
+    activeChessRoomInvite,
+    myFirebaseUid,
+    resolvePersonByUid,
+    directoryProfiles,
+    contacts
+  ]);
+
+  // Automatically record online PvP Chess results & ELO ratings when a room match ends
+  useEffect(() => {
+    if (
+      !isGameOver ||
+      mode !== 'online' ||
+      !onlineRoomCode ||
+      activeTransportRef.current !== 'firestore'
+    ) {
+      return;
+    }
+    const wUid = onlinePlayers.w?.uid || '';
+    const bUid = onlinePlayers.b?.uid || '';
+    if (!wUid || !bUid || wUid === bUid) return;
+    if (myFirebaseUid !== wUid && myFirebaseUid !== bUid) return;
+
+    const winnerSide: 'w' | 'b' | 'draw' =
+      resignedWinner ||
+      (timeoutWinner === 'draw' ? 'draw' : timeoutWinner) ||
+      (gameState.status === 'checkmate' && gameState.winner ? gameState.winner : 'draw');
+    const winnerSeat: 'p1' | 'p2' | 'draw' =
+      winnerSide === 'w' ? 'p1' : winnerSide === 'b' ? 'p2' : 'draw';
+
+    const matchId = buildMatchId({
+      sourceType: 'chessRoom',
+      roomCode: onlineRoomCode,
+      moveCount: moveHistory.length,
+      winnerSeat,
+      p1Uid: wUid,
+      p2Uid: bUid,
+      movesSample: moveHistory
+        .slice(-4)
+        .map(m => m.san)
+        .join('')
+    });
+
+    if (settledChessMatchRef.current.has(matchId)) return;
+    settledChessMatchRef.current.add(matchId);
+
+    const wDir = directoryProfiles.find(p => p.userId === wUid);
+    const bDir = directoryProfiles.find(p => p.userId === bUid);
+    const wName = onlinePlayers.w?.name || wDir?.displayName || 'White';
+    const bName = onlinePlayers.b?.name || bDir?.displayName || 'Black';
+
+    void settleOnlinePvpMatchElo({
+      matchId,
+      sourceType: 'chessRoom',
+      roomCode: onlineRoomCode,
+      gameKind: 'chess',
+      gameType: 'chess',
+      gameTitle: 'Chess',
+      p1Uid: wUid,
+      p1Name: wName,
+      p1AvatarId: (wUid === myFirebaseUid ? profile?.avatarId : wDir?.avatarId) || 'melon_classic',
+      p2Uid: bUid,
+      p2Name: bName,
+      p2AvatarId: (bUid === myFirebaseUid ? profile?.avatarId : bDir?.avatarId) || 'melon_classic',
+      winnerSeat
+    })
+      .then(res => {
+        if (res) setLastEloResult(res);
+      })
+      .catch(() => {});
+  }, [
+    isGameOver,
+    mode,
+    onlineRoomCode,
+    onlinePlayers.w?.uid,
+    onlinePlayers.w?.name,
+    onlinePlayers.b?.uid,
+    onlinePlayers.b?.name,
+    myFirebaseUid,
+    resignedWinner,
+    timeoutWinner,
+    gameState.status,
+    gameState.winner,
+    moveHistory,
+    directoryProfiles,
+    profile?.avatarId
+  ]);
 
   const getEndBannerCopy = () => {
     const wName = getPlayerInfo('w').name.replace(/ \(You\)$/, '');
@@ -3086,6 +3214,44 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                       <span className="truncate">{onlineOpponentInfo.name}</span>
                     </span>
                   )}
+                  {onlineOpponentInfo?.uid && onlineOpponentInfo.uid !== myFirebaseUid && (
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        type="button"
+                        disabled={callPhase !== 'idle'}
+                        onClick={() =>
+                          void startCall({
+                            peerUid: onlineOpponentInfo.uid,
+                            peerName: onlineOpponentInfo.name,
+                            peerAvatarId: onlineOpponentInfo.avatarId,
+                            mode: 'audio',
+                            contextLabel: `Chess · Room ${onlineRoomCode}`
+                          })
+                        }
+                        className="p-1 rounded-md bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/35 text-emerald-300 cursor-pointer disabled:opacity-40"
+                        title={`Voice call ${onlineOpponentInfo.name}`}
+                      >
+                        <Phone className="w-3 h-3" />
+                      </button>
+                      <button
+                        type="button"
+                        disabled={callPhase !== 'idle'}
+                        onClick={() =>
+                          void startCall({
+                            peerUid: onlineOpponentInfo.uid,
+                            peerName: onlineOpponentInfo.name,
+                            peerAvatarId: onlineOpponentInfo.avatarId,
+                            mode: 'video',
+                            contextLabel: `Chess · Room ${onlineRoomCode}`
+                          })
+                        }
+                        className="p-1 rounded-md bg-violet-500/15 hover:bg-violet-500/25 border border-violet-500/35 text-violet-300 cursor-pointer disabled:opacity-40"
+                        title={`Video call ${onlineOpponentInfo.name}`}
+                      >
+                        <Video className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
                   {activeChessRoomInvite && (
                     <span className="text-[10px] font-semibold text-sky-300 truncate">
                       {activeChessRoomInvite.fromUid === myFirebaseUid
@@ -3109,6 +3275,19 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
             </div>
 
             <div className="flex items-center gap-1 shrink-0">
+              <button
+                type="button"
+                onClick={() => navigateSpace('leaderboard')}
+                className="px-2 py-1 rounded-md border text-[10px] font-bold text-amber-300 hover:text-amber-200 hover:bg-white/5 cursor-pointer flex items-center gap-1"
+                style={{
+                  backgroundColor: activeTheme.bgSecondary,
+                  borderColor: activeTheme.border
+                }}
+                title="Open PvP ELO Leaderboard"
+              >
+                <Trophy className="w-3 h-3" />
+                <span className="hidden sm:inline">Ranks</span>
+              </button>
               <button
                 type="button"
                 onClick={() => setAnalysisEnabled(a => !a)}
@@ -3551,6 +3730,31 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                     </div>
                     <h3 className="text-lg font-extrabold text-white">{endBanner.title}</h3>
                     <p className="text-xs text-slate-300 leading-relaxed">{endBanner.subtitle}</p>
+                    {mode === 'online' && lastEloResult && (
+                      <button
+                        type="button"
+                        onClick={() => navigateSpace('leaderboard')}
+                        className="px-3 py-1 rounded-xl border text-[11px] font-mono font-extrabold flex items-center gap-1.5 cursor-pointer hover:brightness-110"
+                        style={{
+                          backgroundColor:
+                            lastEloResult.myCategoryDelta >= 0
+                              ? 'rgba(16, 185, 129, 0.16)'
+                              : 'rgba(244, 63, 94, 0.16)',
+                          borderColor:
+                            lastEloResult.myCategoryDelta >= 0
+                              ? 'rgba(16, 185, 129, 0.45)'
+                              : 'rgba(244, 63, 94, 0.45)',
+                          color: lastEloResult.myCategoryDelta >= 0 ? '#6ee7b7' : '#fda4af'
+                        }}
+                      >
+                        <Trophy className="w-3 h-3" />
+                        <span>
+                          Chess ELO: {lastEloResult.myNewCategoryElo} (
+                          {lastEloResult.myCategoryDelta >= 0 ? '+' : ''}
+                          {lastEloResult.myCategoryDelta})
+                        </span>
+                      </button>
+                    )}
                     <div className="flex items-center gap-2.5 w-full mt-2">
                       {mode === 'online' ? (
                         onlineMyColor !== 'spectator' && (
