@@ -15,13 +15,11 @@ import {
   Home,
   Crown,
   Swords,
-  Trophy,
-  Users
+  Trophy
 } from 'lucide-react';
 import { ThemeConfig } from '../services/themeStore';
 import { triggerPanic } from '../data/cloakPresets';
 import { useAuth } from '../context/AuthContext';
-import { useParty } from '../context/PartyContext';
 import { AVATAR_PRESETS } from '../services/cloudSaveService';
 
 export interface TabItem {
@@ -70,7 +68,6 @@ export const Sidebar: React.FC<OwenSidebarProps> = ({
   totalGames
 }) => {
   const { profile, isSignedIn, isAuthReady } = useAuth();
-  const { myParty, incomingPartyInvites, openPartyModal } = useParty();
   const currentAvatar = AVATAR_PRESETS.find(a => a.id === (profile?.avatarId || 'melon_classic')) || AVATAR_PRESETS[0];
 
   const NAV_ITEMS = [
@@ -271,39 +268,6 @@ export const Sidebar: React.FC<OwenSidebarProps> = ({
         className="p-2.5 border-t flex flex-col gap-1.5 shrink-0"
         style={{ borderColor: activeTheme.border, backgroundColor: activeTheme.bgSecondary }}
       >
-        {/* Party Lobby Button */}
-        <button
-          onClick={() => openPartyModal()}
-          className="flex items-center justify-between gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-slate-200 hover:text-white hover:bg-white/5 border transition-all cursor-pointer"
-          style={{
-            backgroundColor: myParty ? activeTheme.accentBadge : undefined,
-            borderColor: myParty ? activeTheme.borderActive : 'transparent'
-          }}
-          title="Party Lobby — Invite friends for 2v2 or 1v1 matches"
-        >
-          <div className="flex items-center gap-2.5 truncate">
-            <div
-              className="w-6 h-6 rounded-lg flex items-center justify-center text-xs shrink-0 border"
-              style={{
-                backgroundColor: myParty ? activeTheme.accentBadge : 'rgba(168, 85, 247, 0.16)',
-                borderColor: myParty ? activeTheme.borderActive : 'rgba(168, 85, 247, 0.35)'
-              }}
-            >
-              <Users className="w-3.5 h-3.5" style={{ color: myParty ? activeTheme.accent : '#c084fc' }} />
-            </div>
-            {!isCollapsed && (
-              <span className="truncate">
-                {myParty ? `Party (${myParty.members.length}/${myParty.matchMode === '2v2' ? 4 : 2})` : 'Party Lobby'}
-              </span>
-            )}
-          </div>
-          {!isCollapsed && incomingPartyInvites.length > 0 && (
-            <span className="px-1.5 py-0.5 rounded-full bg-fuchsia-500 text-white text-[10px] font-extrabold leading-none">
-              {incomingPartyInvites.length}
-            </span>
-          )}
-        </button>
-
         {/* Themes Button */}
         <button
           onClick={onOpenThemeModal}

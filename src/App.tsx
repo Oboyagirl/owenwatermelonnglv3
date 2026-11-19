@@ -15,10 +15,8 @@ import { FloatingMusicPlayer } from './components/FloatingMusicPlayer';
 import { ChatBoxWidget } from './components/ChatBoxWidget';
 import { NotificationToasts } from './components/NotificationToasts';
 import { NotificationProvider } from './context/NotificationContext';
-import { PartyProvider } from './context/PartyContext';
 import { CallProvider } from './context/CallContext';
 import { CallOverlay } from './components/CallOverlay';
-import { PartyModal } from './components/PartyModal';
 import { useGamesStore } from './services/gamesStore';
 import { useSiteSettingsStore } from './services/siteSettingsStore';
 import { useThemeStore } from './services/themeStore';
@@ -938,7 +936,6 @@ export default function App() {
         onNavigateSpace={handleSelectSpace}
         onOpenChat={() => setIsChatOpen(true)}
       >
-        <PartyProvider>
         <div 
           className="h-screen w-screen text-slate-100 flex overflow-hidden font-sans select-none"
           style={{ backgroundColor: activeTheme.bgPrimary }}
@@ -1124,9 +1121,6 @@ export default function App() {
       {/* Global Peer-to-Peer WebRTC Voice & Video Call Overlay */}
       <CallOverlay activeTheme={activeTheme} />
 
-      {/* Global 2v2 / 1v1 Multiplayer Party Lobby Modal */}
-      <PartyModal activeTheme={activeTheme} />
-
       {/* Sign-In Required Modal when trying to play a game while signed out */}
       {!isSignedIn && isGameAuthModalOpen && (
         <GameAuthGate
@@ -1140,7 +1134,6 @@ export default function App() {
         />
       )}
         </div>
-        </PartyProvider>
       </NotificationProvider>
     </CallProvider>
   );

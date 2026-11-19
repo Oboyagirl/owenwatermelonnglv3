@@ -40,13 +40,8 @@ import {
 import { ThemeConfig } from '../services/themeStore';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
-import { useParty } from '../context/PartyContext';
 import { useCall } from '../context/CallContext';
-import {
-  auth,
-  formatFriendlyFirestoreError,
-  isIgnorableFirestoreError
-} from '../services/firebase';
+import { auth } from '../services/firebase';
 import { AVATAR_PRESETS } from '../services/cloudSaveService';
 import { isProfileOnlineNow } from '../services/chatService';
 import { sendGameInvite } from '../services/inviteService';
@@ -91,21 +86,16 @@ import {
   ChessAuthRequiredError,
   ChessRoomViewPayload,
   claimFirestoreChessTimeout,
-  clearFirestoreChessBots,
   createFirestoreChessRoom,
-  fillFirestoreChessBots,
   joinFirestoreChessRoom,
   leaveFirestoreChessRoom,
   resignFirestoreChessRoom,
   sanitizeRoomCode,
-  sendFirestoreChessBotMove,
   sendFirestoreChessMove,
   signInGoogleForChess,
   subscribeFirestoreChessRoom,
-  switchFirestoreChessTeam,
   voteFirestoreChessRematch
 } from '../services/chessRoomService';
-import type { TeamMode, TeamSeat } from '../utils/teamModes';
 
 interface ChessViewProps {
   activeTheme: ThemeConfig;
@@ -517,7 +507,6 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
   const { user, profile } = useAuth();
   const {
     pendingChessJoinCode,
-    pendingChessPreferredTeam,
     clearPendingChessJoinCode,
     trackedChessRoom,
     setTrackedChessRoom,
@@ -530,9 +519,6 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     acceptGameInvite,
     declineGameInvite
   } = useNotifications();
-  const { openPartyModal } = useParty();
-  const myFirebaseUid =
-    user?.uid && auth.currentUser?.uid === user.uid ? user.uid : auth.currentUser?.uid || '';
   const initialRestoredMatch = useMemo(() => loadSavedLocalChessMatch(), []);
 
   // Match Configuration
@@ -644,17 +630,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
   const [onlineRoomCode, setOnlineRoomCode] = useState<string | null>(null);
   const [onlineMyColor, setOnlineMyColor] = useState<PieceColor | 'spectator'>('w');
   const [onlinePlayers, setOnlinePlayers] = useState<OnlineRoomPlayers>({ w: null, b: null });
-  const [onlineRematchVotes, setOnlineRematchVotes] = useState<string[]>([]);
-  const [createTeamMode, setCreateTeamMode] = useState<TeamMode>('1v1');
-  const [createFillBots, setCreateFillBots] = useState<boolean>(false);
-  const [onlineTeamMode, setOnlineTeamMode] = useState<TeamMode>('1v1');
-  const [onlineWhiteSeats, setOnlineWhiteSeats] = useState<TeamSeat[]>([]);
-  const [onlineBlackSeats, setOnlineBlackSeats] = useState<TeamSeat[]>([]);
-  const [onlineMySeatIndex, setOnlineMySeatIndex] = useState<number | null>(null);
-  const [onlineActiveSeat, setOnlineActiveSeat] = useState<TeamSeat | null>(null);
-  const [onlineParticipantUids, setOnlineParticipantUids] = useState<string[]>([]);
-  const [onlineBotRunnerUid, setOnlineBotRunnerUid] = useState<string | null>(null);
-  const [isRoomActionBusy, setIsRoomActionBusy] = useState<boolean>(false);
+  const [onlineRematchVotes, setOnlineRematchVotes] = useState<PieceColor[]>([]);
   const [joinCodeInput, setJoinCodeInput] = useState('');
   const [onlineError, setOnlineError] = useState<string | null>(null);
   const [onlineAuthNeeded, setOnlineAuthNeeded] = useState(false);
@@ -884,12 +860,6 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       ? onlineMyColor
       : null;
 
-  const isMyActiveOnlineSeat =
-    !onlineActiveSeat ||
-    (onlineActiveSeat.kind === 'human' &&
-      ((myFirebaseUid && onlineActiveSeat.uid === myFirebaseUid) ||
-        onlineActiveSeat.playerId === playerId));
-
   const isHumanTurn =
     !isGameOver &&
     (viewPly === null || viewPly === moveHistory.length) &&
@@ -899,16 +869,14 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       ? gameState.turn === humanColor
       : Boolean(onlineRoomCode) &&
         (onlineMyColor === 'w' || onlineMyColor === 'b') &&
-        gameState.turn === onlineMyColor &&
-        isMyActiveOnlineSeat);
+        gameState.turn === onlineMyColor);
 
   const canPremove =
     !isGameOver &&
     (viewPly === null || viewPly === moveHistory.length) &&
     playerControlledColor !== null &&
-    (mode === 'ai'
-      ? gameState.turn !== playerControlledColor
-      : mode === 'online' && Boolean(onlineRoomCode) && !isHumanTurn);
+    gameState.turn !== playerControlledColor &&
+    (mode === 'ai' || (mode === 'online' && Boolean(onlineRoomCode)));
 
   const speakAsBot = useCallback(
     (bot: ChessBot, event: Parameters<typeof pickBotVoiceline>[1]) => {
@@ -955,14 +923,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       if (pending && pending.code === msg.code) {
         if (!endedByEvent && nextHistory.length < pending.expectedMoveIndex + 1) {
           // Ignore stale pre-move snapshot while our optimistic move is in flight
-          setOnlineTeamMode(msg.teamMode || '1v1');
           setOnlineMyColor(msg.myColor || 'spectator');
-          setOnlineMySeatIndex(msg.mySeatIndex ?? null);
-          setOnlineWhiteSeats(Array.isArray(msg.whiteSeats) ? msg.whiteSeats : []);
-          setOnlineBlackSeats(Array.isArray(msg.blackSeats) ? msg.blackSeats : []);
-          setOnlineActiveSeat(msg.activeSeat || null);
-          setOnlineParticipantUids(Array.isArray(msg.participantUids) ? msg.participantUids : []);
-          setOnlineBotRunnerUid(msg.botRunnerUid || null);
           setOnlinePlayers(msg.players || { w: null, b: null });
           setOnlineRematchVotes(Array.isArray(msg.rematchVotes) ? msg.rematchVotes : []);
           return;
@@ -984,14 +945,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       lastOnlineHistoryLenRef.current = nextHistory.length;
 
       setOnlineRoomCode(msg.code);
-      setOnlineTeamMode(msg.teamMode || '1v1');
       setOnlineMyColor(msg.myColor || 'spectator');
-      setOnlineMySeatIndex(msg.mySeatIndex ?? null);
-      setOnlineWhiteSeats(Array.isArray(msg.whiteSeats) ? msg.whiteSeats : []);
-      setOnlineBlackSeats(Array.isArray(msg.blackSeats) ? msg.blackSeats : []);
-      setOnlineActiveSeat(msg.activeSeat || null);
-      setOnlineParticipantUids(Array.isArray(msg.participantUids) ? msg.participantUids : []);
-      setOnlineBotRunnerUid(msg.botRunnerUid || null);
       setOnlinePlayers(msg.players || { w: null, b: null });
       setOnlineRematchVotes(Array.isArray(msg.rematchVotes) ? msg.rematchVotes : []);
       setGameState(nextState);
@@ -1063,10 +1017,6 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
           if (
             (msg.myColor === 'w' || msg.myColor === 'b') &&
             nextState.turn === msg.myColor &&
-            (!msg.activeSeat ||
-              (msg.activeSeat.kind === 'human' &&
-                ((myFirebaseUid && msg.activeSeat.uid === myFirebaseUid) ||
-                  msg.activeSeat.playerId === playerId))) &&
             typeof document !== 'undefined' &&
             document.visibilityState === 'hidden'
           ) {
@@ -1081,7 +1031,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
         }
       }
     },
-    [playSound, pushTurnToast, myFirebaseUid, playerId]
+    [playSound, pushTurnToast]
   );
 
   const startFirestoreRoomSubscription = useCallback(
@@ -1097,9 +1047,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
         },
         onError: (err) => {
           setWsStatus('disconnected');
-          if (!isIgnorableFirestoreError(err)) {
-            setOnlineError(formatFriendlyFirestoreError(err, 'Reconnecting to room...'));
-          }
+          setOnlineError(err.message || 'Could not sync online room.');
         }
       });
     },
@@ -1120,10 +1068,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
         playerId,
         playerName: playerName.trim() || 'Player',
         preferredColor: sidePref,
-        timeControlId,
-        teamMode: createTeamMode,
-        fillBots: createFillBots,
-        primaryBotId: selectedBotId
+        timeControlId
       });
       pendingAuthActionRef.current = null;
       startFirestoreRoomSubscription(code, uid);
@@ -1133,9 +1078,9 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
         pendingAuthActionRef.current = { kind: 'create' };
         setOnlineAuthNeeded(true);
         setOnlineError(err.message);
-      } else if (!isIgnorableFirestoreError(err)) {
+      } else {
         setOnlineError(
-          formatFriendlyFirestoreError(err, 'Could not start online room right now. Please try again.')
+          err instanceof Error ? err.message : 'Failed to create online room.'
         );
       }
     }
@@ -1144,9 +1089,6 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     playerName,
     sidePref,
     timeControlId,
-    createTeamMode,
-    createFillBots,
-    selectedBotId,
     closeWebSocket,
     closeFirestoreRoom,
     startFirestoreRoomSubscription
@@ -1162,17 +1104,11 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       closeFirestoreRoom();
       activeTransportRef.current = 'firestore';
 
-      const preferredTeam =
-        pendingChessPreferredTeam === 'w' || pendingChessPreferredTeam === 'b'
-          ? pendingChessPreferredTeam
-          : undefined;
-
       try {
         const { code, uid, payload } = await joinFirestoreChessRoom({
           code: cleanCode,
           playerId,
-          playerName: playerName.trim() || 'Player',
-          preferredTeam
+          playerName: playerName.trim() || 'Player'
         });
         pendingAuthActionRef.current = null;
         applyOnlineRoomSync(payload);
@@ -1183,10 +1119,10 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
           pendingAuthActionRef.current = { kind: 'join', code: cleanCode };
           setOnlineAuthNeeded(true);
           setOnlineError(err.message);
-        } else if (!isIgnorableFirestoreError(err)) {
+        } else {
           setTrackedChessRoom(null);
           setOnlineError(
-            formatFriendlyFirestoreError(err, `Room "${cleanCode}" is unavailable right now.`)
+            err instanceof Error ? err.message : `Could not join room "${cleanCode}".`
           );
         }
       }
@@ -1194,7 +1130,6 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     [
       playerId,
       playerName,
-      pendingChessPreferredTeam,
       closeWebSocket,
       closeFirestoreRoom,
       applyOnlineRoomSync,
@@ -1278,9 +1213,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
             setWhiteTimeMs(pending.rollbackClockAnchor.whiteMs);
             setBlackTimeMs(pending.rollbackClockAnchor.blackMs);
           }
-          setOnlineError(
-            formatFriendlyFirestoreError(String(msg.message || ''), 'Please double-check the room details and try again.')
-          );
+          setOnlineError(String(msg.message || 'Room error occurred.'));
           return;
         }
 
@@ -1295,6 +1228,8 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
         }
         if (onUnavailable) {
           onUnavailable();
+        } else {
+          setOnlineError('Connection interrupted. Check your network and try again.');
         }
       };
 
@@ -1412,11 +1347,9 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
         await joinOnlineViaFirestore(pending.code);
       }
     } catch (err) {
-      if (!isIgnorableFirestoreError(err)) {
-        setOnlineError(
-          formatFriendlyFirestoreError(err, 'Google sign-in could not be completed.')
-        );
-      }
+      setOnlineError(
+        err instanceof Error ? err.message : 'Google sign-in could not be completed.'
+      );
     } finally {
       setOnlineSigningIn(false);
     }
@@ -1430,10 +1363,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
           playerId,
           playerName: playerName.trim() || 'Player',
           preferredColor: sidePref,
-          timeControlId,
-          teamMode: createTeamMode,
-          fillBots: createFillBots,
-          primaryBotId: selectedBotId
+          timeControlId
         },
         () => {
           void createOnlineViaFirestore();
@@ -1450,18 +1380,13 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       setOnlineError('Enter a room code to join.');
       return;
     }
-    const preferredTeam =
-      pendingChessPreferredTeam === 'w' || pendingChessPreferredTeam === 'b'
-        ? pendingChessPreferredTeam
-        : undefined;
     if (shouldPreferLocalWs()) {
       connectAndSendWs(
         {
           type: 'room:join',
           code: cleanCode,
           playerId,
-          playerName: playerName.trim() || 'Player',
-          preferredTeam
+          playerName: playerName.trim() || 'Player'
         },
         () => {
           void joinOnlineViaFirestore(cleanCode);
@@ -1469,83 +1394,6 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       );
     } else {
       void joinOnlineViaFirestore(cleanCode);
-    }
-  };
-
-  const handleSwitchOnlineTeam = async (targetColor: PieceColor) => {
-    if (!onlineRoomCode || isRoomActionBusy) return;
-    setOnlineError(null);
-    setIsRoomActionBusy(true);
-    try {
-      if (activeTransportRef.current === 'ws') {
-        connectAndSendWs({
-          type: 'room:switch_team',
-          code: onlineRoomCode,
-          playerId,
-          playerName: playerName.trim() || 'Player',
-          targetColor
-        });
-      } else {
-        await switchFirestoreChessTeam({
-          code: onlineRoomCode,
-          playerId,
-          playerName: playerName.trim() || 'Player',
-          targetColor
-        });
-      }
-    } catch (err) {
-      if (!isIgnorableFirestoreError(err)) {
-        setOnlineError(formatFriendlyFirestoreError(err, 'Could not switch teams right now.'));
-      }
-    } finally {
-      setIsRoomActionBusy(false);
-    }
-  };
-
-  const handleFillRoomWithBots = async () => {
-    if (!onlineRoomCode || isRoomActionBusy) return;
-    setOnlineError(null);
-    setIsRoomActionBusy(true);
-    try {
-      if (activeTransportRef.current === 'ws') {
-        connectAndSendWs({
-          type: 'room:fill_bots',
-          code: onlineRoomCode,
-          playerId,
-          primaryBotId: selectedBotId
-        });
-      } else {
-        await fillFirestoreChessBots(onlineRoomCode, selectedBotId);
-      }
-    } catch (err) {
-      if (!isIgnorableFirestoreError(err)) {
-        setOnlineError(formatFriendlyFirestoreError(err, 'Could not fill bot slots right now.'));
-      }
-    } finally {
-      setIsRoomActionBusy(false);
-    }
-  };
-
-  const handleClearRoomBots = async () => {
-    if (!onlineRoomCode || isRoomActionBusy) return;
-    setOnlineError(null);
-    setIsRoomActionBusy(true);
-    try {
-      if (activeTransportRef.current === 'ws') {
-        connectAndSendWs({
-          type: 'room:clear_bots',
-          code: onlineRoomCode,
-          playerId
-        });
-      } else {
-        await clearFirestoreChessBots(onlineRoomCode);
-      }
-    } catch (err) {
-      if (!isIgnorableFirestoreError(err)) {
-        setOnlineError(formatFriendlyFirestoreError(err, 'Could not clear bots right now.'));
-      }
-    } finally {
-      setIsRoomActionBusy(false);
     }
   };
 
@@ -1570,13 +1418,6 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     timeoutClaimedPlyRef.current = -1;
     setOnlineRoomCode(null);
     setOnlineTimeControlId(null);
-    setOnlineTeamMode('1v1');
-    setOnlineWhiteSeats([]);
-    setOnlineBlackSeats([]);
-    setOnlineMySeatIndex(null);
-    setOnlineActiveSeat(null);
-    setOnlineParticipantUids([]);
-    setOnlineBotRunnerUid(null);
     setOnlinePlayers({ w: null, b: null });
     setOnlineRematchVotes([]);
     setOnlineError(null);
@@ -1602,6 +1443,9 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       anchoredAt: Date.now()
     };
   };
+
+  const myFirebaseUid =
+    user?.uid && auth.currentUser?.uid === user.uid ? user.uid : auth.currentUser?.uid || '';
 
   const invitableChessPlayers = useMemo(() => {
     const byUid = new Map<
@@ -1738,10 +1582,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
           playerId,
           playerName: playerName.trim() || profile?.displayName || user?.displayName || 'Player',
           preferredColor: sidePref,
-          timeControlId,
-          teamMode: createTeamMode,
-          fillBots: createFillBots,
-          primaryBotId: selectedBotId
+          timeControlId
         });
         roomToShare = created.code;
         senderUid = created.uid;
@@ -1760,7 +1601,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
         toName: target.name,
         gameKind: 'chess',
         gameType: 'chess',
-        gameTitle: onlineRoomCode ? (onlineTeamMode === '2v2' ? '2v2 Chess' : 'Chess') : (createTeamMode === '2v2' ? '2v2 Chess' : 'Chess'),
+        gameTitle: 'Chess',
         roomCode: roomToShare
       });
 
@@ -1772,10 +1613,8 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     } catch (err) {
       if (err instanceof ChessAuthRequiredError) {
         setOnlineAuthNeeded(true);
-        setOnlineError(err.message);
-      } else if (!isIgnorableFirestoreError(err)) {
-        setOnlineError(formatFriendlyFirestoreError(err, 'Could not send invite right now.'));
       }
+      setOnlineError(err instanceof Error ? err.message : 'Could not send invite.');
     } finally {
       setInvitingFriendUid(null);
     }
@@ -1800,9 +1639,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
             setWhiteTimeMs(pending.rollbackClockAnchor.whiteMs);
             setBlackTimeMs(pending.rollbackClockAnchor.blackMs);
           }
-          if (!isIgnorableFirestoreError(err)) {
-            setOnlineError(formatFriendlyFirestoreError(err, 'Move could not be confirmed yet.'));
-          }
+          setOnlineError(err instanceof Error ? err.message : 'Failed to send move.');
         });
         return;
       }
@@ -1841,9 +1678,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
         if (onlineRoomCode) {
           if (activeTransportRef.current === 'firestore') {
             void voteFirestoreChessRematch(onlineRoomCode).catch(err => {
-              if (!isIgnorableFirestoreError(err)) {
-                setOnlineError(formatFriendlyFirestoreError(err, 'Could not request rematch.'));
-              }
+              setOnlineError(err instanceof Error ? err.message : 'Could not request rematch.');
             });
           } else {
             connectAndSendWs({
@@ -2235,48 +2070,10 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     commitMove
   ]);
 
-  // Step AI bot teammates/opponents automatically in Firestore 1v1/2v2 online rooms
-  useEffect(() => {
-    if (
-      mode !== 'online' ||
-      !onlineRoomCode ||
-      activeTransportRef.current !== 'firestore' ||
-      isGameOver ||
-      !onlineActiveSeat ||
-      onlineActiveSeat.kind !== 'bot' ||
-      !myFirebaseUid ||
-      onlineBotRunnerUid !== myFirebaseUid
-    ) {
-      return;
-    }
-
-    const expectedMoveIndex = moveHistory.length;
-    const timer = window.setTimeout(() => {
-      void sendFirestoreChessBotMove({
-        code: onlineRoomCode,
-        expectedMoveIndex
-      });
-    }, 420);
-
-    return () => window.clearTimeout(timer);
-  }, [
-    mode,
-    onlineRoomCode,
-    isGameOver,
-    onlineActiveSeat,
-    onlineBotRunnerUid,
-    myFirebaseUid,
-    moveHistory.length
-  ]);
-
-  // Execute queued premove automatically when exact player seat turn arrives
+  // Execute queued premove automatically when turn arrives for playerControlledColor
   useEffect(() => {
     if (!premove || isGameOver || playerControlledColor === null) return;
-    if (mode === 'online') {
-      if (!isHumanTurn) return;
-    } else if (gameState.turn !== playerControlledColor) {
-      return;
-    }
+    if (gameState.turn !== playerControlledColor) return;
 
     const queued = premove;
     setPremove(null);
@@ -2305,7 +2102,6 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
     premove,
     isGameOver,
     playerControlledColor,
-    isHumanTurn,
     gameState,
     mode,
     commitMove
@@ -2607,9 +2403,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
       if (onlineRoomCode && (onlineMyColor === 'w' || onlineMyColor === 'b')) {
         if (activeTransportRef.current === 'firestore') {
           void resignFirestoreChessRoom(onlineRoomCode).catch(err => {
-            if (!isIgnorableFirestoreError(err)) {
-              setOnlineError(formatFriendlyFirestoreError(err, 'Could not resign right now.'));
-            }
+            setOnlineError(err instanceof Error ? err.message : 'Failed to resign.');
           });
         } else {
           connectAndSendWs({
@@ -3321,15 +3115,9 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
   const rows = isFlipped ? [7, 6, 5, 4, 3, 2, 1, 0] : [0, 1, 2, 3, 4, 5, 6, 7];
   const cols = isFlipped ? [7, 6, 5, 4, 3, 2, 1, 0] : [0, 1, 2, 3, 4, 5, 6, 7];
   const endBanner = getEndBannerCopy();
-  const requiredRematchVotes = Math.max(
-    1,
-    onlineParticipantUids.length || (onlinePlayers.w && onlinePlayers.b ? 2 : 1)
-  );
   const hasVotedRematch =
     (onlineMyColor === 'w' || onlineMyColor === 'b') &&
-    (onlineRematchVotes.includes(onlineMyColor) ||
-      (onlineMySeatIndex !== null &&
-        onlineRematchVotes.includes(`${onlineMyColor}:${onlineMySeatIndex}`)));
+    onlineRematchVotes.includes(onlineMyColor);
 
   return (
     <div
@@ -3979,9 +3767,9 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                           >
                             <RefreshCw className="w-3.5 h-3.5" />
                             {hasVotedRematch
-                              ? `Waiting (${onlineRematchVotes.length}/${requiredRematchVotes})`
+                              ? `Waiting (${onlineRematchVotes.length}/2)`
                               : onlineRematchVotes.length > 0
-                              ? `Accept Rematch (${onlineRematchVotes.length}/${requiredRematchVotes})`
+                              ? 'Accept Rematch (1/2)'
                               : 'Rematch'}
                           </button>
                         )
@@ -4499,31 +4287,6 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                   }}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[11px] font-bold text-slate-200">Team Size</span>
-                    <div className="grid grid-cols-2 gap-1">
-                      {(['1v1', '2v2'] as const).map(tm => {
-                        const active = createTeamMode === tm;
-                        return (
-                          <button
-                            key={tm}
-                            type="button"
-                            onClick={() => setCreateTeamMode(tm)}
-                            className={`px-2.5 py-0.5 rounded border text-[10px] font-extrabold cursor-pointer ${
-                              active ? 'text-black' : 'text-slate-300 hover:text-white'
-                            }`}
-                            style={{
-                              backgroundColor: active ? activeTheme.accent : undefined,
-                              borderColor: active ? activeTheme.accent : activeTheme.border
-                            }}
-                          >
-                            {tm === '2v2' ? '2v2 Teams' : '1v1 Solo'}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-2">
                     <span className="text-[11px] font-bold text-slate-200">Host Side</span>
                     <div className="flex items-center gap-1">
                       {(
@@ -4554,26 +4317,6 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-[11px] font-bold text-slate-200 flex items-center gap-1">
-                      <Bot className="w-3 h-3" style={{ color: activeTheme.accent }} />
-                      Fill Open Slots with Bots
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setCreateFillBots(v => !v)}
-                      className={`px-2.5 py-0.5 rounded border text-[10px] font-extrabold cursor-pointer ${
-                        createFillBots ? 'text-black' : 'text-slate-300 hover:text-white'
-                      }`}
-                      style={{
-                        backgroundColor: createFillBots ? activeTheme.accent : undefined,
-                        borderColor: createFillBots ? activeTheme.accent : activeTheme.border
-                      }}
-                    >
-                      {createFillBots ? 'vs Bots ON' : 'Humans Only'}
-                    </button>
-                  </div>
-
                   <button
                     type="button"
                     onClick={handleCreateRoom}
@@ -4581,27 +4324,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                     className="w-full py-1.5 px-3 rounded-lg text-black font-extrabold text-xs cursor-pointer shadow-sm hover:opacity-95 disabled:opacity-60"
                     style={{ backgroundColor: activeTheme.accent }}
                   >
-                    {wsStatus === 'connecting'
-                      ? 'Connecting...'
-                      : `Create ${createTeamMode.toUpperCase()} Room Code`}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      openPartyModal({
-                        gameKind: 'chess',
-                        gameType: 'chess',
-                        gameTitle: 'Chess',
-                        matchMode: createTeamMode,
-                        opponentMode: createFillBots ? 'bots' : 'humans'
-                      })
-                    }
-                    className="w-full py-1.5 px-3 rounded-lg border text-[11px] font-extrabold text-white hover:bg-white/10 cursor-pointer flex items-center justify-center gap-1.5"
-                    style={{ borderColor: activeTheme.borderActive, backgroundColor: activeTheme.accentBadge }}
-                  >
-                    <Users className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
-                    <span>Open 2v2 Party Lobby (Invite Multiple)</span>
+                    {wsStatus === 'connecting' ? 'Connecting...' : 'Create Room Code'}
                   </button>
 
                   <div className="flex items-center gap-1.5 pt-1 border-t border-white/10">
@@ -4638,15 +4361,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div>
-                      <div className="text-[10px] text-slate-400 flex items-center gap-1.5">
-                        <span>Room Code</span>
-                        <span
-                          className="px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase"
-                          style={{ backgroundColor: activeTheme.accentBadge, color: activeTheme.accent }}
-                        >
-                          {onlineTeamMode.toUpperCase()}
-                        </span>
-                      </div>
+                      <div className="text-[10px] text-slate-400">Room Code</div>
                       <div className="text-lg font-mono font-extrabold tracking-widest text-white select-all">
                         {onlineRoomCode}
                       </div>
@@ -4683,151 +4398,9 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                     </div>
                   </div>
 
-                  {/* Team White & Team Black Seat Roster */}
-                  {(onlineWhiteSeats.length > 0 || onlineBlackSeats.length > 0) && (
-                    <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-white/10">
-                      {(
-                        [
-                          { color: 'w' as const, label: 'Team White', seats: onlineWhiteSeats },
-                          { color: 'b' as const, label: 'Team Black', seats: onlineBlackSeats }
-                        ]
-                      ).map(team => (
-                        <div
-                          key={team.color}
-                          className="p-1.5 rounded-md border bg-black/25 flex flex-col gap-1"
-                          style={{
-                            borderColor:
-                              !isGameOver && gameState.turn === team.color
-                                ? activeTheme.borderActive
-                                : 'rgba(255,255,255,0.08)'
-                          }}
-                        >
-                          <div className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center justify-between">
-                            <span>{team.label}</span>
-                            {moveHistory.length === 0 &&
-                              !isGameOver &&
-                              onlineMyColor !== team.color &&
-                              team.seats.some(s => s.kind === 'open' || s.kind === 'bot') && (
-                                <button
-                                  type="button"
-                                  disabled={isRoomActionBusy}
-                                  onClick={() => void handleSwitchOnlineTeam(team.color)}
-                                  className="text-[9px] font-bold hover:underline cursor-pointer disabled:opacity-50"
-                                  style={{ color: activeTheme.accent }}
-                                >
-                                  Join
-                                </button>
-                              )}
-                          </div>
-                          {team.seats.map((seat, idx) => {
-                            const isMeHere =
-                              seat.kind === 'human' &&
-                              ((myFirebaseUid && seat.uid === myFirebaseUid) ||
-                                seat.playerId === playerId);
-                            const isSeatTurnNow =
-                              !isGameOver &&
-                              gameState.turn === team.color &&
-                              onlineMyColor !== undefined &&
-                              onlineActiveSeat &&
-                              ((onlineTeamMode === '1v1' && idx === 0) ||
-                                (onlineActiveSeat.kind === seat.kind &&
-                                  onlineActiveSeat.uid === seat.uid &&
-                                  onlineActiveSeat.playerId === seat.playerId &&
-                                  onlineActiveSeat.name === seat.name));
-                            return (
-                              <div
-                                key={`${team.color}-${idx}`}
-                                className="px-1.5 py-0.5 rounded text-[10px] flex items-center justify-between gap-1 truncate"
-                                style={{
-                                  backgroundColor: isSeatTurnNow
-                                    ? activeTheme.accentBadge
-                                    : 'rgba(255,255,255,0.04)',
-                                  color:
-                                    seat.kind === 'open'
-                                      ? '#64748b'
-                                      : seat.kind === 'bot'
-                                      ? '#c4b5fd'
-                                      : '#f8fafc'
-                                }}
-                              >
-                                <span className="truncate font-semibold">
-                                  {seat.kind === 'open'
-                                    ? 'Open slot'
-                                    : seat.kind === 'bot'
-                                    ? `🤖 ${seat.name || 'Bot'}`
-                                    : isMeHere
-                                    ? `${seat.name || 'You'} (You)`
-                                    : seat.name || 'Player'}
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Quick Bot Fill / Clear Controls */}
-                  {!isGameOver && onlineMyColor !== 'spectator' && (
-                    <div className="flex flex-wrap items-center gap-1">
-                      {[...onlineWhiteSeats, ...onlineBlackSeats].some(s => s.kind === 'open') && (
-                        <button
-                          type="button"
-                          disabled={isRoomActionBusy}
-                          onClick={() => void handleFillRoomWithBots()}
-                          className="flex-1 py-1 px-2 rounded border text-[10px] font-bold text-white hover:bg-white/10 cursor-pointer flex items-center justify-center gap-1 disabled:opacity-50"
-                          style={{ borderColor: activeTheme.borderActive, backgroundColor: activeTheme.accentBadge }}
-                        >
-                          <Bot className="w-3 h-3" style={{ color: activeTheme.accent }} />
-                          <span>Fill Bots</span>
-                        </button>
-                      )}
-                      {moveHistory.length === 0 &&
-                        [...onlineWhiteSeats, ...onlineBlackSeats].some(s => s.kind === 'bot') && (
-                          <button
-                            type="button"
-                            disabled={isRoomActionBusy}
-                            onClick={() => void handleClearRoomBots()}
-                            className="py-1 px-2 rounded border text-[10px] font-bold text-slate-300 hover:text-white hover:bg-white/10 cursor-pointer disabled:opacity-50"
-                            style={{ borderColor: activeTheme.border }}
-                          >
-                            Clear Bots
-                          </button>
-                        )}
-                      <button
-                        type="button"
-                        onClick={() =>
-                          openPartyModal({
-                            gameKind: 'chess',
-                            gameType: 'chess',
-                            gameTitle: 'Chess',
-                            matchMode: onlineTeamMode
-                          })
-                        }
-                        className="py-1 px-2 rounded border text-[10px] font-bold text-slate-200 hover:bg-white/10 cursor-pointer flex items-center gap-1"
-                        style={{ borderColor: activeTheme.border }}
-                        title="Open Party Lobby"
-                      >
-                        <Users className="w-3 h-3" />
-                        <span>Party</span>
-                      </button>
-                    </div>
-                  )}
-
                   <div className="text-[10px] text-slate-300 flex items-center justify-between pt-1 border-t border-white/10">
                     <span>
-                      {[...onlineWhiteSeats, ...onlineBlackSeats].length > 0
-                        ? [...onlineWhiteSeats, ...onlineBlackSeats].every(s => s.kind !== 'open')
-                          ? onlineActiveSeat?.kind === 'bot'
-                            ? `${onlineActiveSeat.name || 'Bot'} moving...`
-                            : isHumanTurn
-                            ? 'Your turn!'
-                            : 'All seats ready'
-                          : `Waiting for ${
-                              [...onlineWhiteSeats, ...onlineBlackSeats].filter(s => s.kind === 'open')
-                                .length
-                            } player(s)...`
-                        : onlinePlayers.w && onlinePlayers.b
+                      {onlinePlayers.w && onlinePlayers.b
                         ? 'Both players connected'
                         : 'Waiting for friend to join...'}
                     </span>
@@ -4883,10 +4456,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
               )}
 
               {/* 1-Click Direct Friend Invites (No Code Needed) */}
-              {(!onlineRoomCode ||
-                [...onlineWhiteSeats, ...onlineBlackSeats].some(s => s.kind === 'open') ||
-                !(onlinePlayers.w && onlinePlayers.b)) &&
-                invitableChessPlayers.length > 0 && (
+              {(!onlineRoomCode || !(onlinePlayers.w && onlinePlayers.b)) && invitableChessPlayers.length > 0 && (
                 <div
                   className="p-2 rounded-lg border flex flex-col gap-1.5"
                   style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}
@@ -5029,7 +4599,7 @@ export const ChessView: React.FC<ChessViewProps> = ({ activeTheme }) => {
                     style={{ backgroundColor: activeTheme.accent }}
                   >
                     {hasVotedRematch
-                      ? `Wait (${onlineRematchVotes.length}/${requiredRematchVotes})`
+                      ? `Wait (${onlineRematchVotes.length}/2)`
                       : 'Rematch'}
                   </button>
                 )
