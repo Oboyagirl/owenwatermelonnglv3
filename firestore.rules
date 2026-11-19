@@ -71,6 +71,43 @@ service cloud.firestore {
       return code is string && code.size() >= 4 && code.size() <= 8 && code.matches('^[A-Z0-9]+$');
     }
 
+    function isValidTeamSeat(seat) {
+      return seat is map &&
+        seat.keys().hasAll(['kind', 'uid', 'playerId', 'name', 'botId']) &&
+        seat.keys().hasOnly(['kind', 'uid', 'playerId', 'name', 'botId']) &&
+        seat.kind is string && seat.kind.size() >= 3 && seat.kind.size() <= 5 && seat.kind in ['open', 'human', 'bot'] &&
+        (seat.uid == null || (seat.uid is string && seat.uid.size() > 0 && seat.uid.size() <= 128)) &&
+        (seat.playerId == null || (seat.playerId is string && seat.playerId.size() > 0 && seat.playerId.size() <= 64)) &&
+        (seat.name == null || (seat.name is string && seat.name.size() > 0 && seat.name.size() <= 24)) &&
+        (seat.botId == null || (seat.botId is string && seat.botId.size() > 0 && seat.botId.size() <= 32));
+    }
+
+    function isValidSeatList(seats) {
+      return seats is list &&
+        seats.size() >= 1 &&
+        seats.size() <= 2 &&
+        isValidTeamSeat(seats[0]) &&
+        (seats.size() < 2 || isValidTeamSeat(seats[1]));
+    }
+
+    function isValidUidList4(uids) {
+      return uids is list &&
+        uids.size() <= 4 &&
+        (uids.size() == 0 || (uids[0] is string && uids[0].size() > 0 && uids[0].size() <= 128)) &&
+        (uids.size() < 2 || (uids[1] is string && uids[1].size() > 0 && uids[1].size() <= 128)) &&
+        (uids.size() < 3 || (uids[2] is string && uids[2].size() > 0 && uids[2].size() <= 128)) &&
+        (uids.size() < 4 || (uids[3] is string && uids[3].size() > 0 && uids[3].size() <= 128));
+    }
+
+    function isValidRematchVotes4(votes) {
+      return votes is list &&
+        votes.size() <= 4 &&
+        (votes.size() == 0 || (votes[0] is string && votes[0].size() >= 1 && votes[0].size() <= 6)) &&
+        (votes.size() < 2 || (votes[1] is string && votes[1].size() >= 1 && votes[1].size() <= 6)) &&
+        (votes.size() < 3 || (votes[2] is string && votes[2].size() >= 1 && votes[2].size() <= 6)) &&
+        (votes.size() < 4 || (votes[3] is string && votes[3].size() >= 1 && votes[3].size() <= 6));
+    }
+
     function isValidChessRoom(data) {
       return data.keys().hasAll([
         'code', 'creatorAuthUid', 'status', 'timeControlId', 'baseMs', 'incMs',
@@ -81,6 +118,7 @@ service cloud.firestore {
       ]) &&
       data.keys().hasOnly([
         'code', 'creatorAuthUid', 'status', 'timeControlId', 'baseMs', 'incMs',
+        'teamMode', 'whiteSeats', 'blackSeats', 'participantUids', 'activeSeatKind', 'activeSeatUid',
         'whiteAuthUid', 'whitePlayerId', 'whiteName', 'whiteElo',
         'blackAuthUid', 'blackPlayerId', 'blackName', 'blackElo',
         'moves', 'turn', 'whiteTimeMs', 'blackTimeMs', 'clockAnchorMs',
@@ -89,6 +127,12 @@ service cloud.firestore {
       isValidRoomCode(data.code) &&
       data.creatorAuthUid is string && data.creatorAuthUid.size() > 0 && data.creatorAuthUid.size() <= 128 &&
       data.status is string && data.status.size() > 0 && data.status.size() <= 16 && data.status in ['waiting', 'active', 'finished'] &&
+      (!('teamMode' in data) || (data.teamMode is string && data.teamMode.size() == 3 && data.teamMode in ['1v1', '2v2'])) &&
+      (!('whiteSeats' in data) || isValidSeatList(data.whiteSeats)) &&
+      (!('blackSeats' in data) || isValidSeatList(data.blackSeats)) &&
+      (!('participantUids' in data) || isValidUidList4(data.participantUids)) &&
+      (!('activeSeatKind' in data) || (data.activeSeatKind is string && data.activeSeatKind.size() >= 3 && data.activeSeatKind.size() <= 5 && data.activeSeatKind in ['open', 'human', 'bot'])) &&
+      (!('activeSeatUid' in data) || data.activeSeatUid == null || (data.activeSeatUid is string && data.activeSeatUid.size() > 0 && data.activeSeatUid.size() <= 128)) &&
       data.timeControlId is string && data.timeControlId.size() > 0 && data.timeControlId.size() <= 16 &&
       data.baseMs is int && data.baseMs >= 0 && data.baseMs <= 3600000 &&
       data.incMs is int && data.incMs >= 0 && data.incMs <= 120000 &&
@@ -108,9 +152,7 @@ service cloud.firestore {
       (data.clockAnchorMs == null || (data.clockAnchorMs is int && data.clockAnchorMs > 0)) &&
       (data.resignedWinner == null || (data.resignedWinner is string && data.resignedWinner.size() == 1 && data.resignedWinner in ['w', 'b'])) &&
       (data.timeoutWinner == null || (data.timeoutWinner is string && data.timeoutWinner.size() >= 1 && data.timeoutWinner.size() <= 4 && data.timeoutWinner in ['w', 'b', 'draw'])) &&
-      data.rematchVotes is list && data.rematchVotes.size() <= 2 &&
-      (data.rematchVotes.size() == 0 || (data.rematchVotes[0] is string && data.rematchVotes[0].size() == 1 && data.rematchVotes[0] in ['w', 'b'])) &&
-      (data.rematchVotes.size() < 2 || (data.rematchVotes[1] is string && data.rematchVotes[1].size() == 1 && data.rematchVotes[1] in ['w', 'b'])) &&
+      isValidRematchVotes4(data.rematchVotes) &&
       data.createdAt is timestamp &&
       data.updatedAt is timestamp;
     }
@@ -118,8 +160,14 @@ service cloud.firestore {
     function isChessRoomParticipant(data) {
       return isSignedIn() && (
         data.whiteAuthUid == request.auth.uid ||
-        data.blackAuthUid == request.auth.uid
+        data.blackAuthUid == request.auth.uid ||
+        ('participantUids' in data && request.auth.uid in data.participantUids)
       );
+    }
+
+    function isValidArcadeGameType(gt) {
+      return gt is string && gt.size() > 0 && gt.size() <= 32 &&
+        gt in ['connect4', 'checkers', 'reversi', 'dots-and-boxes', 'gomoku', 'ultimate-ttt', 'mancala', 'tictactoe', 'draw-guess', 'battleship', 'memory-match', 'dice-duel', 'pixel-guess', 'emoji-charades', 'nim', 'misere-nim', 'chomp', 'hex', 'grid-link-4', 'order-chaos', 'misere-ttt', 'gravity-5', 'snort', 'col-clash', 'domineering', 'cram', 'obstruction', 'ataxx', 'breakthrough', 'kings-escape', 'wordle-duel', 'hangman-duel', 'mastermind', 'hilo-target', 'word-chain', 'blackjack-21', 'yacht-dice', 'tug-of-war', 'rps-arena', 'penalty-kick', 'mines-duel', 'sos-grid', 'symmetry-art', 'color-match', 'emoji-story', 'quoridor', 'pente', 'nine-mens-morris', 'santorini-lite', 'fox-and-hounds', 'isola', 'tak-duel', 'go-mini', 'amazons-mini', 'tron-turn', 'shogi-pocket', 'gobblet-mini', 'splatter-turf', 'knight-duel', 'anagram-scramble', 'trivia-showdown', 'math-blitz', 'simon-duel', 'boggle-duel', 'sudoku-duel', 'uno-duel', 'go-fish', 'poker-dice', 'liars-dice', 'farkle-duel', 'coin-row', 'high-noon-duel'];
     }
 
     function isValidArcadeRoom(data) {
@@ -132,16 +180,25 @@ service cloud.firestore {
       ]) &&
       data.keys().hasOnly([
         'code', 'gameType', 'creatorAuthUid', 'status',
+        'teamMode', 'team1Seats', 'team2Seats', 'participantUids',
+        'team1TurnCount', 'team2TurnCount', 'activeSeatKind', 'activeSeatUid',
         'p1AuthUid', 'p1PlayerId', 'p1Name',
         'p2AuthUid', 'p2PlayerId', 'p2Name',
         'moves', 'turn', 'winner', 'resignedWinner', 'rematchVotes',
         'createdAt', 'updatedAt'
       ]) &&
       isValidRoomCode(data.code) &&
-      data.gameType is string && data.gameType.size() > 0 && data.gameType.size() <= 32 &&
-      data.gameType in ['connect4', 'checkers', 'reversi', 'dots-and-boxes', 'gomoku', 'ultimate-ttt', 'mancala', 'tictactoe', 'draw-guess', 'battleship', 'memory-match', 'dice-duel', 'pixel-guess', 'emoji-charades', 'nim', 'misere-nim', 'chomp', 'hex', 'grid-link-4', 'order-chaos', 'misere-ttt', 'gravity-5', 'snort', 'col-clash', 'domineering', 'cram', 'obstruction', 'ataxx', 'breakthrough', 'kings-escape', 'wordle-duel', 'hangman-duel', 'mastermind', 'hilo-target', 'word-chain', 'blackjack-21', 'yacht-dice', 'tug-of-war', 'rps-arena', 'penalty-kick', 'mines-duel', 'sos-grid', 'symmetry-art', 'color-match', 'emoji-story', 'quoridor', 'pente', 'nine-mens-morris', 'santorini-lite', 'fox-and-hounds', 'isola', 'tak-duel', 'go-mini', 'amazons-mini', 'tron-turn', 'shogi-pocket', 'gobblet-mini', 'splatter-turf', 'knight-duel', 'anagram-scramble', 'trivia-showdown', 'math-blitz', 'simon-duel', 'boggle-duel', 'sudoku-duel', 'uno-duel', 'go-fish', 'poker-dice', 'liars-dice', 'farkle-duel', 'coin-row', 'high-noon-duel'] &&
+      isValidArcadeGameType(data.gameType) &&
       data.creatorAuthUid is string && data.creatorAuthUid.size() > 0 && data.creatorAuthUid.size() <= 128 &&
       data.status is string && data.status.size() > 0 && data.status.size() <= 16 && data.status in ['waiting', 'active', 'finished'] &&
+      (!('teamMode' in data) || (data.teamMode is string && data.teamMode.size() == 3 && data.teamMode in ['1v1', '2v2'])) &&
+      (!('team1Seats' in data) || isValidSeatList(data.team1Seats)) &&
+      (!('team2Seats' in data) || isValidSeatList(data.team2Seats)) &&
+      (!('participantUids' in data) || isValidUidList4(data.participantUids)) &&
+      (!('team1TurnCount' in data) || (data.team1TurnCount is int && data.team1TurnCount >= 0 && data.team1TurnCount <= 10000)) &&
+      (!('team2TurnCount' in data) || (data.team2TurnCount is int && data.team2TurnCount >= 0 && data.team2TurnCount <= 10000)) &&
+      (!('activeSeatKind' in data) || (data.activeSeatKind is string && data.activeSeatKind.size() >= 3 && data.activeSeatKind.size() <= 5 && data.activeSeatKind in ['open', 'human', 'bot'])) &&
+      (!('activeSeatUid' in data) || data.activeSeatUid == null || (data.activeSeatUid is string && data.activeSeatUid.size() > 0 && data.activeSeatUid.size() <= 128)) &&
       (data.p1AuthUid == null || (data.p1AuthUid is string && data.p1AuthUid.size() > 0 && data.p1AuthUid.size() <= 128)) &&
       (data.p1PlayerId == null || (data.p1PlayerId is string && data.p1PlayerId.size() > 0 && data.p1PlayerId.size() <= 64)) &&
       (data.p1Name == null || (data.p1Name is string && data.p1Name.size() > 0 && data.p1Name.size() <= 24)) &&
@@ -153,9 +210,7 @@ service cloud.firestore {
       data.turn is string && data.turn.size() == 2 && data.turn in ['p1', 'p2'] &&
       (data.winner == null || (data.winner is string && data.winner.size() >= 2 && data.winner.size() <= 4 && data.winner in ['p1', 'p2', 'draw'])) &&
       (data.resignedWinner == null || (data.resignedWinner is string && data.resignedWinner.size() == 2 && data.resignedWinner in ['p1', 'p2'])) &&
-      data.rematchVotes is list && data.rematchVotes.size() <= 2 &&
-      (data.rematchVotes.size() == 0 || (data.rematchVotes[0] is string && data.rematchVotes[0].size() == 2 && data.rematchVotes[0] in ['p1', 'p2'])) &&
-      (data.rematchVotes.size() < 2 || (data.rematchVotes[1] is string && data.rematchVotes[1].size() == 2 && data.rematchVotes[1] in ['p1', 'p2'])) &&
+      isValidRematchVotes4(data.rematchVotes) &&
       data.createdAt is timestamp &&
       data.updatedAt is timestamp;
     }
@@ -163,8 +218,94 @@ service cloud.firestore {
     function isArcadeRoomParticipant(data) {
       return isSignedIn() && (
         data.p1AuthUid == request.auth.uid ||
-        data.p2AuthUid == request.auth.uid
+        data.p2AuthUid == request.auth.uid ||
+        ('participantUids' in data && request.auth.uid in data.participantUids)
       );
+    }
+
+    function isValidPartyMember(m) {
+      return m is map &&
+        m.keys().hasAll(['uid', 'playerId', 'displayName', 'avatarId', 'team']) &&
+        m.keys().hasOnly(['uid', 'playerId', 'displayName', 'avatarId', 'team']) &&
+        isValidId(m.uid) &&
+        m.playerId is string && m.playerId.size() > 0 && m.playerId.size() <= 64 &&
+        m.displayName is string && m.displayName.size() > 0 && m.displayName.size() <= 24 &&
+        m.avatarId is string && m.avatarId.size() > 0 && m.avatarId.size() <= 64 &&
+        m.team is string && m.team.size() == 1 && m.team in ['A', 'B'];
+    }
+
+    function isValidParty(data) {
+      return data.keys().hasAll([
+        'id', 'code', 'leaderUid', 'status', 'matchMode', 'opponentMode',
+        'gameKind', 'gameType', 'gameTitle', 'botId', 'members', 'memberUids',
+        'activeRoomCode', 'activeGameKind', 'activeGameType', 'activeLaunchId',
+        'createdAt', 'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'id', 'code', 'leaderUid', 'status', 'matchMode', 'opponentMode',
+        'gameKind', 'gameType', 'gameTitle', 'botId', 'members', 'memberUids',
+        'activeRoomCode', 'activeGameKind', 'activeGameType', 'activeLaunchId',
+        'createdAt', 'updatedAt'
+      ]) &&
+      isValidRoomCode(data.id) &&
+      data.id == data.code &&
+      isValidId(data.leaderUid) &&
+      data.status is string && data.status.size() > 0 && data.status.size() <= 16 && data.status in ['lobby', 'in_game'] &&
+      data.matchMode is string && data.matchMode.size() == 3 && data.matchMode in ['1v1', '2v2'] &&
+      data.opponentMode is string && data.opponentMode.size() >= 4 && data.opponentMode.size() <= 8 && data.opponentMode in ['humans', 'bots'] &&
+      data.gameKind is string && data.gameKind.size() >= 5 && data.gameKind.size() <= 8 && data.gameKind in ['chess', 'arcade'] &&
+      data.gameType is string && data.gameType.size() > 0 && data.gameType.size() <= 32 &&
+      (data.gameType == 'chess' || isValidArcadeGameType(data.gameType)) &&
+      data.gameTitle is string && data.gameTitle.size() > 0 && data.gameTitle.size() <= 64 &&
+      data.botId is string && data.botId.size() > 0 && data.botId.size() <= 32 &&
+      data.members is list && data.members.size() >= 1 && data.members.size() <= 4 &&
+      isValidPartyMember(data.members[0]) &&
+      (data.members.size() < 2 || isValidPartyMember(data.members[1])) &&
+      (data.members.size() < 3 || isValidPartyMember(data.members[2])) &&
+      (data.members.size() < 4 || isValidPartyMember(data.members[3])) &&
+      isValidUidList4(data.memberUids) &&
+      data.memberUids.size() == data.members.size() &&
+      data.leaderUid in data.memberUids &&
+      (data.activeRoomCode == null || isValidRoomCode(data.activeRoomCode)) &&
+      (data.activeGameKind == null || (data.activeGameKind is string && data.activeGameKind.size() >= 5 && data.activeGameKind.size() <= 8 && data.activeGameKind in ['chess', 'arcade'])) &&
+      (data.activeGameType == null || (data.activeGameType is string && data.activeGameType.size() > 0 && data.activeGameType.size() <= 32)) &&
+      (data.activeLaunchId == null || (data.activeLaunchId is string && data.activeLaunchId.size() > 0 && data.activeLaunchId.size() <= 64)) &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
+    }
+
+    function isValidPartyInvite(data) {
+      return data.keys().hasAll([
+        'id', 'partyId', 'partyCode', 'fromUid', 'fromName', 'fromAvatarId',
+        'toUid', 'toName', 'participantUids', 'matchMode', 'opponentMode',
+        'gameKind', 'gameType', 'gameTitle', 'status', 'createdAt', 'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'id', 'partyId', 'partyCode', 'fromUid', 'fromName', 'fromAvatarId',
+        'toUid', 'toName', 'participantUids', 'matchMode', 'opponentMode',
+        'gameKind', 'gameType', 'gameTitle', 'status', 'createdAt', 'updatedAt'
+      ]) &&
+      isValidId(data.id) &&
+      isValidRoomCode(data.partyId) &&
+      data.partyId == data.partyCode &&
+      isValidId(data.fromUid) &&
+      data.fromName is string && data.fromName.size() > 0 && data.fromName.size() <= 64 &&
+      data.fromAvatarId is string && data.fromAvatarId.size() > 0 && data.fromAvatarId.size() <= 64 &&
+      isValidId(data.toUid) &&
+      data.fromUid != data.toUid &&
+      data.toName is string && data.toName.size() > 0 && data.toName.size() <= 64 &&
+      data.participantUids is list && data.participantUids.size() == 2 &&
+      data.participantUids[0] is string && data.participantUids[0] == data.fromUid &&
+      data.participantUids[1] is string && data.participantUids[1] == data.toUid &&
+      data.matchMode is string && data.matchMode.size() == 3 && data.matchMode in ['1v1', '2v2'] &&
+      data.opponentMode is string && data.opponentMode.size() >= 4 && data.opponentMode.size() <= 8 && data.opponentMode in ['humans', 'bots'] &&
+      data.gameKind is string && data.gameKind.size() >= 5 && data.gameKind.size() <= 8 && data.gameKind in ['chess', 'arcade'] &&
+      data.gameType is string && data.gameType.size() > 0 && data.gameType.size() <= 32 &&
+      (data.gameType == 'chess' || isValidArcadeGameType(data.gameType)) &&
+      data.gameTitle is string && data.gameTitle.size() > 0 && data.gameTitle.size() <= 64 &&
+      data.status is string && data.status.size() > 0 && data.status.size() <= 16 && data.status in ['pending', 'accepted', 'declined', 'cancelled'] &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
     }
 
     function isValidFriendCode(code) {
@@ -278,7 +419,7 @@ service cloud.firestore {
         data.gameKind is string && data.gameKind.size() > 0 && data.gameKind.size() <= 16 &&
         data.gameKind in ['chess', 'arcade'] &&
         data.gameType is string && data.gameType.size() > 0 && data.gameType.size() <= 32 &&
-        data.gameType in ['chess', 'connect4', 'checkers', 'reversi', 'dots-and-boxes', 'gomoku', 'ultimate-ttt', 'mancala', 'tictactoe', 'draw-guess', 'battleship', 'memory-match', 'dice-duel', 'pixel-guess', 'emoji-charades', 'nim', 'misere-nim', 'chomp', 'hex', 'grid-link-4', 'order-chaos', 'misere-ttt', 'gravity-5', 'snort', 'col-clash', 'domineering', 'cram', 'obstruction', 'ataxx', 'breakthrough', 'kings-escape', 'wordle-duel', 'hangman-duel', 'mastermind', 'hilo-target', 'word-chain', 'blackjack-21', 'yacht-dice', 'tug-of-war', 'rps-arena', 'penalty-kick', 'mines-duel', 'sos-grid', 'symmetry-art', 'color-match', 'emoji-story', 'quoridor', 'pente', 'nine-mens-morris', 'santorini-lite', 'fox-and-hounds', 'isola', 'tak-duel', 'go-mini', 'amazons-mini', 'tron-turn', 'shogi-pocket', 'gobblet-mini', 'splatter-turf', 'knight-duel', 'anagram-scramble', 'trivia-showdown', 'math-blitz', 'simon-duel', 'boggle-duel', 'sudoku-duel', 'uno-duel', 'go-fish', 'poker-dice', 'liars-dice', 'farkle-duel', 'coin-row', 'high-noon-duel'] &&
+        (data.gameType == 'chess' || isValidArcadeGameType(data.gameType)) &&
         data.gameTitle is string && data.gameTitle.size() > 0 && data.gameTitle.size() <= 64 &&
         isValidRoomCode(data.roomCode) &&
         data.status is string && data.status.size() > 0 && data.status.size() <= 16 &&
@@ -563,7 +704,7 @@ service cloud.firestore {
       }
     }
 
-    // Online Chess Rooms (addressed strictly by room code; no list queries permitted)
+    // Online Chess Rooms (1v1 & 2v2, addressed strictly by room code; no list queries permitted)
     match /chessRooms/{roomCode} {
       allow get: if isSignedIn() && isValidRoomCode(roomCode);
 
@@ -572,7 +713,7 @@ service cloud.firestore {
         isValidChessRoom(incoming()) &&
         incoming().code == roomCode &&
         incoming().creatorAuthUid == request.auth.uid &&
-        incoming().status == 'waiting' &&
+        incoming().status in ['waiting', 'active'] &&
         incoming().moves.size() == 0 &&
         incoming().turn == 'w' &&
         incoming().whiteTimeMs == incoming().baseMs &&
@@ -584,8 +725,9 @@ service cloud.firestore {
         incoming().createdAt == request.time &&
         incoming().updatedAt == request.time &&
         (
-          (incoming().whiteAuthUid == request.auth.uid && incoming().blackAuthUid == null) ||
-          (incoming().blackAuthUid == request.auth.uid && incoming().whiteAuthUid == null)
+          incoming().whiteAuthUid == request.auth.uid ||
+          incoming().blackAuthUid == request.auth.uid ||
+          ('participantUids' in incoming() && request.auth.uid in incoming().participantUids)
         );
 
       allow update: if isSignedIn() &&
@@ -598,45 +740,44 @@ service cloud.firestore {
         incoming().baseMs == existing().baseMs &&
         incoming().incMs == existing().incMs &&
         incoming().updatedAt == request.time &&
+        (!('teamMode' in existing()) || incoming().teamMode == existing().teamMode) &&
         (
-          // Action: Join Open Seat or Reconnect to Own Seat
+          // Action: Join, Reconnect, Switch Team, Vacate Seat, Fill Bots, or Clear Bots
           (
             existing().status != 'finished' &&
             incoming().diff(existing()).affectedKeys().hasOnly([
+              'teamMode', 'whiteSeats', 'blackSeats', 'participantUids', 'activeSeatKind', 'activeSeatUid',
               'whiteAuthUid', 'whitePlayerId', 'whiteName',
               'blackAuthUid', 'blackPlayerId', 'blackName',
               'status', 'updatedAt'
             ]) &&
             (
-              (existing().whiteAuthUid == null && incoming().whiteAuthUid == request.auth.uid && incoming().blackAuthUid == existing().blackAuthUid) ||
-              (existing().blackAuthUid == null && incoming().blackAuthUid == request.auth.uid && incoming().whiteAuthUid == existing().whiteAuthUid) ||
-              (existing().whiteAuthUid == request.auth.uid && incoming().whiteAuthUid == request.auth.uid && incoming().blackAuthUid == existing().blackAuthUid) ||
-              (existing().blackAuthUid == request.auth.uid && incoming().blackAuthUid == request.auth.uid && incoming().whiteAuthUid == existing().whiteAuthUid)
+              isChessRoomParticipant(existing()) ||
+              (
+                (existing().status == 'waiting' || existing().moves.size() == 0) &&
+                (
+                  incoming().whiteAuthUid == request.auth.uid ||
+                  incoming().blackAuthUid == request.auth.uid ||
+                  ('participantUids' in incoming() && request.auth.uid in incoming().participantUids)
+                ) &&
+                (!('participantUids' in existing()) || incoming().participantUids.size() >= existing().participantUids.size())
+              )
             )
           ) ||
-          // Action: Vacate Own Seat Before First Move
-          (
-            existing().status != 'finished' &&
-            existing().moves.size() == 0 &&
-            incoming().diff(existing()).affectedKeys().hasOnly([
-              'whiteAuthUid', 'whitePlayerId', 'whiteName',
-              'blackAuthUid', 'blackPlayerId', 'blackName',
-              'status', 'updatedAt'
-            ]) &&
-            (
-              (existing().whiteAuthUid == request.auth.uid && incoming().whiteAuthUid == null && incoming().blackAuthUid == existing().blackAuthUid) ||
-              (existing().blackAuthUid == request.auth.uid && incoming().blackAuthUid == null && incoming().whiteAuthUid == existing().whiteAuthUid)
-            )
-          ) ||
-          // Action: Active Turn Player Makes Exactly One Move
+          // Action: Active Turn Seat (Human or Bot Runner) Makes Exactly One Move
           (
             existing().status != 'finished' &&
             (
-              (existing().turn == 'w' && existing().whiteAuthUid == request.auth.uid) ||
-              (existing().turn == 'b' && existing().blackAuthUid == request.auth.uid)
+              ('activeSeatUid' in existing() && existing().activeSeatKind == 'human' && existing().activeSeatUid == request.auth.uid) ||
+              ('activeSeatKind' in existing() && existing().activeSeatKind == 'bot' && isChessRoomParticipant(existing())) ||
+              (!('activeSeatKind' in existing()) && (
+                (existing().turn == 'w' && existing().whiteAuthUid == request.auth.uid) ||
+                (existing().turn == 'b' && existing().blackAuthUid == request.auth.uid)
+              ))
             ) &&
             incoming().diff(existing()).affectedKeys().hasOnly([
-              'moves', 'turn', 'status', 'whiteTimeMs', 'blackTimeMs', 'clockAnchorMs', 'rematchVotes', 'updatedAt'
+              'moves', 'turn', 'status', 'whiteTimeMs', 'blackTimeMs', 'clockAnchorMs',
+              'rematchVotes', 'activeSeatKind', 'activeSeatUid', 'updatedAt'
             ]) &&
             incoming().moves.size() == existing().moves.size() + 1 &&
             incoming().moves[existing().moves.size()] is string &&
@@ -667,6 +808,7 @@ service cloud.firestore {
             existing().status == 'finished' &&
             isChessRoomParticipant(existing()) &&
             incoming().diff(existing()).affectedKeys().hasOnly([
+              'teamMode', 'whiteSeats', 'blackSeats', 'participantUids', 'activeSeatKind', 'activeSeatUid',
               'whiteAuthUid', 'whitePlayerId', 'whiteName',
               'blackAuthUid', 'blackPlayerId', 'blackName',
               'moves', 'turn', 'status', 'whiteTimeMs', 'blackTimeMs',
@@ -680,11 +822,7 @@ service cloud.firestore {
             incoming().rematchVotes.size() == 0 &&
             incoming().whiteTimeMs == existing().baseMs &&
             incoming().blackTimeMs == existing().baseMs &&
-            incoming().clockAnchorMs == null &&
-            (
-              (incoming().whiteAuthUid == existing().blackAuthUid && incoming().blackAuthUid == existing().whiteAuthUid) ||
-              (incoming().whiteAuthUid == existing().whiteAuthUid && incoming().blackAuthUid == existing().blackAuthUid)
-            )
+            incoming().clockAnchorMs == null
           )
         );
 
@@ -694,7 +832,7 @@ service cloud.firestore {
         existing().moves.size() == 0;
     }
 
-    // Online Multiplayer Arcade Rooms (addressed strictly by room code; no list queries permitted)
+    // Online Multiplayer Arcade Rooms (1v1 & 2v2 across 72 games; addressed strictly by room code)
     match /arcadeRooms/{roomCode} {
       allow get: if isSignedIn() && isValidRoomCode(roomCode);
 
@@ -703,7 +841,7 @@ service cloud.firestore {
         isValidArcadeRoom(incoming()) &&
         incoming().code == roomCode &&
         incoming().creatorAuthUid == request.auth.uid &&
-        incoming().status == 'waiting' &&
+        incoming().status in ['waiting', 'active'] &&
         incoming().moves.size() == 0 &&
         incoming().turn == 'p1' &&
         incoming().winner == null &&
@@ -712,8 +850,9 @@ service cloud.firestore {
         incoming().createdAt == request.time &&
         incoming().updatedAt == request.time &&
         (
-          (incoming().p1AuthUid == request.auth.uid && incoming().p2AuthUid == null) ||
-          (incoming().p2AuthUid == request.auth.uid && incoming().p1AuthUid == null)
+          incoming().p1AuthUid == request.auth.uid ||
+          incoming().p2AuthUid == request.auth.uid ||
+          ('participantUids' in incoming() && request.auth.uid in incoming().participantUids)
         );
 
       allow update: if isSignedIn() &&
@@ -724,45 +863,45 @@ service cloud.firestore {
         incoming().creatorAuthUid == existing().creatorAuthUid &&
         incoming().createdAt == existing().createdAt &&
         incoming().updatedAt == request.time &&
+        (!('teamMode' in existing()) || incoming().teamMode == existing().teamMode) &&
         (
-          // Action: Join Open Seat or Reconnect to Own Seat
+          // Action: Join, Reconnect, Switch Team, Vacate Seat, Fill Bots, or Clear Bots
           (
             existing().status != 'finished' &&
             incoming().diff(existing()).affectedKeys().hasOnly([
+              'teamMode', 'team1Seats', 'team2Seats', 'participantUids',
+              'team1TurnCount', 'team2TurnCount', 'activeSeatKind', 'activeSeatUid',
               'p1AuthUid', 'p1PlayerId', 'p1Name',
               'p2AuthUid', 'p2PlayerId', 'p2Name',
               'status', 'updatedAt'
             ]) &&
             (
-              (existing().p1AuthUid == null && incoming().p1AuthUid == request.auth.uid && incoming().p2AuthUid == existing().p2AuthUid) ||
-              (existing().p2AuthUid == null && incoming().p2AuthUid == request.auth.uid && incoming().p1AuthUid == existing().p1AuthUid) ||
-              (existing().p1AuthUid == request.auth.uid && incoming().p1AuthUid == request.auth.uid && incoming().p2AuthUid == existing().p2AuthUid) ||
-              (existing().p2AuthUid == request.auth.uid && incoming().p2AuthUid == request.auth.uid && incoming().p1AuthUid == existing().p1AuthUid)
+              isArcadeRoomParticipant(existing()) ||
+              (
+                (existing().status == 'waiting' || existing().moves.size() == 0) &&
+                (
+                  incoming().p1AuthUid == request.auth.uid ||
+                  incoming().p2AuthUid == request.auth.uid ||
+                  ('participantUids' in incoming() && request.auth.uid in incoming().participantUids)
+                ) &&
+                (!('participantUids' in existing()) || incoming().participantUids.size() >= existing().participantUids.size())
+              )
             )
           ) ||
-          // Action: Vacate Own Seat Before First Move
-          (
-            existing().status != 'finished' &&
-            existing().moves.size() == 0 &&
-            incoming().diff(existing()).affectedKeys().hasOnly([
-              'p1AuthUid', 'p1PlayerId', 'p1Name',
-              'p2AuthUid', 'p2PlayerId', 'p2Name',
-              'status', 'updatedAt'
-            ]) &&
-            (
-              (existing().p1AuthUid == request.auth.uid && incoming().p1AuthUid == null && incoming().p2AuthUid == existing().p2AuthUid) ||
-              (existing().p2AuthUid == request.auth.uid && incoming().p2AuthUid == null && incoming().p1AuthUid == existing().p1AuthUid)
-            )
-          ) ||
-          // Action: Active Turn Player Makes Exactly One Move
+          // Action: Active Turn Seat (Human or Bot Runner) Makes Exactly One Move
           (
             existing().status != 'finished' &&
             (
-              (existing().turn == 'p1' && existing().p1AuthUid == request.auth.uid) ||
-              (existing().turn == 'p2' && existing().p2AuthUid == request.auth.uid)
+              ('activeSeatUid' in existing() && existing().activeSeatKind == 'human' && existing().activeSeatUid == request.auth.uid) ||
+              ('activeSeatKind' in existing() && existing().activeSeatKind == 'bot' && isArcadeRoomParticipant(existing())) ||
+              (!('activeSeatKind' in existing()) && (
+                (existing().turn == 'p1' && existing().p1AuthUid == request.auth.uid) ||
+                (existing().turn == 'p2' && existing().p2AuthUid == request.auth.uid)
+              ))
             ) &&
             incoming().diff(existing()).affectedKeys().hasOnly([
-              'moves', 'turn', 'status', 'winner', 'rematchVotes', 'updatedAt'
+              'moves', 'turn', 'status', 'winner', 'rematchVotes',
+              'team1TurnCount', 'team2TurnCount', 'activeSeatKind', 'activeSeatUid', 'updatedAt'
             ]) &&
             incoming().moves.size() == existing().moves.size() + 1 &&
             incoming().moves[existing().moves.size()] is string &&
@@ -791,6 +930,8 @@ service cloud.firestore {
             existing().status == 'finished' &&
             isArcadeRoomParticipant(existing()) &&
             incoming().diff(existing()).affectedKeys().hasOnly([
+              'teamMode', 'team1Seats', 'team2Seats', 'participantUids',
+              'team1TurnCount', 'team2TurnCount', 'activeSeatKind', 'activeSeatUid',
               'p1AuthUid', 'p1PlayerId', 'p1Name',
               'p2AuthUid', 'p2PlayerId', 'p2Name',
               'moves', 'turn', 'status', 'winner', 'resignedWinner', 'rematchVotes', 'updatedAt'
@@ -800,11 +941,7 @@ service cloud.firestore {
             incoming().status in ['waiting', 'active'] &&
             incoming().winner == null &&
             incoming().resignedWinner == null &&
-            incoming().rematchVotes.size() == 0 &&
-            (
-              (incoming().p1AuthUid == existing().p2AuthUid && incoming().p2AuthUid == existing().p1AuthUid) ||
-              (incoming().p1AuthUid == existing().p1AuthUid && incoming().p2AuthUid == existing().p2AuthUid)
-            )
+            incoming().rematchVotes.size() == 0
           )
         );
 
@@ -812,6 +949,107 @@ service cloud.firestore {
         isValidRoomCode(roomCode) &&
         existing().creatorAuthUid == request.auth.uid &&
         existing().moves.size() == 0;
+    }
+
+    // Multiplayer Party Lobbies (1v1 & 2v2, up to 4 players, addressed by party code or memberUids list)
+    match /parties/{partyCode} {
+      allow get: if isSignedIn() && isValidRoomCode(partyCode);
+      allow list: if isSignedIn() && request.auth.uid in resource.data.memberUids;
+
+      allow create: if isSignedIn() &&
+        isValidRoomCode(partyCode) &&
+        isValidParty(incoming()) &&
+        incoming().id == partyCode &&
+        incoming().leaderUid == request.auth.uid &&
+        incoming().status == 'lobby' &&
+        incoming().members.size() == 1 &&
+        incoming().members[0].uid == request.auth.uid &&
+        incoming().activeRoomCode == null &&
+        incoming().activeLaunchId == null &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+
+      allow update: if isSignedIn() &&
+        isValidRoomCode(partyCode) &&
+        isValidParty(incoming()) &&
+        incoming().id == existing().id &&
+        incoming().code == existing().code &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        (
+          // Action: New Member Joins Party (or Reconnects) up to 4 players
+          (
+            incoming().leaderUid == existing().leaderUid &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['members', 'memberUids', 'updatedAt']) &&
+            request.auth.uid in incoming().memberUids &&
+            incoming().members.size() >= existing().members.size()
+          ) ||
+          // Action: Existing Member Switches Team or Leaves Party
+          (
+            request.auth.uid in existing().memberUids &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['leaderUid', 'members', 'memberUids', 'updatedAt'])
+          ) ||
+          // Action: Leader Updates Settings, Kicks Member, Launches Match, or Returns to Lobby
+          (
+            existing().leaderUid == request.auth.uid &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'leaderUid', 'status', 'matchMode', 'opponentMode',
+              'gameKind', 'gameType', 'gameTitle', 'botId',
+              'members', 'memberUids',
+              'activeRoomCode', 'activeGameKind', 'activeGameType', 'activeLaunchId', 'updatedAt'
+            ])
+          )
+        );
+
+      allow delete: if isSignedIn() &&
+        isValidRoomCode(partyCode) &&
+        (
+          existing().leaderUid == request.auth.uid ||
+          (request.auth.uid in existing().memberUids && existing().members.size() <= 1)
+        );
+    }
+
+    // Party Invitations (strictly isolated to sender and recipient)
+    match /partyInvites/{inviteId} {
+      allow get: if isSignedIn() && isValidId(inviteId) && (
+        resource == null || request.auth.uid in existing().participantUids
+      );
+
+      allow list: if isSignedIn() && request.auth.uid in resource.data.participantUids;
+
+      allow create: if isSignedIn() &&
+        isValidId(inviteId) &&
+        isValidPartyInvite(incoming()) &&
+        incoming().id == inviteId &&
+        incoming().fromUid == request.auth.uid &&
+        incoming().status == 'pending' &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        exists(/databases/$(database)/documents/parties/$(incoming().partyId)) &&
+        request.auth.uid in get(/databases/$(database)/documents/parties/$(incoming().partyId)).data.memberUids &&
+        exists(/databases/$(database)/documents/chatProfiles/$(incoming().toUid));
+
+      allow update: if isSignedIn() &&
+        isValidId(inviteId) &&
+        isValidPartyInvite(incoming()) &&
+        incoming().id == existing().id &&
+        incoming().partyId == existing().partyId &&
+        incoming().partyCode == existing().partyCode &&
+        incoming().fromUid == existing().fromUid &&
+        incoming().toUid == existing().toUid &&
+        incoming().participantUids == existing().participantUids &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']) &&
+        existing().status == 'pending' &&
+        (
+          (request.auth.uid == existing().toUid && incoming().status in ['accepted', 'declined']) ||
+          (request.auth.uid == existing().fromUid && incoming().status == 'cancelled')
+        );
+
+      allow delete: if isSignedIn() &&
+        isValidId(inviteId) &&
+        request.auth.uid in existing().participantUids;
     }
 
     // Direct Friend Game Invites (participant-isolated)

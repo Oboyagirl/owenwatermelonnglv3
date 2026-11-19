@@ -30,11 +30,14 @@ export const NotificationToasts: React.FC<NotificationToastsProps> = ({
     <div className="fixed top-16 right-4 z-[60] flex flex-col gap-2.5 w-[calc(100vw-2rem)] sm:w-[350px] pointer-events-none">
       {toasts.map(toast => {
         const isInvite = toast.kind === 'invite' && toast.invite;
+        const isPartyInvite = toast.kind === 'party_invite' && Boolean(toast.onAcceptCustom);
         const isChat = toast.kind === 'chat' && toast.chatTarget;
         const isTurn = toast.kind === 'turn' && toast.targetSpace;
 
         const accent =
-          toast.kind === 'invite'
+          toast.kind === 'party_invite'
+            ? '#a855f7'
+            : toast.kind === 'invite'
             ? '#38bdf8'
             : toast.kind === 'turn'
             ? '#f59e0b'
@@ -60,7 +63,7 @@ export const NotificationToasts: React.FC<NotificationToastsProps> = ({
               >
                 {toast.avatarId ? (
                   <span>{getAvatarIcon(toast.avatarId)}</span>
-                ) : toast.kind === 'invite' ? (
+                ) : toast.kind === 'invite' || toast.kind === 'party_invite' ? (
                   <Gamepad2 className="w-4 h-4" style={{ color: accent }} />
                 ) : toast.kind === 'turn' ? (
                   <Bell className="w-4 h-4" style={{ color: accent }} />
@@ -102,6 +105,33 @@ export const NotificationToasts: React.FC<NotificationToastsProps> = ({
                 <button
                   type="button"
                   onClick={() => void declineGameInvite(toast.invite!)}
+                  className="py-1.5 px-3 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-[11px] cursor-pointer"
+                >
+                  Decline
+                </button>
+              </div>
+            )}
+
+            {isPartyInvite && (
+              <div className="flex items-center gap-2 pt-0.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    toast.onAcceptCustom?.();
+                    dismissToast(toast.id);
+                  }}
+                  className="flex-1 py-1.5 px-3 rounded-xl text-white font-extrabold text-[11px] flex items-center justify-center gap-1.5 cursor-pointer hover:brightness-110 transition-all"
+                  style={{ backgroundColor: accent }}
+                >
+                  <Play className="w-3 h-3 fill-current" />
+                  <span>{toast.acceptLabel || 'Accept & Join'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    toast.onDeclineCustom?.();
+                    dismissToast(toast.id);
+                  }}
                   className="py-1.5 px-3 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-[11px] cursor-pointer"
                 >
                   Decline

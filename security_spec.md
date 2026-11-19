@@ -184,3 +184,12 @@
 2. **Spoofed List Query Without Participant Filter**: `{ "path": "/gameInvites", "auth": { "uid": "u1" }, "operation": "list" }` -> `PERMISSION_DENIED`
 3. **Self-Accepting Own Sent Invite**: `fromUid` attempting `update({ status: 'accepted' })` -> `PERMISSION_DENIED`
 4. **Tampering Room Code After Sending Invite**: `toUid` attempting `update({ roomCode: 'EVIL99', status: 'accepted' })` -> `PERMISSION_DENIED`
+
+---
+
+## 6. 2v2 Team Rooms, Parties (`/parties/{partyCode}`) & Party Invites (`/partyInvites/{inviteId}`)
+
+1. **2v2 Room Seat & Bot Isolation**: `chessRooms` and `arcadeRooms` validate `teamMode` (`'1v1' | '2v2'`), `whiteSeats`/`blackSeats` (`team1Seats`/`team2Seats`), `participantUids` (<= 4 UIDs), and `activeSeatKind`/`activeSeatUid`. Before move 1, seated players may `SwitchTeam` or `FillBots`; during gameplay, only the human owning `activeSeatUid` (or the designated `participantUids[0]` bot runner when `activeSeatKind == 'bot'`) may append 1 move. Rematch votes accept up to 4 team-seat tokens and reset strictly on full vote count or forfeit/creator reset.
+2. **Party Membership & Leader Authority**: Parties (`4-8` char code, max 4 members) allow authenticated reads by room code or member listing (`request.auth.uid in resource.data.memberUids`). Only the creator may create a party with themselves as `leaderUid`. Members may toggle their own team or leave; only `leaderUid` may change match settings (`1v1/2v2`, `humans/bots`, game, botId), kick non-leader members, launch a match (`status = 'in_game'`), reset to lobby, or disband.
+3. **Multi-Recipient Party Invites**: `/partyInvites/{inviteId}` requires `fromUid == request.auth.uid`, `fromUid != toUid`, `status == 'pending'`, and `request.auth.uid in resource.data.participantUids` on reads/list. Only `toUid` may accept/decline; only `fromUid` may cancel.
+

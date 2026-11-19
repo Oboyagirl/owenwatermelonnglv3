@@ -296,8 +296,69 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
     operationType,
     path
   };
-  console.error('Firestore Error: ', JSON.stringify(errInfo));
+  console.warn('Firestore notice:', errInfo.error, operationType, path);
   throw new Error(JSON.stringify(errInfo));
+}
+
+export function extractRawErrorMessage(err: unknown): string {
+  if (!err) return '';
+  let raw = err instanceof Error ? err.message : String(err);
+  if (raw.trim().startsWith('{')) {
+    try {
+      const parsed = JSON.parse(raw) as { error?: unknown };
+      if (parsed && typeof parsed.error === 'string') {
+        raw = parsed.error;
+      }
+    } catch {
+      // Keep original string if not JSON
+    }
+  }
+  return raw.trim();
+}
+
+export function isIgnorableFirestoreError(err: unknown): boolean {
+  const lower = extractRawErrorMessage(err).toLowerCase();
+  if (!lower) return true;
+  return (
+    lower.includes('aborted') ||
+    lower.includes('already-exists') ||
+    lower.includes('cancelled') ||
+    lower.includes('canceled') ||
+    lower.includes('popup-closed-by-user') ||
+    lower.includes('cancelled-popup-request')
+  );
+}
+
+export function formatFriendlyFirestoreError(
+  err: unknown,
+  fallback = 'Syncing with room — please try again.'
+): string {
+  const raw = extractRawErrorMessage(err);
+  const lower = raw.toLowerCase();
+  if (!lower) return fallback;
+  if (
+    lower.includes('missing or insufficient permissions') ||
+    lower.includes('permission-denied') ||
+    lower.includes('permission denied')
+  ) {
+    return 'Session permission refreshed — please try again.';
+  }
+  if (lower.includes('offline') || lower.includes('network') || lower.includes('unavailable')) {
+    return 'Reconnecting to server — please check your connection.';
+  }
+  if (lower.includes('not-found') || lower.includes('does not exist') || lower.includes('was closed')) {
+    return 'Room or party is no longer active.';
+  }
+  if (lower.includes('not your turn')) {
+    return 'Waiting for the active teammate or opponent to move.';
+  }
+  if (lower.includes('aborted') || lower.includes('failed-precondition')) {
+    return 'Game state updated — synced to latest move.';
+  }
+  if (raw.startsWith('{') || raw.includes('authInfo')) {
+    return fallback;
+  }
+  return raw;
 }
 
 // CRITICAL CONSTRAINT: Test connection on app startup

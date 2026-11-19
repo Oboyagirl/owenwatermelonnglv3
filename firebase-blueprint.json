@@ -177,6 +177,35 @@
           "enum": ["waiting", "active", "finished"],
           "maxLength": 16
         },
+        "teamMode": {
+          "type": "string",
+          "description": "Match team format (1v1 or 2v2)",
+          "enum": ["1v1", "2v2"],
+          "maxLength": 3
+        },
+        "whiteSeats": {
+          "type": "array",
+          "description": "Bounded 1-2 element array of White team seat descriptors"
+        },
+        "blackSeats": {
+          "type": "array",
+          "description": "Bounded 1-2 element array of Black team seat descriptors"
+        },
+        "participantUids": {
+          "type": "array",
+          "description": "Bounded up to 4 Firebase Auth UIDs participating in the room"
+        },
+        "activeSeatKind": {
+          "type": "string",
+          "description": "Kind of seat currently on turn (open, human, or bot)",
+          "enum": ["open", "human", "bot"],
+          "maxLength": 8
+        },
+        "activeSeatUid": {
+          "type": "string",
+          "description": "Firebase Auth UID of active turn seat if human, or null",
+          "maxLength": 128
+        },
         "timeControlId": {
           "type": "string",
           "description": "Chess clock time control identifier",
@@ -638,6 +667,43 @@
           "description": "Room lifecycle state",
           "enum": ["waiting", "active", "finished"],
           "maxLength": 16
+        },
+        "teamMode": {
+          "type": "string",
+          "description": "Match team format (1v1 or 2v2)",
+          "enum": ["1v1", "2v2"],
+          "maxLength": 3
+        },
+        "team1Seats": {
+          "type": "array",
+          "description": "Bounded 1-2 element array of Team 1 seat descriptors"
+        },
+        "team2Seats": {
+          "type": "array",
+          "description": "Bounded 1-2 element array of Team 2 seat descriptors"
+        },
+        "participantUids": {
+          "type": "array",
+          "description": "Bounded up to 4 Firebase Auth UIDs participating in the room"
+        },
+        "team1TurnCount": {
+          "type": "number",
+          "description": "Completed turns counter for Team 1 teammate alternation"
+        },
+        "team2TurnCount": {
+          "type": "number",
+          "description": "Completed turns counter for Team 2 teammate alternation"
+        },
+        "activeSeatKind": {
+          "type": "string",
+          "description": "Kind of seat currently on turn (open, human, or bot)",
+          "enum": ["open", "human", "bot"],
+          "maxLength": 8
+        },
+        "activeSeatUid": {
+          "type": "string",
+          "description": "Firebase Auth UID of active turn seat if human, or null",
+          "maxLength": 128
         },
         "p1AuthUid": {
           "type": "string",
@@ -1308,6 +1374,243 @@
         "isPublic",
         "createdAt"
       ]
+    },
+    "party": {
+      "title": "Multiplayer Party Lobby",
+      "description": "Up to 4-player synchronized party lobby supporting 1v1 and 2v2 matches against humans or bots",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Party code identifier",
+          "minLength": 4,
+          "maxLength": 8,
+          "pattern": "^[A-Z0-9]+$"
+        },
+        "code": {
+          "type": "string",
+          "description": "Shareable party code",
+          "minLength": 4,
+          "maxLength": 8,
+          "pattern": "^[A-Z0-9]+$"
+        },
+        "leaderUid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the party leader",
+          "maxLength": 128
+        },
+        "status": {
+          "type": "string",
+          "description": "Party lifecycle status",
+          "enum": ["lobby", "in_game"],
+          "maxLength": 16
+        },
+        "matchMode": {
+          "type": "string",
+          "description": "Match team format (1v1 or 2v2)",
+          "enum": ["1v1", "2v2"],
+          "maxLength": 3
+        },
+        "opponentMode": {
+          "type": "string",
+          "description": "Whether open seats are filled with humans or AI bots",
+          "enum": ["humans", "bots"],
+          "maxLength": 8
+        },
+        "gameKind": {
+          "type": "string",
+          "description": "Selected studio (chess or arcade)",
+          "enum": ["chess", "arcade"],
+          "maxLength": 16
+        },
+        "gameType": {
+          "type": "string",
+          "description": "Specific selected game ID",
+          "maxLength": 32
+        },
+        "gameTitle": {
+          "type": "string",
+          "description": "Human-readable game title",
+          "maxLength": 64
+        },
+        "botId": {
+          "type": "string",
+          "description": "Primary AI bot ID when opponentMode is bots",
+          "maxLength": 32
+        },
+        "members": {
+          "type": "array",
+          "description": "Bounded up to 4 PartyMember objects"
+        },
+        "memberUids": {
+          "type": "array",
+          "description": "Bounded up to 4 member Firebase Auth UIDs"
+        },
+        "activeRoomCode": {
+          "type": "string",
+          "description": "Launched Chess or Arcade room code or null",
+          "maxLength": 8
+        },
+        "activeGameKind": {
+          "type": "string",
+          "description": "Launched game kind or null",
+          "maxLength": 16
+        },
+        "activeGameType": {
+          "type": "string",
+          "description": "Launched game type or null",
+          "maxLength": 32
+        },
+        "activeLaunchId": {
+          "type": "string",
+          "description": "Unique launch token triggering automatic member entry",
+          "maxLength": 64
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of party creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last party update"
+        }
+      },
+      "required": [
+        "id",
+        "code",
+        "leaderUid",
+        "status",
+        "matchMode",
+        "opponentMode",
+        "gameKind",
+        "gameType",
+        "gameTitle",
+        "botId",
+        "members",
+        "memberUids",
+        "activeRoomCode",
+        "activeGameKind",
+        "activeGameType",
+        "activeLaunchId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "partyInvite": {
+      "title": "Party Invitation",
+      "description": "Multi-player party invite sent from leader/members to friends",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Invite document ID",
+          "maxLength": 128
+        },
+        "partyId": {
+          "type": "string",
+          "description": "Target party ID",
+          "maxLength": 8
+        },
+        "partyCode": {
+          "type": "string",
+          "description": "Shareable party code",
+          "maxLength": 8
+        },
+        "fromUid": {
+          "type": "string",
+          "description": "Sender Firebase Auth UID",
+          "maxLength": 128
+        },
+        "fromName": {
+          "type": "string",
+          "description": "Sender display name",
+          "maxLength": 64
+        },
+        "fromAvatarId": {
+          "type": "string",
+          "description": "Sender avatar ID",
+          "maxLength": 64
+        },
+        "toUid": {
+          "type": "string",
+          "description": "Recipient Firebase Auth UID",
+          "maxLength": 128
+        },
+        "toName": {
+          "type": "string",
+          "description": "Recipient display name",
+          "maxLength": 64
+        },
+        "participantUids": {
+          "type": "array",
+          "description": "Bounded two-element array [fromUid, toUid]"
+        },
+        "matchMode": {
+          "type": "string",
+          "description": "Match team format (1v1 or 2v2)",
+          "enum": ["1v1", "2v2"],
+          "maxLength": 3
+        },
+        "opponentMode": {
+          "type": "string",
+          "description": "Opponent mode (humans or bots)",
+          "enum": ["humans", "bots"],
+          "maxLength": 8
+        },
+        "gameKind": {
+          "type": "string",
+          "description": "Game kind (chess or arcade)",
+          "enum": ["chess", "arcade"],
+          "maxLength": 16
+        },
+        "gameType": {
+          "type": "string",
+          "description": "Specific game type",
+          "maxLength": 32
+        },
+        "gameTitle": {
+          "type": "string",
+          "description": "Human-readable game title",
+          "maxLength": 64
+        },
+        "status": {
+          "type": "string",
+          "description": "Invite lifecycle state",
+          "enum": ["pending", "accepted", "declined", "cancelled"],
+          "maxLength": 16
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of update"
+        }
+      },
+      "required": [
+        "id",
+        "partyId",
+        "partyCode",
+        "fromUid",
+        "fromName",
+        "fromAvatarId",
+        "toUid",
+        "toName",
+        "participantUids",
+        "matchMode",
+        "opponentMode",
+        "gameKind",
+        "gameType",
+        "gameTitle",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
     }
   },
   "firestore": {
@@ -1394,6 +1697,18 @@
         "$ref": "#/entities/matchRecord"
       },
       "description": "Immutable completed PvP match results and ELO deltas"
+    },
+    "/parties/{partyCode}": {
+      "schema": {
+        "$ref": "#/entities/party"
+      },
+      "description": "Synchronized 1v1 and 2v2 party lobbies"
+    },
+    "/partyInvites/{inviteId}": {
+      "schema": {
+        "$ref": "#/entities/partyInvite"
+      },
+      "description": "Direct multi-player party invitations isolated to sender and recipient"
     }
   }
 }

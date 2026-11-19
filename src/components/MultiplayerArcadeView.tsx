@@ -38,8 +38,13 @@ import {
 import { ThemeConfig } from '../services/themeStore';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
+import { useParty } from '../context/PartyContext';
 import { useCall } from '../context/CallContext';
-import { auth } from '../services/firebase';
+import {
+  auth,
+  formatFriendlyFirestoreError,
+  isIgnorableFirestoreError
+} from '../services/firebase';
 import { AVATAR_PRESETS } from '../services/cloudSaveService';
 import { isProfileOnlineNow } from '../services/chatService';
 import { sendGameInvite } from '../services/inviteService';
@@ -50,6 +55,7 @@ import {
 } from '../services/leaderboardService';
 import { ExtendedArcadeBoard } from './ExtendedArcadeBoards';
 import { Batch2ArcadeBoard } from './Batch2ArcadeBoards';
+import type { TeamMode, TeamSeat } from '../utils/teamModes';
 import {
   ARCADE_BOTS,
   ARCADE_GAMES,
@@ -100,14 +106,18 @@ import {
   ArcadeAuthRequiredError,
   ArcadeRoomViewPayload,
   clearArcadeRoomCache,
+  clearFirestoreArcadeBots,
   createFirestoreArcadeRoom,
+  fillFirestoreArcadeBots,
   joinFirestoreArcadeRoom,
   leaveFirestoreArcadeRoom,
   resignFirestoreArcadeRoom,
   sanitizeArcadeRoomCode,
+  sendFirestoreArcadeBotMove,
   sendFirestoreArcadeMove,
   signInGoogleForArcade,
   subscribeFirestoreArcadeRoom,
+  switchFirestoreArcadeTeam,
   voteFirestoreArcadeRematch
 } from '../services/arcadeRoomService';
 
@@ -162,6 +172,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
   const { user, profile } = useAuth();
   const {
     pendingArcadeJoinCode,
+    pendingArcadePreferredTeam,
     clearPendingArcadeJoinCode,
     trackedArcadeRoom,
     setTrackedArcadeRoom,
@@ -174,6 +185,9 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
     acceptGameInvite,
     declineGameInvite
   } = useNotifications();
+  const { openPartyModal } = useParty();
+  const myFirebaseUid =
+    user?.uid && auth.currentUser?.uid === user.uid ? user.uid : auth.currentUser?.uid || '';
 
   const studioRef = useRef<HTMLDivElement | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -243,7 +257,17 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const [mySeat, setMySeat] = useState<ArcadePlayer | 'spectator' | null>(null);
   const [players, setPlayers] = useState<OnlinePlayersInfo>({ p1: null, p2: null });
-  const [rematchVotes, setRematchVotes] = useState<ArcadePlayer[]>([]);
+  const [rematchVotes, setRematchVotes] = useState<string[]>([]);
+  const [createTeamMode, setCreateTeamMode] = useState<TeamMode>('1v1');
+  const [createFillBots, setCreateFillBots] = useState<boolean>(false);
+  const [roomTeamMode, setRoomTeamMode] = useState<TeamMode>('1v1');
+  const [team1Seats, setTeam1Seats] = useState<TeamSeat[]>([]);
+  const [team2Seats, setTeam2Seats] = useState<TeamSeat[]>([]);
+  const [mySeatIndex, setMySeatIndex] = useState<number | null>(null);
+  const [activeSeat, setActiveSeat] = useState<TeamSeat | null>(null);
+  const [participantUids, setParticipantUids] = useState<string[]>([]);
+  const [botRunnerUid, setBotRunnerUid] = useState<string | null>(null);
+  const [isRoomActionBusy, setIsRoomActionBusy] = useState<boolean>(false);
   const [connStatus, setConnStatus] = useState<ConnStatus>('disconnected');
   const [onlineError, setOnlineError] = useState<string | null>(null);
   const [onlineAuthNeeded, setOnlineAuthNeeded] = useState(false);
@@ -381,6 +405,13 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         if (!endedByEvent && nextMoves.length < pending.expectedMoveIndex + 1) {
           // Ignore stale snapshot before our optimistic write lands
           setMySeat(msg.mySeat || 'spectator');
+          setMySeatIndex(msg.mySeatIndex ?? null);
+          setRoomTeamMode(msg.teamMode || '1v1');
+          setTeam1Seats(Array.isArray(msg.team1Seats) ? msg.team1Seats : []);
+          setTeam2Seats(Array.isArray(msg.team2Seats) ? msg.team2Seats : []);
+          setActiveSeat(msg.activeSeat || null);
+          setParticipantUids(Array.isArray(msg.participantUids) ? msg.participantUids : []);
+          setBotRunnerUid(msg.botRunnerUid ?? null);
           setPlayers(msg.players || { p1: null, p2: null });
           setRematchVotes(Array.isArray(msg.rematchVotes) ? msg.rematchVotes : []);
           return;
@@ -405,6 +436,13 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         localStorage.setItem(SELECTED_GAME_KEY, msg.gameType);
       } catch {}
       setMySeat(msg.mySeat || 'spectator');
+      setMySeatIndex(msg.mySeatIndex ?? null);
+      setRoomTeamMode(msg.teamMode || '1v1');
+      setTeam1Seats(Array.isArray(msg.team1Seats) ? msg.team1Seats : []);
+      setTeam2Seats(Array.isArray(msg.team2Seats) ? msg.team2Seats : []);
+      setActiveSeat(msg.activeSeat || null);
+      setParticipantUids(Array.isArray(msg.participantUids) ? msg.participantUids : []);
+      setBotRunnerUid(msg.botRunnerUid ?? null);
       setPlayers(msg.players || { p1: null, p2: null });
       setRematchVotes(Array.isArray(msg.rematchVotes) ? msg.rematchVotes : []);
       setGameState(msg.state);
@@ -423,9 +461,15 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
           playSfx('win');
         } else {
           playSfx('move');
+          const isMyActiveSeatTurn =
+            !msg.activeSeat ||
+            (msg.activeSeat.kind === 'human' &&
+              ((myFirebaseUid && msg.activeSeat.uid === myFirebaseUid) ||
+                msg.activeSeat.playerId === playerId));
           if (
             (msg.mySeat === 'p1' || msg.mySeat === 'p2') &&
             msg.state.turn === msg.mySeat &&
+            isMyActiveSeatTurn &&
             typeof document !== 'undefined' &&
             document.visibilityState === 'hidden'
           ) {
@@ -443,7 +487,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         playSfx('win');
       }
     },
-    [playSfx, pushTurnToast]
+    [playSfx, pushTurnToast, myFirebaseUid, playerId]
   );
 
   const startFirestoreSub = useCallback(
@@ -457,7 +501,9 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         onSync: applyOnlineSync,
         onError: err => {
           setConnStatus('disconnected');
-          setOnlineError(err.message || 'Could not sync room.');
+          if (!isIgnorableFirestoreError(err)) {
+            setOnlineError(formatFriendlyFirestoreError(err, 'Reconnecting to room...'));
+          }
         }
       });
     },
@@ -479,7 +525,10 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
           gameType: targetGame,
           playerId,
           playerName: playerName.trim() || 'Player',
-          preferredSeat: seatPref
+          preferredSeat: seatPref,
+          teamMode: createTeamMode,
+          fillBots: createFillBots,
+          primaryBotId: selectedBotId
         });
         pendingAuthActionRef.current = null;
         startFirestoreSub(code, uid);
@@ -489,12 +538,24 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
           pendingAuthActionRef.current = { kind: 'create' };
           setOnlineAuthNeeded(true);
           setOnlineError(err.message);
-        } else {
-          setOnlineError(err instanceof Error ? err.message : 'Failed to create room.');
+        } else if (!isIgnorableFirestoreError(err)) {
+          setOnlineError(
+            formatFriendlyFirestoreError(err, 'Could not start online room right now. Please try again.')
+          );
         }
       }
     },
-    [playerId, playerName, seatPref, closeWs, closeFirestore, startFirestoreSub]
+    [
+      playerId,
+      playerName,
+      seatPref,
+      createTeamMode,
+      createFillBots,
+      selectedBotId,
+      closeWs,
+      closeFirestore,
+      startFirestoreSub
+    ]
   );
 
   const joinViaFirestore = useCallback(
@@ -507,11 +568,17 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
       closeFirestore();
       activeTransportRef.current = 'firestore';
 
+      const preferredTeam =
+        pendingArcadePreferredTeam === 'p1' || pendingArcadePreferredTeam === 'p2'
+          ? pendingArcadePreferredTeam
+          : undefined;
+
       try {
         const { code, uid, payload } = await joinFirestoreArcadeRoom({
           code: cleanCode,
           playerId,
-          playerName: playerName.trim() || 'Player'
+          playerName: playerName.trim() || 'Player',
+          preferredTeam
         });
         pendingAuthActionRef.current = null;
         applyOnlineSync(payload);
@@ -522,13 +589,24 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
           pendingAuthActionRef.current = { kind: 'join', code: cleanCode };
           setOnlineAuthNeeded(true);
           setOnlineError(err.message);
-        } else {
+        } else if (!isIgnorableFirestoreError(err)) {
           setTrackedArcadeRoom(null);
-          setOnlineError(err instanceof Error ? err.message : `Could not join room "${cleanCode}".`);
+          setOnlineError(
+            formatFriendlyFirestoreError(err, `Room "${cleanCode}" is unavailable right now.`)
+          );
         }
       }
     },
-    [playerId, playerName, closeWs, closeFirestore, applyOnlineSync, startFirestoreSub, setTrackedArcadeRoom]
+    [
+      playerId,
+      playerName,
+      pendingArcadePreferredTeam,
+      closeWs,
+      closeFirestore,
+      applyOnlineSync,
+      startFirestoreSub,
+      setTrackedArcadeRoom
+    ]
   );
 
   const connectAndSendWs = useCallback(
@@ -591,7 +669,12 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
             setGameState(pending.rollbackState);
             setMoves(pending.rollbackMoves);
           }
-          setOnlineError(String(msg.message || 'Room error occurred.'));
+          setOnlineError(
+            formatFriendlyFirestoreError(
+              String(msg.message || ''),
+              'Please double-check the room details and try again.'
+            )
+          );
           return;
         }
 
@@ -603,7 +686,6 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
       ws.onerror = () => {
         if (wsRef.current === ws) closeWs();
         if (onUnavailable) onUnavailable();
-        else setOnlineError('Connection interrupted. Check your network and try again.');
       };
 
       ws.onclose = () => {
@@ -648,7 +730,10 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
             gameType: gType,
             playerId,
             playerName: playerName.trim() || 'Player',
-            preferredSeat: seatPref
+            preferredSeat: seatPref,
+            teamMode: createTeamMode,
+            fillBots: createFillBots,
+            primaryBotId: selectedBotId
           },
           () => {
             createViaFirestore(gType);
@@ -658,7 +743,17 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         createViaFirestore(gType);
       }
     },
-    [selectedGame, playerId, playerName, seatPref, connectAndSendWs, createViaFirestore]
+    [
+      selectedGame,
+      playerId,
+      playerName,
+      seatPref,
+      createTeamMode,
+      createFillBots,
+      selectedBotId,
+      connectAndSendWs,
+      createViaFirestore
+    ]
   );
 
   const handleJoinRoom = useCallback(
@@ -668,6 +763,10 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         setOnlineError('Enter a valid 6-character room code.');
         return;
       }
+      const preferredTeam =
+        pendingArcadePreferredTeam === 'p1' || pendingArcadePreferredTeam === 'p2'
+          ? pendingArcadePreferredTeam
+          : undefined;
       setMode('online');
       setViewStage('play');
       setOnlineError(null);
@@ -678,7 +777,8 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
             type: 'room:join',
             code: clean,
             playerId,
-            playerName: playerName.trim() || 'Player'
+            playerName: playerName.trim() || 'Player',
+            preferredTeam
           },
           () => {
             joinViaFirestore(clean);
@@ -688,8 +788,92 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         joinViaFirestore(clean);
       }
     },
-    [joinCodeInput, playerId, playerName, connectAndSendWs, joinViaFirestore]
+    [
+      joinCodeInput,
+      playerId,
+      playerName,
+      pendingArcadePreferredTeam,
+      connectAndSendWs,
+      joinViaFirestore
+    ]
   );
+
+  const handleSwitchArcadeTeam = async (targetTeam: ArcadePlayer) => {
+    if (!roomCode || isRoomActionBusy) return;
+    setOnlineError(null);
+    setIsRoomActionBusy(true);
+    try {
+      if (activeTransportRef.current === 'ws') {
+        connectAndSendWs({
+          type: 'room:switch_team',
+          code: roomCode,
+          playerId,
+          playerName: playerName.trim() || 'Player',
+          targetTeam
+        });
+      } else {
+        await switchFirestoreArcadeTeam({
+          code: roomCode,
+          playerId,
+          playerName: playerName.trim() || 'Player',
+          targetTeam
+        });
+      }
+    } catch (err) {
+      if (!isIgnorableFirestoreError(err)) {
+        setOnlineError(formatFriendlyFirestoreError(err, 'Could not switch teams right now.'));
+      }
+    } finally {
+      setIsRoomActionBusy(false);
+    }
+  };
+
+  const handleFillArcadeBots = async () => {
+    if (!roomCode || isRoomActionBusy) return;
+    setOnlineError(null);
+    setIsRoomActionBusy(true);
+    try {
+      if (activeTransportRef.current === 'ws') {
+        connectAndSendWs({
+          type: 'room:fill_bots',
+          code: roomCode,
+          playerId,
+          primaryBotId: selectedBotId
+        });
+      } else {
+        await fillFirestoreArcadeBots(roomCode, selectedBotId);
+      }
+    } catch (err) {
+      if (!isIgnorableFirestoreError(err)) {
+        setOnlineError(formatFriendlyFirestoreError(err, 'Could not add bot teammates right now.'));
+      }
+    } finally {
+      setIsRoomActionBusy(false);
+    }
+  };
+
+  const handleClearArcadeBots = async () => {
+    if (!roomCode || isRoomActionBusy) return;
+    setOnlineError(null);
+    setIsRoomActionBusy(true);
+    try {
+      if (activeTransportRef.current === 'ws') {
+        connectAndSendWs({
+          type: 'room:clear_bots',
+          code: roomCode,
+          playerId
+        });
+      } else {
+        await clearFirestoreArcadeBots(roomCode);
+      }
+    } catch (err) {
+      if (!isIgnorableFirestoreError(err)) {
+        setOnlineError(formatFriendlyFirestoreError(err, 'Could not clear bots right now.'));
+      }
+    } finally {
+      setIsRoomActionBusy(false);
+    }
+  };
 
   const handleLeaveRoom = useCallback(() => {
     const leavingCode = roomCode;
@@ -709,6 +893,13 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
     lastMoveLenRef.current = 0;
     setRoomCode(null);
     setMySeat(null);
+    setMySeatIndex(null);
+    setRoomTeamMode('1v1');
+    setTeam1Seats([]);
+    setTeam2Seats([]);
+    setActiveSeat(null);
+    setParticipantUids([]);
+    setBotRunnerUid(null);
     setPlayers({ p1: null, p2: null });
     setRematchVotes([]);
     setOnlineError(null);
@@ -810,9 +1001,6 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
       setInvitedFriendUids(new Set());
     }
   }, [roomCode]);
-
-  const myFirebaseUid =
-    user?.uid && auth.currentUser?.uid === user.uid ? user.uid : auth.currentUser?.uid || '';
 
   const invitableArcadePlayers = useMemo(() => {
     const byUid = new Map<
@@ -950,7 +1138,10 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
           gameType: selectedGame,
           playerId,
           playerName: playerName.trim() || profile?.displayName || user?.displayName || 'Player',
-          preferredSeat: seatPref
+          preferredSeat: seatPref,
+          teamMode: createTeamMode,
+          fillBots: createFillBots,
+          primaryBotId: selectedBotId
         });
         roomToShare = created.code;
         senderUid = created.uid;
@@ -982,8 +1173,10 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
     } catch (err) {
       if (err instanceof ArcadeAuthRequiredError) {
         setOnlineAuthNeeded(true);
+        setOnlineError(err.message);
+      } else if (!isIgnorableFirestoreError(err)) {
+        setOnlineError(formatFriendlyFirestoreError(err, 'Could not send invite right now.'));
       }
-      setOnlineError(err instanceof Error ? err.message : 'Could not send invite.');
     } finally {
       setInvitingFriendUid(null);
     }
@@ -1003,7 +1196,9 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         await joinViaFirestore(pending.code);
       }
     } catch (err) {
-      setOnlineError(err instanceof Error ? err.message : 'Google sign-in failed.');
+      if (!isIgnorableFirestoreError(err)) {
+        setOnlineError(formatFriendlyFirestoreError(err, 'Google sign-in could not be completed.'));
+      }
     } finally {
       setIsSigningIn(false);
     }
@@ -1034,13 +1229,21 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
   const isGameOver = Boolean(effectiveWinner);
   const botSeat: ArcadePlayer = humanSeat === 'p1' ? 'p2' : 'p1';
 
+  const isMyActiveOnlineSeat =
+    !activeSeat ||
+    (activeSeat.kind === 'human' &&
+      ((myFirebaseUid && activeSeat.uid === myFirebaseUid) || activeSeat.playerId === playerId));
+
   const canActNow =
     !isGameOver &&
     (mode === 'pvp'
       ? true
       : mode === 'ai'
       ? gameState.turn === humanSeat
-      : Boolean(roomCode) && (mySeat === 'p1' || mySeat === 'p2') && gameState.turn === mySeat);
+      : Boolean(roomCode) &&
+        (mySeat === 'p1' || mySeat === 'p2') &&
+        gameState.turn === mySeat &&
+        isMyActiveOnlineSeat);
 
   // Execute any validated move with 0ms local latency across all 3 modes
   const performAction = useCallback(
@@ -1048,7 +1251,14 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
       if (isGameOver) return;
       if (mode === 'ai' && gameState.turn !== humanSeat) return;
       if (mode === 'online') {
-        if (!roomCode || (mySeat !== 'p1' && mySeat !== 'p2') || gameState.turn !== mySeat) return;
+        if (
+          !roomCode ||
+          (mySeat !== 'p1' && mySeat !== 'p2') ||
+          gameState.turn !== mySeat ||
+          !isMyActiveOnlineSeat
+        ) {
+          return;
+        }
       }
 
       const res = applyArcadeAction(gameState, action);
@@ -1113,7 +1323,9 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
               setGameState(pending.rollbackState);
               setMoves(pending.rollbackMoves);
             }
-            setOnlineError(err instanceof Error ? err.message : 'Failed to send move.');
+            if (!isIgnorableFirestoreError(err)) {
+              setOnlineError(formatFriendlyFirestoreError(err, 'Could not send move right now.'));
+            }
           });
         }
       }
@@ -1127,13 +1339,14 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
       selectedBot,
       roomCode,
       mySeat,
+      isMyActiveOnlineSeat,
       playerId,
       playSfx,
       connectAndSendWs
     ]
   );
 
-  // Selected AI Bot turn automation across all 8 arcade games
+  // Selected AI Bot turn automation across all arcade games
   useEffect(() => {
     if (mode !== 'ai' || isGameOver || gameState.turn !== botSeat) return;
     const timer = window.setTimeout(() => {
@@ -1162,6 +1375,28 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
     return () => window.clearTimeout(timer);
   }, [mode, isGameOver, gameState, botSeat, humanSeat, selectedBot, playSfx]);
 
+  // Designated host client executes AI bot turns in Firestore 1v1/2v2 online rooms
+  useEffect(() => {
+    if (
+      mode !== 'online' ||
+      !roomCode ||
+      activeTransportRef.current !== 'firestore' ||
+      isGameOver
+    ) {
+      return;
+    }
+    if (!activeSeat || activeSeat.kind !== 'bot') return;
+    if (!myFirebaseUid || botRunnerUid !== myFirebaseUid) return;
+
+    const timer = window.setTimeout(() => {
+      void sendFirestoreArcadeBotMove({
+        code: roomCode,
+        expectedMoveIndex: moves.length
+      });
+    }, 380);
+    return () => window.clearTimeout(timer);
+  }, [mode, roomCode, isGameOver, activeSeat, myFirebaseUid, botRunnerUid, moves.length]);
+
   const handleCopy = (text: string, type: 'code' | 'link') => {
     try {
       navigator.clipboard.writeText(text);
@@ -1177,7 +1412,9 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         connectAndSendWs({ type: 'room:resign', code: roomCode, playerId });
       } else {
         resignFirestoreArcadeRoom(roomCode).catch(err => {
-          setOnlineError(err instanceof Error ? err.message : 'Could not resign.');
+          if (!isIgnorableFirestoreError(err)) {
+            setOnlineError(formatFriendlyFirestoreError(err, 'Could not resign right now.'));
+          }
         });
       }
     } else {
@@ -1192,7 +1429,9 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
         connectAndSendWs({ type: 'room:rematch', code: roomCode, playerId });
       } else {
         voteFirestoreArcadeRematch(roomCode).catch(err => {
-          setOnlineError(err instanceof Error ? err.message : 'Could not vote for rematch.');
+          if (!isIgnorableFirestoreError(err)) {
+            setOnlineError(formatFriendlyFirestoreError(err, 'Could not vote for rematch right now.'));
+          }
         });
       }
     } else {
@@ -1373,12 +1612,24 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
     profile?.avatarId
   ]);
 
+  const allOnlineSeats = useMemo(() => [...team1Seats, ...team2Seats], [team1Seats, team2Seats]);
+  const hasOpenSeatsInRoom = useMemo(
+    () =>
+      allOnlineSeats.length > 0
+        ? allOnlineSeats.some(s => s.kind === 'open')
+        : !(players.p1 && players.p2),
+    [allOnlineSeats, players]
+  );
+
   const statusHeadline = useMemo(() => {
     if (effectiveWinner === 'draw') return 'Match Drawn!';
     if (effectiveWinner === 'p1') return `${p1Display} Wins!`;
     if (effectiveWinner === 'p2') return `${p2Display} Wins!`;
-    if (mode === 'online' && roomCode && (!players.p1 || !players.p2)) {
-      return `Room ${roomCode} ready — share code to start!`;
+    if (mode === 'online' && roomCode && hasOpenSeatsInRoom) {
+      return `Room ${roomCode} (${roomTeamMode.toUpperCase()}) ready — invite friends or fill bots!`;
+    }
+    if (mode === 'online' && activeSeat?.kind === 'bot') {
+      return `${activeSeat.name || 'Bot'} is playing...`;
     }
     if (gameState.gameType === 'checkers' && gameState.chainFrom) {
       return `${gameState.turn === 'p1' ? p1Display : p2Display} has a mandatory multi-jump!`;
@@ -1390,18 +1641,41 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
       return `Store landing! ${gameState.turn === 'p1' ? p1Display : p2Display} gets an extra turn!`;
     }
     if (mode === 'online' && (mySeat === 'p1' || mySeat === 'p2')) {
-      return gameState.turn === mySeat ? 'Your Turn — Instant Move' : `Waiting for ${gameState.turn === 'p1' ? p1Display : p2Display}...`;
+      return gameState.turn === mySeat && isMyActiveOnlineSeat
+        ? 'Your Turn — Instant Move'
+        : activeSeat?.name
+        ? `Waiting for ${activeSeat.name}...`
+        : `Waiting for ${gameState.turn === 'p1' ? p1Display : p2Display}...`;
     }
     return `${gameState.turn === 'p1' ? p1Display : p2Display}’s Turn`;
-  }, [effectiveWinner, p1Display, p2Display, mode, roomCode, players, gameState, mySeat]);
+  }, [
+    effectiveWinner,
+    p1Display,
+    p2Display,
+    mode,
+    roomCode,
+    hasOpenSeatsInRoom,
+    roomTeamMode,
+    activeSeat,
+    gameState,
+    mySeat,
+    isMyActiveOnlineSeat
+  ]);
 
   const inviteUrl = useMemo(() => {
     if (!roomCode || typeof window === 'undefined') return '';
     return `${window.location.origin}${window.location.pathname}?arcadeRoom=${roomCode}`;
   }, [roomCode]);
 
+  const requiredRematchVotes = Math.max(
+    1,
+    participantUids.length || (players.p1 && players.p2 ? 2 : 1)
+  );
   const hasVotedRematch =
-    mode === 'online' && (mySeat === 'p1' || mySeat === 'p2') && rematchVotes.includes(mySeat);
+    mode === 'online' &&
+    (mySeat === 'p1' || mySeat === 'p2') &&
+    (rematchVotes.includes(mySeat) ||
+      (mySeatIndex !== null && rematchVotes.includes(`${mySeat}:${mySeatIndex}`)));
 
   const hubCategories: ('All' | ArcadeGameCategory)[] = [
     'All',
@@ -1536,6 +1810,25 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                       Join
                     </button>
                   </form>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      openPartyModal({
+                        gameKind: 'arcade',
+                        gameType: selectedGame,
+                        gameTitle: getArcadeGameMeta(selectedGame).name,
+                        matchMode: createTeamMode,
+                        opponentMode: createFillBots ? 'bots' : 'humans'
+                      })
+                    }
+                    className="px-3 py-2 rounded-xl border text-xs font-extrabold text-white hover:bg-white/10 flex items-center gap-1.5 cursor-pointer"
+                    style={{ backgroundColor: activeTheme.accentBadge, borderColor: activeTheme.borderActive }}
+                    title="Open 2v2 / 1v1 Party Lobby"
+                  >
+                    <Users className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
+                    <span>2v2 / Party</span>
+                  </button>
 
                   <button
                     type="button"
@@ -2114,9 +2407,9 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                     <span>
                       {mode === 'online'
                         ? hasVotedRematch
-                          ? `Rematch Ready (${rematchVotes.length}/2)`
+                          ? `Rematch Ready (${rematchVotes.length}/${requiredRematchVotes})`
                           : rematchVotes.length > 0
-                          ? `Accept Rematch (${rematchVotes.length}/2)`
+                          ? `Accept Rematch (${rematchVotes.length}/${requiredRematchVotes})`
                           : 'Vote Rematch'
                         : 'Play Again'}
                     </span>
@@ -2219,6 +2512,34 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
 
                 {!roomCode ? (
                   <>
+                    {/* Team Size Selector (1v1 / 2v2) */}
+                    <div>
+                      <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                        Team Size
+                      </span>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {(['1v1', '2v2'] as const).map(tm => {
+                          const active = createTeamMode === tm;
+                          return (
+                            <button
+                              key={tm}
+                              type="button"
+                              onClick={() => setCreateTeamMode(tm)}
+                              className={`py-1.5 rounded-xl border text-[11px] font-extrabold cursor-pointer transition-all ${
+                                active ? 'text-black' : 'text-slate-300 hover:text-white'
+                              }`}
+                              style={{
+                                backgroundColor: active ? activeTheme.accent : activeTheme.bgSecondary,
+                                borderColor: active ? activeTheme.accent : activeTheme.border
+                              }}
+                            >
+                              {tm === '2v2' ? '2v2 Teams' : '1v1 Solo'}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
                     {/* Seat Preference for Create */}
                     <div>
                       <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
@@ -2243,6 +2564,27 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                       </div>
                     </div>
 
+                    {/* Fill Open Slots with Bots Toggle */}
+                    <div className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-xl border" style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}>
+                      <span className="text-[11px] font-bold text-slate-200 flex items-center gap-1.5">
+                        <Bot className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
+                        Fill Open Slots with Bots
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setCreateFillBots(v => !v)}
+                        className={`px-2.5 py-0.5 rounded-lg border text-[10px] font-extrabold cursor-pointer ${
+                          createFillBots ? 'text-black' : 'text-slate-300 hover:text-white'
+                        }`}
+                        style={{
+                          backgroundColor: createFillBots ? activeTheme.accent : undefined,
+                          borderColor: createFillBots ? activeTheme.accent : activeTheme.border
+                        }}
+                      >
+                        {createFillBots ? 'vs Bots ON' : 'Humans Only'}
+                      </button>
+                    </div>
+
                     <button
                       onClick={() => handleCreateRoom(selectedGame)}
                       disabled={connStatus === 'connecting'}
@@ -2251,7 +2593,25 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                     >
                       {connStatus === 'connecting'
                         ? 'Connecting Room...'
-                        : `Create ${meta.name} Room Code`}
+                        : `Create ${createTeamMode.toUpperCase()} ${meta.name} Room`}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        openPartyModal({
+                          gameKind: 'arcade',
+                          gameType: selectedGame,
+                          gameTitle: meta.name,
+                          matchMode: createTeamMode,
+                          opponentMode: createFillBots ? 'bots' : 'humans'
+                        })
+                      }
+                      className="w-full py-2 rounded-xl border text-[11px] font-extrabold text-white hover:bg-white/10 cursor-pointer flex items-center justify-center gap-1.5"
+                      style={{ borderColor: activeTheme.borderActive, backgroundColor: activeTheme.accentBadge }}
+                    >
+                      <Users className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
+                      <span>Open 2v2 Party Lobby (Invite Multiple)</span>
                     </button>
 
                     <div className="flex items-center gap-2 pt-2 border-t" style={{ borderColor: activeTheme.border }}>
@@ -2281,11 +2641,21 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                     style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.borderActive }}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                        Active Room Code
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                        <span>Active Room Code</span>
+                        <span
+                          className="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase"
+                          style={{ backgroundColor: activeTheme.accentBadge, color: activeTheme.accent }}
+                        >
+                          {roomTeamMode.toUpperCase()}
+                        </span>
                       </span>
                       <span className="text-[10px] font-mono text-emerald-400">
-                        {players.p1 && players.p2 ? '2/2 Seated' : '1/2 Waiting'}
+                        {allOnlineSeats.length > 0
+                          ? `${allOnlineSeats.filter(s => s.kind !== 'open').length}/${allOnlineSeats.length} Seated`
+                          : players.p1 && players.p2
+                          ? '2/2 Seated'
+                          : '1/2 Waiting'}
                       </span>
                     </div>
 
@@ -2311,8 +2681,137 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                       </div>
                     </div>
 
+                    {/* Team 1 & Team 2 Seat Rosters */}
+                    {(team1Seats.length > 0 || team2Seats.length > 0) && (
+                      <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-white/10">
+                        {(
+                          [
+                            { team: 'p1' as const, label: `Team 1 (${meta.p1Label})`, seats: team1Seats },
+                            { team: 'p2' as const, label: `Team 2 (${meta.p2Label})`, seats: team2Seats }
+                          ]
+                        ).map(group => (
+                          <div
+                            key={group.team}
+                            className="p-1.5 rounded-lg border bg-black/25 flex flex-col gap-1"
+                            style={{
+                              borderColor:
+                                !isGameOver && gameState.turn === group.team
+                                  ? activeTheme.borderActive
+                                  : 'rgba(255,255,255,0.08)'
+                            }}
+                          >
+                            <div className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center justify-between gap-1">
+                              <span className="truncate">{group.label}</span>
+                              {moves.length === 0 &&
+                                !isGameOver &&
+                                mySeat !== group.team &&
+                                group.seats.some(s => s.kind === 'open' || s.kind === 'bot') && (
+                                  <button
+                                    type="button"
+                                    disabled={isRoomActionBusy}
+                                    onClick={() => void handleSwitchArcadeTeam(group.team)}
+                                    className="text-[9px] font-bold hover:underline cursor-pointer shrink-0 disabled:opacity-50"
+                                    style={{ color: activeTheme.accent }}
+                                  >
+                                    Join
+                                  </button>
+                                )}
+                            </div>
+                            {group.seats.map((seat, idx) => {
+                              const isMeHere =
+                                seat.kind === 'human' &&
+                                ((myFirebaseUid && seat.uid === myFirebaseUid) ||
+                                  seat.playerId === playerId);
+                              const isSeatTurnNow =
+                                !isGameOver &&
+                                gameState.turn === group.team &&
+                                activeSeat &&
+                                ((roomTeamMode === '1v1' && idx === 0) ||
+                                  (activeSeat.kind === seat.kind &&
+                                    activeSeat.uid === seat.uid &&
+                                    activeSeat.playerId === seat.playerId &&
+                                    activeSeat.name === seat.name));
+                              return (
+                                <div
+                                  key={`${group.team}-${idx}`}
+                                  className="px-1.5 py-0.5 rounded text-[10px] flex items-center justify-between gap-1 truncate"
+                                  style={{
+                                    backgroundColor: isSeatTurnNow
+                                      ? activeTheme.accentBadge
+                                      : 'rgba(255,255,255,0.04)',
+                                    color:
+                                      seat.kind === 'open'
+                                        ? '#64748b'
+                                        : seat.kind === 'bot'
+                                        ? '#c4b5fd'
+                                        : '#f8fafc'
+                                  }}
+                                >
+                                  <span className="truncate font-semibold">
+                                    {seat.kind === 'open'
+                                      ? 'Open slot'
+                                      : seat.kind === 'bot'
+                                      ? `🤖 ${seat.name || 'Bot'}`
+                                      : isMeHere
+                                      ? `${seat.name || 'You'} (You)`
+                                      : seat.name || 'Player'}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Quick Fill Bots / Clear Bots / Party Controls */}
+                    {!isGameOver && mySeat !== 'spectator' && (
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {allOnlineSeats.some(s => s.kind === 'open') && (
+                          <button
+                            type="button"
+                            disabled={isRoomActionBusy}
+                            onClick={() => void handleFillArcadeBots()}
+                            className="flex-1 py-1.5 px-2.5 rounded-lg border text-[10px] font-bold text-white hover:bg-white/10 cursor-pointer flex items-center justify-center gap-1 disabled:opacity-50"
+                            style={{ borderColor: activeTheme.borderActive, backgroundColor: activeTheme.accentBadge }}
+                          >
+                            <Bot className="w-3 h-3" style={{ color: activeTheme.accent }} />
+                            <span>Fill Bots</span>
+                          </button>
+                        )}
+                        {moves.length === 0 && allOnlineSeats.some(s => s.kind === 'bot') && (
+                          <button
+                            type="button"
+                            disabled={isRoomActionBusy}
+                            onClick={() => void handleClearArcadeBots()}
+                            className="py-1.5 px-2.5 rounded-lg border text-[10px] font-bold text-slate-300 hover:text-white hover:bg-white/10 cursor-pointer disabled:opacity-50"
+                            style={{ borderColor: activeTheme.border }}
+                          >
+                            Clear Bots
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            openPartyModal({
+                              gameKind: 'arcade',
+                              gameType: selectedGame,
+                              gameTitle: meta.name,
+                              matchMode: roomTeamMode
+                            })
+                          }
+                          className="py-1.5 px-2.5 rounded-lg border text-[10px] font-bold text-slate-200 hover:bg-white/10 cursor-pointer flex items-center gap-1"
+                          style={{ borderColor: activeTheme.border }}
+                          title="Open Party Lobby"
+                        >
+                          <Users className="w-3 h-3" />
+                          <span>Party</span>
+                        </button>
+                      </div>
+                    )}
+
                     <p className="text-[11px] text-slate-400 leading-snug">
-                      Works cross-device between GitHub Pages and AI Studio! Share the 6-letter code or invite link.
+                      Works cross-device! Share the room code, switch teams above before move 1, or fill open slots with bots.
                     </p>
 
                     <button
@@ -2368,7 +2867,7 @@ export const MultiplayerArcadeView: React.FC<MultiplayerArcadeViewProps> = ({ ac
                 )}
 
                 {/* 1-Click Direct Friend Invites (No Code Needed) */}
-                {(!roomCode || !(players.p1 && players.p2)) && invitableArcadePlayers.length > 0 && (
+                {(!roomCode || hasOpenSeatsInRoom) && invitableArcadePlayers.length > 0 && (
                   <div
                     className="p-2.5 rounded-xl border flex flex-col gap-1.5"
                     style={{ backgroundColor: activeTheme.bgSecondary, borderColor: activeTheme.border }}

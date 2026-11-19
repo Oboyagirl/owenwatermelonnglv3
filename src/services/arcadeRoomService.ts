@@ -12,6 +12,7 @@ import {
   auth,
   db,
   ensureAuthPersistence,
+  formatFriendlyFirestoreError,
   googleProvider,
   handleFirestoreError,
   OperationType,
@@ -419,11 +420,14 @@ export async function createFirestoreArcadeRoom(params: {
   teamMode?: TeamMode;
   fillBots?: boolean;
   primaryBotId?: string;
+  presetTeam1Seats?: TeamSeat[];
+  presetTeam2Seats?: TeamSeat[];
 }): Promise<{ code: string; uid: string }> {
   const uid = await ensureArcadeFirebaseUid();
   const safeName = sanitizeArcadePlayerName(params.playerName);
   const safePlayerId = String(params.playerId || uid).trim().slice(0, 64) || uid;
   const teamMode = normalizeTeamMode(params.teamMode);
+  const teamSize = getTeamSize(teamMode);
   const resolvedSeat: ArcadePlayer =
     params.preferredSeat === 'p2'
       ? 'p2'
@@ -433,13 +437,22 @@ export async function createFirestoreArcadeRoom(params: {
         : 'p2'
       : 'p1';
 
-  let team1Seats = createEmptySeats(teamMode);
-  let team2Seats = createEmptySeats(teamMode);
-  const creatorSeat = createHumanSeat({ uid, playerId: safePlayerId, name: safeName });
-  if (resolvedSeat === 'p1') {
-    team1Seats[0] = creatorSeat;
-  } else {
-    team2Seats[0] = creatorSeat;
+  let team1Seats = params.presetTeam1Seats
+    ? sanitizeSeatList(params.presetTeam1Seats, teamSize, null)
+    : createEmptySeats(teamMode);
+  let team2Seats = params.presetTeam2Seats
+    ? sanitizeSeatList(params.presetTeam2Seats, teamSize, null)
+    : createEmptySeats(teamMode);
+
+  if (!findSeatForUser(team1Seats, team2Seats, uid, safePlayerId)) {
+    const creatorSeat = createHumanSeat({ uid, playerId: safePlayerId, name: safeName });
+    if (resolvedSeat === 'p1') {
+      const idx = team1Seats.findIndex(s => s.kind === 'open');
+      team1Seats[idx >= 0 ? idx : 0] = creatorSeat;
+    } else {
+      const idx = team2Seats.findIndex(s => s.kind === 'open');
+      team2Seats[idx >= 0 ? idx : 0] = creatorSeat;
+    }
   }
 
   if (params.fillBots) {
@@ -798,10 +811,10 @@ export function subscribeFirestoreArcadeRoom(params: {
         try {
           handleFirestoreError(err, OperationType.GET, path);
         } catch (wrapped) {
-          params.onError(wrapped as Error);
+          params.onError(new Error(formatFriendlyFirestoreError(wrapped)));
         }
       } else {
-        params.onError(err instanceof Error ? err : new Error(String(err)));
+        params.onError(new Error(formatFriendlyFirestoreError(err)));
       }
     }
   );

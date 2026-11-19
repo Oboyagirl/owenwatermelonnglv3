@@ -17,11 +17,13 @@ import {
   Pause,
   SkipForward,
   Music,
-  MessageCircle
+  MessageCircle,
+  Users
 } from 'lucide-react';
 import { ThemeConfig } from '../services/themeStore';
 import { useAuth } from '../context/AuthContext';
 import { useMusic } from '../context/MusicContext';
+import { useParty } from '../context/PartyContext';
 import { AVATAR_PRESETS } from '../services/cloudSaveService';
 import { triggerPanic } from '../data/cloakPresets';
 
@@ -71,6 +73,7 @@ export const Header: React.FC<HeaderProps> = ({
   const isGithubPages = typeof window !== 'undefined' && Boolean(window.location?.hostname?.endsWith('github.io'));
   const { profile, isSignedIn, isAuthReady } = useAuth();
   const { currentTrack, isPlaying, togglePlay, nextTrack } = useMusic();
+  const { myParty, incomingPartyInvites, openPartyModal } = useParty();
   const currentAvatar = AVATAR_PRESETS.find(a => a.id === (profile?.avatarId || 'melon_classic')) || AVATAR_PRESETS[0];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -232,6 +235,28 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
         </div>
+
+        {/* Party Lobby Toggle (1v1 / 2v2 Multi-Invite) */}
+        <button
+          onClick={() => openPartyModal()}
+          className="p-2 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold relative"
+          style={{
+            backgroundColor: myParty ? (activeTheme?.accentBadge || 'rgba(168, 85, 247, 0.2)') : 'rgba(255, 255, 255, 0.05)',
+            borderColor: myParty ? accentColor : borderColor,
+            color: myParty ? accentColor : 'rgb(203, 213, 225)'
+          }}
+          title="Party Lobby — Invite friends for 2v2 or 1v1 vs humans or bots"
+        >
+          <Users className="w-4 h-4" />
+          <span className="hidden lg:inline">
+            {myParty ? `Party ${myParty.members.length}/${myParty.matchMode === '2v2' ? 4 : 2}` : 'Party'}
+          </span>
+          {incomingPartyInvites.length > 0 && (
+            <span className="px-1.5 py-0.2 rounded-full bg-fuchsia-500 text-white text-[10px] font-extrabold leading-tight">
+              {incomingPartyInvites.length}
+            </span>
+          )}
+        </button>
 
         {/* Firebase Friends Chatbox Toggle */}
         {onToggleChatBox && (

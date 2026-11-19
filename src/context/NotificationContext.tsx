@@ -51,7 +51,7 @@ export interface TrackedArcadeRoom {
   gameTitle: string;
 }
 
-export type AppToastKind = 'chat' | 'turn' | 'invite' | 'info';
+export type AppToastKind = 'chat' | 'turn' | 'invite' | 'party_invite' | 'info';
 
 export interface AppToast {
   id: string;
@@ -64,6 +64,9 @@ export interface AppToast {
   targetSpace?: 'chess' | 'rooms';
   roomCode?: string;
   invite?: GameInvite;
+  onAcceptCustom?: () => void;
+  onDeclineCustom?: () => void;
+  acceptLabel?: string;
 }
 
 interface NotificationContextValue {
@@ -76,8 +79,10 @@ interface NotificationContextValue {
   outgoingInvites: GameInvite[];
   lastAcceptedInvite: GameInvite | null;
   pendingChessJoinCode: string | null;
+  pendingChessPreferredTeam: PieceColor | null;
   clearPendingChessJoinCode: () => void;
   pendingArcadeJoinCode: string | null;
+  pendingArcadePreferredTeam: ArcadePlayer | null;
   clearPendingArcadeJoinCode: () => void;
   pendingChatTarget: ChatPeerTarget | null;
   clearPendingChatTarget: () => void;
@@ -87,11 +92,16 @@ interface NotificationContextValue {
   trackedArcadeRoom: TrackedArcadeRoom | null;
   setTrackedArcadeRoom: (room: TrackedArcadeRoom | null) => void;
   openChatWithPeer: (peer: ChatPeerTarget) => void;
-  openGameRoom: (space: 'chess' | 'rooms', code?: string) => void;
+  openGameRoom: (
+    space: 'chess' | 'rooms',
+    code?: string,
+    preferredTeam?: PieceColor | ArcadePlayer
+  ) => void;
   navigateSpace: (space: AppSpaceType) => void;
   acceptGameInvite: (invite: GameInvite) => Promise<void>;
   declineGameInvite: (invite: GameInvite) => Promise<void>;
   pushTurnToast: (params: { space: 'chess' | 'rooms'; title: string; body: string; roomCode?: string }) => void;
+  pushCustomToast: (toast: Omit<AppToast, 'id' | 'createdAt'>, ttlMs?: number) => void;
 }
 
 const NotificationContext = createContext<NotificationContextValue | undefined>(undefined);
@@ -119,7 +129,9 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   const [invites, setInvites] = useState<GameInvite[]>([]);
 
   const [pendingChessJoinCode, setPendingChessJoinCode] = useState<string | null>(null);
+  const [pendingChessPreferredTeam, setPendingChessPreferredTeam] = useState<PieceColor | null>(null);
   const [pendingArcadeJoinCode, setPendingArcadeJoinCode] = useState<string | null>(null);
+  const [pendingArcadePreferredTeam, setPendingArcadePreferredTeam] = useState<ArcadePlayer | null>(null);
   const [pendingChatTarget, setPendingChatTarget] = useState<ChatPeerTarget | null>(null);
   const [lastAcceptedInvite, setLastAcceptedInvite] = useState<GameInvite | null>(null);
 
@@ -173,7 +185,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
         osc.start(now + offset);
         osc.stop(now + offset + dur);
       };
-      if (kind === 'invite') {
+      if (kind === 'invite' || kind === 'party_invite') {
         playTone(587.33, 0.09, 0, 0.09);
         playTone(880, 0.14, 0.08, 0.1);
       } else if (kind === 'turn') {
@@ -516,10 +528,23 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   );
 
   const openGameRoom = useCallback(
-    (space: 'chess' | 'rooms', code?: string) => {
+    (
+      space: 'chess' | 'rooms',
+      code?: string,
+      preferredTeam?: PieceColor | ArcadePlayer
+    ) => {
       if (code) {
-        if (space === 'chess') setPendingChessJoinCode(code);
-        else setPendingArcadeJoinCode(code);
+        if (space === 'chess') {
+          setPendingChessPreferredTeam(
+            preferredTeam === 'w' || preferredTeam === 'b' ? preferredTeam : null
+          );
+          setPendingChessJoinCode(code);
+        } else {
+          setPendingArcadePreferredTeam(
+            preferredTeam === 'p1' || preferredTeam === 'p2' ? preferredTeam : null
+          );
+          setPendingArcadeJoinCode(code);
+        }
       }
       onNavigateSpace(space);
     },
@@ -592,9 +617,17 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       outgoingInvites,
       lastAcceptedInvite,
       pendingChessJoinCode,
-      clearPendingChessJoinCode: () => setPendingChessJoinCode(null),
+      pendingChessPreferredTeam,
+      clearPendingChessJoinCode: () => {
+        setPendingChessJoinCode(null);
+        setPendingChessPreferredTeam(null);
+      },
       pendingArcadeJoinCode,
-      clearPendingArcadeJoinCode: () => setPendingArcadeJoinCode(null),
+      pendingArcadePreferredTeam,
+      clearPendingArcadeJoinCode: () => {
+        setPendingArcadeJoinCode(null);
+        setPendingArcadePreferredTeam(null);
+      },
       pendingChatTarget,
       clearPendingChatTarget: () => setPendingChatTarget(null),
       setChatOpenState,
@@ -607,7 +640,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       navigateSpace: onNavigateSpace,
       acceptGameInvite,
       declineGameInvite,
-      pushTurnToast
+      pushTurnToast,
+      pushCustomToast: pushToast
     }),
     [
       toasts,
@@ -619,7 +653,9 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       outgoingInvites,
       lastAcceptedInvite,
       pendingChessJoinCode,
+      pendingChessPreferredTeam,
       pendingArcadeJoinCode,
+      pendingArcadePreferredTeam,
       pendingChatTarget,
       setChatOpenState,
       trackedChessRoom,
@@ -631,7 +667,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       onNavigateSpace,
       acceptGameInvite,
       declineGameInvite,
-      pushTurnToast
+      pushTurnToast,
+      pushToast
     ]
   );
 
